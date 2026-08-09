@@ -27,10 +27,13 @@ import {
   ReceiptText,
   CalendarPlus,
   ListPlus,
+  Trophy,
+  Kanban,
+  SlidersHorizontal,
   type LucideIcon,
 } from "lucide-react";
 
-export type NavChild = { title: string; url: string; badge?: number };
+export type NavChild = { title: string; url: string; badge?: number; icon?: LucideIcon };
 
 export type NavItem = {
   title: string;
@@ -139,7 +142,21 @@ export const navItems: NavItem[] = [
   { title: "Clients & Projects", url: "/work/projects", icon: Briefcase, section: "Work" },
   { title: "Work Logs", url: "/work/logs", icon: ScrollText, section: "Work" },
   { title: "Research", url: "/work/research", icon: BookOpen, section: "Work" },
-  { title: "Sales", url: "/work/sales", icon: ReceiptText, section: "Work" },
+  {
+    title: "Sales",
+    icon: ReceiptText,
+    section: "Work",
+    children: [
+      { title: "Dashboard", url: "/work/sales/dashboard", icon: LayoutDashboard },
+      { title: "Pipeline", url: "/work/sales/pipeline", icon: Kanban },
+      { title: "Leads", url: "/work/sales/leads", icon: Users },
+      { title: "Tasks & Follow-ups", url: "/work/sales/tasks", icon: ClipboardList },
+      { title: "Sales Analytics", url: "/work/sales/analytics", icon: BarChart3 },
+      { title: "Team Performance", url: "/work/sales/team", icon: Trophy },
+      { title: "Reports", url: "/work/sales/reports", icon: FileText },
+      { title: "Settings", url: "/work/sales/settings", icon: SlidersHorizontal },
+    ],
+  },
   { title: "Tasks", url: "/tasks", icon: ClipboardList, section: "Work" },
   { title: "Chat", url: "/chat", icon: MessagesSquare, section: "Work", badge: 3 },
   {

@@ -414,6 +414,16 @@ function SidebarBody({
                               : "text-sidebar-foreground/80 hover:bg-sidebar-accent",
                           )}
                         >
+                          {child.icon && (
+                            <child.icon
+                              className={cn(
+                                "h-4 w-4 shrink-0 transition-colors",
+                                child.url === active
+                                  ? "text-sidebar-accent-foreground"
+                                  : "text-sidebar-muted group-hover:text-sidebar-accent-foreground",
+                              )}
+                            />
+                          )}
                           <span className="min-w-0 flex-1 truncate text-left">{child.title}</span>
                           {child.badge ? <Badge count={child.badge} /> : null}
                           <span
