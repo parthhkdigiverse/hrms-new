@@ -1,0 +1,198 @@
+import {
+  LayoutDashboard,
+  Users,
+  Files,
+  IndianRupee,
+  Building2,
+  Landmark,
+  Clock,
+  CalendarDays,
+  CalendarRange,
+  MonitorPlay,
+  MessageSquareWarning,
+  Star,
+  Activity,
+  FileText,
+  MessagesSquare,
+  ClipboardList,
+  Briefcase,
+  BookOpen,
+  Vote,
+  Settings,
+  Shield,
+  ScrollText,
+  BarChart3,
+  CheckCheck,
+  UserPlus,
+  ReceiptText,
+  CalendarPlus,
+  ListPlus,
+  type LucideIcon,
+} from "lucide-react";
+
+export type NavChild = { title: string; url: string; badge?: number };
+
+export type NavItem = {
+  title: string;
+  url?: string;
+  icon: LucideIcon;
+  section: string;
+  children?: NavChild[];
+  badge?: number;
+};
+
+export const navItems: NavItem[] = [
+  { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard, section: "Overview" },
+  {
+    title: "Approvals Hub",
+    icon: CheckCheck,
+    section: "Overview",
+    badge: 9,
+    children: [
+      { title: "Pending Queue", url: "/approvals", badge: 9 },
+      { title: "Leave Approvals", url: "/approvals/leave", badge: 4 },
+      { title: "Invoice Approvals", url: "/approvals/invoices", badge: 3 },
+      { title: "Penalty & Remarks", url: "/approvals/penalties", badge: 2 },
+      { title: "Daily Progress", url: "/approvals/daily-progress" },
+      { title: "Approval History", url: "/approvals/history" },
+    ],
+  },
+  {
+    title: "Reports & Analytics",
+    icon: BarChart3,
+    section: "Overview",
+    children: [
+      { title: "Overview", url: "/reports" },
+      { title: "Attendance Report", url: "/reports/attendance" },
+      { title: "Payroll Cost", url: "/reports/payroll" },
+      { title: "Hiring Funnel", url: "/reports/hiring" },
+      { title: "Project & Work Report", url: "/reports/work" },
+      { title: "Custom Reports", url: "/reports/custom" },
+    ],
+  },
+  {
+    title: "Employees",
+    icon: Users,
+    section: "People",
+    children: [
+      { title: "Employee List", url: "/employees/list" },
+      { title: "Org Structure", url: "/employees/org" },
+      { title: "Attendance List", url: "/employees/attendance" },
+      { title: "Leave Requests", url: "/employees/leave-requests", badge: 4 },
+    ],
+  },
+  {
+    title: "Recruitment",
+    icon: Building2,
+    section: "People",
+    children: [
+      { title: "Interviews", url: "/recruitment/interviews", badge: 2 },
+      { title: "Hirings", url: "/recruitment/hirings" },
+    ],
+  },
+  {
+    title: "Training & Courses",
+    icon: BookOpen,
+    section: "People",
+    children: [
+      { title: "Course Library", url: "/training/library" },
+      { title: "Manage Courses", url: "/training/manage" },
+    ],
+  },
+  { title: "Attendance", url: "/attendance", icon: Clock, section: "Time" },
+  { title: "Leave", url: "/leave", icon: CalendarDays, section: "Time" },
+  { title: "Schedule", url: "/schedule", icon: CalendarRange, section: "Time" },
+  {
+    title: "Payroll",
+    icon: IndianRupee,
+    section: "Finance",
+    children: [
+      { title: "Salary Structure", url: "/payroll/structure" },
+      { title: "Payroll Processing", url: "/payroll/processing" },
+      { title: "Payslips", url: "/payroll/payslips" },
+      { title: "Bonuses & Deductions", url: "/payroll/bonuses" },
+    ],
+  },
+  {
+    title: "Company Finance",
+    icon: Landmark,
+    section: "Finance",
+    children: [
+      { title: "Transactions", url: "/finance/transactions" },
+      { title: "Plan", url: "/finance/plan" },
+      { title: "Summary", url: "/finance/summary" },
+      { title: "Client Transactions", url: "/finance/clients" },
+      { title: "Audit Logs", url: "/finance/audit" },
+    ],
+  },
+  {
+    title: "Invoice",
+    icon: FileText,
+    section: "Finance",
+    children: [
+      { title: "All Invoices", url: "/invoice/all" },
+      { title: "Invoice Ledger", url: "/invoice/ledger" },
+      { title: "Create Invoice", url: "/invoice/create" },
+      { title: "Create Proforma Invoice", url: "/invoice/proforma" },
+    ],
+  },
+  { title: "Clients & Projects", url: "/work/projects", icon: Briefcase, section: "Work" },
+  { title: "Work Logs", url: "/work/logs", icon: ScrollText, section: "Work" },
+  { title: "Research", url: "/work/research", icon: BookOpen, section: "Work" },
+  { title: "Sales", url: "/work/sales", icon: ReceiptText, section: "Work" },
+  { title: "Tasks", url: "/tasks", icon: ClipboardList, section: "Work" },
+  { title: "Chat", url: "/chat", icon: MessagesSquare, section: "Work", badge: 3 },
+  {
+    title: "Documents",
+    icon: Files,
+    section: "Work",
+    children: [
+      { title: "Employee Documents", url: "/documents/employee" },
+      { title: "Document Generator", url: "/documents/generator" },
+    ],
+  },
+  {
+    title: "Workspace",
+    icon: MonitorPlay,
+    section: "Workplace",
+    children: [
+      { title: "Seating Arrangement", url: "/workspace/seating" },
+      { title: "Resource Management", url: "/workspace/resources" },
+      { title: "Gallery", url: "/workspace/gallery" },
+      { title: "Assets", url: "/workspace/assets" },
+    ],
+  },
+  { title: "Penalty", url: "/penalty", icon: MessageSquareWarning, section: "Workplace" },
+  { title: "Remarks", url: "/remarks", icon: Star, section: "Workplace" },
+  { title: "Activity Tracker", url: "/activity-tracker", icon: Activity, section: "Workplace" },
+  { title: "Elections", url: "/elections", icon: Vote, section: "Workplace" },
+  { title: "Settings", url: "/settings", icon: Settings, section: "Admin" },
+  { title: "Restrictions", url: "/restrictions", icon: Shield, section: "Admin" },
+  { title: "Activity Logs", url: "/activity-logs", icon: ScrollText, section: "Admin" },
+];
+
+export const sectionOrder = [
+  "Overview",
+  "People",
+  "Time",
+  "Finance",
+  "Work",
+  "Workplace",
+  "Admin",
+];
+
+export type QuickAction = { title: string; url: string; icon: LucideIcon; hint?: string };
+
+export const quickCreateActions: QuickAction[] = [
+  { title: "New Invoice", url: "/invoice/create", icon: ReceiptText, hint: "Billing" },
+  { title: "New Task", url: "/tasks?new=1", icon: ListPlus, hint: "Work" },
+  { title: "Add Employee", url: "/employees/list?new=1", icon: UserPlus, hint: "People" },
+  { title: "Apply Leave", url: "/leave?new=1", icon: CalendarPlus, hint: "Time" },
+];
+
+export const mobileBarItems: QuickAction[] = [
+  { title: "Home", url: "/dashboard", icon: LayoutDashboard },
+  { title: "Tasks", url: "/tasks", icon: ClipboardList },
+  { title: "Approvals", url: "/approvals", icon: CheckCheck },
+  { title: "Chat", url: "/chat", icon: MessagesSquare },
+];
