@@ -1,14 +1,15 @@
 import { useState } from "react";
-import { Search, Filter, LayoutGrid, List, MoreVertical, Phone, Mail, Plus, MapPin, Edit2 } from "lucide-react";
+import { Search, Filter, LayoutGrid, List, MoreVertical, Phone, Mail, Plus, MapPin, Edit2, Trash2 } from "lucide-react";
 import { EMPLOYEES, Employee } from "./employee-data";
 import { useDepartments } from "./DepartmentContext";
 import { EmployeeProfileModal } from "./EmployeeProfileModal";
 import { EmployeeFormModal } from "./EmployeeFormModal";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { useEmployeesContext } from "./EmployeeContext";
 
 export function EmployeeList() {
-  const [employees, setEmployees] = useState<Employee[]>(EMPLOYEES);
+  const { employees, addEmployee, updateEmployee, deleteEmployee } = useEmployeesContext();
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedDept, setSelectedDept] = useState<string | null>(null);
@@ -38,7 +39,7 @@ export function EmployeeList() {
 
   const handleFormSubmit = (formData: Partial<Employee>) => {
     if (editingEmployee) {
-      setEmployees(employees.map(emp => emp.id === editingEmployee.id ? { ...emp, ...formData } as Employee : emp));
+      updateEmployee(editingEmployee.id, formData);
       toast.success("Employee updated successfully.");
     } else {
       const newEmployee: Employee = {
@@ -47,8 +48,17 @@ export function EmployeeList() {
         avatar: `https://i.pravatar.cc/150?u=${formData.name?.split(' ')[0]?.toLowerCase() || 'new'}`,
         performanceScore: 85, // default
       };
-      setEmployees([newEmployee, ...employees]);
-      toast.success("Employee added successfully.");
+      addEmployee(newEmployee);
+      toast.success("New employee added.");
+    }
+    setIsFormOpen(false);
+    setEditingEmployee(null);
+  };
+
+  const handleDeleteEmployee = (id: string, name: string) => {
+    if (window.confirm(`Are you sure you want to completely delete ${name} from the company records?`)) {
+      deleteEmployee(id);
+      toast.success(`${name} has been deleted.`);
     }
   };
 
@@ -138,9 +148,20 @@ export function EmployeeList() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filteredEmployees.map((emp) => (
             <div key={emp.id} className="group bg-white border border-slate-100 rounded-3xl p-6 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 relative">
-              <button className="absolute top-4 right-4 p-2 text-slate-400 hover:bg-slate-100 rounded-full transition-colors opacity-0 group-hover:opacity-100">
-                <MoreVertical className="w-4 h-4" />
-              </button>
+              <div className="absolute top-4 right-4 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                <button 
+                  onClick={() => openEditForm(emp)}
+                  className="p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-600 rounded-full transition-colors"
+                >
+                  <Edit2 className="w-4 h-4" />
+                </button>
+                <button 
+                  onClick={() => handleDeleteEmployee(emp.id, emp.name)}
+                  className="p-2 text-slate-400 hover:bg-red-50 hover:text-red-600 rounded-full transition-colors"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
               
               <div className="flex flex-col items-center text-center">
                 <div className="relative mb-4">
@@ -160,20 +181,12 @@ export function EmployeeList() {
                   {emp.department}
                 </span>
 
-                <div className="flex w-full gap-2 mt-auto">
-                  <button 
-                    onClick={() => setSelectedEmployee(emp)}
-                    className="flex-1 bg-[#00A56C]/10 text-[#00A56C] hover:bg-[#00A56C]/20 py-2.5 rounded-xl text-[12px] font-bold transition-colors"
-                  >
-                    View
-                  </button>
-                  <button 
-                    onClick={() => openEditForm(emp)}
-                    className="p-2.5 bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-xl transition-colors"
-                  >
-                    <Edit2 className="w-4 h-4" />
-                  </button>
-                </div>
+                <button 
+                  onClick={() => setSelectedEmployee(emp)}
+                  className="w-full bg-[#00A56C]/10 text-[#00A56C] hover:bg-[#00A56C]/20 py-2.5 rounded-xl text-[12px] font-bold transition-colors"
+                >
+                  View Profile
+                </button>
               </div>
             </div>
           ))}

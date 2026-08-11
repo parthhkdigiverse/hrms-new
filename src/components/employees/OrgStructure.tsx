@@ -5,7 +5,9 @@ import { cn } from "@/lib/utils";
 import { ManageDepartmentsModal } from "./ManageDepartmentsModal";
 import { AddOrgNodeModal } from "./AddOrgNodeModal";
 import { DeleteConfirmModal } from "./DeleteConfirmModal";
+import { UnassignedSidebar } from "./UnassignedSidebar";
 import { toast } from "sonner";
+import { useEmployeesContext } from "./EmployeeContext";
 
 const OrgNodeCard = ({ 
   node, 
@@ -148,22 +150,16 @@ export function OrgStructure() {
   const [selectedParent, setSelectedParent] = useState<OrgNodeData | null>(null);
   const [nodeToDelete, setNodeToDelete] = useState<OrgNodeData | null>(null);
 
-  const [treeData, setTreeData] = useState<OrgNodeData>(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('hrms_org_tree');
-      if (saved) return JSON.parse(saved);
-    }
-    return ORG_DATA;
-  });
-
-  useEffect(() => {
-    localStorage.setItem('hrms_org_tree', JSON.stringify(treeData));
-  }, [treeData]);
+  const { employees, treeData, updateTree, addEmployee } = useEmployeesContext();
 
   const handleMoveNode = (draggedId: string, targetId: string) => {
     if (draggedId === targetId) return;
 
     const newTree = JSON.parse(JSON.stringify(treeData)) as OrgNodeData;
+    
+    // Check if dragging from unassigned
+    const unassignedEmployee = employees.find(emp => emp.id === draggedId);
+    let draggedNode: OrgNodeData | null = null;
     
     if (draggedId === newTree.id) {
       toast.error("Cannot move the root node");
@@ -181,22 +177,22 @@ export function OrgStructure() {
       return null;
     };
 
-    const nodeToMove = findNode(newTree, draggedId);
+    const nodeToMove = unassignedEmployee || findNode(newTree, draggedId);
     if (!nodeToMove) return;
 
-    let isCircular = false;
-    const checkDescendant = (node: OrgNodeData) => {
-      if (node.id === targetId) isCircular = true;
-      if (node.children) node.children.forEach(checkDescendant);
-    };
-    checkDescendant(nodeToMove);
+    if (!unassignedEmployee) {
+      let isCircular = false;
+      const checkDescendant = (node: OrgNodeData) => {
+        if (node.id === targetId) isCircular = true;
+        if (node.children) node.children.forEach(checkDescendant);
+      };
+      checkDescendant(nodeToMove as OrgNodeData);
 
-    if (isCircular) {
-      toast.error("Cannot move a manager under their own report");
-      return;
+      if (isCircular) {
+        toast.error("Cannot move a manager under their own report");
+        return;
+      }
     }
-
-    let draggedNode: OrgNodeData | null = null;
     const removeNode = (node: OrgNodeData): boolean => {
       if (node.children) {
         const index = node.children.findIndex(c => c.id === draggedId);
@@ -212,7 +208,20 @@ export function OrgStructure() {
       return false;
     };
 
-    removeNode(newTree);
+    if (unassignedEmployee) {
+      draggedNode = {
+        id: unassignedEmployee.id,
+        name: unassignedEmployee.name,
+        role: unassignedEmployee.role,
+        department: unassignedEmployee.department,
+        status: unassignedEmployee.status,
+        avatar: unassignedEmployee.avatar,
+        children: []
+      };
+    } else {
+      removeNode(newTree);
+    }
+    
     if (!draggedNode) return;
 
     const insertNode = (node: OrgNodeData): boolean => {
@@ -230,7 +239,7 @@ export function OrgStructure() {
     };
 
     if (insertNode(newTree)) {
-      setTreeData(newTree);
+      updateTree(newTree);
       toast.success("Employee moved successfully");
     }
   };
@@ -239,12 +248,13 @@ export function OrgStructure() {
     if (!selectedParent) return;
 
     const newTree = JSON.parse(JSON.stringify(treeData)) as OrgNodeData;
+    const newId = `EMP-${Math.random().toString(36).substr(2, 9)}`;
     const insertChild = (node: OrgNodeData): boolean => {
       if (node.id === selectedParent.id) {
         if (!node.children) node.children = [];
         node.children.push({
           ...nodeData,
-          id: `EMP-${Math.random().toString(36).substr(2, 9)}`,
+          id: newId,
         });
         return true;
       }
@@ -257,7 +267,22 @@ export function OrgStructure() {
     };
 
     if (insertChild(newTree)) {
-      setTreeData(newTree);
+      updateTree(newTree);
+      
+      // Also add to global employees list
+      addEmployee({
+        id: newId,
+        name: nodeData.name,
+        role: nodeData.role,
+        department: "Engineering", // default or we can get from nodeData if we add it
+        status: "Active",
+        email: `${(nodeData.name.split(' ')[0] || "").toLowerCase()}@example.com`,
+        phone: "+1 555-0000",
+        avatar: nodeData.avatar,
+        performanceScore: 85,
+        joinDate: new Date().toISOString().split("T")[0] || ""
+      });
+      
       toast.success(`${nodeData.name} added under ${selectedParent.name}`);
       setAddModalOpen(false);
     }
@@ -308,8 +333,8 @@ export function OrgStructure() {
     };
 
     if (removeNode(newTree)) {
-      setTreeData(newTree);
-      toast.success("Team member removed successfully");
+      updateTree(newTree);
+      toast.success("Team member unassigned from this branch");
     }
     setNodeToDelete(null);
   };
@@ -360,10 +385,11 @@ export function OrgStructure() {
       </div>
 
       {/* Org Chart Container */}
-      <div className="flex-1 bg-slate-50/50 border border-slate-200/60 rounded-3xl overflow-auto relative shadow-inner">
-        <style dangerouslySetInnerHTML={{__html: `
-          .org-children {
-            padding-top: 20px; 
+      <div className="flex-1 flex relative overflow-hidden rounded-3xl border border-slate-200/60 shadow-inner">
+        <div className="flex-1 bg-slate-50/50 overflow-auto">
+          <style dangerouslySetInnerHTML={{__html: `
+            .org-children {
+              padding-top: 20px; 
             position: relative;
             transition: all 0.5s;
           }
@@ -434,6 +460,9 @@ export function OrgStructure() {
             </ul>
           </div>
         </div>
+        </div>
+        
+        <UnassignedSidebar />
       </div>
       
       <ManageDepartmentsModal 
