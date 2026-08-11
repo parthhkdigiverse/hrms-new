@@ -11,6 +11,8 @@ import { SalesAnalytics } from "@/components/sales/SalesAnalytics";
 import { SalesTeamPerformance } from "@/components/sales/SalesTeamPerformance";
 import { SalesReports } from "@/components/sales/SalesReports";
 import { SalesSettings } from "@/components/sales/SalesSettings";
+import { PayrollDashboard } from "@/components/payroll/PayrollDashboard";
+import { SalaryStructure } from "@/components/payroll/SalaryStructure";
 import { QuickActionModals } from "@/components/sales/QuickActionModals";
 import { SalesProvider } from "@/components/sales/SalesContext";
 import { toast } from "sonner";
@@ -85,8 +87,12 @@ function Index() {
           {active === "/work/sales/settings" && <SalesSettings onAction={handleQuickAction} />}
         </SalesProvider>
 
+        {/* Render Payroll pages */}
+        {active === "/payroll/dashboard" && <PayrollDashboard />}
+        {active === "/payroll/structure" && <SalaryStructure />}
+
         {/* Fallback original content for all other items */}
-        {!active.startsWith("/work/sales") && (
+        {!active.startsWith("/work/sales") && !active.startsWith("/payroll") && (
           <>
             <header className="mb-8 max-w-3xl">
               <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
