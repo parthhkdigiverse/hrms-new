@@ -20,7 +20,7 @@ export function EmployeeFormModal({ isOpen, onClose, onSubmit, initialData }: Em
     email: "",
     phone: "",
     status: "Active",
-    joinDate: new Date().toISOString().split("T")[0],
+    joinDate: new Date().toISOString().split("T")[0] || "",
   });
 
   useEffect(() => {
@@ -34,7 +34,7 @@ export function EmployeeFormModal({ isOpen, onClose, onSubmit, initialData }: Em
         email: "",
         phone: "",
         status: "Active",
-        joinDate: new Date().toISOString().split("T")[0],
+        joinDate: new Date().toISOString().split("T")[0] || "",
       });
     }
   }, [initialData, isOpen]);

@@ -170,9 +170,12 @@ export function SalesSettings() {
   const handleSavePermissions = () => {
     if (editRoleIdx !== null && permissions[editRoleIdx]) {
       const updated = [...permissions];
-      updated[editRoleIdx].perms = [...tempPerms];
-      setPermissions(updated);
-      toast.success(`${updated[editRoleIdx].role} permissions updated`);
+      const role = updated[editRoleIdx];
+      if (role) {
+        role.perms = [...tempPerms];
+        setPermissions(updated);
+        toast.success(`${role.role} permissions updated`);
+      }
     }
     setEditRoleIdx(null);
   };

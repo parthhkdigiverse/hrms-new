@@ -32,7 +32,7 @@ export function CompanyHealth() {
               {/* Background Sparkline */}
               <div className="absolute inset-x-0 bottom-0 h-16 pointer-events-none opacity-40">
                 <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={metric.chartData || PROFIT_TREND}>
+                  <AreaChart data={(metric as any).chartData || PROFIT_TREND}>
                     <defs>
                       <linearGradient id={`grad-${i}`} x1="0" y1="0" x2="0" y2="1">
                         <stop offset="5%" stopColor={metric.chartColor || "#10b981"} stopOpacity={0.8}/>

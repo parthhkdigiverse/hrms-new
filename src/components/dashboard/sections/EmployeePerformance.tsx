@@ -58,11 +58,11 @@ export function EmployeePerformance() {
               </div>
             </h3>
             <div className="min-h-[80px]">
-              <p className="text-3xl font-black mb-1 animate-in fade-in slide-in-from-right-4 duration-500" key={spotlight.name}>
-                {spotlight.name}
+              <p className="text-3xl font-black mb-1 animate-in fade-in slide-in-from-right-4 duration-500" key={spotlight?.name}>
+                {spotlight?.name}
               </p>
-              <p className="text-slate-400 text-sm animate-in fade-in slide-in-from-right-4 duration-500 delay-75" key={spotlight.role}>
-                {spotlight.role}
+              <p className="text-slate-400 text-sm animate-in fade-in slide-in-from-right-4 duration-500 delay-75" key={spotlight?.role}>
+                {spotlight?.role}
               </p>
             </div>
           </div>
