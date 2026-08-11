@@ -1,15 +1,12 @@
 import { DEPARTMENTS } from "../dashboard-data";
 import { cn } from "@/lib/utils";
+import { CollapsibleSection } from "./CollapsibleSection";
 
 export function DepartmentStatus() {
   return (
     <div className="mb-12">
-      <div className="mb-6 pl-2">
-        <p className="text-[10px] font-bold text-[#00A56C] uppercase tracking-widest mb-0.5">Section 05</p>
-        <h2 className="text-[22px] font-black text-slate-900 tracking-tight">Department Status</h2>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <CollapsibleSection section="Section 05" title="Department Status">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {DEPARTMENTS.map((dept, i) => (
           <div key={i} className="bg-white border border-border/60 rounded-3xl p-6 shadow-sm">
             <div className="mb-6">
@@ -38,7 +35,8 @@ export function DepartmentStatus() {
             </div>
           </div>
         ))}
-      </div>
+        </div>
+      </CollapsibleSection>
     </div>
   );
 }

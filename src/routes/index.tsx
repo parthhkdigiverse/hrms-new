@@ -63,7 +63,7 @@ const suggestions = [
 ];
 
 function Index() {
-  const [active, setActive] = useState("/work/sales/dashboard");
+  const [active, setActive] = useState("/dashboard");
   const [activeAction, setActiveAction] = useState<string | null>(null);
 
   const handleQuickAction = (label: string) => {

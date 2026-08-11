@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Sparkles, Trophy } from "lucide-react";
 import { TOP_PERFORMERS, NEEDS_ATTENTION, LATE_LEADERBOARD, SPOTLIGHT_EMPLOYEES } from "../dashboard-data";
 import { cn } from "@/lib/utils";
+import { CollapsibleSection } from "./CollapsibleSection";
 
 export function EmployeePerformance() {
   const [currentSpotlight, setCurrentSpotlight] = useState(0);
@@ -17,12 +18,8 @@ export function EmployeePerformance() {
 
   return (
     <div className="mb-12">
-      <div className="mb-6 pl-2">
-        <p className="text-[10px] font-bold text-[#00A56C] uppercase tracking-widest mb-0.5">Section 03</p>
-        <h2 className="text-[22px] font-black text-slate-900 tracking-tight">Employee Performance</h2>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <CollapsibleSection section="Section 03" title="Employee Performance">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Top 5 Performers */}
         <div className="bg-white border border-border/60 rounded-3xl p-6 shadow-sm">
           <div className="mb-4">
@@ -69,9 +66,6 @@ export function EmployeePerformance() {
               </p>
             </div>
           </div>
-          <button className="bg-white text-slate-900 text-[12px] font-bold px-4 py-3 rounded-xl w-full hover:bg-slate-100 transition-colors mt-6 z-10 relative">
-            View Profile
-          </button>
         </div>
 
         {/* Third Column: Stacked Cards */}
@@ -113,7 +107,8 @@ export function EmployeePerformance() {
             </div>
           </div>
         </div>
-      </div>
+        </div>
+      </CollapsibleSection>
     </div>
   );
 }

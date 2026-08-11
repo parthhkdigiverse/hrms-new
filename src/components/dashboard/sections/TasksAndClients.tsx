@@ -1,16 +1,14 @@
 import { MY_TASKS, KEY_ACCOUNTS } from "../dashboard-data";
 import { cn } from "@/lib/utils";
 import { CheckCircle2, Circle } from "lucide-react";
+import { CollapsibleSection } from "./CollapsibleSection";
 
 export function TasksAndClients() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-12">
       {/* SECTION 09: Tasks */}
       <div>
-        <div className="mb-6 pl-2">
-          <p className="text-[10px] font-bold text-[#00A56C] uppercase tracking-widest mb-0.5">Section 09</p>
-          <h2 className="text-[22px] font-black text-slate-900 tracking-tight">Tasks & Deadlines</h2>
-        </div>
+        <CollapsibleSection section="Section 09" title="Tasks & Deadlines">
 
         <div className="bg-white border border-border/60 rounded-3xl p-6 shadow-sm mb-6">
           <div className="mb-6">
@@ -48,14 +46,12 @@ export function TasksAndClients() {
             <p className="text-[26px] font-black text-emerald-700 leading-none">38</p>
           </div>
         </div>
+        </CollapsibleSection>
       </div>
 
       {/* SECTION 10: Clients */}
       <div>
-        <div className="mb-6 pl-2">
-          <p className="text-[10px] font-bold text-[#00A56C] uppercase tracking-widest mb-0.5">Section 10</p>
-          <h2 className="text-[22px] font-black text-slate-900 tracking-tight">Client Management</h2>
-        </div>
+        <CollapsibleSection section="Section 10" title="Client Management">
 
         <div className="grid grid-cols-2 gap-4 mb-6">
           <div className="bg-white border border-border/60 rounded-3xl p-5 shadow-sm">
@@ -103,6 +99,7 @@ export function TasksAndClients() {
             ))}
           </div>
         </div>
+        </CollapsibleSection>
       </div>
     </div>
   );

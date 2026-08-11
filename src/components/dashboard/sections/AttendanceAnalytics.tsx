@@ -1,20 +1,22 @@
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
 import { WEEKLY_ATTENDANCE } from "../dashboard-data";
+import { CollapsibleSection } from "./CollapsibleSection";
 
 export function AttendanceAnalytics() {
   // Generate mock heatmap data for 5 weeks
   const generateHeatmap = () => {
     const weeks = [];
+    let dayCount = 1;
     for (let w = 0; w < 5; w++) {
       const days = [];
       for (let d = 0; d < 7; d++) {
-        // weekends
-        if (d === 0 || d === 6) {
-          days.push(0);
-        } else {
-          // random intensity 1-4
-          days.push(Math.floor(Math.random() * 4) + 1);
-        }
+        // weekends (Sat=5, Sun=6)
+        const val = (d === 5 || d === 6) ? 0 : Math.floor(Math.random() * 4) + 1;
+        days.push({
+          val,
+          date: dayCount > 31 ? dayCount - 31 : dayCount
+        });
+        dayCount++;
       }
       weeks.push(days);
     }
@@ -25,12 +27,8 @@ export function AttendanceAnalytics() {
 
   return (
     <div className="mb-12">
-      <div className="mb-6 pl-2">
-        <p className="text-[10px] font-bold text-[#00A56C] uppercase tracking-widest mb-0.5">Section 04</p>
-        <h2 className="text-[22px] font-black text-slate-900 tracking-tight">Attendance Analytics</h2>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <CollapsibleSection section="Section 04" title="Attendance Analytics">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Weekly Attendance */}
         <div className="bg-white border border-border/60 rounded-3xl p-6 shadow-sm md:col-span-2">
           <div className="mb-6">
@@ -91,18 +89,30 @@ export function AttendanceAnalytics() {
             <p className="text-[11px] text-slate-500">Attendance intensity over the last 5 weeks</p>
           </div>
           <div className="flex flex-col gap-2">
+            {/* Days Header */}
+            <div className="flex gap-2 mb-1">
+              {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day, i) => (
+                <div key={i} className="flex-1 text-center text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                  {day}
+                </div>
+              ))}
+            </div>
+            
+            {/* Calendar Grid */}
             {heatmap.map((week, w) => (
               <div key={w} className="flex gap-2">
-                {week.map((val, d) => (
+                {week.map((day, d) => (
                   <div 
                     key={d} 
-                    className={`flex-1 h-8 rounded-lg ${
-                      val === 0 ? 'bg-slate-50' : 
-                      val === 1 ? 'bg-emerald-100' :
-                      val === 2 ? 'bg-emerald-300' :
-                      val === 3 ? 'bg-emerald-500' : 'bg-emerald-700'
+                    className={`flex-1 h-10 flex items-center justify-center rounded-lg text-[12px] font-medium transition-all cursor-default hover:scale-[1.02] ${
+                      day.val === 0 ? 'bg-slate-50 text-slate-400' : 
+                      day.val === 1 ? 'bg-emerald-100 text-emerald-800' :
+                      day.val === 2 ? 'bg-emerald-300 text-emerald-900' :
+                      day.val === 3 ? 'bg-emerald-500 text-white' : 'bg-emerald-700 text-white'
                     }`}
-                  ></div>
+                  >
+                    {day.date}
+                  </div>
                 ))}
               </div>
             ))}
@@ -116,7 +126,8 @@ export function AttendanceAnalytics() {
             <span>High</span>
           </div>
         </div>
-      </div>
+        </div>
+      </CollapsibleSection>
     </div>
   );
 }

@@ -200,7 +200,7 @@ export function SalesPipeline({ onAction }: { onAction?: (action: string) => voi
       if (!map[l.stage]) {
         map[l.stage] = [];
       }
-      map[l.stage].push(l);
+      map[l.stage]!.push(l);
     }
     return map;
   }, [filtered, activeStages]);

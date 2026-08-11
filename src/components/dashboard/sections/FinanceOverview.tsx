@@ -1,15 +1,12 @@
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { FINANCE_METRICS, CASH_FLOW, PROFIT_TREND } from "../dashboard-data";
+import { CollapsibleSection } from "./CollapsibleSection";
 
 export function FinanceOverview() {
   return (
     <div className="mb-12">
-      <div className="mb-6 pl-2">
-        <p className="text-[10px] font-bold text-[#00A56C] uppercase tracking-widest mb-0.5">Section 08</p>
-        <h2 className="text-[22px] font-black text-slate-900 tracking-tight">Finance Overview</h2>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <CollapsibleSection section="Section 08" title="Finance Overview">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Main Metrics */}
         <div className="grid grid-cols-2 gap-4">
           <div className="bg-emerald-50 border border-emerald-100 rounded-3xl p-5 shadow-sm flex flex-col justify-between">
@@ -88,7 +85,8 @@ export function FinanceOverview() {
             </ResponsiveContainer>
           </div>
         </div>
-      </div>
+        </div>
+      </CollapsibleSection>
     </div>
   );
 }

@@ -1,15 +1,12 @@
 import { Trophy } from "lucide-react";
 import { SALES_METRICS, UPCOMING_FOLLOW_UPS } from "../dashboard-data";
+import { CollapsibleSection } from "./CollapsibleSection";
 
 export function SalesOverview() {
   return (
     <div className="mb-12">
-      <div className="mb-6 pl-2">
-        <p className="text-[10px] font-bold text-[#00A56C] uppercase tracking-widest mb-0.5">Section 07</p>
-        <h2 className="text-[22px] font-black text-slate-900 tracking-tight">Sales Overview</h2>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <CollapsibleSection section="Section 07" title="Sales Overview">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Main Sales Metrics */}
         <div className="bg-white border border-border/60 rounded-3xl p-6 shadow-sm flex flex-col justify-between">
           <div>
@@ -61,9 +58,6 @@ export function SalesOverview() {
             <p className="text-3xl font-black mb-1">Aarav Mehta</p>
             <p className="text-slate-400 text-sm">₹12.8 L closed this month</p>
           </div>
-          <button className="bg-white text-slate-900 text-[12px] font-bold px-4 py-3 rounded-xl w-full hover:bg-slate-100 transition-colors mt-6">
-            View Deals
-          </button>
         </div>
 
         {/* Upcoming Follow Ups */}
@@ -89,7 +83,8 @@ export function SalesOverview() {
             ))}
           </div>
         </div>
-      </div>
+        </div>
+      </CollapsibleSection>
     </div>
   );
 }

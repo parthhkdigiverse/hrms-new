@@ -1,14 +1,12 @@
 import { cn } from "@/lib/utils";
 import { AreaChart, Area, ResponsiveContainer } from "recharts";
 import { TOP_METRICS, PROFIT_TREND } from "../dashboard-data";
+import { CollapsibleSection } from "./CollapsibleSection";
 
 export function CompanyHealth() {
   return (
     <div className="mb-12">
-      <div className="mb-6 pl-2">
-        <p className="text-[10px] font-bold text-[#00A56C] uppercase tracking-widest mb-0.5">Section 02</p>
-        <h2 className="text-[22px] font-black text-slate-900 tracking-tight">Company Health</h2>
-      </div>
+      <CollapsibleSection section="Section 02" title="Company Health">
 
       <div className="grid grid-cols-4 gap-6">
         {TOP_METRICS.map((metric, i) => {
@@ -54,7 +52,8 @@ export function CompanyHealth() {
             </div>
           )
         })}
-      </div>
+        </div>
+      </CollapsibleSection>
     </div>
   );
 }
