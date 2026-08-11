@@ -19,6 +19,7 @@ import { BonusDeductions } from "@/components/payroll/BonusDeductions";
 import { Payslips } from "@/components/payroll/Payslips";
 import { QuickActionModals } from "@/components/sales/QuickActionModals";
 import { SalesProvider } from "@/components/sales/SalesContext";
+import { Dashboard } from "@/components/dashboard/Dashboard";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/")({
@@ -79,6 +80,9 @@ function Index() {
     <div className="flex min-h-screen w-full bg-background">
       <AppSidebar active={active} setActive={setActive} />
       <main className="min-w-0 flex-1 overflow-x-hidden px-6 pb-24 pt-20 sm:px-10 md:pb-8 md:pt-8">
+        {/* Main Dashboard */}
+        {active === "/dashboard" && <Dashboard />}
+
         {/* Render the appropriate sales page based on state */}
         <SalesProvider>
           {active === "/work/sales/dashboard" && <SalesDashboard setActive={setActive} onAction={handleQuickAction} />}
@@ -100,7 +104,7 @@ function Index() {
         {active === "/payroll/payslips" && <Payslips />}
 
         {/* Fallback original content for all other items */}
-        {!active.startsWith("/work/sales") && !active.startsWith("/payroll") && (
+        {active !== "/dashboard" && !active.startsWith("/work/sales") && !active.startsWith("/payroll") && (
           <>
             <header className="mb-8 max-w-3xl">
               <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
