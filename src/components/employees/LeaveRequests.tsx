@@ -1,10 +1,11 @@
 import { useState, useMemo } from "react";
-import { Check, X, Calendar, Clock, ChevronDown, Filter, CalendarDays, Activity } from "lucide-react";
+import { Check, X, Calendar, Clock, ChevronDown, Filter, CalendarDays, Activity, Plus } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { useSettingsContext } from "../payroll/SettingsContext";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
 type LeaveStatus = "Pending" | "Approved" | "Rejected";
-type LeaveType = "Sick Leave" | "Casual Leave" | "Annual Leave" | "Unpaid Leave";
 
 interface LeaveRequest {
   id: string;
@@ -13,7 +14,7 @@ interface LeaveRequest {
   avatar: string;
   role: string;
   department: string;
-  type: LeaveType;
+  type: string;
   startDate: string;
   endDate: string;
   durationDays: number;
@@ -115,32 +116,81 @@ const MOCK_REQUESTS: LeaveRequest[] = [
   },
 ];
 
-const getLeaveTypeColor = (type: LeaveType) => {
+const getLeaveTypeColor = (type: string) => {
   switch (type) {
     case "Sick Leave": return "text-rose-600 bg-rose-50 border-rose-100";
     case "Casual Leave": return "text-amber-600 bg-amber-50 border-amber-100";
     case "Annual Leave": return "text-indigo-600 bg-indigo-50 border-indigo-100";
     case "Unpaid Leave": return "text-slate-600 bg-slate-50 border-slate-200";
+    default: return "text-teal-600 bg-teal-50 border-teal-100";
   }
 };
 
-const getLeaveTypeIcon = (type: LeaveType) => {
+const getLeaveTypeIcon = (type: string) => {
   switch (type) {
     case "Sick Leave": return <Activity className="w-3.5 h-3.5" />;
     case "Casual Leave": return <Clock className="w-3.5 h-3.5" />;
     case "Annual Leave": return <CalendarDays className="w-3.5 h-3.5" />;
     case "Unpaid Leave": return <X className="w-3.5 h-3.5" />;
+    default: return <Calendar className="w-3.5 h-3.5" />;
   }
 };
 
 export function LeaveRequests() {
+  const { leaveTypes } = useSettingsContext();
   const [requests, setRequests] = useState<LeaveRequest[]>(MOCK_REQUESTS);
   const [activeTab, setActiveTab] = useState<LeaveStatus>("Pending");
   const [searchQuery, setSearchQuery] = useState("");
+  const [isAddOpen, setIsAddOpen] = useState(false);
+  
+  // New leave form state
+  const [newLeaveType, setNewLeaveType] = useState<string>(leaveTypes[0] || "Sick Leave");
+  const [newStartDate, setNewStartDate] = useState("");
+  const [newEndDate, setNewEndDate] = useState("");
+  const [newReason, setNewReason] = useState("");
 
   const handleAction = (id: string, action: "Approved" | "Rejected") => {
     setRequests(prev => prev.map(r => r.id === id ? { ...r, status: action } : r));
     toast.success(`Leave request ${action.toLowerCase()} successfully`);
+  };
+
+  const handleAddLeave = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newStartDate || !newEndDate || !newReason) {
+      toast.error("Please fill all required fields");
+      return;
+    }
+
+    const start = new Date(newStartDate);
+    const end = new Date(newEndDate);
+    const diffTime = Math.abs(end.getTime() - start.getTime());
+    const durationDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; // +1 to include both start and end dates
+
+    const newRequest: LeaveRequest = {
+      id: `LR-${Math.random().toString(36).substr(2, 9)}`,
+      employeeId: "EMP-NEW", // Mock ID for demo
+      employeeName: "Current User", // Mock name
+      avatar: "https://i.pravatar.cc/150?u=current",
+      role: "Software Engineer",
+      department: "Engineering",
+      type: newLeaveType,
+      startDate: newStartDate,
+      endDate: newEndDate,
+      durationDays,
+      reason: newReason,
+      status: "Pending",
+      appliedOn: new Date().toISOString().split("T")[0] || "",
+    };
+
+    setRequests(prev => [newRequest, ...prev]);
+    setIsAddOpen(false);
+    toast.success("Leave request submitted successfully");
+    
+    // Reset form
+    setNewLeaveType(leaveTypes[0] || "Sick Leave");
+    setNewStartDate("");
+    setNewEndDate("");
+    setNewReason("");
   };
 
   const filteredRequests = useMemo(() => {
@@ -176,6 +226,83 @@ export function LeaveRequests() {
           <button className="px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-700 hover:bg-slate-50 shadow-sm flex items-center gap-2">
             Filter <ChevronDown className="w-4 h-4" />
           </button>
+          
+          <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
+            <DialogTrigger asChild>
+              <button className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-bold shadow-sm flex items-center gap-2 transition-colors">
+                <Plus className="w-4 h-4" /> Add Leave
+              </button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px] rounded-2xl">
+              <DialogHeader>
+                <DialogTitle className="text-xl font-black text-slate-900">Request Leave</DialogTitle>
+              </DialogHeader>
+              <form onSubmit={handleAddLeave} className="space-y-4 mt-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-bold text-slate-700">Leave Type</label>
+                  <select 
+                    value={newLeaveType}
+                    onChange={e => setNewLeaveType(e.target.value)}
+                    className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                  >
+                    {leaveTypes.map(type => (
+                      <option key={type} value={type}>{type}</option>
+                    ))}
+                  </select>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-sm font-bold text-slate-700">Start Date</label>
+                    <input 
+                      type="date" 
+                      required
+                      value={newStartDate}
+                      onChange={e => setNewStartDate(e.target.value)}
+                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-bold text-slate-700">End Date</label>
+                    <input 
+                      type="date" 
+                      required
+                      value={newEndDate}
+                      onChange={e => setNewEndDate(e.target.value)}
+                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-bold text-slate-700">Reason</label>
+                  <textarea 
+                    required
+                    value={newReason}
+                    onChange={e => setNewReason(e.target.value)}
+                    placeholder="Briefly explain your reason..."
+                    className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm min-h-[100px] resize-none focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                  />
+                </div>
+
+                <div className="pt-4 flex justify-end gap-3">
+                  <button 
+                    type="button" 
+                    onClick={() => setIsAddOpen(false)}
+                    className="px-4 py-2 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 font-bold text-sm rounded-xl transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button 
+                    type="submit"
+                    className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-xl transition-colors"
+                  >
+                    Submit Request
+                  </button>
+                </div>
+              </form>
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
 

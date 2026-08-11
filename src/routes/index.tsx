@@ -27,6 +27,7 @@ import { LeaveRequests } from "@/components/employees/LeaveRequests";
 import { toast } from "sonner";
 import { DepartmentProvider } from "@/components/employees/DepartmentContext";
 import { EmployeeProvider } from "@/components/employees/EmployeeContext";
+import { SettingsProvider } from "@/components/payroll/SettingsContext";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -96,9 +97,10 @@ function Index() {
   };
 
   return (
-    <DepartmentProvider>
-      <EmployeeProvider>
-        <div className="flex h-screen overflow-hidden bg-background">
+    <SettingsProvider>
+      <DepartmentProvider>
+        <EmployeeProvider>
+          <div className="flex h-screen overflow-hidden bg-background">
         <AppSidebar active={active} setActive={setActive} />
       <main className="min-w-0 flex-1 overflow-x-hidden px-6 pb-24 pt-20 sm:px-10 md:pb-8 md:pt-8">
         {/* Main Dashboard */}
@@ -174,7 +176,8 @@ function Index() {
       </main>
         <QuickActionModals activeAction={activeAction} onClose={() => setActiveAction(null)} />
       </div>
-      </EmployeeProvider>
-    </DepartmentProvider>
+        </EmployeeProvider>
+      </DepartmentProvider>
+    </SettingsProvider>
   );
 }

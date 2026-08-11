@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { X, Plus } from "lucide-react";
+import { useSettingsContext } from "./SettingsContext";
 
 const TABS = [
   "General",
@@ -31,6 +33,8 @@ function Switch({ checked, onChange }: { checked?: boolean; onChange?: () => voi
 
 export function PayrollSettings() {
   const [activeTab, setActiveTab] = useState("General");
+  const { leaveTypes, addLeaveType, removeLeaveType } = useSettingsContext();
+  const [newLeaveTypeInput, setNewLeaveTypeInput] = useState("");
   
   // Settings State
   const [workingDays, setWorkingDays] = useState("26");
@@ -253,6 +257,56 @@ export function PayrollSettings() {
                   <p className="text-[12px] text-slate-500 mt-0.5">Encash unused leave at year end</p>
                 </div>
                 <Switch checked={settings.encashment} onChange={() => setSettings({...settings, encashment: !settings.encashment})} />
+              </div>
+            </div>
+
+            {/* Leave Types Configuration */}
+            <div className="rounded-[16px] border border-border/60 bg-white p-6 shadow-[0_2px_8px_rgba(0,0,0,0.02)] mt-6 col-span-1 lg:col-span-2">
+              <div className="mb-5">
+                <h2 className="text-[15px] font-bold text-slate-900">Leave Types</h2>
+                <p className="text-[13px] text-muted-foreground/80 mt-1">Configure available leave types for employees</p>
+              </div>
+              <div className="h-px w-full bg-border/40 mb-6" />
+              
+              <div className="flex flex-wrap gap-2 mb-6">
+                {leaveTypes.map(type => (
+                  <div key={type} className="flex items-center gap-2 px-3 py-1.5 bg-slate-100 border border-slate-200 rounded-lg">
+                    <span className="text-[13px] font-semibold text-slate-700">{type}</span>
+                    <button 
+                      onClick={() => removeLeaveType(type)}
+                      className="p-0.5 text-slate-400 hover:text-rose-500 rounded-md transition-colors"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+
+              <div className="flex items-center gap-3 max-w-md">
+                <input 
+                  type="text" 
+                  placeholder="New leave type (e.g. Maternity Leave)"
+                  value={newLeaveTypeInput}
+                  onChange={e => setNewLeaveTypeInput(e.target.value)}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter' && newLeaveTypeInput.trim()) {
+                      addLeaveType(newLeaveTypeInput.trim());
+                      setNewLeaveTypeInput("");
+                    }
+                  }}
+                  className="flex-1 rounded-[10px] border border-border/80 p-2.5 text-[13px] font-medium text-slate-700 outline-none focus:border-indigo-500 bg-white shadow-sm"
+                />
+                <button 
+                  onClick={() => {
+                    if (newLeaveTypeInput.trim()) {
+                      addLeaveType(newLeaveTypeInput.trim());
+                      setNewLeaveTypeInput("");
+                    }
+                  }}
+                  className="px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-[10px] text-[13px] font-bold shadow-sm flex items-center gap-2 transition-colors"
+                >
+                  <Plus className="w-4 h-4" /> Add
+                </button>
               </div>
             </div>
           </div>
