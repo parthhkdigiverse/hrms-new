@@ -13,6 +13,7 @@ import { SalesReports } from "@/components/sales/SalesReports";
 import { SalesSettings } from "@/components/sales/SalesSettings";
 import { PayrollDashboard } from "@/components/payroll/PayrollDashboard";
 import { SalaryStructure } from "@/components/payroll/SalaryStructure";
+import { PayrollSettings } from "@/components/payroll/PayrollSettings";
 import { QuickActionModals } from "@/components/sales/QuickActionModals";
 import { SalesProvider } from "@/components/sales/SalesContext";
 import { toast } from "sonner";
@@ -90,6 +91,7 @@ function Index() {
         {/* Render Payroll pages */}
         {active === "/payroll/dashboard" && <PayrollDashboard />}
         {active === "/payroll/structure" && <SalaryStructure />}
+        {active === "/payroll/settings" && <PayrollSettings />}
 
         {/* Fallback original content for all other items */}
         {!active.startsWith("/work/sales") && !active.startsWith("/payroll") && (
