@@ -107,8 +107,6 @@ export const navItems: NavItem[] = [
       { title: "Manage Courses", url: "/training/manage" },
     ],
   },
-  { title: "Attendance", url: "/attendance", icon: Clock, section: "Time" },
-  { title: "Leave", url: "/leave", icon: CalendarDays, section: "Time" },
   { title: "Schedule", url: "/schedule", icon: CalendarRange, section: "Time" },
   {
     title: "Payroll",
