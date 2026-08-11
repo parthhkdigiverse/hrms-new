@@ -1,18 +1,25 @@
 import { useState } from "react";
-import { Search, Filter, LayoutGrid, List, MoreVertical, Phone, Mail, Plus, MapPin } from "lucide-react";
+import { Search, Filter, LayoutGrid, List, MoreVertical, Phone, Mail, Plus, MapPin, Edit2 } from "lucide-react";
 import { EMPLOYEES, Employee } from "./employee-data";
 import { EmployeeProfileModal } from "./EmployeeProfileModal";
+import { EmployeeFormModal } from "./EmployeeFormModal";
+import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
 export function EmployeeList() {
+  const [employees, setEmployees] = useState<Employee[]>(EMPLOYEES);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedDept, setSelectedDept] = useState<string | null>(null);
   const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
+  
+  // Form modal state
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
 
-  const departments = Array.from(new Set(EMPLOYEES.map(emp => emp.department)));
+  const departments = Array.from(new Set(employees.map(emp => emp.department)));
 
-  const filteredEmployees = EMPLOYEES.filter(emp => {
+  const filteredEmployees = employees.filter(emp => {
     const matchesSearch = emp.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
                           emp.role.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesDept = selectedDept ? emp.department === selectedDept : true;
@@ -28,6 +35,32 @@ export function EmployeeList() {
     }
   };
 
+  const handleFormSubmit = (formData: Partial<Employee>) => {
+    if (editingEmployee) {
+      setEmployees(employees.map(emp => emp.id === editingEmployee.id ? { ...emp, ...formData } as Employee : emp));
+      toast.success("Employee updated successfully.");
+    } else {
+      const newEmployee: Employee = {
+        ...(formData as Employee),
+        id: `EMP-${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`,
+        avatar: `https://i.pravatar.cc/150?u=${formData.name?.split(' ')[0]?.toLowerCase() || 'new'}`,
+        performanceScore: 85, // default
+      };
+      setEmployees([newEmployee, ...employees]);
+      toast.success("Employee added successfully.");
+    }
+  };
+
+  const openAddForm = () => {
+    setEditingEmployee(null);
+    setIsFormOpen(true);
+  };
+
+  const openEditForm = (emp: Employee) => {
+    setEditingEmployee(emp);
+    setIsFormOpen(true);
+  };
+
   return (
     <div className="w-full max-w-[1400px] mx-auto animate-in fade-in zoom-in-95 duration-300">
       {/* Header */}
@@ -36,7 +69,10 @@ export function EmployeeList() {
           <h1 className="text-[28px] font-black text-slate-900 tracking-tight mb-2">Employee Directory</h1>
           <p className="text-[14px] text-slate-500">Manage your team members and their account permissions here.</p>
         </div>
-        <button className="flex items-center gap-2 bg-[#00A56C] hover:bg-[#00A56C]/90 text-white px-5 py-2.5 rounded-xl font-bold transition-all shadow-sm shadow-emerald-500/20 active:scale-95">
+        <button 
+          onClick={openAddForm}
+          className="flex items-center gap-2 bg-[#00A56C] hover:bg-[#00A56C]/90 text-white px-5 py-2.5 rounded-xl font-bold transition-all shadow-sm shadow-emerald-500/20 active:scale-95"
+        >
           <Plus className="w-4 h-4" />
           Add Employee
         </button>
@@ -128,10 +164,13 @@ export function EmployeeList() {
                     onClick={() => setSelectedEmployee(emp)}
                     className="flex-1 bg-[#00A56C]/10 text-[#00A56C] hover:bg-[#00A56C]/20 py-2.5 rounded-xl text-[12px] font-bold transition-colors"
                   >
-                    View Profile
+                    View
                   </button>
-                  <button className="p-2.5 bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-xl transition-colors">
-                    <Mail className="w-4 h-4" />
+                  <button 
+                    onClick={() => openEditForm(emp)}
+                    className="p-2.5 bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-xl transition-colors"
+                  >
+                    <Edit2 className="w-4 h-4" />
                   </button>
                 </div>
               </div>
@@ -188,12 +227,20 @@ export function EmployeeList() {
                       <span className="text-[13px] font-medium text-slate-700">{emp.joinDate}</span>
                     </td>
                     <td className="px-6 py-4 text-right">
-                      <button 
-                        onClick={() => setSelectedEmployee(emp)}
-                        className="text-[12px] font-bold text-[#00A56C] hover:text-[#00A56C]/80 px-3 py-1.5 rounded-lg hover:bg-[#00A56C]/10 transition-colors opacity-0 group-hover:opacity-100"
-                      >
-                        View
-                      </button>
+                      <div className="flex justify-end gap-2">
+                        <button 
+                          onClick={() => setSelectedEmployee(emp)}
+                          className="text-[12px] font-bold text-[#00A56C] hover:text-[#00A56C]/80 px-3 py-1.5 rounded-lg hover:bg-[#00A56C]/10 transition-colors opacity-0 group-hover:opacity-100"
+                        >
+                          View
+                        </button>
+                        <button 
+                          onClick={() => openEditForm(emp)}
+                          className="text-[12px] font-bold text-blue-600 hover:text-blue-800 px-3 py-1.5 rounded-lg hover:bg-blue-50 transition-colors opacity-0 group-hover:opacity-100"
+                        >
+                          Edit
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -210,6 +257,14 @@ export function EmployeeList() {
           onClose={() => setSelectedEmployee(null)} 
         />
       )}
+
+      {/* Add / Edit Form Modal */}
+      <EmployeeFormModal 
+        isOpen={isFormOpen}
+        onClose={() => setIsFormOpen(false)}
+        onSubmit={handleFormSubmit}
+        initialData={editingEmployee}
+      />
     </div>
   );
 }
