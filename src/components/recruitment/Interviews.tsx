@@ -134,6 +134,24 @@ export function Interviews() {
     toast.success("Stage added successfully");
   };
 
+  const handleDragStart = (e: React.DragEvent, candidateId: string) => {
+    e.dataTransfer.setData("candidateId", candidateId);
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault(); // Necessary to allow dropping
+  };
+
+  const handleDrop = (e: React.DragEvent, stageLabel: string) => {
+    e.preventDefault();
+    const candidateId = e.dataTransfer.getData("candidateId");
+    if (!candidateId) return;
+
+    setCandidates(prev => prev.map(c => 
+      c.id === candidateId ? { ...c, stage: stageLabel } : c
+    ));
+  };
+
   // Form State
   const [newName, setNewName] = useState("");
   const [newRole, setNewRole] = useState("");
@@ -300,7 +318,12 @@ export function Interviews() {
             const stageCandidates = filteredCandidates.filter(c => c.stage === stage.label);
             
             return (
-              <div key={stage.label} className="w-[320px] flex flex-col bg-slate-50/50 rounded-2xl border border-slate-200/60 p-4">
+              <div 
+                key={stage.label} 
+                className="w-[320px] flex flex-col bg-slate-50/50 rounded-2xl border border-slate-200/60 p-4 transition-colors"
+                onDragOver={handleDragOver}
+                onDrop={(e) => handleDrop(e, stage.label)}
+              >
                 <div className="flex items-center justify-between mb-4 px-1">
                   <div className="flex items-center gap-2">
                     {renamingStage === stage.label ? (
@@ -360,7 +383,9 @@ export function Interviews() {
                   {stageCandidates.map(candidate => (
                     <div 
                       key={candidate.id}
-                      className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm hover:shadow-md hover:border-indigo-200 transition-all cursor-pointer group"
+                      draggable
+                      onDragStart={(e) => handleDragStart(e, candidate.id)}
+                      className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm hover:shadow-md hover:border-indigo-200 transition-all group cursor-grab active:cursor-grabbing"
                     >
                       <div className="flex justify-between items-start mb-3">
                         <div className="flex items-center gap-3">
