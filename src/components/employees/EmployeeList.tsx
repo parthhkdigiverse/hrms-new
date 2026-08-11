@@ -1,12 +1,14 @@
 import { useState } from "react";
 import { Search, Filter, LayoutGrid, List, MoreVertical, Phone, Mail, Plus, MapPin } from "lucide-react";
 import { EMPLOYEES, Employee } from "./employee-data";
+import { EmployeeProfileModal } from "./EmployeeProfileModal";
 import { cn } from "@/lib/utils";
 
 export function EmployeeList() {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedDept, setSelectedDept] = useState<string | null>(null);
+  const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
 
   const departments = Array.from(new Set(EMPLOYEES.map(emp => emp.department)));
 
@@ -122,7 +124,10 @@ export function EmployeeList() {
                 </span>
 
                 <div className="flex w-full gap-2 mt-auto">
-                  <button className="flex-1 bg-[#00A56C]/10 text-[#00A56C] hover:bg-[#00A56C]/20 py-2.5 rounded-xl text-[12px] font-bold transition-colors">
+                  <button 
+                    onClick={() => setSelectedEmployee(emp)}
+                    className="flex-1 bg-[#00A56C]/10 text-[#00A56C] hover:bg-[#00A56C]/20 py-2.5 rounded-xl text-[12px] font-bold transition-colors"
+                  >
                     View Profile
                   </button>
                   <button className="p-2.5 bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-xl transition-colors">
@@ -183,7 +188,10 @@ export function EmployeeList() {
                       <span className="text-[13px] font-medium text-slate-700">{emp.joinDate}</span>
                     </td>
                     <td className="px-6 py-4 text-right">
-                      <button className="text-[12px] font-bold text-[#00A56C] hover:text-[#00A56C]/80 px-3 py-1.5 rounded-lg hover:bg-[#00A56C]/10 transition-colors opacity-0 group-hover:opacity-100">
+                      <button 
+                        onClick={() => setSelectedEmployee(emp)}
+                        className="text-[12px] font-bold text-[#00A56C] hover:text-[#00A56C]/80 px-3 py-1.5 rounded-lg hover:bg-[#00A56C]/10 transition-colors opacity-0 group-hover:opacity-100"
+                      >
                         View
                       </button>
                     </td>
@@ -193,6 +201,14 @@ export function EmployeeList() {
             </table>
           </div>
         </div>
+      )}
+
+      {/* Profile Modal */}
+      {selectedEmployee && (
+        <EmployeeProfileModal 
+          employee={selectedEmployee} 
+          onClose={() => setSelectedEmployee(null)} 
+        />
       )}
     </div>
   );
