@@ -1,6 +1,7 @@
 import { ACTIVITY_FEED, AI_SUMMARY } from "../dashboard-data";
 import { cn } from "@/lib/utils";
 import { Sparkles, ArrowRight, UserPlus, CheckCircle, CheckSquare, IndianRupee, Briefcase, Rocket, Banknote } from "lucide-react";
+import { CollapsibleSection } from "./CollapsibleSection";
 
 const IconMap: Record<string, any> = {
   UserPlus, CheckCircle, CheckSquare, IndianRupee, Briefcase, Rocket, Banknote
@@ -11,10 +12,7 @@ export function ActivityAndAI() {
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
       {/* SECTION 13: Calendar */}
       <div>
-        <div className="mb-6 pl-2">
-          <p className="text-[10px] font-bold text-[#00A56C] uppercase tracking-widest mb-0.5">Section 13</p>
-          <h2 className="text-[22px] font-black text-slate-900 tracking-tight">Today's Calendar</h2>
-        </div>
+        <CollapsibleSection section="Section 13" title="Today's Calendar">
         <div className="bg-white border border-border/60 rounded-3xl p-6 shadow-sm h-[320px] overflow-y-auto">
           <p className="text-[11px] text-slate-500 mb-6">Meetings · birthdays · leaves · interviews · deadlines</p>
           <div className="space-y-4">
@@ -56,14 +54,12 @@ export function ActivityAndAI() {
             </div>
           </div>
         </div>
+        </CollapsibleSection>
       </div>
 
       {/* SECTION 14: Activity Feed */}
       <div>
-        <div className="mb-6 pl-2">
-          <p className="text-[10px] font-bold text-[#00A56C] uppercase tracking-widest mb-0.5">Section 14</p>
-          <h2 className="text-[22px] font-black text-slate-900 tracking-tight">Recent Activity</h2>
-        </div>
+        <CollapsibleSection section="Section 14" title="Recent Activity">
         <div className="bg-white border border-border/60 rounded-3xl p-6 shadow-sm h-[320px] overflow-y-auto">
           <p className="text-[11px] text-slate-500 mb-6">Everything happening across the company</p>
           <div className="space-y-5">
@@ -87,16 +83,12 @@ export function ActivityAndAI() {
             })}
           </div>
         </div>
+        </CollapsibleSection>
       </div>
 
       {/* SECTION 15: AI Summary */}
       <div>
-        <div className="mb-6 pl-2">
-          <p className="text-[10px] font-bold text-[#00A56C] uppercase tracking-widest mb-0.5">Section 15</p>
-          <h2 className="text-[22px] font-black text-slate-900 tracking-tight flex items-center gap-2">
-            AI Summary <Sparkles className="h-5 w-5 text-indigo-500" />
-          </h2>
-        </div>
+        <CollapsibleSection section="Section 15" title="AI Summary" titleIcon={<Sparkles className="h-5 w-5 text-indigo-500" />}>
         <div className="bg-indigo-900 rounded-3xl p-6 text-white shadow-sm h-[320px] overflow-y-auto relative">
           <p className="text-[11px] text-indigo-200 mb-6">Generated from attendance, sales, finance and delivery signals</p>
           
@@ -118,6 +110,7 @@ export function ActivityAndAI() {
             </div>
           </div>
         </div>
+        </CollapsibleSection>
       </div>
     </div>
   );

@@ -1,14 +1,13 @@
 import { OVERALL_KPIS } from "../dashboard-data";
 import { CloudSun, Clock, Target } from "lucide-react";
+import { CollapsibleSection } from "./CollapsibleSection";
 
 export function OverallKPIs() {
   return (
     <div className="mb-12">
       {/* SECTION 16: Overall KPIs */}
-      <div className="mb-6 pl-2">
-        <p className="text-[10px] font-bold text-[#00A56C] uppercase tracking-widest mb-0.5">Section 16</p>
-        <h2 className="text-[22px] font-black text-slate-900 tracking-tight">Overall KPIs</h2>
-      </div>
+      <div className="mb-12">
+        <CollapsibleSection section="Section 16" title="Overall KPIs">
 
       <div className="bg-white border border-border/60 rounded-3xl p-6 shadow-sm mb-12">
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-x-6 gap-y-8">
@@ -28,12 +27,12 @@ export function OverallKPIs() {
           ))}
         </div>
       </div>
+        </CollapsibleSection>
+      </div>
 
       {/* SECTION 17: Bottom Widgets */}
-      <div className="mb-6 pl-2">
-        <p className="text-[10px] font-bold text-[#00A56C] uppercase tracking-widest mb-0.5">Section 17</p>
-        <h2 className="text-[22px] font-black text-slate-900 tracking-tight">Status & Targets</h2>
-      </div>
+      <div>
+        <CollapsibleSection section="Section 17" title="Status & Targets">
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <div className="bg-white border border-border/60 rounded-3xl p-6 shadow-sm flex items-center gap-4">
@@ -70,6 +69,8 @@ export function OverallKPIs() {
             </div>
           </div>
         </div>
+        </div>
+        </CollapsibleSection>
       </div>
     </div>
   );

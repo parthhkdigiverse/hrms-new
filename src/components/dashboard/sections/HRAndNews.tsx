@@ -1,15 +1,13 @@
 import { HR_UPDATES, COMPANY_NEWS } from "../dashboard-data";
 import { Gift, Award, CalendarDays, UserPlus, LogOut, CheckCircle2, FileText, Megaphone } from "lucide-react";
+import { CollapsibleSection } from "./CollapsibleSection";
 
 export function HRAndNews() {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-12">
       {/* SECTION 11: HR Updates */}
       <div>
-        <div className="mb-6 pl-2">
-          <p className="text-[10px] font-bold text-[#00A56C] uppercase tracking-widest mb-0.5">Section 11</p>
-          <h2 className="text-[22px] font-black text-slate-900 tracking-tight">HR Updates</h2>
-        </div>
+        <CollapsibleSection section="Section 11" title="HR Updates">
 
         <div className="bg-white border border-border/60 rounded-3xl p-6 shadow-sm space-y-6">
           
@@ -147,14 +145,12 @@ export function HRAndNews() {
             </div>
           </div>
         </div>
+        </CollapsibleSection>
       </div>
 
       {/* SECTION 12: Company News */}
       <div>
-        <div className="mb-6 pl-2">
-          <p className="text-[10px] font-bold text-[#00A56C] uppercase tracking-widest mb-0.5">Section 12</p>
-          <h2 className="text-[22px] font-black text-slate-900 tracking-tight">Company News</h2>
-        </div>
+        <CollapsibleSection section="Section 12" title="Company News">
 
         <div className="space-y-4 mb-6">
           {COMPANY_NEWS.map((news, i) => (
@@ -171,6 +167,7 @@ export function HRAndNews() {
             <p className="text-xl font-bold leading-snug">“Discipline compounds faster than talent. Show up, ship, repeat.”</p>
           </div>
         </div>
+        </CollapsibleSection>
       </div>
     </div>
   );
