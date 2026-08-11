@@ -20,6 +20,7 @@ import { Payslips } from "@/components/payroll/Payslips";
 import { QuickActionModals } from "@/components/sales/QuickActionModals";
 import { SalesProvider } from "@/components/sales/SalesContext";
 import { Dashboard } from "@/components/dashboard/Dashboard";
+import { EmployeeList } from "@/components/employees/EmployeeList";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/")({
@@ -103,8 +104,11 @@ function Index() {
         {active === "/payroll/bonuses" && <BonusDeductions />}
         {active === "/payroll/payslips" && <Payslips />}
 
+        {/* Render Employee pages */}
+        {active === "/employees/list" && <EmployeeList />}
+
         {/* Fallback original content for all other items */}
-        {active !== "/dashboard" && !active.startsWith("/work/sales") && !active.startsWith("/payroll") && (
+        {active !== "/dashboard" && !active.startsWith("/work/sales") && !active.startsWith("/payroll") && active !== "/employees/list" && (
           <>
             <header className="mb-8 max-w-3xl">
               <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
