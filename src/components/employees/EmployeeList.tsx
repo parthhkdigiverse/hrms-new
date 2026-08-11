@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Search, Filter, LayoutGrid, List, MoreVertical, Phone, Mail, Plus, MapPin, Edit2 } from "lucide-react";
 import { EMPLOYEES, Employee } from "./employee-data";
+import { useDepartments } from "./DepartmentContext";
 import { EmployeeProfileModal } from "./EmployeeProfileModal";
 import { EmployeeFormModal } from "./EmployeeFormModal";
 import { toast } from "sonner";
@@ -17,7 +18,7 @@ export function EmployeeList() {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
 
-  const departments = Array.from(new Set(employees.map(emp => emp.department)));
+  const { departments } = useDepartments();
 
   const filteredEmployees = employees.filter(emp => {
     const matchesSearch = emp.name.toLowerCase().includes(searchQuery.toLowerCase()) || 

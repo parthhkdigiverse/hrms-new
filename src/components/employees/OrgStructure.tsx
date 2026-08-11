@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { ORG_DATA, OrgNodeData } from "./org-data";
-import { ChevronDown, ChevronUp, Users, ZoomIn, ZoomOut, Maximize } from "lucide-react";
+import { ChevronDown, ChevronUp, Users, ZoomIn, ZoomOut, Maximize, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { ManageDepartmentsModal } from "./ManageDepartmentsModal";
 
 const OrgNodeCard = ({ node, isExpanded, toggleExpand }: { node: OrgNodeData, isExpanded: boolean, toggleExpand: () => void }) => {
   const hasChildren = node.children && node.children.length > 0;
@@ -62,6 +63,7 @@ const OrgTree = ({ node }: { node: OrgNodeData }) => {
 
 export function OrgStructure() {
   const [zoom, setZoom] = useState(1);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
     <div className="w-full max-w-[1400px] mx-auto animate-in fade-in zoom-in-95 duration-300 flex flex-col h-[calc(100vh-120px)]">
@@ -72,7 +74,16 @@ export function OrgStructure() {
           <p className="text-[14px] text-slate-500">Visual hierarchy of teams and reporting lines across the company.</p>
         </div>
         
-        <div className="flex items-center gap-2 bg-white border border-slate-200 p-1.5 rounded-2xl shadow-sm">
+        <div className="flex gap-4 items-center">
+          <button 
+            onClick={() => setIsModalOpen(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-700 font-bold rounded-xl shadow-sm hover:bg-slate-50 transition-colors"
+          >
+            <Settings className="w-4 h-4" />
+            Manage Departments
+          </button>
+          
+          <div className="flex items-center gap-2 bg-white border border-slate-200 p-1.5 rounded-2xl shadow-sm">
           <button 
             onClick={() => setZoom(Math.max(0.4, zoom - 0.1))}
             className="p-2 hover:bg-slate-100 rounded-xl text-slate-600 transition-colors"
@@ -95,6 +106,7 @@ export function OrgStructure() {
           >
             <Maximize className="w-4 h-4" />
           </button>
+        </div>
         </div>
       </div>
 
@@ -168,6 +180,11 @@ export function OrgStructure() {
           </div>
         </div>
       </div>
+      
+      <ManageDepartmentsModal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+      />
     </div>
   );
 }

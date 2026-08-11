@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { X } from "lucide-react";
 import { Employee, EmployeeStatus } from "./employee-data";
+import { useDepartments } from "./DepartmentContext";
 import { toast } from "sonner";
 
 interface EmployeeFormModalProps {
@@ -11,6 +12,7 @@ interface EmployeeFormModalProps {
 }
 
 export function EmployeeFormModal({ isOpen, onClose, onSubmit, initialData }: EmployeeFormModalProps) {
+  const { departments } = useDepartments();
   const [formData, setFormData] = useState<Partial<Employee>>({
     name: "",
     role: "",
@@ -114,13 +116,9 @@ export function EmployeeFormModal({ isOpen, onClose, onSubmit, initialData }: Em
                   onChange={(e) => setFormData({...formData, department: e.target.value})}
                   className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#00A56C]/20 focus:border-[#00A56C]/50 transition-all"
                 >
-                  <option value="Development">Development</option>
-                  <option value="Sales">Sales</option>
-                  <option value="Creative">Creative</option>
-                  <option value="Marketing">Marketing</option>
-                  <option value="HR">Human Resources</option>
-                  <option value="Finance">Finance</option>
-                  <option value="Product">Product</option>
+                  {departments.map(dept => (
+                    <option key={dept} value={dept}>{dept}</option>
+                  ))}
                 </select>
               </div>
 

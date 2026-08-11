@@ -23,6 +23,7 @@ import { Dashboard } from "@/components/dashboard/Dashboard";
 import { EmployeeList } from "@/components/employees/EmployeeList";
 import { OrgStructure } from "@/components/employees/OrgStructure";
 import { toast } from "sonner";
+import { DepartmentProvider } from "@/components/employees/DepartmentContext";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -92,8 +93,9 @@ function Index() {
   };
 
   return (
-    <div className="flex min-h-screen w-full bg-background">
-      <AppSidebar active={active} setActive={setActive} />
+    <DepartmentProvider>
+      <div className="flex min-h-screen w-full bg-background">
+        <AppSidebar active={active} setActive={setActive} />
       <main className="min-w-0 flex-1 overflow-x-hidden px-6 pb-24 pt-20 sm:px-10 md:pb-8 md:pt-8">
         {/* Main Dashboard */}
         {active === "/dashboard" && <Dashboard />}
@@ -164,7 +166,8 @@ function Index() {
           </>
         )}
       </main>
-      <QuickActionModals activeAction={activeAction} onClose={() => setActiveAction(null)} />
-    </div>
+        <QuickActionModals activeAction={activeAction} onClose={() => setActiveAction(null)} />
+      </div>
+    </DepartmentProvider>
   );
 }

@@ -13,6 +13,16 @@ export interface Employee {
   performanceScore: number; // Out of 100
 }
 
+export const AVAILABLE_DEPARTMENTS = [
+  "Development",
+  "Sales",
+  "Creative",
+  "HR",
+  "Product",
+  "Marketing",
+  "Finance"
+];
+
 export const EMPLOYEES: Employee[] = [
   {
     id: "EMP-001",
