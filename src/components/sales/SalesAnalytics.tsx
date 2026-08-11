@@ -71,7 +71,7 @@ export function SalesAnalytics({ onAction }: { onAction?: (action: string) => vo
         <ChartCard title="Conversion Funnel" subtitle="1,240 leads → 78 won (6.3%)">
           <div className="space-y-2.5">
             {conversionFunnel.map((item, i) => {
-              const maxVal = conversionFunnel[0].value;
+              const maxVal = conversionFunnel[0]?.value || 1;
               const pct = (item.value / maxVal) * 100;
               return (
                 <div key={item.stage} className="flex items-center gap-3">
@@ -88,7 +88,7 @@ export function SalesAnalytics({ onAction }: { onAction?: (action: string) => vo
                   </div>
                   {i > 0 && (
                     <span className="w-10 text-right text-[10px] text-muted-foreground">
-                      {((item.value / conversionFunnel[i - 1].value) * 100).toFixed(0)}%
+                      {((item.value / (conversionFunnel[i - 1]?.value || 1)) * 100).toFixed(0)}%
                     </span>
                   )}
                 </div>

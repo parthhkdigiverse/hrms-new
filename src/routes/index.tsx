@@ -14,6 +14,9 @@ import { SalesSettings } from "@/components/sales/SalesSettings";
 import { PayrollDashboard } from "@/components/payroll/PayrollDashboard";
 import { SalaryStructure } from "@/components/payroll/SalaryStructure";
 import { PayrollSettings } from "@/components/payroll/PayrollSettings";
+import { PayrollProcessing } from "@/components/payroll/PayrollProcessing";
+import { BonusDeductions } from "@/components/payroll/BonusDeductions";
+import { Payslips } from "@/components/payroll/Payslips";
 import { QuickActionModals } from "@/components/sales/QuickActionModals";
 import { SalesProvider } from "@/components/sales/SalesContext";
 import { toast } from "sonner";
@@ -85,13 +88,16 @@ function Index() {
           {active === "/work/sales/analytics" && <SalesAnalytics onAction={handleQuickAction} />}
           {active === "/work/sales/team" && <SalesTeamPerformance onAction={handleQuickAction} />}
           {active === "/work/sales/reports" && <SalesReports onAction={handleQuickAction} />}
-          {active === "/work/sales/settings" && <SalesSettings onAction={handleQuickAction} />}
+          {active === "/work/sales/settings" && <SalesSettings />}
         </SalesProvider>
 
         {/* Render Payroll pages */}
         {active === "/payroll/dashboard" && <PayrollDashboard />}
         {active === "/payroll/structure" && <SalaryStructure />}
         {active === "/payroll/settings" && <PayrollSettings />}
+        {active === "/payroll/processing" && <PayrollProcessing />}
+        {active === "/payroll/bonuses" && <BonusDeductions />}
+        {active === "/payroll/payslips" && <Payslips />}
 
         {/* Fallback original content for all other items */}
         {!active.startsWith("/work/sales") && !active.startsWith("/payroll") && (

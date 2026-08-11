@@ -19,7 +19,7 @@ import { MOCK_EMPLOYEES, formatCurrency } from "./payroll-data";
 export function SalaryStructure() {
   const [employees, setEmployees] = useState(MOCK_EMPLOYEES);
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedEmpId, setSelectedEmpId] = useState<string | null>(employees[3].id); // Default to Imran Qureshi to match screenshot
+  const [selectedEmpId, setSelectedEmpId] = useState<string | null>(employees[0]?.id || null); // Default to Ananya Sharma
   
   // Edit state
   const [isEditing, setIsEditing] = useState(false);

@@ -96,27 +96,31 @@ export function SalesTeamPerformance({ onAction }: { onAction?: (action: string)
 
       {/* Top & Bottom Highlights */}
       <div className="grid gap-4 sm:grid-cols-2">
-        <div className="flex items-center gap-4 rounded-2xl border border-emerald-200 bg-gradient-to-r from-emerald-50 to-white p-5">
-          <div className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-emerald-100">
-            <Award className="h-6 w-6 text-emerald-600" />
+        {top && (
+          <div className="flex items-center gap-4 rounded-2xl border border-emerald-200 bg-gradient-to-r from-emerald-50 to-white p-5">
+            <div className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-emerald-100">
+              <Award className="h-6 w-6 text-emerald-600" />
+            </div>
+            <div>
+              <p className="text-xs font-bold uppercase tracking-wider text-emerald-600">Top Performer</p>
+              <p className="text-lg font-black">{top.name}</p>
+              <p className="text-xs text-muted-foreground">{Math.round((top.achieved / top.target) * 100)}% of target · {formatCurrency(top.achieved)}</p>
+            </div>
           </div>
-          <div>
-            <p className="text-xs font-bold uppercase tracking-wider text-emerald-600">Top Performer</p>
-            <p className="text-lg font-black">{top.name}</p>
-            <p className="text-xs text-muted-foreground">{Math.round((top.achieved / top.target) * 100)}% of target · {formatCurrency(top.achieved)}</p>
-          </div>
-        </div>
+        )}
 
-        <div className="flex items-center gap-4 rounded-2xl border border-rose-200 bg-gradient-to-r from-rose-50 to-white p-5">
-          <div className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-rose-100">
-            <TrendingDown className="h-6 w-6 text-rose-600" />
+        {bottom && (
+          <div className="flex items-center gap-4 rounded-2xl border border-rose-200 bg-gradient-to-r from-rose-50 to-white p-5">
+            <div className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-rose-100">
+              <TrendingDown className="h-6 w-6 text-rose-600" />
+            </div>
+            <div>
+              <p className="text-xs font-bold uppercase tracking-wider text-rose-600">Needs Support</p>
+              <p className="text-lg font-black">{bottom.name}</p>
+              <p className="text-xs text-muted-foreground">{Math.round((bottom.achieved / bottom.target) * 100)}% of target · {formatCurrency(bottom.achieved)}</p>
+            </div>
           </div>
-          <div>
-            <p className="text-xs font-bold uppercase tracking-wider text-rose-600">Needs Support</p>
-            <p className="text-lg font-black">{bottom.name}</p>
-            <p className="text-xs text-muted-foreground">{Math.round((bottom.achieved / bottom.target) * 100)}% of target · {formatCurrency(bottom.achieved)}</p>
-          </div>
-        </div>
+        )}
       </div>
 
       {/* Leaderboard */}

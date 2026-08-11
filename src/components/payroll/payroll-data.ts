@@ -24,7 +24,14 @@ export interface EmployeeSalary {
   effectiveDate: string;
   grossSalary: number;
   components: SalaryComponent[];
-  history: SalaryHistory[];
+  history: { date: string; amount: number; reason: string; type: string; actionBy: string }[];
+  attendance: {
+    workingDays: number;
+    present: number;
+    leave: number;
+    absent: number;
+    overtimeHrs: number;
+  };
 }
 
 export const formatCurrency = (amount: number) => {
@@ -37,7 +44,7 @@ export const formatCurrency = (amount: number) => {
 
 export const MOCK_EMPLOYEES: EmployeeSalary[] = [
   {
-    id: "e1",
+    id: "1",
     empId: "HKD-001",
     name: "Ananya Sharma",
     designation: "Senior Software Engineer",
@@ -45,194 +52,46 @@ export const MOCK_EMPLOYEES: EmployeeSalary[] = [
     joiningDate: "11 Mar 2024",
     type: "Full Time",
     effectiveDate: "01 Jul 2026",
-    grossSalary: 92000,
-    components: [
-      { id: "c1", name: "Basic Salary", amount: 36800, type: "earnings" },
-      { id: "c2", name: "HRA", amount: 18400, type: "earnings" },
-      { id: "c3", name: "Special Allowance", amount: 12880, type: "earnings" },
-      { id: "c4", name: "Medical Allowance", amount: 4600, type: "earnings" },
-      { id: "c5", name: "Travel Allowance", amount: 4600, type: "earnings" },
-      { id: "c6", name: "Internet Allowance", amount: 2760, type: "earnings" },
-      { id: "c7", name: "Food Allowance", amount: 3680, type: "earnings" },
-      { id: "c8", name: "Performance Allowance", amount: 5520, type: "earnings" },
-      { id: "c9", name: "Other Allowance", amount: 2760, type: "earnings" },
-      
-      { id: "d1", name: "Professional Tax", amount: 200, type: "deductions" },
-      { id: "d2", name: "TDS", amount: 5520, type: "deductions" },
-      { id: "d3", name: "Provident Fund", amount: 1800, type: "deductions" },
-      { id: "d4", name: "ESIC", amount: 0, type: "deductions" },
-      { id: "d5", name: "Health Insurance", amount: 650, type: "deductions" },
-      { id: "d6", name: "Loan Recovery", amount: 0, type: "deductions" },
-      { id: "d7", name: "Leave Deduction", amount: 3538, type: "deductions" }
-    ],
+    grossSalary: 81400,
+    components: [],
     history: [
-      { date: "01 Jul 2026", amount: 92000, reason: "Promoted to Senior Engineer", actionBy: "CEO", type: "Promotion" },
-      { date: "01 Apr 2025", amount: 74000, reason: "Annual appraisal FY25", actionBy: "HR Admin", type: "Increase" },
-      { date: "11 Mar 2024", amount: 62000, reason: "Joining salary", actionBy: "HR Admin", type: "Initial" }
-    ]
+      { date: "01 Apr 2026", amount: 81400, reason: "Annual Appraisal", type: "Promotion", actionBy: "HR Admin" },
+      { date: "05 Jun 2022", amount: 65000, reason: "Joined Company", type: "Initial", actionBy: "HR Admin" }
+    ],
+    attendance: { workingDays: 26, present: 24, leave: 2, absent: 0, overtimeHrs: 6 }
   },
   {
-    id: "e2",
+    id: "2",
     empId: "HKD-002",
     name: "Rahul Verma",
-    designation: "Regional Sales Manager",
-    department: "Sales",
-    joiningDate: "09 Jan 2023",
-    type: "Full Time",
-    effectiveDate: "01 Jan 2026",
-    grossSalary: 85000,
-    components: [
-      { id: "c1", name: "Basic Salary", amount: 34000, type: "earnings" },
-      { id: "c2", name: "HRA", amount: 17000, type: "earnings" },
-      { id: "c3", name: "Special Allowance", amount: 34000, type: "earnings" },
-      { id: "d1", name: "Professional Tax", amount: 200, type: "deductions" },
-      { id: "d2", name: "TDS", amount: 4800, type: "deductions" },
-      { id: "d3", name: "Loan Recovery", amount: 3000, type: "deductions" }
-    ],
-    history: [
-      { date: "01 Jan 2026", amount: 85000, reason: "Mid-year adjustment", actionBy: "HR Admin", type: "Increase" },
-      { date: "15 Jun 2025", amount: 75000, reason: "Joining salary", actionBy: "HR Admin", type: "Initial" }
-    ]
-  },
-  {
-    id: "e3",
-    empId: "HKD-003",
-    name: "Priya Nair",
-    designation: "HR Executive",
-    department: "Human Resources",
-    joiningDate: "02 Jun 2025",
+    designation: "Backend Developer",
+    department: "Engineering",
+    joiningDate: "12 Oct 2023",
     type: "Full Time",
     effectiveDate: "01 Jul 2026",
-    grossSalary: 38000,
-    components: [
-      { id: "c1", name: "Basic Salary", amount: 15200, type: "earnings" },
-      { id: "c2", name: "HRA", amount: 7600, type: "earnings" },
-      { id: "c3", name: "Special Allowance", amount: 15200, type: "earnings" },
-      { id: "d1", name: "Professional Tax", amount: 200, type: "deductions" },
-      { id: "d2", name: "TDS", amount: 0, type: "deductions" },
-      { id: "d3", name: "Provident Fund", amount: 1800, type: "deductions" }
-    ],
+    grossSalary: 68000,
+    components: [],
     history: [
-      { date: "01 Jul 2026", amount: 38000, reason: "Annual appraisal", actionBy: "HR Admin", type: "Increase" },
-      { date: "10 Feb 2025", amount: 32000, reason: "Joining salary", actionBy: "HR Admin", type: "Initial" }
-    ]
+      { date: "01 Apr 2026", amount: 68000, reason: "Annual Appraisal", type: "Promotion", actionBy: "HR Admin" },
+      { date: "12 Oct 2023", amount: 55000, reason: "Joined Company", type: "Initial", actionBy: "HR Admin" }
+    ],
+    attendance: { workingDays: 26, present: 26, leave: 0, absent: 0, overtimeHrs: 12 }
   },
   {
-    id: "e4",
-    empId: "HKD-004",
-    name: "Imran Qureshi",
-    designation: "Accounts Lead",
-    department: "Finance",
-    joiningDate: "21 Nov 2022",
-    type: "Full Time",
-    effectiveDate: "01 Oct 2025",
-    grossSalary: 71000,
-    components: [
-      { id: "c1", name: "Basic Salary", amount: 28400, type: "earnings" },
-      { id: "c2", name: "HRA", amount: 14200, type: "earnings" },
-      { id: "c3", name: "Special Allowance", amount: 9940, type: "earnings" },
-      { id: "c4", name: "Medical Allowance", amount: 3550, type: "earnings" },
-      { id: "c5", name: "Travel Allowance", amount: 3550, type: "earnings" },
-      { id: "c6", name: "Internet Allowance", amount: 2130, type: "earnings" },
-      { id: "c7", name: "Food Allowance", amount: 2840, type: "earnings" },
-      { id: "c8", name: "Performance Allowance", amount: 4260, type: "earnings" },
-      { id: "c9", name: "Other Allowance", amount: 2130, type: "earnings" },
-      { id: "d1", name: "Professional Tax", amount: 200, type: "deductions" },
-      { id: "d2", name: "TDS", amount: 4260, type: "deductions" },
-      { id: "d3", name: "Provident Fund", amount: 1800, type: "deductions" },
-      { id: "d4", name: "ESIC", amount: 0, type: "deductions" },
-      { id: "d5", name: "Health Insurance", amount: 650, type: "deductions" }
-    ],
-    history: [
-      { date: "01 Apr 2026", amount: 71000, reason: "Annual appraisal", actionBy: "HR Admin", type: "Increase" },
-      { date: "05 May 2024", amount: 55000, reason: "Joining salary", actionBy: "HR Admin", type: "Initial" }
-    ]
-  },
-  {
-    id: "e5",
-    empId: "HKD-005",
-    name: "Sneha Patil",
+    id: "3",
+    empId: "HKD-003",
+    name: "Priya Nair",
     designation: "Product Designer",
     department: "Design",
-    joiningDate: "05 Jan 2026",
+    joiningDate: "15 Jan 2024",
     type: "Full Time",
-    effectiveDate: "05 Jan 2026",
-    grossSalary: 54000,
-    components: [
-      { id: "c1", name: "Basic Salary", amount: 21600, type: "earnings" },
-      { id: "c2", name: "HRA", amount: 10800, type: "earnings" },
-      { id: "c3", name: "Special Allowance", amount: 21600, type: "earnings" },
-      { id: "d1", name: "Professional Tax", amount: 200, type: "deductions" },
-      { id: "d2", name: "TDS", amount: 1200, type: "deductions" },
-      { id: "d3", name: "Provident Fund", amount: 1800, type: "deductions" }
-    ],
+    effectiveDate: "01 Jul 2026",
+    grossSalary: 72500,
+    components: [],
     history: [
-      { date: "15 Oct 2025", amount: 54000, reason: "Joining salary", actionBy: "HR Admin", type: "Initial" }
-    ]
-  },
-  {
-    id: "e6",
-    empId: "HKD-006",
-    name: "Vikram Joshi",
-    designation: "QA Engineer",
-    department: "Engineering",
-    joiningDate: "17 Feb 2025",
-    type: "Contract",
-    effectiveDate: "01 Apr 2026",
-    grossSalary: 42000,
-    components: [
-      { id: "c1", name: "Basic Salary", amount: 16800, type: "earnings" },
-      { id: "c2", name: "HRA", amount: 8400, type: "earnings" },
-      { id: "c3", name: "Special Allowance", amount: 16800, type: "earnings" },
-      { id: "d1", name: "Professional Tax", amount: 200, type: "deductions" },
-      { id: "d2", name: "Provident Fund", amount: 1800, type: "deductions" }
+      { date: "15 Jan 2024", amount: 72500, reason: "Joined Company", type: "Initial", actionBy: "HR Admin" }
     ],
-    history: [
-      { date: "20 Nov 2025", amount: 42000, reason: "Joining salary", actionBy: "HR Admin", type: "Initial" }
-    ]
-  },
-  {
-    id: "e7",
-    empId: "HKD-007",
-    name: "Meera Krishnan",
-    designation: "Growth Marketer",
-    department: "Marketing",
-    joiningDate: "19 Aug 2024",
-    type: "Full Time",
-    effectiveDate: "01 Jun 2026",
-    grossSalary: 65000,
-    components: [
-      { id: "c1", name: "Basic Salary", amount: 26000, type: "earnings" },
-      { id: "c2", name: "HRA", amount: 13000, type: "earnings" },
-      { id: "c3", name: "Special Allowance", amount: 26000, type: "earnings" },
-      { id: "d1", name: "Professional Tax", amount: 200, type: "deductions" },
-      { id: "d2", name: "TDS", amount: 3100, type: "deductions" }
-    ],
-    history: [
-      { date: "01 Sep 2025", amount: 65000, reason: "Joining salary", actionBy: "HR Admin", type: "Initial" }
-    ]
-  },
-  {
-    id: "e8",
-    empId: "HKD-008",
-    name: "Arjun Desai",
-    designation: "Operations Associate",
-    department: "Operations",
-    joiningDate: "12 Dec 2025",
-    type: "Full Time",
-    effectiveDate: "12 Dec 2025",
-    grossSalary: 22000,
-    components: [
-      { id: "c1", name: "Basic Salary", amount: 11000, type: "earnings" },
-      { id: "c2", name: "HRA", amount: 5500, type: "earnings" },
-      { id: "c3", name: "Special Allowance", amount: 5500, type: "earnings" },
-      { id: "d1", name: "Professional Tax", amount: 200, type: "deductions" },
-      { id: "d2", name: "Provident Fund", amount: 1320, type: "deductions" },
-      { id: "d3", name: "ESIC", amount: 165, type: "deductions" }
-    ],
-    history: [
-      { date: "12 Dec 2025", amount: 22000, reason: "Joining salary", actionBy: "HR Admin", type: "Initial" }
-    ]
+    attendance: { workingDays: 26, present: 25, leave: 1, absent: 0, overtimeHrs: 0 }
   }
 ];
 
@@ -255,11 +114,29 @@ export const MOCK_PAYROLL_TRENDS = [
 ];
 
 export const MOCK_DEPARTMENT_COSTS = [
-  { name: "Engineering", cost: 134, fill: "#10b981" },
-  { name: "Sales", cost: 85, fill: "#f59e0b" },
-  { name: "Finance", cost: 68, fill: "#6366f1" },
-  { name: "Marketing", cost: 65, fill: "#ec4899" },
-  { name: "Design", cost: 54, fill: "#8b5cf6" },
-  { name: "HR", cost: 38, fill: "#14b8a6" },
-  { name: "Operations", cost: 22, fill: "#f43f5e" }
+  { name: "Engineering", value: 45, color: "#0088FE" },
+  { name: "Sales", value: 25, color: "#00C49F" },
+  { name: "Marketing", value: 15, color: "#FFBB28" },
+  { name: "HR & Admin", value: 15, color: "#FF8042" },
+];
+
+export const MOCK_BONUS_DEDUCTIONS = [
+  { ref: "BD-1041", type: "Bonus", typeLabel: "Festival Bonus", appliedTo: "All employees", appliedToSub: "Entire Company", reason: "Diwali festival bonus 2026", creator: "HR Admin", date: "05 Jul 2026", amount: 5000, state: "Approved" },
+  { ref: "BD-1042", type: "Bonus", typeLabel: "Performance Bonus", appliedTo: "Ananya Sharma", appliedToSub: "Individual", reason: "Q2 delivery excellence", creator: "HR Admin", date: "12 Jul 2026", amount: 8000, state: "Approved" },
+  { ref: "BD-1043", type: "Bonus", typeLabel: "Sales Incentive", appliedTo: "Sales", appliedToSub: "Department", reason: "Q2 target 128% achieved", creator: "Accounts", date: "14 Jul 2026", amount: 12000, state: "Approved" },
+  { ref: "BD-1044", type: "Bonus", typeLabel: "Referral Bonus", appliedTo: "Meera Krishnan", appliedToSub: "Individual", reason: "Referral joined & confirmed", creator: "HR Admin", date: "18 Jul 2026", amount: 6000, state: "Pending" },
+  { ref: "BD-1045", type: "Deduction", typeLabel: "Late Coming", appliedTo: "Vikram Joshi", appliedToSub: "Individual", reason: "6 late marks beyond grace", creator: "HR Admin", date: "20 Jul 2026", amount: -500, state: "Approved" },
+  { ref: "BD-1046", type: "Deduction", typeLabel: "Advance Recovery", appliedTo: "Vikram Joshi", appliedToSub: "Individual", reason: "Salary advance EMI 2/4", creator: "Accounts", date: "21 Jul 2026", amount: -2500, state: "Approved" },
+  { ref: "BD-1047", type: "Deduction", typeLabel: "Loan EMI", appliedTo: "Rahul Verma", appliedToSub: "Individual", reason: "Personal loan EMI 7/12", creator: "Accounts", date: "22 Jul 2026", amount: -3000, state: "Approved" },
+  { ref: "BD-1048", type: "Bonus", typeLabel: "Project Bonus", appliedTo: "Imran Qureshi", appliedToSub: "Individual", reason: "Audit closure ahead of schedule", creator: "CEO", date: "24 Jul 2026", amount: 5000, state: "Approved" }
+];
+
+export const MOCK_PAYROLL_RUNS = [
+  { id: "1", employee: "Ananya Sharma", empId: "HKD-001", working: 26, present: 24, absent: 0, leave: 2, otHrs: 6, gross: 92000, deduction: 11708, netSalary: 93596, status: "Not Generated" },
+  { id: "2", employee: "Rahul Verma", empId: "HKD-002", working: 26, present: 25, absent: 1, leave: 0, otHrs: 0, gross: 66000, deduction: 9610, netSalary: 68390, status: "Not Generated" },
+  { id: "3", employee: "Priya Nair", empId: "HKD-003", working: 26, present: 22, absent: 2, leave: 2, otHrs: 4, gross: 38000, deduction: 4872, netSalary: 34592, status: "Not Generated" },
+  { id: "4", employee: "Imran Qureshi", empId: "HKD-004", working: 26, present: 26, absent: 0, leave: 0, otHrs: 9, gross: 71000, deduction: 6910, netSalary: 75228, status: "Not Generated" },
+  { id: "5", employee: "Sneha Patil", empId: "HKD-005", working: 26, present: 23, absent: 1, leave: 2, otHrs: 2, gross: 45000, deduction: 5281, netSalary: 40583, status: "Not Generated" },
+  { id: "6", employee: "Vikram Joshi", empId: "HKD-006", working: 26, present: 20, absent: 4, leave: 2, otHrs: 0, gross: 36000, deduction: 7983, netSalary: 28017, status: "Not Generated" },
+  { id: "7", employee: "Meera Krishnan", empId: "HKD-007", working: 26, present: 25, absent: 0, leave: 1, otHrs: 3, gross: 52000, deduction: 3690, netSalary: 55810, status: "Not Generated" }
 ];

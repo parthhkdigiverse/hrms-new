@@ -197,11 +197,10 @@ export function SalesPipeline({ onAction }: { onAction?: (action: string) => voi
     const map: Record<string, Lead[]> = {};
     for (const s of activeStages) map[s] = [];
     for (const l of filtered) {
-      if (map[l.stage]) {
-        map[l.stage].push(l);
-      } else {
-        map[l.stage] = [l];
+      if (!map[l.stage]) {
+        map[l.stage] = [];
       }
+      map[l.stage].push(l);
     }
     return map;
   }, [filtered, activeStages]);
@@ -260,7 +259,7 @@ export function SalesPipeline({ onAction }: { onAction?: (action: string) => voi
           {activeStages.map((stage) => {
             // Pick color dynamically if not in original pipelineStages
             const predefinedColor = ["#6366f1", "#8b5cf6", "#3b82f6", "#06b6d4", "#f59e0b", "#f97316", "#10b981", "#f43f5e"];
-            const color = predefinedColor[activeStages.indexOf(stage) % predefinedColor.length];
+            const color = predefinedColor[activeStages.indexOf(stage) % predefinedColor.length] || "#6366f1";
             return (
               <KanbanColumn
                 key={stage}

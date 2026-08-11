@@ -160,12 +160,15 @@ export function SalesSettings() {
   const [editStageName, setEditStageName] = useState("");
 
   const handleEditPermissions = (idx: number) => {
-    setTempPerms([...permissions[idx].perms]);
-    setEditRoleIdx(idx);
+    const rolePerms = permissions[idx]?.perms;
+    if (rolePerms) {
+      setTempPerms([...rolePerms]);
+      setEditRoleIdx(idx);
+    }
   };
 
   const handleSavePermissions = () => {
-    if (editRoleIdx !== null) {
+    if (editRoleIdx !== null && permissions[editRoleIdx]) {
       const updated = [...permissions];
       updated[editRoleIdx].perms = [...tempPerms];
       setPermissions(updated);
@@ -186,7 +189,8 @@ export function SalesSettings() {
       return;
     }
     const selectedIcon = AVAILABLE_ICONS[newCategoryIconIdx];
-    const randomColor = COLORS[Math.floor(Math.random() * COLORS.length)];
+    if (!selectedIcon) return;
+    const randomColor = COLORS[Math.floor(Math.random() * COLORS.length)] || "bg-slate-500";
     
     setCategories([{ 
       name: newCategoryName, 
@@ -248,20 +252,28 @@ export function SalesSettings() {
 
   // Edit Handlers
   const startEditCategory = (idx: number) => {
+    const cat = categories[idx];
+    if (!cat) return;
     setEditingCategoryIdx(idx);
-    setEditCategoryName(categories[idx].name);
-    const iconIdx = AVAILABLE_ICONS.findIndex(i => i.name === categories[idx].iconName);
+    setEditCategoryName(cat.name);
+    const iconIdx = AVAILABLE_ICONS.findIndex(i => i.name === cat.iconName);
     setEditCategoryIconIdx(iconIdx !== -1 ? iconIdx : 0);
   };
   const saveEditCategory = () => {
     if (editingCategoryIdx === null) return;
-    if (!editCategoryName.trim()) return toast.error("Name cannot be empty");
+    if (!editCategoryName.trim()) {
+      toast.error("Name cannot be empty");
+      return;
+    }
     const updated = [...categories];
+    const iconObj = AVAILABLE_ICONS[editCategoryIconIdx];
+    if (!iconObj || !updated[editingCategoryIdx]) return;
+    
     updated[editingCategoryIdx] = {
       ...updated[editingCategoryIdx],
       name: editCategoryName,
-      iconName: AVAILABLE_ICONS[editCategoryIconIdx].name,
-      icon: AVAILABLE_ICONS[editCategoryIconIdx].icon
+      iconName: iconObj.name,
+      icon: iconObj.icon
     };
     setCategories(updated);
     setEditingCategoryIdx(null);
@@ -269,12 +281,17 @@ export function SalesSettings() {
   };
 
   const startEditSource = (idx: number) => {
+    const src = sources[idx];
+    if (!src) return;
     setEditingSourceIdx(idx);
-    setEditSourceName(sources[idx]);
+    setEditSourceName(src);
   };
   const saveEditSource = () => {
     if (editingSourceIdx === null) return;
-    if (!editSourceName.trim()) return toast.error("Name cannot be empty");
+    if (!editSourceName.trim()) {
+      toast.error("Name cannot be empty");
+      return;
+    }
     const updated = [...sources];
     updated[editingSourceIdx] = editSourceName;
     setSources(updated);
@@ -283,12 +300,17 @@ export function SalesSettings() {
   };
 
   const startEditStage = (idx: number) => {
+    const stage = stages[idx];
+    if (!stage) return;
     setEditingStageIdx(idx);
-    setEditStageName(stages[idx]);
+    setEditStageName(stage);
   };
   const saveEditStage = () => {
     if (editingStageIdx === null) return;
-    if (!editStageName.trim()) return toast.error("Name cannot be empty");
+    if (!editStageName.trim()) {
+      toast.error("Name cannot be empty");
+      return;
+    }
     const updated = [...stages];
     updated[editingStageIdx] = editStageName;
     setStages(updated);
@@ -389,8 +411,8 @@ export function SalesSettings() {
                   title="Choose Icon"
                 >
                   {(() => {
-                    const IconComp = AVAILABLE_ICONS[newCategoryIconIdx].icon;
-                    return <IconComp className="h-5 w-5 text-emerald-600" />;
+                    const IconComp = AVAILABLE_ICONS[newCategoryIconIdx]?.icon;
+                    return IconComp ? <IconComp className="h-5 w-5 text-emerald-600" /> : null;
                   })()}
                 </button>
                 
@@ -446,8 +468,8 @@ export function SalesSettings() {
                           title="Choose Icon"
                         >
                           {(() => {
-                            const IconComp = AVAILABLE_ICONS[editCategoryIconIdx].icon;
-                            return <IconComp className="h-5 w-5" />;
+                            const IconComp = AVAILABLE_ICONS[editCategoryIconIdx]?.icon;
+                            return IconComp ? <IconComp className="h-5 w-5" /> : null;
                           })()}
                         </button>
                         <input 
@@ -696,7 +718,7 @@ export function SalesSettings() {
       {editRoleIdx !== null && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-in fade-in">
           <div className="w-full max-w-lg rounded-3xl bg-white p-6 shadow-xl animate-in zoom-in-95 max-h-[90vh] flex flex-col">
-            <h3 className="text-xl font-black tracking-tight mb-2">Edit {permissions[editRoleIdx].role} Permissions</h3>
+            <h3 className="text-xl font-black tracking-tight mb-2">Edit {permissions[editRoleIdx]?.role || "Role"} Permissions</h3>
             <p className="text-sm text-muted-foreground mb-6">
               Select the capabilities this role should have access to.
             </p>

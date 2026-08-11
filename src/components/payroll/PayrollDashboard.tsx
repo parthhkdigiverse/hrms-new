@@ -11,6 +11,7 @@ import {
 import { 
   BarChart, 
   Bar, 
+  Cell,
   LineChart, 
   Line, 
   XAxis, 
@@ -168,9 +169,9 @@ export function PayrollDashboard() {
                     contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                     formatter={(value) => [`₹${value}k`, "Cost"]}
                   />
-                  <Bar dataKey="cost" radius={[0, 4, 4, 0]}>
+                  <Bar dataKey="value" radius={[0, 4, 4, 0]}>
                     {MOCK_DEPARTMENT_COSTS.map((entry, index) => (
-                      <cell key={`cell-${index}`} fill={entry.fill} />
+                      <Cell key={`cell-${index}`} fill={entry.color} />
                     ))}
                   </Bar>
                 </BarChart>

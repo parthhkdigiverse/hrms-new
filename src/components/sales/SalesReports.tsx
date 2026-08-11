@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Download, FileText, Calendar, Filter, PieChart, Users, TrendingUp, IndianRupee } from "lucide-react";
+import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
 const reportTypes = [
@@ -34,7 +35,7 @@ const reportTypes = [
 ];
 
 export function SalesReports({ onAction }: { onAction?: (action: string) => void }) {
-  const [selectedReport, setSelectedReport] = useState(reportTypes[0].id);
+  const [selectedReport, setSelectedReport] = useState(reportTypes[0]?.id || "");
   const [dateRange, setDateRange] = useState("This Month");
   const [format, setFormat] = useState("PDF");
 
