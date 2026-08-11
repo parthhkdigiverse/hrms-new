@@ -30,6 +30,11 @@ import {
   Trophy,
   Kanban,
   SlidersHorizontal,
+  LayoutGrid,
+  Wallet,
+  Settings2,
+  PlayCircle,
+  Gift,
   type LucideIcon,
 } from "lucide-react";
 
@@ -110,10 +115,12 @@ export const navItems: NavItem[] = [
     icon: IndianRupee,
     section: "Finance",
     children: [
-      { title: "Salary Structure", url: "/payroll/structure" },
-      { title: "Payroll Processing", url: "/payroll/processing" },
-      { title: "Payslips", url: "/payroll/payslips" },
-      { title: "Bonuses & Deductions", url: "/payroll/bonuses" },
+      { title: "Payroll Dashboard", url: "/payroll/dashboard", icon: LayoutGrid },
+      { title: "Salary Structure", url: "/payroll/structure", icon: Wallet },
+      { title: "Payroll Settings", url: "/payroll/settings", icon: Settings2 },
+      { title: "Payroll Processing", url: "/payroll/processing", icon: PlayCircle },
+      { title: "Bonus & Deductions", url: "/payroll/bonuses", icon: Gift },
+      { title: "Payslips", url: "/payroll/payslips", icon: FileText },
     ],
   },
   {
