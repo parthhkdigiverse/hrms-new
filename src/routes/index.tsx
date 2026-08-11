@@ -65,7 +65,20 @@ const suggestions = [
 ];
 
 function Index() {
-  const [active, setActive] = useState("/dashboard");
+  const [active, setActiveState] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem("activeSidebarTab") || "/dashboard";
+    }
+    return "/dashboard";
+  });
+  
+  const setActive = (val: string) => {
+    setActiveState(val);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem("activeSidebarTab", val);
+    }
+  };
+
   const [activeAction, setActiveAction] = useState<string | null>(null);
 
   const handleQuickAction = (label: string) => {
