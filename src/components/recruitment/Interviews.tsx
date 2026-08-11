@@ -1,0 +1,442 @@
+import { useState } from "react";
+import { Search, Plus, Calendar as CalendarIcon, Video, MoreHorizontal, Clock, CheckCircle2, ChevronRight, User } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { toast } from "sonner";
+import { cn } from "@/lib/utils";
+
+type InterviewStage = string;
+
+interface InterviewCandidate {
+  id: string;
+  name: string;
+  role: string;
+  avatar: string;
+  stage: InterviewStage;
+  date: string;
+  time: string;
+  interviewer: string;
+  interviewerAvatar: string;
+}
+
+const MOCK_CANDIDATES: InterviewCandidate[] = [
+  {
+    id: "C-001",
+    name: "Alex Johnson",
+    role: "Senior Frontend Engineer",
+    avatar: "https://i.pravatar.cc/150?u=alex",
+    stage: "Technical",
+    date: "Today",
+    time: "2:00 PM - 3:00 PM",
+    interviewer: "Sarah Lee",
+    interviewerAvatar: "https://i.pravatar.cc/150?u=sarah",
+  },
+  {
+    id: "C-002",
+    name: "Maria Garcia",
+    role: "Product Designer",
+    avatar: "https://i.pravatar.cc/150?u=maria",
+    stage: "Screening",
+    date: "Today",
+    time: "4:00 PM - 4:30 PM",
+    interviewer: "David Kim",
+    interviewerAvatar: "https://i.pravatar.cc/150?u=david",
+  },
+  {
+    id: "C-003",
+    name: "James Smith",
+    role: "Backend Developer",
+    avatar: "https://i.pravatar.cc/150?u=james",
+    stage: "Cultural",
+    date: "Tomorrow",
+    time: "10:00 AM - 11:00 AM",
+    interviewer: "Elena Rodriguez",
+    interviewerAvatar: "https://i.pravatar.cc/150?u=elena",
+  },
+  {
+    id: "C-004",
+    name: "Sophia Chen",
+    role: "Marketing Manager",
+    avatar: "https://i.pravatar.cc/150?u=sophia",
+    stage: "Offer",
+    date: "Tomorrow",
+    time: "1:00 PM - 1:30 PM",
+    interviewer: "Michael Scott",
+    interviewerAvatar: "https://i.pravatar.cc/150?u=michael",
+  },
+  {
+    id: "C-005",
+    name: "Liam O'Connor",
+    role: "DevOps Engineer",
+    avatar: "https://i.pravatar.cc/150?u=liam",
+    stage: "Technical",
+    date: "Aug 14, 2026",
+    time: "11:00 AM - 12:30 PM",
+    interviewer: "Sarah Lee",
+    interviewerAvatar: "https://i.pravatar.cc/150?u=sarah",
+  },
+];
+
+const INITIAL_STAGES: { label: InterviewStage; color: string; bgColor: string }[] = [
+  { label: "Screening", color: "text-blue-700", bgColor: "bg-blue-50" },
+  { label: "Technical", color: "text-indigo-700", bgColor: "bg-indigo-50" },
+  { label: "Cultural", color: "text-purple-700", bgColor: "bg-purple-50" },
+  { label: "Offer", color: "text-emerald-700", bgColor: "bg-emerald-50" },
+];
+
+export function Interviews() {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [candidates, setCandidates] = useState<InterviewCandidate[]>(MOCK_CANDIDATES);
+  const [isScheduleOpen, setIsScheduleOpen] = useState(false);
+  const [stages, setStages] = useState(INITIAL_STAGES);
+  
+  // Add Stage State
+  const [isAddingStage, setIsAddingStage] = useState(false);
+  const [newStageName, setNewStageName] = useState("");
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+
+  const handleDeleteStage = (stageLabel: string) => {
+    const stageCandidates = candidates.filter(c => c.stage === stageLabel);
+    if (stageCandidates.length > 0) {
+      toast.error(`Cannot delete stage "${stageLabel}". Please move or delete the ${stageCandidates.length} candidates in this stage first.`);
+      return;
+    }
+    
+    setStages(prev => prev.filter(s => s.label !== stageLabel));
+    toast.success(`Stage deleted`);
+  };
+
+  const [renamingStage, setRenamingStage] = useState<string | null>(null);
+  const [renameInput, setRenameInput] = useState("");
+
+  const handleRenameStage = (oldLabel: string) => {
+    if (!renameInput.trim() || renameInput.trim() === oldLabel) {
+      setRenamingStage(null);
+      return;
+    }
+    const newLabel = renameInput.trim();
+    
+    setStages(prev => prev.map(s => s.label === oldLabel ? { ...s, label: newLabel } : s));
+    setCandidates(prev => prev.map(c => c.stage === oldLabel ? { ...c, stage: newLabel } : c));
+    
+    setRenamingStage(null);
+    toast.success("Stage renamed");
+  };
+
+  const handleAddStage = () => {
+    if (!newStageName.trim()) return;
+    setStages(prev => [...prev, {
+      label: newStageName.trim(),
+      color: "text-slate-700",
+      bgColor: "bg-slate-100"
+    }]);
+    setNewStageName("");
+    setIsAddingStage(false);
+    toast.success("Stage added successfully");
+  };
+
+  // Form State
+  const [newName, setNewName] = useState("");
+  const [newRole, setNewRole] = useState("");
+  const [newStage, setNewStage] = useState<InterviewStage>(stages[0]?.label || "Screening");
+  const [newDate, setNewDate] = useState("");
+  const [newTime, setNewTime] = useState("");
+  const [newInterviewer, setNewInterviewer] = useState("");
+
+  const handleSchedule = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newName || !newRole || !newDate || !newTime || !newInterviewer) {
+      toast.error("Please fill all required fields");
+      return;
+    }
+
+    const newCandidate: InterviewCandidate = {
+      id: `C-${Math.random().toString(36).substr(2, 9)}`,
+      name: newName,
+      role: newRole,
+      avatar: `https://i.pravatar.cc/150?u=${newName.replace(/\s/g, '')}`,
+      stage: newStage,
+      date: newDate,
+      time: newTime,
+      interviewer: newInterviewer,
+      interviewerAvatar: `https://i.pravatar.cc/150?u=${newInterviewer.replace(/\s/g, '')}`,
+    };
+
+    setCandidates(prev => [...prev, newCandidate]);
+    setIsScheduleOpen(false);
+    toast.success("Interview scheduled successfully!");
+    
+    setNewName("");
+    setNewRole("");
+    setNewStage("Screening");
+    setNewDate("");
+    setNewTime("");
+    setNewInterviewer("");
+  };
+
+  const filteredCandidates = candidates.filter(c => 
+    c.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    c.role.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  return (
+    <div className="h-full flex flex-col space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-[1600px] mx-auto w-full">
+      
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h1 className="text-2xl font-black text-slate-900 tracking-tight">Interviews</h1>
+          <p className="text-sm text-slate-500 mt-1">Manage candidate pipeline and schedules</p>
+        </div>
+        <div className="flex items-center gap-3 w-full sm:w-auto">
+          <div className="relative flex-1 sm:flex-none">
+            <input 
+              type="text" 
+              placeholder="Search candidates..." 
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              className="w-full sm:w-64 pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-sm"
+            />
+          </div>
+          <Dialog open={isScheduleOpen} onOpenChange={setIsScheduleOpen}>
+            <DialogTrigger asChild>
+              <button className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-bold shadow-sm flex items-center gap-2 transition-colors whitespace-nowrap">
+                <Plus className="w-4 h-4" /> Schedule
+              </button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px] rounded-2xl">
+              <DialogHeader>
+                <DialogTitle className="text-xl font-black text-slate-900">Schedule Interview</DialogTitle>
+              </DialogHeader>
+              <form onSubmit={handleSchedule} className="space-y-4 mt-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-bold text-slate-700">Candidate Name</label>
+                  <input 
+                    type="text" 
+                    required
+                    value={newName}
+                    onChange={e => setNewName(e.target.value)}
+                    className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-bold text-slate-700">Role / Position</label>
+                  <input 
+                    type="text" 
+                    required
+                    value={newRole}
+                    onChange={e => setNewRole(e.target.value)}
+                    className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-bold text-slate-700">Interview Stage</label>
+                  <select 
+                    value={newStage}
+                    onChange={e => setNewStage(e.target.value as InterviewStage)}
+                    className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                  >
+                    {stages.map(s => <option key={s.label} value={s.label}>{s.label}</option>)}
+                  </select>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-sm font-bold text-slate-700">Date</label>
+                    <input 
+                      type="text"
+                      placeholder="e.g. Aug 15"
+                      required
+                      value={newDate}
+                      onChange={e => setNewDate(e.target.value)}
+                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-bold text-slate-700">Time</label>
+                    <input 
+                      type="text" 
+                      placeholder="e.g. 2:00 PM"
+                      required
+                      value={newTime}
+                      onChange={e => setNewTime(e.target.value)}
+                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-bold text-slate-700">Interviewer Name</label>
+                  <input 
+                    type="text" 
+                    required
+                    value={newInterviewer}
+                    onChange={e => setNewInterviewer(e.target.value)}
+                    className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                  />
+                </div>
+                <div className="pt-4 flex justify-end gap-3">
+                  <button 
+                    type="button" 
+                    onClick={() => setIsScheduleOpen(false)}
+                    className="px-4 py-2 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 font-bold text-sm rounded-xl transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button 
+                    type="submit"
+                    className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-xl transition-colors"
+                  >
+                    Schedule Interview
+                  </button>
+                </div>
+              </form>
+            </DialogContent>
+          </Dialog>
+        </div>
+      </div>
+
+      {/* Kanban Board */}
+      <div className="flex-1 overflow-x-auto hide-scrollbar pb-4">
+        <div className="flex gap-6 min-w-max h-full">
+          {stages.map(stage => {
+            const stageCandidates = filteredCandidates.filter(c => c.stage === stage.label);
+            
+            return (
+              <div key={stage.label} className="w-[320px] flex flex-col bg-slate-50/50 rounded-2xl border border-slate-200/60 p-4">
+                <div className="flex items-center justify-between mb-4 px-1">
+                  <div className="flex items-center gap-2">
+                    {renamingStage === stage.label ? (
+                      <input 
+                        type="text" 
+                        autoFocus
+                        value={renameInput}
+                        onChange={e => setRenameInput(e.target.value)}
+                        onBlur={() => handleRenameStage(stage.label)}
+                        onKeyDown={e => {
+                          if (e.key === 'Enter') handleRenameStage(stage.label);
+                          if (e.key === 'Escape') setRenamingStage(null);
+                        }}
+                        className="font-bold text-slate-900 bg-white border border-indigo-200 rounded px-2 py-0.5 text-sm w-32 outline-none focus:ring-2 focus:ring-indigo-500/20"
+                      />
+                    ) : (
+                      <h3 className="font-bold text-slate-900">{stage.label}</h3>
+                    )}
+                    <span className={cn("px-2 py-0.5 rounded-full text-xs font-bold", stage.bgColor, stage.color)}>
+                      {stageCandidates.length}
+                    </span>
+                  </div>
+                  <div className="relative">
+                    <button 
+                      onClick={() => setActiveDropdown(activeDropdown === stage.label ? null : stage.label)}
+                      className="p-1 hover:bg-slate-200 rounded text-slate-400 hover:text-slate-700 transition-colors"
+                    >
+                      <MoreHorizontal className="w-4 h-4" />
+                    </button>
+                    {activeDropdown === stage.label && (
+                      <div className="absolute right-0 top-full mt-1 w-36 bg-white rounded-xl shadow-lg border border-slate-100 py-1 z-10 animate-in fade-in zoom-in duration-200">
+                        <button 
+                          onClick={() => {
+                            setRenameInput(stage.label);
+                            setRenamingStage(stage.label);
+                            setActiveDropdown(null);
+                          }}
+                          className="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 font-medium transition-colors"
+                        >
+                          Rename Stage
+                        </button>
+                        <button 
+                          onClick={() => {
+                            handleDeleteStage(stage.label);
+                            setActiveDropdown(null);
+                          }}
+                          className="w-full text-left px-4 py-2 text-sm text-rose-600 hover:bg-rose-50 font-medium transition-colors"
+                        >
+                          Delete Stage
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-3 flex-1 overflow-y-auto hide-scrollbar">
+                  {stageCandidates.map(candidate => (
+                    <div 
+                      key={candidate.id}
+                      className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm hover:shadow-md hover:border-indigo-200 transition-all cursor-pointer group"
+                    >
+                      <div className="flex justify-between items-start mb-3">
+                        <div className="flex items-center gap-3">
+                          <img src={candidate.avatar} alt={candidate.name} className="w-10 h-10 rounded-full object-cover border-2 border-white shadow-sm" />
+                          <div>
+                            <h4 className="text-sm font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">{candidate.name}</h4>
+                            <p className="text-xs font-medium text-slate-500">{candidate.role}</p>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-2 mt-4 pt-4 border-t border-slate-100">
+                        <div className="flex items-center gap-2 text-xs font-medium text-slate-600">
+                          <CalendarIcon className="w-3.5 h-3.5 text-slate-400" />
+                          <span>{candidate.date} • {candidate.time}</span>
+                        </div>
+                        <div className="flex items-center justify-between text-xs font-medium text-slate-600">
+                          <div className="flex items-center gap-2">
+                            <User className="w-3.5 h-3.5 text-slate-400" />
+                            <span>{candidate.interviewer}</span>
+                          </div>
+                          <div className="flex items-center gap-1 text-indigo-600 bg-indigo-50 px-2 py-1 rounded-lg">
+                            <Video className="w-3 h-3" />
+                            <span>Meet</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                  
+                  {stageCandidates.length === 0 && (
+                    <div className="flex-1 flex flex-col items-center justify-center text-center p-6 border-2 border-dashed border-slate-200 rounded-xl">
+                      <p className="text-sm font-medium text-slate-400">No candidates in this stage</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+
+          {/* Add Stage Column */}
+          <div className="w-[320px] flex flex-col shrink-0 h-full min-h-[300px]">
+            {isAddingStage ? (
+              <div className="bg-slate-50/50 rounded-2xl border border-slate-200/60 p-4">
+                <input 
+                  type="text"
+                  autoFocus
+                  placeholder="Stage Name"
+                  value={newStageName}
+                  onChange={e => setNewStageName(e.target.value)}
+                  onKeyDown={e => { 
+                    if(e.key === 'Enter') handleAddStage(); 
+                    if(e.key === 'Escape') { setIsAddingStage(false); setNewStageName(""); } 
+                  }}
+                  className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                />
+                <div className="flex items-center gap-2 mt-3">
+                  <button onClick={handleAddStage} className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-lg transition-colors">
+                    Add
+                  </button>
+                  <button onClick={() => { setIsAddingStage(false); setNewStageName(""); }} className="px-3 py-1.5 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 font-bold text-xs rounded-lg transition-colors">
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <button 
+                onClick={() => setIsAddingStage(true)}
+                className="flex items-center justify-center gap-2 h-14 bg-slate-50/50 hover:bg-slate-100 border-2 border-dashed border-slate-200 text-slate-500 hover:text-slate-700 font-bold text-sm rounded-2xl transition-colors w-full"
+              >
+                <Plus className="w-4 h-4" /> Add Stage
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

@@ -28,6 +28,8 @@ import { toast } from "sonner";
 import { DepartmentProvider } from "@/components/employees/DepartmentContext";
 import { EmployeeProvider } from "@/components/employees/EmployeeContext";
 import { SettingsProvider } from "@/components/payroll/SettingsContext";
+import { Interviews } from "@/components/recruitment/Interviews";
+import { Hirings } from "@/components/recruitment/Hirings";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -132,8 +134,12 @@ function Index() {
         {active === "/employees/attendance" && <AttendanceList />}
         {active === "/employees/leave-requests" && <LeaveRequests />}
 
+        {/* Recruitment */}
+        {active === "/recruitment/interviews" && <Interviews />}
+        {active === "/recruitment/hirings" && <Hirings />}
+
         {/* Fallback original content for all other items */}
-        {active !== "/dashboard" && !active.startsWith("/work/sales") && !active.startsWith("/payroll") && !active.startsWith("/employees") && (
+        {active !== "/dashboard" && !active.startsWith("/work/sales") && !active.startsWith("/payroll") && !active.startsWith("/employees") && !active.startsWith("/recruitment") && (
           <>
             <header className="mb-8 max-w-3xl">
               <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
