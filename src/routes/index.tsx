@@ -1,5 +1,19 @@
+import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { AppSidebar } from "@/components/AppSidebar";
+
+// Sales Components
+import { SalesDashboard } from "@/components/sales/SalesDashboard";
+import { SalesPipeline } from "@/components/sales/SalesPipeline";
+import { SalesLeads } from "@/components/sales/SalesLeads";
+import { SalesTasks } from "@/components/sales/SalesTasks";
+import { SalesAnalytics } from "@/components/sales/SalesAnalytics";
+import { SalesTeamPerformance } from "@/components/sales/SalesTeamPerformance";
+import { SalesReports } from "@/components/sales/SalesReports";
+import { SalesSettings } from "@/components/sales/SalesSettings";
+import { QuickActionModals } from "@/components/sales/QuickActionModals";
+import { SalesProvider } from "@/components/sales/SalesContext";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -42,47 +56,78 @@ const suggestions = [
 ];
 
 function Index() {
+  const [active, setActive] = useState("/work/sales/dashboard");
+  const [activeAction, setActiveAction] = useState<string | null>(null);
+
+  const handleQuickAction = (label: string) => {
+    if (label === "Export Excel" || label === "Export PDF") {
+      const type = label.split(" ")[1];
+      toast.loading(`Exporting data to ${type}...`, { duration: 1500 });
+      setTimeout(() => toast.success(`${type} export complete!`, { description: "Your file has been downloaded." }), 1500);
+    } else {
+      setActiveAction(label);
+    }
+  };
+
   return (
     <div className="flex min-h-screen w-full bg-background">
-      <AppSidebar />
+      <AppSidebar active={active} setActive={setActive} />
       <main className="min-w-0 flex-1 overflow-x-hidden px-6 pb-24 pt-20 sm:px-10 md:pb-8 md:pt-8">
-        <header className="mb-8 max-w-3xl">
-          <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
-            Navigation review
-          </p>
-          <h1 className="mt-2 text-3xl font-black tracking-tight sm:text-4xl">
-            Your sidebar, reorganized
-          </h1>
-          <p className="mt-3 text-muted-foreground">
-            Same menu items from your screenshots — regrouped, searchable and collapsible. Click
-            around the sidebar to try it.
-          </p>
-        </header>
+        {/* Render the appropriate sales page based on state */}
+        <SalesProvider>
+          {active === "/work/sales/dashboard" && <SalesDashboard setActive={setActive} onAction={handleQuickAction} />}
+          {active === "/work/sales/pipeline" && <SalesPipeline onAction={handleQuickAction} />}
+          {active === "/work/sales/leads" && <SalesLeads onAction={handleQuickAction} />}
+          {active === "/work/sales/tasks" && <SalesTasks onAction={handleQuickAction} />}
+          {active === "/work/sales/analytics" && <SalesAnalytics onAction={handleQuickAction} />}
+          {active === "/work/sales/team" && <SalesTeamPerformance onAction={handleQuickAction} />}
+          {active === "/work/sales/reports" && <SalesReports onAction={handleQuickAction} />}
+          {active === "/work/sales/settings" && <SalesSettings onAction={handleQuickAction} />}
+        </SalesProvider>
 
-        <section className="mb-10">
-          <h2 className="mb-4 text-lg font-bold">What changed</h2>
-          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-            {improvements.map(([title, body]) => (
-              <div key={title} className="rounded-xl border border-border bg-card p-4">
-                <p className="font-semibold">{title}</p>
-                <p className="mt-1 text-sm text-muted-foreground">{body}</p>
+        {/* Fallback original content for all other items */}
+        {!active.startsWith("/work/sales") && (
+          <>
+            <header className="mb-8 max-w-3xl">
+              <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
+                Navigation review
+              </p>
+              <h1 className="mt-2 text-3xl font-black tracking-tight sm:text-4xl">
+                Your sidebar, reorganized
+              </h1>
+              <p className="mt-3 text-muted-foreground">
+                Same menu items from your screenshots — regrouped, searchable and collapsible. Click
+                around the sidebar to try it.
+              </p>
+            </header>
+
+            <section className="mb-10">
+              <h2 className="mb-4 text-lg font-bold">What changed</h2>
+              <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                {improvements.map(([title, body]) => (
+                  <div key={title} className="rounded-xl border border-border bg-card p-4">
+                    <p className="font-semibold">{title}</p>
+                    <p className="mt-1 text-sm text-muted-foreground">{body}</p>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-        </section>
+            </section>
 
-        <section className="max-w-5xl">
-          <h2 className="mb-4 text-lg font-bold">Worth adding next</h2>
-          <ul className="grid gap-3 sm:grid-cols-2">
-            {suggestions.map(([title, body]) => (
-              <li key={title} className="rounded-xl border border-dashed border-border p-4">
-                <p className="font-semibold">{title}</p>
-                <p className="mt-1 text-sm text-muted-foreground">{body}</p>
-              </li>
-            ))}
-          </ul>
-        </section>
+            <section className="max-w-5xl">
+              <h2 className="mb-4 text-lg font-bold">Worth adding next</h2>
+              <ul className="grid gap-3 sm:grid-cols-2">
+                {suggestions.map(([title, body]) => (
+                  <li key={title} className="rounded-xl border border-dashed border-border p-4">
+                    <p className="font-semibold">{title}</p>
+                    <p className="mt-1 text-sm text-muted-foreground">{body}</p>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          </>
+        )}
       </main>
+      <QuickActionModals activeAction={activeAction} onClose={() => setActiveAction(null)} />
     </div>
   );
 }

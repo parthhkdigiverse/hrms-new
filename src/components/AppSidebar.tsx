@@ -467,9 +467,14 @@ function SidebarBody({
   );
 }
 
-export function AppSidebar() {
+export function AppSidebar({ active = "/dashboard", setActive }: { active?: string; setActive?: (url: string) => void }) {
   const [collapsed, setCollapsed] = useState(false);
-  const [active, setActive] = useState("/dashboard");
+  // Default to internal state if no setActive is provided (for backward compatibility if used elsewhere)
+  const [internalActive, setInternalActive] = useState(active);
+  
+  const currentActive = setActive ? active : internalActive;
+  const handleSetActive = setActive || setInternalActive;
+
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
 
@@ -520,8 +525,8 @@ export function AppSidebar() {
           <SidebarBody
             collapsed={false}
             setCollapsed={() => {}}
-            active={active}
-            setActive={setActive}
+            active={currentActive}
+            setActive={handleSetActive}
             isMobile
             onClose={() => setDrawerOpen(false)}
           />
@@ -533,10 +538,10 @@ export function AppSidebar() {
         {mobileBarItems.map((item) => (
           <button
             key={item.url}
-            onClick={() => setActive(item.url)}
+            onClick={() => handleSetActive(item.url)}
             className={cn(
               "flex flex-1 flex-col items-center gap-1 py-2 text-[10px] font-medium",
-              active === item.url ? "text-sidebar-primary" : "text-sidebar-muted",
+              currentActive === item.url ? "text-sidebar-primary" : "text-sidebar-muted",
             )}
           >
             <item.icon className="h-5 w-5" />
@@ -557,8 +562,8 @@ export function AppSidebar() {
         <SidebarBody
           collapsed={effectivelyCollapsed}
           setCollapsed={setCollapsed}
-          active={active}
-          setActive={setActive}
+          active={currentActive}
+          setActive={handleSetActive}
           isLocked={!collapsed}
         />
       </aside>
