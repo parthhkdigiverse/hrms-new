@@ -107,7 +107,7 @@ export const navItems: NavItem[] = [
       { title: "Manage Courses", url: "/training/manage" },
     ],
   },
-  { title: "Schedule", url: "/schedule", icon: CalendarRange, section: "Time" },
+  { title: "Schedule", url: "/schedule", icon: CalendarRange, section: "Work" },
   {
     title: "Payroll",
     icon: IndianRupee,
@@ -196,7 +196,6 @@ export const navItems: NavItem[] = [
 export const sectionOrder = [
   "Overview",
   "People",
-  "Time",
   "Finance",
   "Work",
   "Workplace",
@@ -209,7 +208,7 @@ export const quickCreateActions: QuickAction[] = [
   { title: "New Invoice", url: "/invoice/create", icon: ReceiptText, hint: "Billing" },
   { title: "New Task", url: "/tasks?new=1", icon: ListPlus, hint: "Work" },
   { title: "Add Employee", url: "/employees/list?new=1", icon: UserPlus, hint: "People" },
-  { title: "Apply Leave", url: "/leave?new=1", icon: CalendarPlus, hint: "Time" },
+  { title: "Apply Leave", url: "/leave?new=1", icon: CalendarPlus, hint: "Work" },
 ];
 
 export const mobileBarItems: QuickAction[] = [
