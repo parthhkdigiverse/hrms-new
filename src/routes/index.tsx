@@ -39,6 +39,8 @@ import { Projects } from "@/components/work/Projects";
 import { Penalties } from "@/components/employees/Penalties";
 import { Remarks } from "@/components/employees/Remarks";
 import { ActivityLogs } from "@/components/admin/ActivityLogs";
+import { ActivityTracker } from "@/components/admin/ActivityTracker";
+import { Restrictions } from "@/components/admin/Restrictions";
 import { SeatingArrangement } from "@/components/workspace/SeatingArrangement";
 import { ResourceManagement } from "@/components/workspace/ResourceManagement";
 import { Gallery } from "@/components/workspace/Gallery";
@@ -201,9 +203,11 @@ function Index() {
 
         {/* Admin */}
         {active === "/activity-logs" && <ActivityLogs />}
+        {active === "/activity-tracker" && <ActivityTracker />}
+        {active === "/restrictions" && <Restrictions />}
 
         {/* Fallback original content for all other items */}
-        {active !== "/dashboard" && active !== "/schedule" && active !== "/work/logs" && active !== "/work/projects" && active !== "/tasks" && active !== "/chat" && active !== "/work/research" && active !== "/penalty" && active !== "/approvals/penalties" && active !== "/remarks" && active !== "/activity-logs" && !active.startsWith("/work/sales") && !active.startsWith("/payroll") && !active.startsWith("/employees") && !active.startsWith("/recruitment") && !active.startsWith("/workspace") && !active.startsWith("/approvals") && !active.startsWith("/invoice") && !active.startsWith("/reports") && (
+        {active !== "/dashboard" && active !== "/schedule" && active !== "/work/logs" && active !== "/work/projects" && active !== "/tasks" && active !== "/chat" && active !== "/work/research" && active !== "/penalty" && active !== "/approvals/penalties" && active !== "/remarks" && active !== "/activity-logs" && active !== "/activity-tracker" && active !== "/restrictions" && !active.startsWith("/work/sales") && !active.startsWith("/payroll") && !active.startsWith("/employees") && !active.startsWith("/recruitment") && !active.startsWith("/workspace") && !active.startsWith("/approvals") && !active.startsWith("/invoice") && !active.startsWith("/reports") && (
           <>
             <header className="mb-8 max-w-3xl">
               <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
