@@ -58,7 +58,7 @@ const MOCK_LOGS: ActivityLog[] = [
     action: "Approved Monthly Payroll Run",
     category: "Payroll",
     severity: "Info",
-    metadata: "Total dispersed: $142,500.00",
+    metadata: "Total dispersed: ₹142,500.00",
     ip: "192.168.1.88"
   },
   {

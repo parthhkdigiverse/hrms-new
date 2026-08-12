@@ -37,7 +37,7 @@ const INITIAL_CLIENTS: Client[] = [
     id: "c1",
     name: "TechNova Solutions",
     logo: "https://i.pravatar.cc/150?u=technova",
-    totalBudget: "$345,000",
+    totalBudget: "₹345,000",
     activeProjects: 3,
     status: "Active",
     contacts: [
@@ -49,7 +49,7 @@ const INITIAL_CLIENTS: Client[] = [
     id: "c2",
     name: "Acme Corp",
     logo: "https://i.pravatar.cc/150?u=acme",
-    totalBudget: "$120,000",
+    totalBudget: "₹120,000",
     activeProjects: 1,
     status: "Active",
     contacts: [{ name: "Bob", avatar: "https://i.pravatar.cc/150?u=bob" }]
@@ -58,7 +58,7 @@ const INITIAL_CLIENTS: Client[] = [
     id: "c3",
     name: "Global Retail Inc.",
     logo: "https://i.pravatar.cc/150?u=global",
-    totalBudget: "$450,000",
+    totalBudget: "₹450,000",
     activeProjects: 4,
     status: "Active",
     contacts: [
@@ -70,7 +70,7 @@ const INITIAL_CLIENTS: Client[] = [
     id: "c4",
     name: "Startup Hub",
     logo: "https://i.pravatar.cc/150?u=startup",
-    totalBudget: "$15,000",
+    totalBudget: "₹15,000",
     activeProjects: 0,
     status: "Archived",
     contacts: [{ name: "Eve", avatar: "https://i.pravatar.cc/150?u=eve" }]
@@ -86,7 +86,7 @@ const INITIAL_PROJECTS: Project[] = [
     status: "In Progress",
     progress: 75,
     deadline: "2026-09-01",
-    budget: "$45,000",
+    budget: "₹45,000",
     team: [
       { name: "Alex", avatar: "https://i.pravatar.cc/150?u=alex" },
       { name: "Sarah", avatar: "https://i.pravatar.cc/150?u=sarah" },
@@ -101,7 +101,7 @@ const INITIAL_PROJECTS: Project[] = [
     status: "In Review",
     progress: 90,
     deadline: "2026-08-20",
-    budget: "$120,000",
+    budget: "₹120,000",
     team: [
       { name: "Emma", avatar: "https://i.pravatar.cc/150?u=emma" },
       { name: "James", avatar: "https://i.pravatar.cc/150?u=james" }
@@ -115,7 +115,7 @@ const INITIAL_PROJECTS: Project[] = [
     status: "In Progress",
     progress: 35,
     deadline: "2026-11-15",
-    budget: "$85,000",
+    budget: "₹85,000",
     team: [
       { name: "David", avatar: "https://i.pravatar.cc/150?u=david" },
       { name: "Sarah", avatar: "https://i.pravatar.cc/150?u=sarah" },
@@ -131,7 +131,7 @@ const INITIAL_PROJECTS: Project[] = [
     status: "Completed",
     progress: 100,
     deadline: "2026-07-30",
-    budget: "$15,000",
+    budget: "₹15,000",
     team: [
       { name: "Emma", avatar: "https://i.pravatar.cc/150?u=emma" }
     ]
@@ -144,7 +144,7 @@ const INITIAL_PROJECTS: Project[] = [
     status: "On Hold",
     progress: 15,
     deadline: "2027-01-10",
-    budget: "$250,000",
+    budget: "₹250,000",
     team: [
       { name: "Mike", avatar: "https://i.pravatar.cc/150?u=mike" },
       { name: "David", avatar: "https://i.pravatar.cc/150?u=david" }
@@ -158,7 +158,7 @@ const INITIAL_PROJECTS: Project[] = [
     status: "In Progress",
     progress: 60,
     deadline: "2026-10-05",
-    budget: "$65,000",
+    budget: "₹65,000",
     team: [
       { name: "Sarah", avatar: "https://i.pravatar.cc/150?u=sarah" },
       { name: "John", avatar: "https://i.pravatar.cc/150?u=john" },
@@ -173,7 +173,11 @@ export function Projects() {
   const [clients, setClients] = useState<Client[]>(() => {
     const saved = localStorage.getItem('hrms_clients');
     if (saved) {
-      try { return JSON.parse(saved); } catch (e) {}
+      try { 
+        const parsed = JSON.parse(saved);
+        if (JSON.stringify(parsed).includes('$')) return INITIAL_CLIENTS; // Force update to ₹
+        return parsed;
+      } catch (e) {}
     }
     return INITIAL_CLIENTS;
   });
@@ -181,7 +185,11 @@ export function Projects() {
   const [projects, setProjects] = useState<Project[]>(() => {
     const saved = localStorage.getItem('hrms_projects');
     if (saved) {
-      try { return JSON.parse(saved); } catch (e) {}
+      try { 
+        const parsed = JSON.parse(saved);
+        if (JSON.stringify(parsed).includes('$')) return INITIAL_PROJECTS; // Force update to ₹
+        return parsed;
+      } catch (e) {}
     }
     return INITIAL_PROJECTS;
   });
@@ -197,27 +205,12 @@ export function Projects() {
   const [activeTab, setActiveTab] = useState(TABS[0]);
   const [searchQuery, setSearchQuery] = useState("");
   
-  const [selectedClientId, setSelectedClientId] = useState<string | null>(() => {
-    return localStorage.getItem('hrms_selectedClientId') || null;
-  });
-  
-  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(() => {
-    return localStorage.getItem('hrms_selectedProjectId') || null;
-  });
+  const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
+  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
 
   useEffect(() => { localStorage.setItem('hrms_clients', JSON.stringify(clients)); }, [clients]);
   useEffect(() => { localStorage.setItem('hrms_projects', JSON.stringify(projects)); }, [projects]);
   useEffect(() => { localStorage.setItem('hrms_categories', JSON.stringify(categories)); }, [categories]);
-  
-  useEffect(() => {
-    if (selectedClientId) localStorage.setItem('hrms_selectedClientId', selectedClientId);
-    else localStorage.removeItem('hrms_selectedClientId');
-  }, [selectedClientId]);
-
-  useEffect(() => {
-    if (selectedProjectId) localStorage.setItem('hrms_selectedProjectId', selectedProjectId);
-    else localStorage.removeItem('hrms_selectedProjectId');
-  }, [selectedProjectId]);
   const [isKanbanView, setIsKanbanView] = useState(false);
 
   const [isNewClientModalOpen, setIsNewClientModalOpen] = useState(false);
@@ -249,7 +242,7 @@ export function Projects() {
       id: `c${Date.now()}`,
       name: newClientName,
       logo: `https://i.pravatar.cc/150?u=${encodeURIComponent(newClientName)}`,
-      totalBudget: newClientBudget || "$0",
+      totalBudget: newClientBudget || "₹0",
       activeProjects: 0,
       status: "Active",
       contacts: [{ name: "User", avatar: "https://i.pravatar.cc/150?u=user" }]
@@ -270,7 +263,7 @@ export function Projects() {
       status: "In Progress",
       progress: 0,
       deadline: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] || "", // 30 days from now
-      budget: newProjectBudget || "$0",
+      budget: newProjectBudget || "₹0",
       team: [{ name: "User", avatar: "https://i.pravatar.cc/150?u=user" }]
     };
     
@@ -765,7 +758,7 @@ export function Projects() {
                   type="text" 
                   value={newProjectBudget}
                   onChange={(e) => setNewProjectBudget(e.target.value)}
-                  placeholder="e.g. $10,000"
+                  placeholder="e.g. ₹10,000"
                   className="w-full px-4 py-3 bg-muted/50 border border-border/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium"
                 />
               </div>
@@ -1160,7 +1153,7 @@ export function Projects() {
                 type="text" 
                 value={newClientBudget}
                 onChange={(e) => setNewClientBudget(e.target.value)}
-                placeholder="e.g. $100,000"
+                placeholder="e.g. ₹100,000"
                 className="w-full px-4 py-3 bg-muted/50 border border-border/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium"
               />
             </div>
