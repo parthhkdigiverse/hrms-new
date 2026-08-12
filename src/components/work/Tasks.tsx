@@ -31,7 +31,7 @@ const MOCK_TASKS: Task[] = [
 
 export function Tasks() {
   const [tasks, setTasks] = useState(MOCK_TASKS);
-  const [view, setView] = useState<"board" | "list">("board");
+  const [view, setView] = useState<"board" | "list">("list");
   const [searchQuery, setSearchQuery] = useState("");
   
   const [isNewTaskOpen, setIsNewTaskOpen] = useState(false);
