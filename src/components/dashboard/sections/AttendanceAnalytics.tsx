@@ -3,22 +3,41 @@ import { WEEKLY_ATTENDANCE } from "../dashboard-data";
 import { CollapsibleSection } from "./CollapsibleSection";
 
 export function AttendanceAnalytics() {
-  // Generate mock heatmap data for 5 weeks
   const generateHeatmap = () => {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = today.getMonth();
+    
+    // get first day of month (0-6 where 0 is Sunday, 1 is Monday...)
+    const firstDay = new Date(year, month, 1).getDay();
+    // adjust firstDay so that 0 is Monday, 6 is Sunday
+    const adjustedFirstDay = firstDay === 0 ? 6 : firstDay - 1;
+    
+    // get total days in month
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    
     const weeks = [];
-    let dayCount = 1;
-    for (let w = 0; w < 5; w++) {
+    let currentDay = 1;
+    
+    for (let w = 0; w < 6; w++) {
       const days = [];
       for (let d = 0; d < 7; d++) {
-        // weekends (Sat=5, Sun=6)
-        const val = (d === 5 || d === 6) ? 0 : Math.floor(Math.random() * 4) + 1;
-        days.push({
-          val,
-          date: dayCount > 31 ? dayCount - 31 : dayCount
-        });
-        dayCount++;
+        if (w === 0 && d < adjustedFirstDay) {
+          // empty days before the 1st
+          days.push({ val: 0, date: "" });
+        } else if (currentDay > daysInMonth) {
+          // empty days after the last day
+          days.push({ val: 0, date: "" });
+        } else {
+          // actual days
+          const isWeekend = (d === 5 || d === 6); // Sat=5, Sun=6
+          const val = isWeekend ? 0 : Math.floor(Math.random() * 4) + 1;
+          days.push({ val, date: currentDay });
+          currentDay++;
+        }
       }
       weeks.push(days);
+      if (currentDay > daysInMonth) break;
     }
     return weeks;
   };
@@ -86,7 +105,7 @@ export function AttendanceAnalytics() {
         <div className="bg-white border border-border/60 rounded-3xl p-6 shadow-sm md:col-span-3">
           <div className="mb-6">
             <h3 className="font-bold text-slate-900">Heatmap Calendar</h3>
-            <p className="text-[11px] text-slate-500">Attendance intensity over the last 5 weeks</p>
+            <p className="text-[11px] text-slate-500">Attendance intensity for {new Date().toLocaleString('default', { month: 'long', year: 'numeric' })}</p>
           </div>
           <div className="flex flex-col gap-2">
             {/* Days Header */}
@@ -104,7 +123,7 @@ export function AttendanceAnalytics() {
                 {week.map((day, d) => (
                   <div 
                     key={d} 
-                    className={`flex-1 h-10 flex items-center justify-center rounded-lg text-[12px] font-medium transition-all cursor-default hover:scale-[1.02] ${
+                    className={`flex-1 h-10 flex items-center justify-center rounded-lg text-[12px] font-medium transition-all cursor-default ${!day.date ? 'opacity-0' : 'hover:scale-[1.02]'} ${
                       day.val === 0 ? 'bg-slate-50 text-slate-400' : 
                       day.val === 1 ? 'bg-emerald-100 text-emerald-800' :
                       day.val === 2 ? 'bg-emerald-300 text-emerald-900' :
