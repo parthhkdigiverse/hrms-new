@@ -8,6 +8,8 @@ export function TimeTrackerWidget() {
   const [status, setStatus] = useState<PunchStatus>("Punched Out");
   const [workSeconds, setWorkSeconds] = useState(0);
   const [breakSeconds, setBreakSeconds] = useState(0);
+  const [punchInTime, setPunchInTime] = useState<string | null>(null);
+  const [punchOutTime, setPunchOutTime] = useState<string | null>(null);
 
   // Simulated timer
   useEffect(() => {
@@ -34,10 +36,15 @@ export function TimeTrackerWidget() {
   };
 
   const handlePunch = () => {
+    const timeString = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     if (status === "Punched Out") {
       setStatus("Punched In");
+      if (!punchInTime) {
+        setPunchInTime(timeString);
+      }
     } else {
       setStatus("Punched Out");
+      setPunchOutTime(timeString);
     }
   };
 
@@ -94,15 +101,27 @@ export function TimeTrackerWidget() {
           </div>
         </div>
 
-        {/* Timers */}
+        {/* Timers & Times */}
         <div className="flex items-center gap-8 px-8 border-x border-border/50">
-          <div>
-            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Work Hours</p>
-            <p className="text-3xl font-black font-mono text-foreground">{formatTime(workSeconds)}</p>
+          <div className="flex gap-8">
+            <div>
+              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Work Hours</p>
+              <p className="text-3xl font-black font-mono text-foreground">{formatTime(workSeconds)}</p>
+            </div>
+            <div>
+              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Break Hours</p>
+              <p className="text-3xl font-black font-mono text-muted-foreground">{formatTime(breakSeconds)}</p>
+            </div>
           </div>
-          <div>
-            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Break Hours</p>
-            <p className="text-3xl font-black font-mono text-muted-foreground">{formatTime(breakSeconds)}</p>
+          <div className="hidden lg:flex flex-col gap-2 pl-8 border-l border-border/50">
+            <div>
+              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest leading-none">Punch In</p>
+              <p className="text-sm font-bold text-foreground leading-tight mt-1">{punchInTime || "--:--"}</p>
+            </div>
+            <div>
+              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest leading-none">Punch Out</p>
+              <p className="text-sm font-bold text-foreground leading-tight mt-1">{punchOutTime || "--:--"}</p>
+            </div>
           </div>
         </div>
 
