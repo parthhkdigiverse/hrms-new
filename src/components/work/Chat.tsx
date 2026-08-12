@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Search, Plus, Hash, Settings, Bell, Phone, Video, Info, Send, Smile, Paperclip, MoreVertical, Image as ImageIcon } from "lucide-react";
+import { Search, Plus, Hash, Settings, Bell, Info, Send, Smile, Paperclip, MoreVertical, Image as ImageIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface Message {
@@ -155,15 +155,8 @@ export function Chat() {
           </div>
           
           <div className="flex items-center gap-1">
-            <button className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors">
-              <Phone className="w-5 h-5" />
-            </button>
-            <button className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors">
-              <Video className="w-5 h-5" />
-            </button>
-            <div className="w-px h-6 bg-slate-200 mx-1"></div>
-            <button className="p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors">
-              <Info className="w-5 h-5" />
+            <button className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">
+              <MoreVertical className="w-5 h-5" />
             </button>
           </div>
         </div>
