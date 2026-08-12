@@ -213,6 +213,6 @@ export const quickCreateActions: QuickAction[] = [
 export const mobileBarItems: QuickAction[] = [
   { title: "Home", url: "/dashboard", icon: LayoutDashboard },
   { title: "Tasks", url: "/tasks", icon: ClipboardList },
-  { title: "Approvals", url: "/approvals", icon: CheckCheck },
+  { title: "Approvals", url: "/approvals/leave-requests", icon: CheckCheck },
   { title: "Chat", url: "/chat", icon: MessagesSquare },
 ];
