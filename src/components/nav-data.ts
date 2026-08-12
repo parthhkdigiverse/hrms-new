@@ -58,7 +58,6 @@ export const navItems: NavItem[] = [
     badge: 9,
     children: [
       { title: "Leave Requests", url: "/employees/leave-requests", badge: 4 },
-      { title: "Invoice Approvals", url: "/approvals/invoices", badge: 3 },
       { title: "Penalties", url: "/approvals/penalties", badge: 2 },
       { title: "Daily Progress", url: "/approvals/daily-progress" },
       { title: "Approval History", url: "/approvals/history" },

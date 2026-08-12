@@ -45,6 +45,11 @@ import { Gallery } from "@/components/workspace/Gallery";
 import { Documents } from "@/components/documents/Documents";
 import { DocumentGenerator } from "@/components/documents/DocumentGenerator";
 import { DailyProgress } from "@/components/approvals/DailyProgress";
+import { AllInvoices } from "@/components/invoice/AllInvoices";
+import { CreateInvoice } from "@/components/invoice/CreateInvoice";
+import { CreateProforma } from "@/components/invoice/CreateProforma";
+import { InvoiceLedger } from "@/components/invoice/InvoiceLedger";
+import { InvoiceApprovals } from "@/components/approvals/InvoiceApprovals";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -152,7 +157,14 @@ function Index() {
         {active === "/employees/documents/generate" && <DocumentGenerator onBack={() => setActive("/employees/documents")} />}
         {(active === "/penalty" || active === "/approvals/penalties") && <Penalties />}
         {active === "/approvals/daily-progress" && <DailyProgress />}
+        {active === "/approvals/invoices" && <InvoiceApprovals />}
         {active === "/remarks" && <Remarks />}
+        
+        {/* Invoice */}
+        {active === "/invoice/all" && <AllInvoices />}
+        {active === "/invoice/ledger" && <InvoiceLedger />}
+        {active === "/invoice/create" && <CreateInvoice onBack={() => setActive("/invoice/all")} />}
+        {active === "/invoice/proforma" && <CreateProforma onBack={() => setActive("/invoice/all")} />}
 
         {/* Recruitment */}
         {active === "/recruitment/interviews" && <Interviews />}
@@ -177,7 +189,7 @@ function Index() {
         {active === "/activity-logs" && <ActivityLogs />}
 
         {/* Fallback original content for all other items */}
-        {active !== "/dashboard" && active !== "/schedule" && active !== "/work/logs" && active !== "/work/projects" && active !== "/tasks" && active !== "/chat" && active !== "/work/research" && active !== "/penalty" && active !== "/approvals/penalties" && active !== "/remarks" && active !== "/activity-logs" && !active.startsWith("/work/sales") && !active.startsWith("/payroll") && !active.startsWith("/employees") && !active.startsWith("/recruitment") && !active.startsWith("/workspace") && !active.startsWith("/approvals") && (
+        {active !== "/dashboard" && active !== "/schedule" && active !== "/work/logs" && active !== "/work/projects" && active !== "/tasks" && active !== "/chat" && active !== "/work/research" && active !== "/penalty" && active !== "/approvals/penalties" && active !== "/remarks" && active !== "/activity-logs" && !active.startsWith("/work/sales") && !active.startsWith("/payroll") && !active.startsWith("/employees") && !active.startsWith("/recruitment") && !active.startsWith("/workspace") && !active.startsWith("/approvals") && !active.startsWith("/invoice") && (
           <>
             <header className="mb-8 max-w-3xl">
               <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
