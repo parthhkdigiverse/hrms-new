@@ -37,6 +37,7 @@ import { Chat } from "@/components/work/Chat";
 import { Research } from "@/components/work/Research";
 import { Penalties } from "@/components/employees/Penalties";
 import { Remarks } from "@/components/employees/Remarks";
+import { ActivityLogs } from "@/components/admin/ActivityLogs";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -156,8 +157,11 @@ function Index() {
         {active === "/chat" && <Chat />}
         {active === "/work/research" && <Research />}
 
+        {/* Admin */}
+        {active === "/activity-logs" && <ActivityLogs />}
+
         {/* Fallback original content for all other items */}
-        {active !== "/dashboard" && active !== "/schedule" && active !== "/work/logs" && active !== "/tasks" && active !== "/chat" && active !== "/work/research" && active !== "/penalty" && active !== "/approvals/penalties" && active !== "/remarks" && !active.startsWith("/work/sales") && !active.startsWith("/payroll") && !active.startsWith("/employees") && !active.startsWith("/recruitment") && (
+        {active !== "/dashboard" && active !== "/schedule" && active !== "/work/logs" && active !== "/tasks" && active !== "/chat" && active !== "/work/research" && active !== "/penalty" && active !== "/approvals/penalties" && active !== "/remarks" && active !== "/activity-logs" && !active.startsWith("/work/sales") && !active.startsWith("/payroll") && !active.startsWith("/employees") && !active.startsWith("/recruitment") && (
           <>
             <header className="mb-8 max-w-3xl">
               <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
