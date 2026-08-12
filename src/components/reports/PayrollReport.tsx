@@ -117,7 +117,7 @@ export function PayrollReport() {
                   contentStyle={{ backgroundColor: 'hsl(var(--card))', borderColor: 'hsl(var(--border))', borderRadius: '12px', color: 'hsl(var(--foreground))' }}
                 />
                 <Legend wrapperStyle={{ paddingTop: '20px' }} />
-                <Bar dataKey="Base" stackId="a" fill="hsl(var(--primary))" radius={[0, 0, 4, 4]} />
+                <Bar dataKey="Base" stackId="a" fill="#3b82f6" radius={[0, 0, 4, 4]} />
                 <Bar dataKey="Bonuses" stackId="a" fill="#10b981" radius={[4, 4, 0, 0]} />
                 <Line type="monotone" dataKey="Deductions" stroke="#ef4444" strokeWidth={3} dot={{ r: 4 }} />
               </ComposedChart>
