@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Search, Plus, Filter, MoreHorizontal, LayoutGrid, List, Briefcase, Calendar, Clock, Star, Circle, Trash2, Edit2, Archive, ArrowLeft, Users, DollarSign, FolderGit2 } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Search, Plus, Filter, MoreHorizontal, LayoutGrid, List, Briefcase, Calendar, Clock, Star, Circle, Trash2, Edit2, Archive, ArrowLeft, Users, DollarSign, FolderGit2, CheckCircle2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
@@ -21,12 +21,15 @@ interface Project {
   id: string;
   clientId: string;
   name: string;
+  category: string;
   status: ProjectStatus;
   progress: number;
   deadline: string;
   budget: string;
   team: { name: string; avatar: string }[];
 }
+
+const DEFAULT_CATEGORIES = ["Web Dev", "App Dev", "Digital Marketing", "Design", "Consulting", "General"];
 
 const INITIAL_CLIENTS: Client[] = [
   {
@@ -78,6 +81,7 @@ const INITIAL_PROJECTS: Project[] = [
     id: "1",
     clientId: "c1",
     name: "HRMS UI Redesign",
+    category: "Design",
     status: "In Progress",
     progress: 75,
     deadline: "2026-09-01",
@@ -92,6 +96,7 @@ const INITIAL_PROJECTS: Project[] = [
     id: "2",
     clientId: "c2",
     name: "Q4 Marketing Campaign",
+    category: "Digital Marketing",
     status: "In Review",
     progress: 90,
     deadline: "2026-08-20",
@@ -105,6 +110,7 @@ const INITIAL_PROJECTS: Project[] = [
     id: "3",
     clientId: "c3",
     name: "Mobile App Development",
+    category: "App Dev",
     status: "In Progress",
     progress: 35,
     deadline: "2026-11-15",
@@ -120,6 +126,7 @@ const INITIAL_PROJECTS: Project[] = [
     id: "4",
     clientId: "c4",
     name: "Brand Guidelines",
+    category: "Design",
     status: "Completed",
     progress: 100,
     deadline: "2026-07-30",
@@ -132,6 +139,7 @@ const INITIAL_PROJECTS: Project[] = [
     id: "5",
     clientId: "c1",
     name: "Legacy System Migration",
+    category: "Web Dev",
     status: "On Hold",
     progress: 15,
     deadline: "2027-01-10",
@@ -145,6 +153,7 @@ const INITIAL_PROJECTS: Project[] = [
     id: "6",
     clientId: "c3",
     name: "E-commerce Platform",
+    category: "Web Dev",
     status: "In Progress",
     progress: 60,
     deadline: "2026-10-05",
@@ -160,20 +169,70 @@ const INITIAL_PROJECTS: Project[] = [
 const TABS = ["Active Clients", "Archived Clients"];
 
 export function Projects() {
-  const [clients, setClients] = useState<Client[]>(INITIAL_CLIENTS);
-  const [projects, setProjects] = useState<Project[]>(INITIAL_PROJECTS);
+  const [clients, setClients] = useState<Client[]>(() => {
+    const saved = localStorage.getItem('hrms_clients');
+    if (saved) {
+      try { return JSON.parse(saved); } catch (e) {}
+    }
+    return INITIAL_CLIENTS;
+  });
+
+  const [projects, setProjects] = useState<Project[]>(() => {
+    const saved = localStorage.getItem('hrms_projects');
+    if (saved) {
+      try { return JSON.parse(saved); } catch (e) {}
+    }
+    return INITIAL_PROJECTS;
+  });
+
+  const [categories, setCategories] = useState<string[]>(() => {
+    const saved = localStorage.getItem('hrms_categories');
+    if (saved) {
+      try { return JSON.parse(saved); } catch (e) {}
+    }
+    return DEFAULT_CATEGORIES;
+  });
+
   const [activeTab, setActiveTab] = useState(TABS[0]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
+  
+  const [selectedClientId, setSelectedClientId] = useState<string | null>(() => {
+    return localStorage.getItem('hrms_selectedClientId') || null;
+  });
+  
+  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(() => {
+    return localStorage.getItem('hrms_selectedProjectId') || null;
+  });
+
+  useEffect(() => { localStorage.setItem('hrms_clients', JSON.stringify(clients)); }, [clients]);
+  useEffect(() => { localStorage.setItem('hrms_projects', JSON.stringify(projects)); }, [projects]);
+  useEffect(() => { localStorage.setItem('hrms_categories', JSON.stringify(categories)); }, [categories]);
+  
+  useEffect(() => {
+    if (selectedClientId) localStorage.setItem('hrms_selectedClientId', selectedClientId);
+    else localStorage.removeItem('hrms_selectedClientId');
+  }, [selectedClientId]);
+
+  useEffect(() => {
+    if (selectedProjectId) localStorage.setItem('hrms_selectedProjectId', selectedProjectId);
+    else localStorage.removeItem('hrms_selectedProjectId');
+  }, [selectedProjectId]);
+  const [isKanbanView, setIsKanbanView] = useState(false);
 
   const [isNewClientModalOpen, setIsNewClientModalOpen] = useState(false);
   const [isNewProjectModalOpen, setIsNewProjectModalOpen] = useState(false);
+  const [isEditProjectModalOpen, setIsEditProjectModalOpen] = useState(false);
   
   const [newClientName, setNewClientName] = useState("");
   const [newClientBudget, setNewClientBudget] = useState("");
   
   const [newProjectName, setNewProjectName] = useState("");
   const [newProjectBudget, setNewProjectBudget] = useState("");
+  const [newProjectCategory, setNewProjectCategory] = useState("");
+  const [isAddingCategory, setIsAddingCategory] = useState(false);
+  const [newCategoryInput, setNewCategoryInput] = useState("");
+
+  const [editingProject, setEditingProject] = useState<Project | null>(null);
 
   const handleCreateClient = () => {
     if (!newClientName.trim()) return;
@@ -193,11 +252,12 @@ export function Projects() {
   };
 
   const handleCreateProject = () => {
-    if (!newProjectName.trim() || !selectedClientId) return;
+    if (!newProjectName.trim() || !selectedClientId || !newProjectCategory) return;
     const newProject: Project = {
       id: `p${Date.now()}`,
       clientId: selectedClientId,
       name: newProjectName,
+      category: newProjectCategory,
       status: "In Progress",
       progress: 0,
       deadline: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] || "", // 30 days from now
@@ -213,7 +273,44 @@ export function Projects() {
     setProjects([newProject, ...projects]);
     setNewProjectName("");
     setNewProjectBudget("");
+    setNewProjectCategory("");
     setIsNewProjectModalOpen(false);
+  };
+
+  const openEditModal = (project: Project) => {
+    setEditingProject({ ...project });
+    setIsEditProjectModalOpen(true);
+  };
+
+  const handleUpdateProject = () => {
+    if (!editingProject || !editingProject.name.trim()) return;
+    setProjects(projects.map(p => p.id === editingProject.id ? editingProject : p));
+    setIsEditProjectModalOpen(false);
+    setEditingProject(null);
+  };
+
+  const handleAddCategory = () => {
+    if (newCategoryInput.trim() && !categories.includes(newCategoryInput.trim())) {
+      setCategories([...categories, newCategoryInput.trim()]);
+      setNewProjectCategory(newCategoryInput.trim());
+    }
+    setIsAddingCategory(false);
+    setNewCategoryInput("");
+  };
+
+  const handleDeleteCategory = () => {
+    if (categories.length <= 1) return; // Prevent deleting the last category
+    
+    // We shouldn't delete categories that are currently in use by projects
+    const isCategoryInUse = projects.some(p => p.category === newProjectCategory);
+    if (isCategoryInUse) {
+      alert("Cannot delete this category because it is currently in use by a project.");
+      return;
+    }
+
+    const newCategories = categories.filter(c => c !== newProjectCategory);
+    setCategories(newCategories);
+    setNewProjectCategory(newCategories[0] || "");
   };
 
   const getStatusColor = (status: ProjectStatus) => {
@@ -246,6 +343,174 @@ export function Projects() {
   if (selectedClientId) {
     const client = clients.find(c => c.id === selectedClientId);
     if (!client) return null;
+
+    if (selectedProjectId) {
+      const project = projects.find(p => p.id === selectedProjectId);
+      if (!project) return null;
+
+      return (
+        <div className="w-full max-w-7xl mx-auto space-y-8 animate-in fade-in duration-500">
+          {/* Detail View Header */}
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div className="flex items-center gap-4">
+              <button 
+                onClick={() => setSelectedProjectId(null)}
+                className="p-2.5 bg-card border border-border/60 rounded-xl hover:bg-muted/80 hover:text-primary transition-colors shadow-sm group"
+              >
+                <ArrowLeft className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
+              </button>
+              <div>
+                <h1 className="text-3xl font-black tracking-tight text-foreground leading-tight">{project.name}</h1>
+                <div className="flex items-center gap-2 mt-2">
+                  <span className={cn("px-2 py-0.5 inline-flex text-[10px] font-bold uppercase tracking-widest rounded-lg items-center gap-1.5", getStatusColor(project.status))}>
+                    <Circle className="w-1.5 h-1.5 fill-current" />
+                    {project.status}
+                  </span>
+                  <span className="px-2 py-0.5 inline-flex text-[10px] font-bold uppercase tracking-widest rounded-lg items-center gap-1.5 bg-muted text-muted-foreground border border-border/50">
+                    <Briefcase className="w-3 h-3" />
+                    {project.category || "General"}
+                  </span>
+                </div>
+              </div>
+            </div>
+            
+            <button 
+              onClick={() => openEditModal(project)}
+              className="flex items-center gap-2 px-4 py-2.5 bg-primary text-primary-foreground font-bold text-sm rounded-xl hover:bg-primary/90 transition-all shadow-sm"
+            >
+              <Edit2 className="w-4 h-4" />
+              <span className="hidden sm:inline">Edit Project</span>
+            </button>
+          </div>
+
+          {/* Top Summary */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="bg-card border border-border/60 rounded-3xl p-6 shadow-sm">
+               <div className="flex justify-between items-end mb-2">
+                  <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest">Progress</span>
+                  <span className="text-3xl font-black text-foreground font-mono">{project.progress}%</span>
+               </div>
+               <div className="h-2 w-full bg-muted/60 rounded-full overflow-hidden mt-4">
+                 <div 
+                   className={cn("h-full rounded-full transition-all duration-1000 ease-out", getProgressColor(project.status))}
+                   style={{ width: `${project.progress}%` }}
+                 ></div>
+               </div>
+            </div>
+            
+            <div className="bg-card border border-border/60 rounded-3xl p-6 flex items-center gap-5 shadow-sm">
+              <div className="w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-500 flex items-center justify-center shrink-0">
+                <DollarSign className="w-6 h-6" />
+              </div>
+              <div>
+                <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Budget</p>
+                <h3 className="text-3xl font-black text-foreground font-mono">{project.budget}</h3>
+              </div>
+            </div>
+            
+            <div className="bg-card border border-border/60 rounded-3xl p-6 flex items-center gap-5 shadow-sm">
+              <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 text-indigo-500 flex items-center justify-center shrink-0">
+                <Calendar className="w-6 h-6" />
+              </div>
+              <div>
+                <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Deadline</p>
+                <h3 className="text-xl font-black text-foreground">{new Date(project.deadline).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</h3>
+              </div>
+            </div>
+          </div>
+
+          {/* Main Content Columns */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+             {/* Left Col: Tasks */}
+             <div className="lg:col-span-2 space-y-6">
+               <div className="flex items-center justify-between">
+                 <h2 className="text-xl font-bold tracking-tight">Milestones & Tasks</h2>
+                 <button 
+                   onClick={() => setIsKanbanView(!isKanbanView)}
+                   className="text-sm font-bold text-primary hover:underline"
+                 >
+                   {isKanbanView ? "View List" : "View Kanban"}
+                 </button>
+               </div>
+               
+               {isKanbanView ? (
+                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                    <div className="space-y-3 bg-muted/20 p-4 rounded-3xl border border-border/40">
+                       <h4 className="font-bold text-xs text-muted-foreground uppercase tracking-widest mb-4 flex items-center justify-between">
+                         To Do <span className="bg-background px-2 py-0.5 rounded-md">2</span>
+                       </h4>
+                       {["Development Sprint 1", "QA & Testing"].map((task, i) => (
+                         <div key={i} className="bg-card border border-border/60 p-4 rounded-2xl shadow-sm hover:border-primary/30 hover:shadow-md transition-all cursor-pointer">
+                            <p className="font-bold text-sm text-foreground">{task}</p>
+                            <p className="text-xs font-medium text-muted-foreground mt-3 flex items-center gap-1.5"><Calendar className="w-3 h-3" /> Due in {i + 2} weeks</p>
+                         </div>
+                       ))}
+                       <button className="w-full py-2 border-2 border-dashed border-border/60 rounded-xl text-xs font-bold text-muted-foreground hover:bg-muted/50 transition-colors flex items-center justify-center gap-1">
+                         <Plus className="w-3 h-3" /> Add Task
+                       </button>
+                    </div>
+                    
+                    <div className="space-y-3 bg-muted/20 p-4 rounded-3xl border border-border/40">
+                       <h4 className="font-bold text-xs text-primary uppercase tracking-widest mb-4 flex items-center justify-between">
+                         In Progress <span className="bg-primary/10 text-primary px-2 py-0.5 rounded-md">0</span>
+                       </h4>
+                       <div className="p-4 rounded-2xl border-2 border-border/40 border-dashed text-center py-8">
+                         <p className="text-xs font-bold text-muted-foreground">No tasks</p>
+                       </div>
+                    </div>
+                    
+                    <div className="space-y-3 bg-muted/20 p-4 rounded-3xl border border-border/40">
+                       <h4 className="font-bold text-xs text-emerald-500 uppercase tracking-widest mb-4 flex items-center justify-between">
+                         Done <span className="bg-emerald-500/10 text-emerald-500 px-2 py-0.5 rounded-md">2</span>
+                       </h4>
+                       {["Requirement Analysis", "Design Phase"].map((task, i) => (
+                         <div key={i} className="bg-muted/40 border border-border/40 p-4 rounded-2xl">
+                            <p className="font-bold text-sm text-muted-foreground line-through decoration-muted-foreground/50">{task}</p>
+                            <p className="text-xs font-medium text-muted-foreground/70 mt-3 flex items-center gap-1.5"><CheckCircle2 className="w-3 h-3" /> Completed</p>
+                         </div>
+                       ))}
+                    </div>
+                 </div>
+               ) : (
+                 <div className="bg-card border border-border/60 rounded-3xl p-6 shadow-sm space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                   {/* Mock Tasks */}
+                   {["Requirement Analysis", "Design Phase", "Development Sprint 1", "QA & Testing"].map((task, i) => (
+                     <div key={i} className="flex items-center gap-4 p-4 rounded-2xl border border-border/40 hover:bg-muted/30 transition-colors">
+                        <div className={cn("w-6 h-6 rounded-full border-2 flex items-center justify-center", i < 2 ? "border-primary bg-primary/10 text-primary" : "border-muted-foreground text-transparent")}>
+                           {i < 2 && <CheckCircle2 className="w-4 h-4" />}
+                        </div>
+                        <div>
+                          <p className={cn("font-bold", i < 2 ? "line-through text-muted-foreground" : "text-foreground")}>{task}</p>
+                          <p className="text-xs font-medium text-muted-foreground mt-0.5">Due {new Date(Date.now() + i * 7 * 24 * 60 * 60 * 1000).toLocaleDateString()}</p>
+                        </div>
+                     </div>
+                   ))}
+                 </div>
+               )}
+             </div>
+
+             {/* Right Col: Team & Client */}
+             <div className="space-y-6">
+               <h2 className="text-xl font-bold tracking-tight">Team Members</h2>
+               <div className="bg-card border border-border/60 rounded-3xl p-6 shadow-sm space-y-4">
+                  {project.team.map((member, i) => (
+                    <div key={i} className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl overflow-hidden bg-muted">
+                        <img src={member.avatar} alt={member.name} className="w-full h-full object-cover" />
+                      </div>
+                      <div>
+                        <p className="font-bold text-foreground text-sm">{member.name}</p>
+                        <p className="text-xs text-muted-foreground">Team Member</p>
+                      </div>
+                    </div>
+                  ))}
+               </div>
+             </div>
+          </div>
+
+        </div>
+      );
+    }
 
     const clientProjects = projects.filter(p => p.clientId === client.id);
 
@@ -320,24 +585,36 @@ export function Projects() {
           <h2 className="text-xl font-bold tracking-tight mb-4">Projects</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {clientProjects.map((project) => (
-              <div key={project.id} className="group bg-card border border-border/60 rounded-3xl p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 hover:border-primary/30 transition-all duration-300 relative overflow-hidden flex flex-col h-full">
+              <div 
+                key={project.id} 
+                onClick={() => setSelectedProjectId(project.id)}
+                className="group bg-card border border-border/60 rounded-3xl p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 hover:border-primary/30 transition-all duration-300 relative overflow-hidden flex flex-col h-full cursor-pointer"
+              >
                 {/* Background Accent */}
                 <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none transition-opacity opacity-0 group-hover:opacity-100"></div>
 
                 <div className="flex justify-between items-start mb-4 relative z-10">
-                  <span className={cn("px-3 py-1 text-[10px] font-bold uppercase tracking-widest rounded-lg flex items-center gap-1.5", getStatusColor(project.status))}>
-                    <Circle className="w-2 h-2 fill-current" />
-                    {project.status}
-                  </span>
+                  <div className="flex flex-col items-start gap-2">
+                    <span className={cn("px-3 py-1 text-[10px] font-bold uppercase tracking-widest rounded-lg flex items-center gap-1.5", getStatusColor(project.status))}>
+                      <Circle className="w-2 h-2 fill-current" />
+                      {project.status}
+                    </span>
+                    <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-1">
+                      <Briefcase className="w-3 h-3" /> {project.category || "General"}
+                    </span>
+                  </div>
                   
                   <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
+                    <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
                       <button className="p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground rounded-lg transition-colors outline-none focus:ring-2 focus:ring-primary/20">
                         <MoreHorizontal className="w-5 h-5" />
                       </button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-48 rounded-2xl p-2 border-border/60 shadow-xl bg-background/95 backdrop-blur-md">
-                      <DropdownMenuItem className="rounded-xl cursor-pointer py-2.5 focus:bg-primary/10 focus:text-primary font-medium transition-colors">
+                      <DropdownMenuItem 
+                        onClick={(e) => { e.stopPropagation(); openEditModal(project); }}
+                        className="rounded-xl cursor-pointer py-2.5 focus:bg-primary/10 focus:text-primary font-medium transition-colors"
+                      >
                         <Edit2 className="w-4 h-4 mr-2" /> Edit Project
                       </DropdownMenuItem>
                       <DropdownMenuSeparator className="bg-border/50" />
@@ -435,6 +712,65 @@ export function Projects() {
                   className="w-full px-4 py-3 bg-muted/50 border border-border/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium"
                 />
               </div>
+              <div>
+                <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Category</label>
+                {!isAddingCategory ? (
+                  <div className="flex gap-2">
+                    <select 
+                      value={newProjectCategory}
+                      onChange={(e) => setNewProjectCategory(e.target.value)}
+                      className={cn(
+                        "w-full px-4 py-3 bg-muted/50 border border-border/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium appearance-none",
+                        !newProjectCategory && "text-muted-foreground"
+                      )}
+                    >
+                      <option value="" disabled>Select Category</option>
+                      {categories.map(cat => (
+                        <option key={cat} value={cat}>{cat}</option>
+                      ))}
+                    </select>
+                    <button 
+                      onClick={() => setIsAddingCategory(true)}
+                      className="px-3 bg-muted/50 border border-border/50 rounded-xl hover:bg-muted transition-colors flex items-center justify-center text-muted-foreground hover:text-foreground"
+                      title="Add New Category"
+                    >
+                      <Plus className="w-5 h-5" />
+                    </button>
+                    {categories.length > 1 && (
+                      <button 
+                        onClick={handleDeleteCategory}
+                        className="px-3 bg-muted/50 border border-border/50 rounded-xl hover:bg-rose-500/10 hover:text-rose-600 hover:border-rose-500/30 transition-colors flex items-center justify-center text-muted-foreground"
+                        title="Delete Selected Category"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
+                ) : (
+                  <div className="flex gap-2">
+                    <input 
+                      type="text" 
+                      value={newCategoryInput}
+                      onChange={(e) => setNewCategoryInput(e.target.value)}
+                      placeholder="e.g. E-commerce"
+                      className="w-full px-4 py-3 bg-muted/50 border border-border/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium"
+                      autoFocus
+                    />
+                    <button 
+                      onClick={handleAddCategory}
+                      className="px-4 bg-primary text-primary-foreground rounded-xl hover:bg-primary/90 transition-colors font-bold text-sm"
+                    >
+                      Save
+                    </button>
+                    <button 
+                      onClick={() => setIsAddingCategory(false)}
+                      className="px-3 text-muted-foreground hover:bg-muted rounded-xl transition-colors"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
             <div className="p-6 pt-4 bg-muted/30 border-t border-border/50 flex justify-end gap-3">
               <button 
@@ -445,10 +781,95 @@ export function Projects() {
               </button>
               <button 
                 onClick={handleCreateProject}
-                disabled={!newProjectName.trim()}
+                disabled={!newProjectName.trim() || !newProjectCategory}
                 className="px-6 py-2.5 bg-primary text-primary-foreground font-bold rounded-xl shadow-md hover:bg-primary/90 transition-all disabled:opacity-50"
               >
                 Create Project
+              </button>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Edit Project Modal */}
+        <Dialog open={isEditProjectModalOpen} onOpenChange={setIsEditProjectModalOpen}>
+          <DialogContent className="sm:max-w-[425px] rounded-3xl p-0 overflow-hidden border-border/50 shadow-2xl">
+            <div className="p-6 pb-4">
+              <DialogHeader>
+                <DialogTitle className="text-2xl font-black tracking-tight">Edit Project</DialogTitle>
+              </DialogHeader>
+            </div>
+            {editingProject && (
+              <div className="p-6 pt-0 space-y-4 max-h-[60vh] overflow-y-auto">
+                <div>
+                  <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Project Name</label>
+                  <input 
+                    type="text" 
+                    value={editingProject.name}
+                    onChange={(e) => setEditingProject({...editingProject, name: e.target.value})}
+                    className="w-full px-4 py-3 bg-muted/50 border border-border/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Budget (Optional)</label>
+                  <input 
+                    type="text" 
+                    value={editingProject.budget}
+                    onChange={(e) => setEditingProject({...editingProject, budget: e.target.value})}
+                    className="w-full px-4 py-3 bg-muted/50 border border-border/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Category</label>
+                  <select 
+                    value={editingProject.category}
+                    onChange={(e) => setEditingProject({...editingProject, category: e.target.value})}
+                    className="w-full px-4 py-3 bg-muted/50 border border-border/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium appearance-none"
+                  >
+                    {categories.map(cat => (
+                      <option key={cat} value={cat}>{cat}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Status</label>
+                  <select 
+                    value={editingProject.status}
+                    onChange={(e) => setEditingProject({...editingProject, status: e.target.value as ProjectStatus})}
+                    className="w-full px-4 py-3 bg-muted/50 border border-border/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium appearance-none"
+                  >
+                    {["In Progress", "In Review", "Completed", "On Hold"].map(status => (
+                      <option key={status} value={status}>{status}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 flex justify-between">
+                    <span>Progress</span>
+                    <span className="text-foreground">{editingProject.progress}%</span>
+                  </label>
+                  <input 
+                    type="range" 
+                    min="0" max="100" 
+                    value={editingProject.progress}
+                    onChange={(e) => setEditingProject({...editingProject, progress: parseInt(e.target.value)})}
+                    className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
+                  />
+                </div>
+              </div>
+            )}
+            <div className="p-6 pt-4 bg-muted/30 border-t border-border/50 flex justify-end gap-3">
+              <button 
+                onClick={() => { setIsEditProjectModalOpen(false); setEditingProject(null); }}
+                className="px-5 py-2.5 rounded-xl font-bold text-muted-foreground hover:bg-muted transition-colors"
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={handleUpdateProject}
+                disabled={!editingProject?.name?.trim()}
+                className="px-6 py-2.5 bg-primary text-primary-foreground font-bold rounded-xl shadow-md hover:bg-primary/90 transition-all disabled:opacity-50"
+              >
+                Save Changes
               </button>
             </div>
           </DialogContent>
