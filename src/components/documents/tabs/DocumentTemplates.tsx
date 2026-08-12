@@ -7,6 +7,7 @@ interface DocTemplate {
   name: string;
   category: string;
   lastUpdated: string;
+  content?: string;
 }
 
 const DEFAULT_TEMPLATES: DocTemplate[] = [
