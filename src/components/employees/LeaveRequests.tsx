@@ -390,7 +390,7 @@ export function LeaveRequests() {
                       </button>
                       <button 
                         onClick={() => handleAction(request.id, "Approved")}
-                        className="px-4 py-2 bg-card hover:bg-primary text-primary-foreground text-sm font-bold rounded-lg transition-colors flex items-center gap-2 shadow-sm"
+                        className="px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground text-sm font-bold rounded-lg transition-colors flex items-center gap-2 shadow-sm"
                       >
                         <Check className="w-4 h-4" /> Approve
                       </button>
