@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Search, Download, Target, Plus, Info, Edit3, Trash2, ArrowRight } from "lucide-react";
+import { Search, Download, Target, Plus, Info, Edit3, Trash2, ArrowRight, X } from "lucide-react";
 
 const mockPlanData = {
   "FINANCIAL - REVENUE": [
@@ -26,8 +26,13 @@ const mockPlanData = {
 };
 
 export function FinancialPlan() {
+  const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false);
+  const [isAddRowOpen, setIsAddRowOpen] = useState(false);
+  const [isEditRowOpen, setIsEditRowOpen] = useState(false);
+  const [activeCategory, setActiveCategory] = useState("");
+
   return (
-    <div className="w-full max-w-[1400px] mx-auto space-y-6 animate-in fade-in duration-500 pb-12">
+    <div className="w-full max-w-[1400px] mx-auto space-y-6 animate-in fade-in duration-500 pb-12 relative">
       
       {/* Header */}
       <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4">
@@ -44,7 +49,10 @@ export function FinancialPlan() {
           <button className="px-4 py-2 bg-background border border-border/50 text-foreground font-bold rounded-lg hover:bg-muted/50 transition-colors shadow-sm flex items-center gap-2 text-sm">
             <Download className="w-4 h-4 text-indigo-500" /> Export Plan
           </button>
-          <button className="px-4 py-2 bg-primary text-primary-foreground font-bold rounded-lg hover:opacity-90 transition-opacity shadow-sm flex items-center gap-2 text-sm">
+          <button 
+            onClick={() => setIsAddCategoryOpen(true)}
+            className="px-4 py-2 bg-primary text-primary-foreground font-bold rounded-lg hover:opacity-90 transition-opacity shadow-sm flex items-center gap-2 text-sm"
+          >
             <Plus className="w-4 h-4" /> Add Category
           </button>
         </div>
@@ -97,12 +105,18 @@ export function FinancialPlan() {
                       <td className="p-4 text-xs font-bold text-muted-foreground border-r border-border/50">
                         <span className="px-2 py-0.5 rounded bg-background border border-border/50">{row.unit}</span>
                       </td>
-                      <td className="p-4 text-right font-black text-emerald-600 border-r border-border/50 cursor-pointer hover:bg-muted/50 transition-colors group-hover:bg-muted/40">
+                      <td 
+                        className="p-4 text-right font-black text-emerald-600 border-r border-border/50 cursor-pointer hover:bg-muted/50 transition-colors group-hover:bg-muted/40"
+                        onClick={() => setIsEditRowOpen(true)}
+                      >
                         {row.target}
                       </td>
                       <td className="p-4 text-center">
                         <div className="flex items-center justify-center gap-2">
-                          <button className="text-muted-foreground hover:text-foreground transition-colors p-1.5 rounded-md hover:bg-muted">
+                          <button 
+                            onClick={() => setIsEditRowOpen(true)}
+                            className="text-muted-foreground hover:text-foreground transition-colors p-1.5 rounded-md hover:bg-muted"
+                          >
                             <Edit3 className="w-4 h-4" />
                           </button>
                         </div>
@@ -112,7 +126,13 @@ export function FinancialPlan() {
                   {/* Add Row Button for Category */}
                   <tr>
                     <td colSpan={6} className="p-2 border-r border-border/50 bg-muted/10 text-center">
-                      <button className="text-xs font-bold text-primary hover:text-primary/80 flex items-center justify-center gap-1 w-full py-1.5 hover:bg-primary/5 rounded-md transition-colors">
+                      <button 
+                        onClick={() => {
+                          setActiveCategory(categoryName);
+                          setIsAddRowOpen(true);
+                        }}
+                        className="text-xs font-bold text-primary hover:text-primary/80 flex items-center justify-center gap-1 w-full py-1.5 hover:bg-primary/5 rounded-md transition-colors"
+                      >
                         <Plus className="w-3.5 h-3.5" /> Add Row to {categoryName}
                       </button>
                     </td>
@@ -123,6 +143,77 @@ export function FinancialPlan() {
           </table>
         </div>
       </div>
+
+      {/* --- ADD CATEGORY MODAL --- */}
+      {isAddCategoryOpen && (
+        <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-card border border-border/50 shadow-2xl rounded-2xl w-full max-w-sm overflow-hidden animate-in zoom-in-95 duration-200">
+            <div className="p-4 border-b border-border/50 flex justify-between items-center bg-indigo-500/5">
+              <h3 className="font-black text-lg text-foreground flex items-center gap-2">
+                <Plus className="w-5 h-5 text-indigo-600" /> Add Category
+              </h3>
+              <button onClick={() => setIsAddCategoryOpen(false)} className="p-2 hover:bg-muted rounded-full transition-colors">
+                <X className="w-4 h-4 text-muted-foreground" />
+              </button>
+            </div>
+            <div className="p-6 space-y-4">
+              <div className="space-y-1.5">
+                <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wide">Category Name</label>
+                <input type="text" placeholder="e.g. MARKETING EXPENSES" className="w-full px-3 py-2 bg-background border border-border/50 rounded-lg text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500/20 uppercase" />
+              </div>
+            </div>
+            <div className="p-4 border-t border-border/50 flex justify-end gap-2 bg-muted/10">
+              <button onClick={() => setIsAddCategoryOpen(false)} className="px-4 py-2 font-bold text-sm bg-background border border-border/50 rounded-lg hover:bg-muted transition-colors text-muted-foreground">Cancel</button>
+              <button onClick={() => setIsAddCategoryOpen(false)} className="px-4 py-2 font-bold text-sm bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors shadow-sm">Save Category</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* --- ADD/EDIT ROW MODAL --- */}
+      {(isAddRowOpen || isEditRowOpen) && (
+        <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-card border border-border/50 shadow-2xl rounded-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200">
+            <div className="p-4 border-b border-border/50 flex justify-between items-center bg-primary/5">
+              <h3 className="font-black text-lg text-foreground flex items-center gap-2">
+                {isEditRowOpen ? <Edit3 className="w-5 h-5 text-primary" /> : <Plus className="w-5 h-5 text-primary" />}
+                {isEditRowOpen ? "Edit Target / Metric" : `Add Row to ${activeCategory}`}
+              </h3>
+              <button onClick={() => { setIsAddRowOpen(false); setIsEditRowOpen(false); }} className="p-2 hover:bg-muted rounded-full transition-colors">
+                <X className="w-4 h-4 text-muted-foreground" />
+              </button>
+            </div>
+            <div className="p-6 space-y-4">
+              <div className="space-y-1.5">
+                <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wide">Sub-Category</label>
+                <input type="text" placeholder="e.g. Headcount" className="w-full px-3 py-2 bg-background border border-border/50 rounded-lg text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-primary/20" />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wide">Metric Name</label>
+                <input type="text" placeholder="e.g. Developers" className="w-full px-3 py-2 bg-background border border-border/50 rounded-lg text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-primary/20" />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wide">Unit</label>
+                  <select className="w-full px-3 py-2 bg-background border border-border/50 rounded-lg text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-primary/20">
+                    <option>INR</option>
+                    <option>Number</option>
+                    <option>Active</option>
+                  </select>
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wide">Target Value</label>
+                  <input type="text" placeholder="Value" className="w-full px-3 py-2 bg-background border border-border/50 rounded-lg text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-primary/20 text-emerald-600" />
+                </div>
+              </div>
+            </div>
+            <div className="p-4 border-t border-border/50 flex justify-end gap-2 bg-muted/10">
+              <button onClick={() => { setIsAddRowOpen(false); setIsEditRowOpen(false); }} className="px-4 py-2 font-bold text-sm bg-background border border-border/50 rounded-lg hover:bg-muted transition-colors text-muted-foreground">Cancel</button>
+              <button onClick={() => { setIsAddRowOpen(false); setIsEditRowOpen(false); }} className="px-4 py-2 font-bold text-sm bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-opacity shadow-sm">Save Row</button>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );
