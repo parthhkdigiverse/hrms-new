@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Clock, Coffee, LogIn, LogOut, CheckCircle2 } from "lucide-react";
+import { Clock, Coffee, LogIn, LogOut, CheckCircle2, Pencil } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 
@@ -166,12 +166,16 @@ export function TimeTrackerWidget() {
               </div>
             </div>
             {activeTask && status !== "Punched Out" && (
-              <div className="flex items-center gap-2 mt-3 pt-2 border-t border-border/40">
+              <button 
+                onClick={() => setIsPunchInModalOpen(true)}
+                className="flex items-center gap-2 mt-3 pt-2 border-t border-border/40 hover:opacity-80 transition-opacity group text-left"
+              >
                 <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></div>
                 <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Task:</span>
-                <span className="text-xs font-bold text-foreground truncate max-w-[150px]">{activeTask}</span>
+                <span className="text-xs font-bold text-foreground truncate max-w-[150px] group-hover:text-primary transition-colors">{activeTask}</span>
+                <Pencil className="w-3 h-3 text-muted-foreground group-hover:text-primary transition-colors ml-1" />
                 <span className="text-xs font-mono font-bold text-primary ml-auto">{formatTime(activeTaskSeconds)}</span>
-              </div>
+              </button>
             )}
           </div>
           <div className="hidden lg:flex flex-col gap-2 pl-8 border-l border-border/50">
@@ -334,7 +338,7 @@ export function TimeTrackerWidget() {
               disabled={(!selectedTask && !customTask.trim())}
               className="px-6 py-2.5 bg-primary text-primary-foreground font-bold text-sm rounded-xl shadow-md hover:bg-primary/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Save & Punch In
+              {status === "Punched Out" ? "Save & Punch In" : "Update Task"}
             </button>
           </div>
         </DialogContent>
