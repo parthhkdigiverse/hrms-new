@@ -58,6 +58,11 @@ import { AttendanceReport } from "@/components/reports/AttendanceReport";
 import { PayrollReport } from "@/components/reports/PayrollReport";
 import { HiringFunnel } from "@/components/reports/HiringFunnel";
 import { WorkReport } from "@/components/reports/WorkReport";
+import { Transactions } from "@/components/finance/Transactions";
+import { FinancialPlan } from "@/components/finance/FinancialPlan";
+import { FinancialSummary } from "@/components/finance/FinancialSummary";
+import { OtherTransactions } from "@/components/finance/OtherTransactions";
+import { AuditLogs } from "@/components/finance/AuditLogs";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -169,7 +174,12 @@ function Index() {
         {active === "/approvals/invoices" && <InvoiceApprovals />}
         {active === "/remarks" && <Remarks />}
         
-        {/* Invoice */}
+        {/* Finance */}
+        {active === "/finance/transactions" && <Transactions />}
+        {active === "/finance/plan" && <FinancialPlan />}
+        {active === "/finance/summary" && <FinancialSummary />}
+        {active === "/finance/clients" && <OtherTransactions />}
+        {active === "/finance/audit" && <AuditLogs />}
         {active === "/invoice/all" && <AllInvoices />}
         {active === "/invoice/ledger" && <InvoiceLedger />}
         {active === "/invoice/create" && <CreateInvoice onBack={() => setActive("/invoice/all")} />}
@@ -207,7 +217,7 @@ function Index() {
         {active === "/restrictions" && <Restrictions />}
 
         {/* Fallback original content for all other items */}
-        {active !== "/dashboard" && active !== "/schedule" && active !== "/work/logs" && active !== "/work/projects" && active !== "/tasks" && active !== "/chat" && active !== "/work/research" && active !== "/penalty" && active !== "/approvals/penalties" && active !== "/remarks" && active !== "/activity-logs" && active !== "/activity-tracker" && active !== "/restrictions" && !active.startsWith("/work/sales") && !active.startsWith("/payroll") && !active.startsWith("/employees") && !active.startsWith("/recruitment") && !active.startsWith("/workspace") && !active.startsWith("/approvals") && !active.startsWith("/invoice") && !active.startsWith("/reports") && (
+        {active !== "/dashboard" && active !== "/schedule" && active !== "/work/logs" && active !== "/work/projects" && active !== "/tasks" && active !== "/chat" && active !== "/work/research" && active !== "/penalty" && active !== "/approvals/penalties" && active !== "/remarks" && active !== "/activity-logs" && active !== "/activity-tracker" && active !== "/restrictions" && !active.startsWith("/work/sales") && !active.startsWith("/payroll") && !active.startsWith("/employees") && !active.startsWith("/recruitment") && !active.startsWith("/workspace") && !active.startsWith("/approvals") && !active.startsWith("/invoice") && !active.startsWith("/reports") && !active.startsWith("/finance") && (
           <>
             <header className="mb-8 max-w-3xl">
               <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
