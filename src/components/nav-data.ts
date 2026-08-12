@@ -73,7 +73,6 @@ export const navItems: NavItem[] = [
       { title: "Payroll Cost", url: "/reports/payroll" },
       { title: "Hiring Funnel", url: "/reports/hiring" },
       { title: "Project & Work Report", url: "/reports/work" },
-      { title: "Custom Reports", url: "/reports/custom" },
     ],
   },
   {

@@ -45,6 +45,7 @@ import { Gallery } from "@/components/workspace/Gallery";
 import { Documents } from "@/components/documents/Documents";
 import { DocumentGenerator } from "@/components/documents/DocumentGenerator";
 import { DailyProgress } from "@/components/approvals/DailyProgress";
+import { ApprovalHistory } from "@/components/approvals/ApprovalHistory";
 import { AllInvoices } from "@/components/invoice/AllInvoices";
 import { CreateInvoice } from "@/components/invoice/CreateInvoice";
 import { CreateProforma } from "@/components/invoice/CreateProforma";
@@ -157,6 +158,7 @@ function Index() {
         {active === "/employees/documents/generate" && <DocumentGenerator onBack={() => setActive("/employees/documents")} />}
         {(active === "/penalty" || active === "/approvals/penalties") && <Penalties />}
         {active === "/approvals/daily-progress" && <DailyProgress />}
+        {active === "/approvals/history" && <ApprovalHistory />}
         {active === "/approvals/invoices" && <InvoiceApprovals />}
         {active === "/remarks" && <Remarks />}
         
