@@ -54,8 +54,8 @@ export function AttendanceAnalytics() {
         {/* Weekly Attendance */}
         <div className="bg-white border border-border/60 rounded-3xl p-6 shadow-sm md:col-span-2">
           <div className="mb-6">
-            <h3 className="font-bold text-slate-900">Weekly Attendance</h3>
-            <p className="text-[11px] text-slate-500">Present vs late vs WFH vs absent</p>
+            <h3 className="font-bold text-foreground">Weekly Attendance</h3>
+            <p className="text-[11px] text-muted-foreground">Present vs late vs WFH vs absent</p>
           </div>
           <div className="h-[250px] mt-4">
             <ResponsiveContainer width="100%" height="100%">
@@ -67,7 +67,7 @@ export function AttendanceAnalytics() {
                 <Legend 
                   iconType="circle" 
                   wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} 
-                  formatter={(value) => <span className="text-slate-500 font-medium capitalize">{value}</span>}
+                  formatter={(value) => <span className="text-muted-foreground font-medium capitalize">{value}</span>}
                 />
                 <Bar dataKey="present" fill="#20b2aa" radius={[4, 4, 0, 0]} barSize={16} />
                 <Bar dataKey="late" fill="#f5a623" radius={[4, 4, 0, 0]} barSize={16} />
@@ -81,24 +81,24 @@ export function AttendanceAnalytics() {
         {/* Small stats */}
         <div className="space-y-6">
           <div className="bg-white border border-border/60 rounded-3xl p-6 shadow-sm">
-            <h3 className="font-bold text-slate-900 mb-1">Work From Home</h3>
-            <p className="text-[11px] text-slate-500 mb-4">26 employees remote today</p>
+            <h3 className="font-bold text-foreground mb-1">Work From Home</h3>
+            <p className="text-[11px] text-muted-foreground mb-4">26 employees remote today</p>
             <div className="flex items-end gap-2">
               <p className="text-3xl font-black text-blue-500 leading-none">17%</p>
             </div>
-            <div className="h-1.5 w-full bg-slate-100 rounded-full mt-4 overflow-hidden">
+            <div className="h-1.5 w-full bg-muted rounded-full mt-4 overflow-hidden">
               <div className="h-full bg-blue-500 rounded-full" style={{ width: '17%' }}></div>
             </div>
           </div>
           
           <div className="bg-white border border-border/60 rounded-3xl p-6 shadow-sm">
-            <h3 className="font-bold text-slate-900 mb-1">Late Analysis</h3>
-            <p className="text-[11px] text-slate-500 mb-4">Avg delay 18 min · peak on Wednesdays</p>
+            <h3 className="font-bold text-foreground mb-1">Late Analysis</h3>
+            <p className="text-[11px] text-muted-foreground mb-4">Avg delay 18 min · peak on Wednesdays</p>
             <div className="flex items-end gap-2">
               <p className="text-3xl font-black text-amber-500 leading-none">8</p>
-              <p className="text-[11px] font-bold text-slate-400 mb-1">late today</p>
+              <p className="text-[11px] font-bold text-muted-foreground mb-1">late today</p>
             </div>
-            <div className="h-1.5 w-full bg-slate-100 rounded-full mt-4 overflow-hidden">
+            <div className="h-1.5 w-full bg-muted rounded-full mt-4 overflow-hidden">
               <div className="h-full bg-amber-500 rounded-full" style={{ width: '8%' }}></div>
             </div>
           </div>
@@ -108,19 +108,19 @@ export function AttendanceAnalytics() {
         <div className="bg-white border border-border/60 rounded-3xl p-6 shadow-sm md:col-span-3">
           <div className="mb-6 flex justify-between items-center">
             <div>
-              <h3 className="font-bold text-slate-900">Heatmap Calendar</h3>
-              <p className="text-[11px] text-slate-500">Attendance intensity for {currentMonthDate.toLocaleString('default', { month: 'long', year: 'numeric' })}</p>
+              <h3 className="font-bold text-foreground">Heatmap Calendar</h3>
+              <p className="text-[11px] text-muted-foreground">Attendance intensity for {currentMonthDate.toLocaleString('default', { month: 'long', year: 'numeric' })}</p>
             </div>
             <div className="flex items-center gap-2">
               <button 
                 onClick={() => setCurrentMonthDate(new Date(currentMonthDate.getFullYear(), currentMonthDate.getMonth() - 1, 1))}
-                className="w-8 h-8 flex items-center justify-center rounded-lg bg-slate-50 text-slate-500 hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
+                className="w-8 h-8 flex items-center justify-center rounded-lg bg-muted/50 text-muted-foreground hover:bg-primary/10 hover:text-primary transition-colors"
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
               <button 
                 onClick={() => setCurrentMonthDate(new Date(currentMonthDate.getFullYear(), currentMonthDate.getMonth() + 1, 1))}
-                className="w-8 h-8 flex items-center justify-center rounded-lg bg-slate-50 text-slate-500 hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
+                className="w-8 h-8 flex items-center justify-center rounded-lg bg-muted/50 text-muted-foreground hover:bg-primary/10 hover:text-primary transition-colors"
               >
                 <ChevronRight className="w-4 h-4" />
               </button>
@@ -130,7 +130,7 @@ export function AttendanceAnalytics() {
             {/* Days Header */}
             <div className="flex gap-2 mb-1">
               {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day, i) => (
-                <div key={i} className="flex-1 text-center text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                <div key={i} className="flex-1 text-center text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
                   {day}
                 </div>
               ))}
@@ -143,7 +143,7 @@ export function AttendanceAnalytics() {
                   <div 
                     key={d} 
                     className={`flex-1 h-10 flex items-center justify-center rounded-lg text-[12px] font-medium transition-all cursor-default ${!day.date ? 'opacity-0' : 'hover:scale-[1.02]'} ${
-                      day.val === 0 ? 'bg-slate-50 text-slate-400' : 
+                      day.val === 0 ? 'bg-muted/50 text-muted-foreground' : 
                       day.val === 1 ? 'bg-emerald-100 text-emerald-800' :
                       day.val === 2 ? 'bg-emerald-300 text-emerald-900' :
                       day.val === 3 ? 'bg-emerald-500 text-white' : 'bg-emerald-700 text-white'
@@ -155,7 +155,7 @@ export function AttendanceAnalytics() {
               </div>
             ))}
           </div>
-          <div className="flex justify-end items-center gap-2 mt-4 text-[10px] text-slate-500">
+          <div className="flex justify-end items-center gap-2 mt-4 text-[10px] text-muted-foreground">
             <span>Low</span>
             <div className="w-3 h-3 rounded-sm bg-emerald-100"></div>
             <div className="w-3 h-3 rounded-sm bg-emerald-300"></div>

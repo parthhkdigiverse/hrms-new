@@ -89,7 +89,7 @@ export function PayrollSettings() {
       
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-2xl font-bold tracking-tight text-slate-900">Payroll Settings</h1>
+        <h1 className="text-2xl font-bold tracking-tight text-foreground">Payroll Settings</h1>
         <p className="mt-1.5 text-[13px] text-muted-foreground/80">Company-wide payroll rules applied to every processing cycle</p>
       </div>
 
@@ -102,8 +102,8 @@ export function PayrollSettings() {
             className={cn(
               "px-5 py-2 text-[13px] font-semibold rounded-lg transition-all",
               activeTab === tab 
-                ? "bg-white text-slate-900 shadow-sm" 
-                : "text-slate-500 hover:text-slate-700"
+                ? "bg-white text-foreground shadow-sm" 
+                : "text-muted-foreground hover:text-foreground/80"
             )}
           >
             {tab}
@@ -119,18 +119,18 @@ export function PayrollSettings() {
             {/* Card 1: Working Days */}
             <div className="rounded-[16px] border border-border/60 bg-white p-6 shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
               <div className="mb-5">
-                <h2 className="text-[15px] font-bold text-slate-900">Working Days Per Month</h2>
+                <h2 className="text-[15px] font-bold text-foreground">Working Days Per Month</h2>
                 <p className="text-[13px] text-muted-foreground/80 mt-1">Base divisor used for per-day salary calculation</p>
               </div>
               <div className="h-px w-full bg-border/40 mb-6" />
               
               <div className="grid grid-cols-2 gap-5">
                 <div>
-                  <label className="text-[12px] font-semibold text-slate-500 mb-2 block">Working days</label>
+                  <label className="text-[12px] font-semibold text-muted-foreground mb-2 block">Working days</label>
                   <select 
                     value={workingDays}
                     onChange={(e) => setWorkingDays(e.target.value)}
-                    className="w-full rounded-[10px] border border-border/80 p-2.5 text-[13px] font-medium text-slate-700 outline-none focus:border-emerald-500 bg-white shadow-sm"
+                    className="w-full rounded-[10px] border border-border/80 p-2.5 text-[13px] font-medium text-foreground/80 outline-none focus:border-emerald-500 bg-white shadow-sm"
                   >
                     <option value="26">26</option>
                     <option value="28">28</option>
@@ -139,11 +139,11 @@ export function PayrollSettings() {
                   </select>
                 </div>
                 <div>
-                  <label className="text-[12px] font-semibold text-slate-500 mb-2 block">Salary calculation method</label>
+                  <label className="text-[12px] font-semibold text-muted-foreground mb-2 block">Salary calculation method</label>
                   <select 
                     value={calcMethod}
                     onChange={(e) => setCalcMethod(e.target.value)}
-                    className="w-full rounded-[10px] border border-border/80 p-2.5 text-[13px] font-medium text-slate-700 outline-none focus:border-emerald-500 bg-white shadow-sm"
+                    className="w-full rounded-[10px] border border-border/80 p-2.5 text-[13px] font-medium text-foreground/80 outline-none focus:border-emerald-500 bg-white shadow-sm"
                   >
                     <option value="Working Days">Working Days</option>
                     <option value="Calendar Days">Calendar Days</option>
@@ -155,7 +155,7 @@ export function PayrollSettings() {
             {/* Card 2: Weekly Off */}
             <div className="rounded-[16px] border border-border/60 bg-white p-6 shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
               <div className="mb-5">
-                <h2 className="text-[15px] font-bold text-slate-900">Weekly Off</h2>
+                <h2 className="text-[15px] font-bold text-foreground">Weekly Off</h2>
                 <p className="text-[13px] text-muted-foreground/80 mt-1">Non-working days excluded from attendance loss</p>
               </div>
               <div className="h-px w-full bg-border/40 mb-6" />
@@ -171,7 +171,7 @@ export function PayrollSettings() {
                         "px-4 py-1.5 rounded-full text-[13px] font-semibold transition-colors",
                         isSelected 
                           ? "bg-[#00A56C] text-white border border-[#00A56C]" 
-                          : "bg-white border border-border/80 text-slate-600 hover:bg-slate-50"
+                          : "bg-white border border-border/80 text-foreground/80 hover:bg-muted/50"
                       )}
                     >
                       {day}
@@ -179,7 +179,7 @@ export function PayrollSettings() {
                   );
                 })}
               </div>
-              <p className="text-[13px] text-slate-500">Selected: <span className="text-slate-600">{getSelectedText()}</span></p>
+              <p className="text-[13px] text-muted-foreground">Selected: <span className="text-foreground/80">{getSelectedText()}</span></p>
             </div>
 
           </div>
@@ -190,25 +190,25 @@ export function PayrollSettings() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
             <div className="rounded-[16px] border border-border/60 bg-white p-6 shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
               <div className="mb-5">
-                <h2 className="text-[15px] font-bold text-slate-900">Holiday Calendar</h2>
+                <h2 className="text-[15px] font-bold text-foreground">Holiday Calendar</h2>
                 <p className="text-[13px] text-muted-foreground/80 mt-1">Holidays treated as paid non-working days</p>
               </div>
               <div className="h-px w-full bg-border/40 mb-6" />
               <div className="space-y-4">
                 <div className="flex items-center justify-between p-3.5 border border-border/80 rounded-xl">
-                  <span className="text-[14px] font-semibold text-slate-800">Company Holidays</span>
+                  <span className="text-[14px] font-semibold text-foreground">Company Holidays</span>
                   <span className="px-3 py-1 bg-[#E8F5F1] text-[#00A56C] text-[12px] font-bold rounded-full">4 days</span>
                 </div>
                 <div className="flex items-center justify-between p-3.5 border border-border/80 rounded-xl">
-                  <span className="text-[14px] font-semibold text-slate-800">National Holidays</span>
+                  <span className="text-[14px] font-semibold text-foreground">National Holidays</span>
                   <span className="px-3 py-1 bg-[#E8F5F1] text-[#00A56C] text-[12px] font-bold rounded-full">3 days</span>
                 </div>
                 <div className="flex items-center justify-between p-3.5 border border-border/80 rounded-xl">
-                  <span className="text-[14px] font-semibold text-slate-800">Festival Holidays</span>
+                  <span className="text-[14px] font-semibold text-foreground">Festival Holidays</span>
                   <span className="px-3 py-1 bg-[#E8F5F1] text-[#00A56C] text-[12px] font-bold rounded-full">8 days</span>
                 </div>
                 <div className="flex items-center justify-between p-3.5 border border-border/80 rounded-xl">
-                  <span className="text-[14px] font-semibold text-slate-800">Optional Holidays</span>
+                  <span className="text-[14px] font-semibold text-foreground">Optional Holidays</span>
                   <span className="px-3 py-1 bg-[#E8F5F1] text-[#00A56C] text-[12px] font-bold rounded-full">2 of 5 selectable</span>
                 </div>
               </div>
@@ -216,23 +216,23 @@ export function PayrollSettings() {
 
             <div className="rounded-[16px] border border-border/60 bg-white p-6 shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
               <div className="mb-5">
-                <h2 className="text-[15px] font-bold text-slate-900">Leave Policy</h2>
+                <h2 className="text-[15px] font-bold text-foreground">Leave Policy</h2>
                 <p className="text-[13px] text-muted-foreground/80 mt-1">Paid, unpaid, half-day, carry forward and encashment</p>
               </div>
               <div className="h-px w-full bg-border/40 mb-6" />
               
               <div className="grid grid-cols-3 gap-4 mb-6">
                 <div>
-                  <label className="text-[12px] font-semibold text-slate-500 mb-2 block">Paid leave / year</label>
-                  <input type="text" value={settings.paidLeave} onChange={(e) => setSettings({...settings, paidLeave: e.target.value})} className="w-full rounded-[10px] border border-border/80 p-2.5 text-[13px] font-medium text-slate-700 outline-none focus:border-emerald-500 bg-white shadow-sm" />
+                  <label className="text-[12px] font-semibold text-muted-foreground mb-2 block">Paid leave / year</label>
+                  <input type="text" value={settings.paidLeave} onChange={(e) => setSettings({...settings, paidLeave: e.target.value})} className="w-full rounded-[10px] border border-border/80 p-2.5 text-[13px] font-medium text-foreground/80 outline-none focus:border-emerald-500 bg-white shadow-sm" />
                 </div>
                 <div>
-                  <label className="text-[12px] font-semibold text-slate-500 mb-2 block">Unpaid leave cap</label>
-                  <input type="text" value={settings.unpaidLeaveCap} onChange={(e) => setSettings({...settings, unpaidLeaveCap: e.target.value})} className="w-full rounded-[10px] border border-border/80 p-2.5 text-[13px] font-medium text-slate-700 outline-none focus:border-emerald-500 bg-white shadow-sm" />
+                  <label className="text-[12px] font-semibold text-muted-foreground mb-2 block">Unpaid leave cap</label>
+                  <input type="text" value={settings.unpaidLeaveCap} onChange={(e) => setSettings({...settings, unpaidLeaveCap: e.target.value})} className="w-full rounded-[10px] border border-border/80 p-2.5 text-[13px] font-medium text-foreground/80 outline-none focus:border-emerald-500 bg-white shadow-sm" />
                 </div>
                 <div>
-                  <label className="text-[12px] font-semibold text-slate-500 mb-2 block">Half day rule</label>
-                  <select value={settings.halfDayRule} onChange={(e) => setSettings({...settings, halfDayRule: e.target.value})} className="w-full rounded-[10px] border border-border/80 p-2.5 text-[13px] font-medium text-slate-700 outline-none focus:border-emerald-500 bg-white shadow-sm">
+                  <label className="text-[12px] font-semibold text-muted-foreground mb-2 block">Half day rule</label>
+                  <select value={settings.halfDayRule} onChange={(e) => setSettings({...settings, halfDayRule: e.target.value})} className="w-full rounded-[10px] border border-border/80 p-2.5 text-[13px] font-medium text-foreground/80 outline-none focus:border-emerald-500 bg-white shadow-sm">
                     <option>4 hours</option>
                   </select>
                 </div>
@@ -240,21 +240,21 @@ export function PayrollSettings() {
 
               <div className="flex items-center justify-between p-4 border border-border/80 rounded-xl mb-4">
                 <div>
-                  <p className="text-[14px] font-semibold text-slate-800">Carry Forward Leave</p>
-                  <p className="text-[12px] text-slate-500 mt-0.5">Unused paid leaves move to next year</p>
+                  <p className="text-[14px] font-semibold text-foreground">Carry Forward Leave</p>
+                  <p className="text-[12px] text-muted-foreground mt-0.5">Unused paid leaves move to next year</p>
                 </div>
                 <Switch checked={settings.carryForward} onChange={() => setSettings({...settings, carryForward: !settings.carryForward})} />
               </div>
 
               <div className="mb-6">
-                <label className="text-[12px] font-semibold text-slate-500 mb-2 block">Maximum carry forward days</label>
-                <input type="text" value={settings.maxCarryForward} onChange={(e) => setSettings({...settings, maxCarryForward: e.target.value})} className="w-full rounded-[10px] border border-border/80 p-2.5 text-[13px] font-medium text-slate-700 outline-none focus:border-emerald-500 bg-white shadow-sm" />
+                <label className="text-[12px] font-semibold text-muted-foreground mb-2 block">Maximum carry forward days</label>
+                <input type="text" value={settings.maxCarryForward} onChange={(e) => setSettings({...settings, maxCarryForward: e.target.value})} className="w-full rounded-[10px] border border-border/80 p-2.5 text-[13px] font-medium text-foreground/80 outline-none focus:border-emerald-500 bg-white shadow-sm" />
               </div>
 
               <div className="flex items-center justify-between p-4 border border-border/80 rounded-xl">
                 <div>
-                  <p className="text-[14px] font-semibold text-slate-800">Leave Encashment</p>
-                  <p className="text-[12px] text-slate-500 mt-0.5">Encash unused leave at year end</p>
+                  <p className="text-[14px] font-semibold text-foreground">Leave Encashment</p>
+                  <p className="text-[12px] text-muted-foreground mt-0.5">Encash unused leave at year end</p>
                 </div>
                 <Switch checked={settings.encashment} onChange={() => setSettings({...settings, encashment: !settings.encashment})} />
               </div>
@@ -263,18 +263,18 @@ export function PayrollSettings() {
             {/* Leave Types Configuration */}
             <div className="rounded-[16px] border border-border/60 bg-white p-6 shadow-[0_2px_8px_rgba(0,0,0,0.02)] mt-6 col-span-1 lg:col-span-2">
               <div className="mb-5">
-                <h2 className="text-[15px] font-bold text-slate-900">Leave Types</h2>
+                <h2 className="text-[15px] font-bold text-foreground">Leave Types</h2>
                 <p className="text-[13px] text-muted-foreground/80 mt-1">Configure available leave types for employees</p>
               </div>
               <div className="h-px w-full bg-border/40 mb-6" />
               
               <div className="flex flex-wrap gap-2 mb-6">
                 {leaveTypes.map(type => (
-                  <div key={type} className="flex items-center gap-2 px-3 py-1.5 bg-slate-100 border border-slate-200 rounded-lg">
-                    <span className="text-[13px] font-semibold text-slate-700">{type}</span>
+                  <div key={type} className="flex items-center gap-2 px-3 py-1.5 bg-muted border border-border rounded-lg">
+                    <span className="text-[13px] font-semibold text-foreground/80">{type}</span>
                     <button 
                       onClick={() => removeLeaveType(type)}
-                      className="p-0.5 text-slate-400 hover:text-rose-500 rounded-md transition-colors"
+                      className="p-0.5 text-muted-foreground hover:text-rose-500 rounded-md transition-colors"
                     >
                       <X className="w-3.5 h-3.5" />
                     </button>
@@ -294,7 +294,7 @@ export function PayrollSettings() {
                       setNewLeaveTypeInput("");
                     }
                   }}
-                  className="flex-1 rounded-[10px] border border-border/80 p-2.5 text-[13px] font-medium text-slate-700 outline-none focus:border-indigo-500 bg-white shadow-sm"
+                  className="flex-1 rounded-[10px] border border-border/80 p-2.5 text-[13px] font-medium text-foreground/80 outline-none focus:border-primary bg-white shadow-sm"
                 />
                 <button 
                   onClick={() => {
@@ -303,7 +303,7 @@ export function PayrollSettings() {
                       setNewLeaveTypeInput("");
                     }
                   }}
-                  className="px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-[10px] text-[13px] font-bold shadow-sm flex items-center gap-2 transition-colors"
+                  className="px-4 py-2.5 bg-card hover:bg-primary text-primary-foreground rounded-[10px] text-[13px] font-bold shadow-sm flex items-center gap-2 transition-colors"
                 >
                   <Plus className="w-4 h-4" /> Add
                 </button>
@@ -317,19 +317,19 @@ export function PayrollSettings() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
             <div className="rounded-[16px] border border-border/60 bg-white p-6 shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
               <div className="mb-5">
-                <h2 className="text-[15px] font-bold text-slate-900">Attendance Rules</h2>
+                <h2 className="text-[15px] font-bold text-foreground">Attendance Rules</h2>
                 <p className="text-[13px] text-muted-foreground/80 mt-1">Grace, penalty and punch rules affecting payable days</p>
               </div>
               <div className="h-px w-full bg-border/40 mb-6" />
               
               <div className="grid grid-cols-2 gap-5 mb-5">
                 <div>
-                  <label className="text-[12px] font-semibold text-slate-500 mb-2 block">Late coming grace (minutes)</label>
-                  <input type="text" value={settings.lateGrace} onChange={(e) => setSettings({...settings, lateGrace: e.target.value})} className="w-full rounded-[10px] border border-border/80 p-2.5 text-[13px] font-medium text-slate-700 outline-none focus:border-emerald-500 bg-white shadow-sm" />
+                  <label className="text-[12px] font-semibold text-muted-foreground mb-2 block">Late coming grace (minutes)</label>
+                  <input type="text" value={settings.lateGrace} onChange={(e) => setSettings({...settings, lateGrace: e.target.value})} className="w-full rounded-[10px] border border-border/80 p-2.5 text-[13px] font-medium text-foreground/80 outline-none focus:border-emerald-500 bg-white shadow-sm" />
                 </div>
                 <div>
-                  <label className="text-[12px] font-semibold text-slate-500 mb-2 block">Late penalty</label>
-                  <select value={settings.latePenalty} onChange={(e) => setSettings({...settings, latePenalty: e.target.value})} className="w-full rounded-[10px] border border-border/80 p-2.5 text-[13px] font-medium text-slate-700 outline-none focus:border-emerald-500 bg-white shadow-sm">
+                  <label className="text-[12px] font-semibold text-muted-foreground mb-2 block">Late penalty</label>
+                  <select value={settings.latePenalty} onChange={(e) => setSettings({...settings, latePenalty: e.target.value})} className="w-full rounded-[10px] border border-border/80 p-2.5 text-[13px] font-medium text-foreground/80 outline-none focus:border-emerald-500 bg-white shadow-sm">
                     <option>₹300 per instance</option>
                   </select>
                 </div>
@@ -337,14 +337,14 @@ export function PayrollSettings() {
 
               <div className="grid grid-cols-2 gap-5 mb-5">
                 <div>
-                  <label className="text-[12px] font-semibold text-slate-500 mb-2 block">Half day rule</label>
-                  <select value={settings.halfDayRule} onChange={(e) => setSettings({...settings, halfDayRule: e.target.value})} className="w-full rounded-[10px] border border-border/80 p-2.5 text-[13px] font-medium text-slate-700 outline-none focus:border-emerald-500 bg-white shadow-sm">
+                  <label className="text-[12px] font-semibold text-muted-foreground mb-2 block">Half day rule</label>
+                  <select value={settings.halfDayRule} onChange={(e) => setSettings({...settings, halfDayRule: e.target.value})} className="w-full rounded-[10px] border border-border/80 p-2.5 text-[13px] font-medium text-foreground/80 outline-none focus:border-emerald-500 bg-white shadow-sm">
                     <option>Below 4 hrs</option>
                   </select>
                 </div>
                 <div>
-                  <label className="text-[12px] font-semibold text-slate-500 mb-2 block">Absent rule</label>
-                  <select value={settings.absentRule} onChange={(e) => setSettings({...settings, absentRule: e.target.value})} className="w-full rounded-[10px] border border-border/80 p-2.5 text-[13px] font-medium text-slate-700 outline-none focus:border-emerald-500 bg-white shadow-sm">
+                  <label className="text-[12px] font-semibold text-muted-foreground mb-2 block">Absent rule</label>
+                  <select value={settings.absentRule} onChange={(e) => setSettings({...settings, absentRule: e.target.value})} className="w-full rounded-[10px] border border-border/80 p-2.5 text-[13px] font-medium text-foreground/80 outline-none focus:border-emerald-500 bg-white shadow-sm">
                     <option>No punch = Absent</option>
                   </select>
                 </div>
@@ -352,8 +352,8 @@ export function PayrollSettings() {
 
               <div className="grid grid-cols-2 gap-5">
                 <div>
-                  <label className="text-[12px] font-semibold text-slate-500 mb-2 block">Missing punch rule</label>
-                  <select value={settings.missingPunch} onChange={(e) => setSettings({...settings, missingPunch: e.target.value})} className="w-full rounded-[10px] border border-border/80 p-2.5 text-[13px] font-medium text-slate-700 outline-none focus:border-emerald-500 bg-white shadow-sm">
+                  <label className="text-[12px] font-semibold text-muted-foreground mb-2 block">Missing punch rule</label>
+                  <select value={settings.missingPunch} onChange={(e) => setSettings({...settings, missingPunch: e.target.value})} className="w-full rounded-[10px] border border-border/80 p-2.5 text-[13px] font-medium text-foreground/80 outline-none focus:border-emerald-500 bg-white shadow-sm">
                     <option>Regularize within 3 days</option>
                   </select>
                 </div>
@@ -362,31 +362,31 @@ export function PayrollSettings() {
 
             <div className="rounded-[16px] border border-border/60 bg-white p-6 shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
               <div className="mb-5">
-                <h2 className="text-[15px] font-bold text-slate-900">Overtime</h2>
+                <h2 className="text-[15px] font-bold text-foreground">Overtime</h2>
                 <p className="text-[13px] text-muted-foreground/80 mt-1">OT computed from approved attendance only</p>
               </div>
               <div className="h-px w-full bg-border/40 mb-6" />
 
               <div className="flex items-center justify-between p-4 border border-border/80 rounded-xl mb-6">
                 <div>
-                  <p className="text-[14px] font-semibold text-slate-800">Enable Overtime</p>
-                  <p className="text-[12px] text-slate-500 mt-0.5">OT paid with monthly payroll</p>
+                  <p className="text-[14px] font-semibold text-foreground">Enable Overtime</p>
+                  <p className="text-[12px] text-muted-foreground mt-0.5">OT paid with monthly payroll</p>
                 </div>
                 <Switch checked={settings.enableOT} onChange={() => setSettings({...settings, enableOT: !settings.enableOT})} />
               </div>
               
               <div className="grid grid-cols-3 gap-4">
                 <div>
-                  <label className="text-[12px] font-semibold text-slate-500 mb-2 block">OT rate / hour</label>
-                  <input type="text" value={settings.otRate} onChange={(e) => setSettings({...settings, otRate: e.target.value})} className="w-full rounded-[10px] border border-border/80 p-2.5 text-[13px] font-medium text-slate-700 outline-none focus:border-emerald-500 bg-white shadow-sm" />
+                  <label className="text-[12px] font-semibold text-muted-foreground mb-2 block">OT rate / hour</label>
+                  <input type="text" value={settings.otRate} onChange={(e) => setSettings({...settings, otRate: e.target.value})} className="w-full rounded-[10px] border border-border/80 p-2.5 text-[13px] font-medium text-foreground/80 outline-none focus:border-emerald-500 bg-white shadow-sm" />
                 </div>
                 <div>
-                  <label className="text-[12px] font-semibold text-slate-500 mb-2 block">Double OT after</label>
-                  <input type="text" value={settings.doubleOTAfter} onChange={(e) => setSettings({...settings, doubleOTAfter: e.target.value})} className="w-full rounded-[10px] border border-border/80 p-2.5 text-[13px] font-medium text-slate-700 outline-none focus:border-emerald-500 bg-white shadow-sm" />
+                  <label className="text-[12px] font-semibold text-muted-foreground mb-2 block">Double OT after</label>
+                  <input type="text" value={settings.doubleOTAfter} onChange={(e) => setSettings({...settings, doubleOTAfter: e.target.value})} className="w-full rounded-[10px] border border-border/80 p-2.5 text-[13px] font-medium text-foreground/80 outline-none focus:border-emerald-500 bg-white shadow-sm" />
                 </div>
                 <div>
-                  <label className="text-[12px] font-semibold text-slate-500 mb-2 block">Holiday OT multiplier</label>
-                  <select value={settings.holidayOT} onChange={(e) => setSettings({...settings, holidayOT: e.target.value})} className="w-full rounded-[10px] border border-border/80 p-2.5 text-[13px] font-medium text-slate-700 outline-none focus:border-emerald-500 bg-white shadow-sm">
+                  <label className="text-[12px] font-semibold text-muted-foreground mb-2 block">Holiday OT multiplier</label>
+                  <select value={settings.holidayOT} onChange={(e) => setSettings({...settings, holidayOT: e.target.value})} className="w-full rounded-[10px] border border-border/80 p-2.5 text-[13px] font-medium text-foreground/80 outline-none focus:border-emerald-500 bg-white shadow-sm">
                     <option>2x</option>
                   </select>
                 </div>
@@ -400,7 +400,7 @@ export function PayrollSettings() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
             <div className="rounded-[16px] border border-border/60 bg-white p-6 shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
               <div className="mb-5">
-                <h2 className="text-[15px] font-bold text-slate-900">Health & Statutory Benefits</h2>
+                <h2 className="text-[15px] font-bold text-foreground">Health & Statutory Benefits</h2>
                 <p className="text-[13px] text-muted-foreground/80 mt-1">Company and employee contributions</p>
               </div>
               <div className="h-px w-full bg-border/40 mb-6" />
@@ -409,42 +409,42 @@ export function PayrollSettings() {
                 <div className="border border-border/80 rounded-xl overflow-hidden">
                   <div className="flex items-center justify-between p-4">
                     <div>
-                      <p className="text-[14px] font-semibold text-slate-800">Health Insurance</p>
-                      <p className="text-[12px] text-slate-500 mt-0.5">Company ₹1,200 · Employee ₹650</p>
+                      <p className="text-[14px] font-semibold text-foreground">Health Insurance</p>
+                      <p className="text-[12px] text-muted-foreground mt-0.5">Company ₹1,200 · Employee ₹650</p>
                     </div>
                     <Switch checked={settings.healthIns} onChange={() => setSettings({...settings, healthIns: !settings.healthIns})} />
                   </div>
                   <div className="px-4 pb-4 grid grid-cols-2 gap-4">
                     <div>
-                      <label className="text-[11px] font-semibold text-slate-500 mb-1.5 block">Company contribution</label>
-                      <input type="text" value={settings.healthCoCont} onChange={(e) => setSettings({...settings, healthCoCont: e.target.value})} className="w-full rounded-[8px] border border-border/80 p-2 text-[13px] font-medium text-slate-700 outline-none focus:border-emerald-500 bg-white" />
+                      <label className="text-[11px] font-semibold text-muted-foreground mb-1.5 block">Company contribution</label>
+                      <input type="text" value={settings.healthCoCont} onChange={(e) => setSettings({...settings, healthCoCont: e.target.value})} className="w-full rounded-[8px] border border-border/80 p-2 text-[13px] font-medium text-foreground/80 outline-none focus:border-emerald-500 bg-white" />
                     </div>
                     <div>
-                      <label className="text-[11px] font-semibold text-slate-500 mb-1.5 block">Employee contribution</label>
-                      <input type="text" value={settings.healthEmpCont} onChange={(e) => setSettings({...settings, healthEmpCont: e.target.value})} className="w-full rounded-[8px] border border-border/80 p-2 text-[13px] font-medium text-slate-700 outline-none focus:border-emerald-500 bg-white" />
+                      <label className="text-[11px] font-semibold text-muted-foreground mb-1.5 block">Employee contribution</label>
+                      <input type="text" value={settings.healthEmpCont} onChange={(e) => setSettings({...settings, healthEmpCont: e.target.value})} className="w-full rounded-[8px] border border-border/80 p-2 text-[13px] font-medium text-foreground/80 outline-none focus:border-emerald-500 bg-white" />
                     </div>
                   </div>
                 </div>
 
                 <div className="flex items-center justify-between p-4 border border-border/80 rounded-xl">
                   <div>
-                    <p className="text-[14px] font-semibold text-slate-800">Maternity Leave</p>
-                    <p className="text-[12px] text-slate-500 mt-0.5">Days allowed: 182</p>
+                    <p className="text-[14px] font-semibold text-foreground">Maternity Leave</p>
+                    <p className="text-[12px] text-muted-foreground mt-0.5">Days allowed: 182</p>
                   </div>
                   <Switch checked={settings.maternity} onChange={() => setSettings({...settings, maternity: !settings.maternity})} />
                 </div>
 
                 <div className="flex items-center justify-between p-4 border border-border/80 rounded-xl">
                   <div>
-                    <p className="text-[14px] font-semibold text-slate-800">Paternity Leave</p>
-                    <p className="text-[12px] text-slate-500 mt-0.5">Days allowed: 15</p>
+                    <p className="text-[14px] font-semibold text-foreground">Paternity Leave</p>
+                    <p className="text-[12px] text-muted-foreground mt-0.5">Days allowed: 15</p>
                   </div>
                   <Switch checked={settings.paternity} onChange={() => setSettings({...settings, paternity: !settings.paternity})} />
                 </div>
 
                 <div className="flex items-center justify-between p-4 border border-border/80 rounded-xl">
                   <div>
-                    <p className="text-[14px] font-semibold text-slate-800">Medical Benefit</p>
+                    <p className="text-[14px] font-semibold text-foreground">Medical Benefit</p>
                   </div>
                   <Switch checked={settings.medical} onChange={() => setSettings({...settings, medical: !settings.medical})} />
                 </div>
@@ -453,32 +453,32 @@ export function PayrollSettings() {
 
             <div className="rounded-[16px] border border-border/60 bg-white p-6 shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
               <div className="mb-5">
-                <h2 className="text-[15px] font-bold text-slate-900">Reimbursements & Perks</h2>
+                <h2 className="text-[15px] font-bold text-foreground">Reimbursements & Perks</h2>
                 <p className="text-[13px] text-muted-foreground/80 mt-1">Applied as monthly allowances in payslips</p>
               </div>
               <div className="h-px w-full bg-border/40 mb-6" />
 
               <div className="space-y-4">
                 <div className="flex items-center justify-between p-4 border border-border/80 rounded-xl">
-                  <p className="text-[14px] font-semibold text-slate-800">Travel Reimbursement</p>
+                  <p className="text-[14px] font-semibold text-foreground">Travel Reimbursement</p>
                   <Switch checked={settings.travelReimburse} onChange={() => setSettings({...settings, travelReimburse: !settings.travelReimburse})} />
                 </div>
                 <div className="flex items-center justify-between p-4 border border-border/80 rounded-xl">
-                  <p className="text-[14px] font-semibold text-slate-800">Meal Benefit</p>
+                  <p className="text-[14px] font-semibold text-foreground">Meal Benefit</p>
                   <Switch checked={settings.mealBenefit} onChange={() => setSettings({...settings, mealBenefit: !settings.mealBenefit})} />
                 </div>
                 <div className="flex items-center justify-between p-4 border border-border/80 rounded-xl">
-                  <p className="text-[14px] font-semibold text-slate-800">Internet Reimbursement</p>
+                  <p className="text-[14px] font-semibold text-foreground">Internet Reimbursement</p>
                   <Switch checked={settings.internetReimburse} onChange={() => setSettings({...settings, internetReimburse: !settings.internetReimburse})} />
                 </div>
-                <div className="flex items-center justify-between p-4 border border-border/80 rounded-xl bg-slate-50/30">
-                  <p className={cn("text-[14px] font-semibold", settings.mobileAllowance ? "text-slate-800" : "text-slate-400")}>Mobile Allowance</p>
+                <div className="flex items-center justify-between p-4 border border-border/80 rounded-xl bg-muted/50/30">
+                  <p className={cn("text-[14px] font-semibold", settings.mobileAllowance ? "text-foreground" : "text-muted-foreground")}>Mobile Allowance</p>
                   <Switch checked={settings.mobileAllowance} onChange={() => setSettings({...settings, mobileAllowance: !settings.mobileAllowance})} />
                 </div>
                 <div className="flex items-center justify-between p-4 border border-border/80 rounded-xl">
                   <div>
-                    <p className="text-[14px] font-semibold text-slate-800">Bonus Eligibility</p>
-                    <p className="text-[12px] text-slate-500 mt-0.5">After 6 months of service</p>
+                    <p className="text-[14px] font-semibold text-foreground">Bonus Eligibility</p>
+                    <p className="text-[12px] text-muted-foreground mt-0.5">After 6 months of service</p>
                   </div>
                   <Switch checked={settings.bonusEligible} onChange={() => setSettings({...settings, bonusEligible: !settings.bonusEligible})} />
                 </div>
@@ -492,27 +492,27 @@ export function PayrollSettings() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
             <div className="rounded-[16px] border border-border/60 bg-white p-6 shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
               <div className="mb-5">
-                <h2 className="text-[15px] font-bold text-slate-900">Payroll Lock</h2>
+                <h2 className="text-[15px] font-bold text-foreground">Payroll Lock</h2>
                 <p className="text-[13px] text-muted-foreground/80 mt-1">Prevent edits once payroll is approved</p>
               </div>
               <div className="h-px w-full bg-border/40 mb-6" />
 
               <div className="flex items-center justify-between p-4 border border-border/80 rounded-xl mb-4">
                 <div>
-                  <p className="text-[14px] font-semibold text-slate-800">Lock payroll after approval</p>
-                  <p className="text-[12px] text-slate-500 mt-0.5">Approved payroll becomes read-only forever</p>
+                  <p className="text-[14px] font-semibold text-foreground">Lock payroll after approval</p>
+                  <p className="text-[12px] text-muted-foreground mt-0.5">Approved payroll becomes read-only forever</p>
                 </div>
                 <Switch checked={settings.lockPayroll} onChange={() => setSettings({...settings, lockPayroll: !settings.lockPayroll})} />
               </div>
               
-              <p className="text-[13px] text-slate-500 leading-relaxed">
+              <p className="text-[13px] text-muted-foreground leading-relaxed">
                 Payroll records can never be deleted — corrections are posted as adjustments in the next cycle.
               </p>
             </div>
 
             <div className="rounded-[16px] border border-border/60 bg-white p-6 shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
               <div className="mb-5">
-                <h2 className="text-[15px] font-bold text-slate-900">Approval Workflow</h2>
+                <h2 className="text-[15px] font-bold text-foreground">Approval Workflow</h2>
                 <p className="text-[13px] text-muted-foreground/80 mt-1">Sequential approvals required before disbursement</p>
               </div>
               <div className="h-px w-full bg-border/40 mb-6" />
@@ -521,24 +521,24 @@ export function PayrollSettings() {
                 <div className="flex items-center gap-4 p-4 border border-border/80 rounded-xl bg-white relative z-10">
                   <div className="w-8 h-8 rounded-full bg-[#00A56C] text-white flex items-center justify-center text-[14px] font-bold shrink-0">1</div>
                   <div>
-                    <p className="text-[14px] font-bold text-slate-900">HR</p>
-                    <p className="text-[12px] text-slate-500 mt-0.5">Verifies attendance, leave and salary revisions</p>
+                    <p className="text-[14px] font-bold text-foreground">HR</p>
+                    <p className="text-[12px] text-muted-foreground mt-0.5">Verifies attendance, leave and salary revisions</p>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-4 p-4 border border-border/80 rounded-xl bg-white relative z-10">
                   <div className="w-8 h-8 rounded-full bg-[#00A56C] text-white flex items-center justify-center text-[14px] font-bold shrink-0">2</div>
                   <div>
-                    <p className="text-[14px] font-bold text-slate-900">Accounts</p>
-                    <p className="text-[12px] text-slate-500 mt-0.5">Validates deductions, recoveries and tax</p>
+                    <p className="text-[14px] font-bold text-foreground">Accounts</p>
+                    <p className="text-[12px] text-muted-foreground mt-0.5">Validates deductions, recoveries and tax</p>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-4 p-4 border border-border/80 rounded-xl bg-white relative z-10">
                   <div className="w-8 h-8 rounded-full bg-[#00A56C] text-white flex items-center justify-center text-[14px] font-bold shrink-0">3</div>
                   <div>
-                    <p className="text-[14px] font-bold text-slate-900">CEO</p>
-                    <p className="text-[12px] text-slate-500 mt-0.5">Final approval — locks payroll</p>
+                    <p className="text-[14px] font-bold text-foreground">CEO</p>
+                    <p className="text-[12px] text-muted-foreground mt-0.5">Final approval — locks payroll</p>
                   </div>
                 </div>
               </div>

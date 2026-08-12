@@ -10,25 +10,25 @@ export function DepartmentStatus() {
         {DEPARTMENTS.map((dept, i) => (
           <div key={i} className="bg-white border border-border/60 rounded-3xl p-6 shadow-sm">
             <div className="mb-6">
-              <h3 className="text-lg font-black text-slate-900 mb-1">{dept.name}</h3>
-              <p className="text-[11px] text-slate-500">{dept.total} Employees</p>
+              <h3 className="text-lg font-black text-foreground mb-1">{dept.name}</h3>
+              <p className="text-[11px] text-muted-foreground">{dept.total} Employees</p>
             </div>
             
             <div className="space-y-4">
               <div className="flex justify-between items-end">
                 <div>
-                  <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Present Today</p>
-                  <p className="text-xl font-black text-[#00A56C] leading-none">{dept.present}<span className="text-sm text-slate-400 font-medium">/{dept.total}</span></p>
+                  <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider mb-1">Present Today</p>
+                  <p className="text-xl font-black text-[#00A56C] leading-none">{dept.present}<span className="text-sm text-muted-foreground font-medium">/{dept.total}</span></p>
                 </div>
                 <div className="text-right">
-                  <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Tasks</p>
-                  <p className="text-xl font-black text-indigo-600 leading-none">{dept.completed}<span className="text-sm text-slate-400 font-medium">/{dept.completed + dept.tasks}</span></p>
+                  <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider mb-1">Tasks</p>
+                  <p className="text-xl font-black text-primary leading-none">{dept.completed}<span className="text-sm text-muted-foreground font-medium">/{dept.completed + dept.tasks}</span></p>
                 </div>
               </div>
               
-              <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+              <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden">
                 <div 
-                  className="h-full bg-indigo-500 rounded-full" 
+                  className="h-full bg-primary rounded-full" 
                   style={{ width: `${(dept.completed / (dept.completed + dept.tasks)) * 100}%` }}
                 ></div>
               </div>

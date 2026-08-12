@@ -13,10 +13,10 @@ export function OverallKPIs() {
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-x-6 gap-y-8">
           {OVERALL_KPIS.map((kpi, i) => (
             <div key={i}>
-              <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">{kpi.label}</p>
-              <p className="text-xl font-black text-slate-900 leading-none">{kpi.value}</p>
+              <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider mb-2">{kpi.label}</p>
+              <p className="text-xl font-black text-foreground leading-none">{kpi.value}</p>
               {kpi.value.includes('%') && (
-                <div className="h-1 w-full bg-slate-100 rounded-full mt-3 overflow-hidden">
+                <div className="h-1 w-full bg-muted rounded-full mt-3 overflow-hidden">
                   <div 
                     className="h-full bg-[#00A56C] rounded-full" 
                     style={{ width: kpi.value }}
@@ -40,8 +40,8 @@ export function OverallKPIs() {
             <CloudSun className="h-6 w-6" />
           </div>
           <div>
-            <p className="text-[15px] font-bold text-slate-900">31°C · Ahmedabad</p>
-            <p className="text-[11px] text-slate-500">Partly cloudy · humidity 68%</p>
+            <p className="text-[15px] font-bold text-foreground">31°C · Ahmedabad</p>
+            <p className="text-[11px] text-muted-foreground">Partly cloudy · humidity 68%</p>
           </div>
         </div>
 
@@ -50,8 +50,8 @@ export function OverallKPIs() {
             <Clock className="h-6 w-6" />
           </div>
           <div>
-            <p className="text-[15px] font-bold text-slate-900">07:13:03</p>
-            <p className="text-[11px] text-slate-500">Until office closes at 7:00 PM</p>
+            <p className="text-[15px] font-bold text-foreground">07:13:03</p>
+            <p className="text-[11px] text-muted-foreground">Until office closes at 7:00 PM</p>
           </div>
         </div>
 
@@ -61,10 +61,10 @@ export function OverallKPIs() {
           </div>
           <div className="flex-1">
             <div className="flex justify-between items-end mb-2">
-              <p className="text-[15px] font-bold text-slate-900">Sales Target</p>
+              <p className="text-[15px] font-bold text-foreground">Sales Target</p>
               <p className="text-[11px] font-bold text-emerald-600">82% achieved</p>
             </div>
-            <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+            <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
               <div className="h-full bg-emerald-500 rounded-full" style={{ width: '82%' }}></div>
             </div>
           </div>

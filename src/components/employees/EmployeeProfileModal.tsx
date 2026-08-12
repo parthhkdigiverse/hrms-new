@@ -31,12 +31,12 @@ export function EmployeeProfileModal({ employee, onClose }: EmployeeProfileModal
       case 'Active': return 'bg-emerald-500 text-white';
       case 'On Leave': return 'bg-amber-500 text-white';
       case 'Remote': return 'bg-blue-500 text-white';
-      default: return 'bg-slate-500 text-white';
+      default: return 'bg-muted/500 text-white';
     }
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/50 backdrop-blur-sm animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-card/50 backdrop-blur-sm animate-in fade-in duration-200">
       <div className="flex min-h-full items-center justify-center p-4 text-center sm:p-6">
         <div 
           className="bg-white w-full max-w-3xl rounded-3xl shadow-2xl overflow-hidden flex flex-col text-left animate-in zoom-in-95 duration-200 relative my-auto"
@@ -71,8 +71,8 @@ export function EmployeeProfileModal({ employee, onClose }: EmployeeProfileModal
             </div>
             
             <div className="flex-1">
-              <h2 className="text-3xl font-black text-slate-900 tracking-tight">{employee.name}</h2>
-              <p className="text-[15px] font-medium text-slate-500">{employee.role} · <span className="text-[#00A56C]">{employee.department}</span></p>
+              <h2 className="text-3xl font-black text-foreground tracking-tight">{employee.name}</h2>
+              <p className="text-[15px] font-medium text-muted-foreground">{employee.role} · <span className="text-[#00A56C]">{employee.department}</span></p>
             </div>
             
             <div className="flex gap-2 w-full md:w-auto mt-4 md:mt-0">
@@ -86,36 +86,36 @@ export function EmployeeProfileModal({ employee, onClose }: EmployeeProfileModal
             {/* Left Column: Contact & Details */}
             <div className="space-y-6">
               <div>
-                <h3 className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-3">Contact Information</h3>
+                <h3 className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider mb-3">Contact Information</h3>
                 <div className="space-y-3">
-                  <div className="flex items-center gap-3 text-[13px] text-slate-600 font-medium">
-                    <div className="p-2 bg-slate-50 rounded-lg text-slate-400"><Mail className="w-4 h-4" /></div>
+                  <div className="flex items-center gap-3 text-[13px] text-foreground/80 font-medium">
+                    <div className="p-2 bg-muted/50 rounded-lg text-muted-foreground"><Mail className="w-4 h-4" /></div>
                     {employee.email}
                   </div>
-                  <div className="flex items-center gap-3 text-[13px] text-slate-600 font-medium">
-                    <div className="p-2 bg-slate-50 rounded-lg text-slate-400"><Phone className="w-4 h-4" /></div>
+                  <div className="flex items-center gap-3 text-[13px] text-foreground/80 font-medium">
+                    <div className="p-2 bg-muted/50 rounded-lg text-muted-foreground"><Phone className="w-4 h-4" /></div>
                     {employee.phone}
                   </div>
-                  <div className="flex items-center gap-3 text-[13px] text-slate-600 font-medium">
-                    <div className="p-2 bg-slate-50 rounded-lg text-slate-400"><MapPin className="w-4 h-4" /></div>
+                  <div className="flex items-center gap-3 text-[13px] text-foreground/80 font-medium">
+                    <div className="p-2 bg-muted/50 rounded-lg text-muted-foreground"><MapPin className="w-4 h-4" /></div>
                     Mumbai, India
                   </div>
                 </div>
               </div>
 
               <div>
-                <h3 className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-3">Employment</h3>
+                <h3 className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider mb-3">Employment</h3>
                 <div className="space-y-3">
-                  <div className="flex items-center gap-3 text-[13px] text-slate-600 font-medium">
-                    <div className="p-2 bg-slate-50 rounded-lg text-slate-400"><Calendar className="w-4 h-4" /></div>
+                  <div className="flex items-center gap-3 text-[13px] text-foreground/80 font-medium">
+                    <div className="p-2 bg-muted/50 rounded-lg text-muted-foreground"><Calendar className="w-4 h-4" /></div>
                     Joined {employee.joinDate}
                   </div>
-                  <div className="flex items-center gap-3 text-[13px] text-slate-600 font-medium">
-                    <div className="p-2 bg-slate-50 rounded-lg text-slate-400"><Clock className="w-4 h-4" /></div>
+                  <div className="flex items-center gap-3 text-[13px] text-foreground/80 font-medium">
+                    <div className="p-2 bg-muted/50 rounded-lg text-muted-foreground"><Clock className="w-4 h-4" /></div>
                     Tenure: {tenureText}
                   </div>
-                  <div className="flex items-center gap-3 text-[13px] text-slate-600 font-medium">
-                    <div className="p-2 bg-slate-50 rounded-lg text-slate-400"><Briefcase className="w-4 h-4" /></div>
+                  <div className="flex items-center gap-3 text-[13px] text-foreground/80 font-medium">
+                    <div className="p-2 bg-muted/50 rounded-lg text-muted-foreground"><Briefcase className="w-4 h-4" /></div>
                     Full-time Employee
                   </div>
                 </div>
@@ -125,51 +125,51 @@ export function EmployeeProfileModal({ employee, onClose }: EmployeeProfileModal
             {/* Right Column: Lifetime Stats */}
             <div className="md:col-span-2 space-y-6">
               <div>
-                <h3 className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-3">Lifetime Statistics</h3>
+                <h3 className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider mb-3">Lifetime Statistics</h3>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                   
-                  <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 flex flex-col justify-center items-center text-center">
-                    <TrendingUp className="w-5 h-5 text-indigo-500 mb-2" />
-                    <p className="text-2xl font-black text-slate-900 leading-none mb-1">{employee.performanceScore}</p>
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Perf. Score</p>
+                  <div className="bg-muted/50 p-4 rounded-2xl border border-border/50 flex flex-col justify-center items-center text-center">
+                    <TrendingUp className="w-5 h-5 text-primary mb-2" />
+                    <p className="text-2xl font-black text-foreground leading-none mb-1">{employee.performanceScore}</p>
+                    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Perf. Score</p>
                   </div>
                   
-                  <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 flex flex-col justify-center items-center text-center">
+                  <div className="bg-muted/50 p-4 rounded-2xl border border-border/50 flex flex-col justify-center items-center text-center">
                     <CheckCircle2 className="w-5 h-5 text-emerald-500 mb-2" />
-                    <p className="text-2xl font-black text-slate-900 leading-none mb-1">{attendanceRate}%</p>
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Attendance</p>
+                    <p className="text-2xl font-black text-foreground leading-none mb-1">{attendanceRate}%</p>
+                    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Attendance</p>
                   </div>
 
-                  <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 flex flex-col justify-center items-center text-center">
+                  <div className="bg-muted/50 p-4 rounded-2xl border border-border/50 flex flex-col justify-center items-center text-center">
                     <Briefcase className="w-5 h-5 text-amber-500 mb-2" />
-                    <p className="text-2xl font-black text-slate-900 leading-none mb-1">{projectsCompleted}</p>
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Projects</p>
+                    <p className="text-2xl font-black text-foreground leading-none mb-1">{projectsCompleted}</p>
+                    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Projects</p>
                   </div>
 
-                  <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 flex flex-col justify-center items-center text-center">
+                  <div className="bg-muted/50 p-4 rounded-2xl border border-border/50 flex flex-col justify-center items-center text-center">
                     <Award className="w-5 h-5 text-rose-500 mb-2" />
-                    <p className="text-2xl font-black text-slate-900 leading-none mb-1">{awards}</p>
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Awards</p>
+                    <p className="text-2xl font-black text-foreground leading-none mb-1">{awards}</p>
+                    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Awards</p>
                   </div>
 
                 </div>
               </div>
 
               <div>
-                <h3 className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-3">Recent Highlights</h3>
+                <h3 className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider mb-3">Recent Highlights</h3>
                 <div className="space-y-3">
-                  <div className="flex gap-3 items-start bg-white border border-slate-100 p-3 rounded-xl shadow-sm">
+                  <div className="flex gap-3 items-start bg-white border border-border/50 p-3 rounded-xl shadow-sm">
                     <div className="p-2 bg-emerald-50 text-emerald-500 rounded-lg shrink-0"><Award className="w-4 h-4" /></div>
                     <div>
-                      <p className="text-[13px] font-bold text-slate-900">Employee of the Month</p>
-                      <p className="text-[11px] text-slate-500 mt-0.5">Awarded last month for outstanding contribution to the core product.</p>
+                      <p className="text-[13px] font-bold text-foreground">Employee of the Month</p>
+                      <p className="text-[11px] text-muted-foreground mt-0.5">Awarded last month for outstanding contribution to the core product.</p>
                     </div>
                   </div>
-                  <div className="flex gap-3 items-start bg-white border border-slate-100 p-3 rounded-xl shadow-sm">
+                  <div className="flex gap-3 items-start bg-white border border-border/50 p-3 rounded-xl shadow-sm">
                     <div className="p-2 bg-blue-50 text-blue-500 rounded-lg shrink-0"><CheckCircle2 className="w-4 h-4" /></div>
                     <div>
-                      <p className="text-[13px] font-bold text-slate-900">Completed Leadership Training</p>
-                      <p className="text-[11px] text-slate-500 mt-0.5">Successfully finished the Level 2 management curriculum.</p>
+                      <p className="text-[13px] font-bold text-foreground">Completed Leadership Training</p>
+                      <p className="text-[11px] text-muted-foreground mt-0.5">Successfully finished the Level 2 management curriculum.</p>
                     </div>
                   </div>
                 </div>

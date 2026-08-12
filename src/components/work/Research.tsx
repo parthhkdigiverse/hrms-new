@@ -149,8 +149,8 @@ export function Research() {
   return (
     <div className="space-y-8 h-[calc(100vh-8rem)] flex flex-col overflow-hidden pb-4">
       {/* Hero Section */}
-      <div className="relative rounded-3xl overflow-hidden bg-slate-900 shrink-0">
-        <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/20 to-purple-500/20 mix-blend-overlay"></div>
+      <div className="relative rounded-3xl overflow-hidden bg-card shrink-0">
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-primary/10 mix-blend-overlay"></div>
         <div className="absolute top-0 right-0 p-12 opacity-10 pointer-events-none">
           <BookOpen className="w-64 h-64 text-white" />
         </div>
@@ -159,24 +159,24 @@ export function Research() {
           <h1 className="text-3xl md:text-4xl font-bold text-white mb-4 tracking-tight">
             Knowledge & Research Hub
           </h1>
-          <p className="text-slate-300 max-w-2xl text-lg mb-8">
+          <p className="text-border max-w-2xl text-lg mb-8">
             Discover internal documentation, market intelligence, and deep-dives from across the company.
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 max-w-3xl">
             <div className="relative flex-1">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
               <input 
                 type="text" 
                 placeholder="Search articles, policies, or topics..." 
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
-                className="w-full pl-12 pr-4 py-3.5 bg-white/10 border border-white/20 rounded-2xl text-white placeholder:text-slate-400 backdrop-blur-md focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all"
+                className="w-full pl-12 pr-4 py-3.5 bg-white/10 border border-white/20 rounded-2xl text-white placeholder:text-muted-foreground backdrop-blur-md focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
               />
             </div>
             <Dialog open={isNewDocOpen} onOpenChange={setIsNewDocOpen}>
               <DialogTrigger asChild>
-                <button className="px-6 py-3.5 bg-indigo-500 hover:bg-indigo-600 text-white font-bold rounded-2xl transition-colors shadow-lg shadow-indigo-500/25 flex items-center justify-center gap-2 shrink-0">
+                <button className="px-6 py-3.5 bg-primary hover:bg-primary text-primary-foreground font-bold rounded-2xl transition-colors shadow-lg shadow-primary/20 flex items-center justify-center gap-2 shrink-0">
                   <Plus className="w-5 h-5" />
                   <span className="hidden sm:inline">New Document</span>
                 </button>
@@ -187,22 +187,22 @@ export function Research() {
                 </DialogHeader>
                 <form onSubmit={handleCreateDocument} className="space-y-4 pt-4">
                   <div className="space-y-2">
-                    <label className="text-sm font-bold text-slate-700">Document Title</label>
+                    <label className="text-sm font-bold text-foreground/80">Document Title</label>
                     <input 
                       type="text" 
                       required
                       placeholder="e.g. Q4 Marketing Strategy"
                       value={newTitle}
                       onChange={e => setNewTitle(e.target.value)}
-                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                      className="w-full px-3 py-2 bg-white border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm font-bold text-slate-700">Category</label>
+                    <label className="text-sm font-bold text-foreground/80">Category</label>
                     <select 
                       value={newCategory}
                       onChange={e => setNewCategory(e.target.value as Category)}
-                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                      className="w-full px-3 py-2 bg-white border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
                     >
                       {categories.filter(c => c !== "All").map(c => (
                         <option key={c} value={c}>{c}</option>
@@ -210,27 +210,27 @@ export function Research() {
                     </select>
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm font-bold text-slate-700">Summary / Excerpt</label>
+                    <label className="text-sm font-bold text-foreground/80">Summary / Excerpt</label>
                     <textarea 
                       required
                       rows={3}
                       placeholder="Brief description of the document contents..."
                       value={newExcerpt}
                       onChange={e => setNewExcerpt(e.target.value)}
-                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 resize-none"
+                      className="w-full px-3 py-2 bg-white border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 resize-none"
                     />
                   </div>
                   <div className="pt-4 flex justify-end gap-3">
                     <button 
                       type="button" 
                       onClick={() => setIsNewDocOpen(false)}
-                      className="px-4 py-2 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 font-bold text-sm rounded-xl transition-colors"
+                      className="px-4 py-2 bg-white border border-border text-foreground/80 hover:bg-muted/50 font-bold text-sm rounded-xl transition-colors"
                     >
                       Cancel
                     </button>
                     <button 
                       type="submit"
-                      className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-xl transition-colors"
+                      className="px-4 py-2 bg-primary hover:bg-primary text-primary-foreground font-bold text-sm rounded-xl transition-colors"
                     >
                       Publish Document
                     </button>
@@ -254,15 +254,15 @@ export function Research() {
                 className={cn(
                   "px-4 py-2 rounded-xl text-sm font-bold whitespace-nowrap transition-all duration-200 border",
                   activeCategory === cat 
-                    ? "bg-slate-900 text-white border-slate-900 shadow-md" 
-                    : "bg-white text-slate-600 border-slate-200 hover:border-slate-300 hover:bg-slate-50"
+                    ? "bg-primary text-primary-foreground border-primary shadow-md" 
+                    : "bg-white text-foreground/80 border-border hover:border-border hover:bg-muted/50"
                 )}
               >
                 {cat}
               </button>
             ))}
             <div className="flex-1"></div>
-            <button className="flex items-center gap-2 px-3 py-2 text-sm font-bold text-slate-500 hover:text-slate-800 transition-colors bg-white border border-slate-200 rounded-xl shrink-0">
+            <button className="flex items-center gap-2 px-3 py-2 text-sm font-bold text-muted-foreground hover:text-foreground transition-colors bg-white border border-border rounded-xl shrink-0">
               <Filter className="w-4 h-4" />
               Filters
             </button>
@@ -273,32 +273,32 @@ export function Research() {
             {filteredArticles.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 {filteredArticles.map(article => (
-                  <div key={article.id} className="group bg-white border border-slate-200 rounded-2xl p-5 hover:border-indigo-300 hover:shadow-lg hover:shadow-indigo-500/5 transition-all duration-300 flex flex-col cursor-pointer">
+                  <div key={article.id} className="group bg-white border border-border rounded-2xl p-5 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/20 transition-all duration-300 flex flex-col cursor-pointer">
                     <div className="flex justify-between items-start mb-3">
-                      <span className="px-2.5 py-1 bg-slate-100 text-slate-600 text-xs font-bold rounded-lg group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-colors">
+                      <span className="px-2.5 py-1 bg-muted text-foreground/80 text-xs font-bold rounded-lg group-hover:bg-primary/10 group-hover:text-primary transition-colors">
                         {article.category}
                       </span>
                       <button 
                         onClick={(e) => handleToggleBookmark(e, article.id)}
-                        className="text-slate-300 hover:text-amber-500 transition-colors"
+                        className="text-border hover:text-amber-500 transition-colors"
                       >
                         <Bookmark className={cn("w-5 h-5", article.bookmarked && "fill-amber-500 text-amber-500")} />
                       </button>
                     </div>
                     
-                    <h3 className="text-lg font-bold text-slate-800 mb-2 leading-tight group-hover:text-indigo-600 transition-colors">
+                    <h3 className="text-lg font-bold text-foreground mb-2 leading-tight group-hover:text-primary transition-colors">
                       {article.title}
                     </h3>
-                    <p className="text-sm text-slate-500 line-clamp-2 mb-6 flex-1">
+                    <p className="text-sm text-muted-foreground line-clamp-2 mb-6 flex-1">
                       {article.excerpt}
                     </p>
                     
-                    <div className="flex items-center justify-between pt-4 border-t border-slate-100 mt-auto">
+                    <div className="flex items-center justify-between pt-4 border-t border-border/50 mt-auto">
                       <div className="flex items-center gap-2">
                         <img src={article.author.avatar} alt={article.author.name} className="w-6 h-6 rounded-full ring-2 ring-white" />
-                        <span className="text-xs font-medium text-slate-700">{article.author.name}</span>
+                        <span className="text-xs font-medium text-foreground/80">{article.author.name}</span>
                       </div>
-                      <div className="flex items-center gap-1.5 text-xs text-slate-400 font-medium">
+                      <div className="flex items-center gap-1.5 text-xs text-muted-foreground font-medium">
                         <Clock className="w-3.5 h-3.5" />
                         {article.readTime}
                       </div>
@@ -308,11 +308,11 @@ export function Research() {
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center h-64 text-center">
-                <div className="w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center mb-4 text-slate-400">
+                <div className="w-16 h-16 bg-muted rounded-2xl flex items-center justify-center mb-4 text-muted-foreground">
                   <Search className="w-8 h-8" />
                 </div>
-                <h3 className="text-lg font-bold text-slate-700 mb-1">No articles found</h3>
-                <p className="text-slate-500 text-sm max-w-sm">We couldn't find any documents matching your search criteria. Try using different keywords.</p>
+                <h3 className="text-lg font-bold text-foreground/80 mb-1">No articles found</h3>
+                <p className="text-muted-foreground text-sm max-w-sm">We couldn't find any documents matching your search criteria. Try using different keywords.</p>
               </div>
             )}
           </div>

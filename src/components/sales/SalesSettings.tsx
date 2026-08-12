@@ -19,14 +19,14 @@ const INITIAL_LEAD_CATEGORIES = [
   { name: "Restaurants", icon: UtensilsCrossed, color: "bg-orange-500", iconName: "UtensilsCrossed" },
   { name: "Real Estate", icon: Building2, color: "bg-emerald-600", iconName: "Building2" },
   { name: "Doctors", icon: Stethoscope, color: "bg-blue-500", iconName: "Stethoscope" },
-  { name: "Education", icon: GraduationCap, color: "bg-indigo-500", iconName: "GraduationCap" },
+  { name: "Education", icon: GraduationCap, color: "bg-primary", iconName: "GraduationCap" },
   { name: "Hospital", icon: HeartPulse, color: "bg-rose-500", iconName: "HeartPulse" },
-  { name: "Manufacturing", icon: Factory, color: "bg-slate-500", iconName: "Factory" },
+  { name: "Manufacturing", icon: Factory, color: "bg-muted/500", iconName: "Factory" },
   { name: "Textile", icon: Shirt, color: "bg-orange-600", iconName: "Shirt" },
   { name: "Finance", icon: Landmark, color: "bg-teal-600", iconName: "Landmark" },
-  { name: "Automobile", icon: Car, color: "bg-slate-800", iconName: "Car" },
+  { name: "Automobile", icon: Car, color: "bg-card", iconName: "Car" },
   { name: "Travel", icon: Plane, color: "bg-sky-500", iconName: "Plane" },
-  { name: "IT Company", icon: Cpu, color: "bg-indigo-600", iconName: "Cpu" },
+  { name: "IT Company", icon: Cpu, color: "bg-primary", iconName: "Cpu" },
   { name: "Salon", icon: Scissors, color: "bg-pink-500", iconName: "Scissors" },
   { name: "Gym", icon: Dumbbell, color: "bg-green-600", iconName: "Dumbbell" },
   { name: "Construction", icon: HardHat, color: "bg-yellow-700", iconName: "HardHat" },
@@ -52,7 +52,7 @@ const AVAILABLE_ICONS = [
 
 const COLORS = [
   "bg-amber-500", "bg-orange-500", "bg-emerald-600", "bg-blue-500", 
-  "bg-indigo-500", "bg-rose-500", "bg-slate-500", "bg-teal-600", 
+  "bg-primary", "bg-rose-500", "bg-muted/500", "bg-teal-600", 
   "bg-sky-500", "bg-pink-500", "bg-green-600", "bg-yellow-700"
 ];
 
@@ -193,7 +193,7 @@ export function SalesSettings() {
     }
     const selectedIcon = AVAILABLE_ICONS[newCategoryIconIdx];
     if (!selectedIcon) return;
-    const randomColor = COLORS[Math.floor(Math.random() * COLORS.length)] || "bg-slate-500";
+    const randomColor = COLORS[Math.floor(Math.random() * COLORS.length)] || "bg-muted/500";
     
     setCategories([{ 
       name: newCategoryName, 

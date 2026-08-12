@@ -12,24 +12,24 @@ export function TasksAndClients() {
 
         <div className="bg-white border border-border/60 rounded-3xl p-6 shadow-sm mb-6">
           <div className="mb-6">
-            <h3 className="font-bold text-slate-900">My Tasks & Team Tasks</h3>
-            <p className="text-[11px] text-slate-500">Active tasks across projects</p>
+            <h3 className="font-bold text-foreground">My Tasks & Team Tasks</h3>
+            <p className="text-[11px] text-muted-foreground">Active tasks across projects</p>
           </div>
           <div className="space-y-3">
             {MY_TASKS.map((task, i) => (
-              <div key={i} className="flex items-start gap-3 p-3 rounded-2xl bg-slate-50 border border-slate-100 hover:bg-slate-100 transition-colors cursor-pointer">
+              <div key={i} className="flex items-start gap-3 p-3 rounded-2xl bg-muted/50 border border-border/50 hover:bg-muted transition-colors cursor-pointer">
                 <div className="mt-0.5">
                   {task.status === "completed" ? (
                     <CheckCircle2 className="h-5 w-5 text-[#00A56C]" />
                   ) : (
-                    <Circle className="h-5 w-5 text-slate-300" />
+                    <Circle className="h-5 w-5 text-border" />
                   )}
                 </div>
                 <div className="flex-1">
-                  <p className={cn("text-[13px] font-bold leading-tight mb-1", task.status === "completed" ? "text-slate-400 line-through" : "text-slate-900")}>
+                  <p className={cn("text-[13px] font-bold leading-tight mb-1", task.status === "completed" ? "text-muted-foreground line-through" : "text-foreground")}>
                     {task.title}
                   </p>
-                  <p className="text-[11px] text-slate-500">{task.assignee} · due {task.due}</p>
+                  <p className="text-[11px] text-muted-foreground">{task.assignee} · due {task.due}</p>
                 </div>
               </div>
             ))}
@@ -55,38 +55,38 @@ export function TasksAndClients() {
 
         <div className="grid grid-cols-2 gap-4 mb-6">
           <div className="bg-white border border-border/60 rounded-3xl p-5 shadow-sm">
-            <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Total Clients</p>
-            <p className="text-[26px] font-black text-slate-900 leading-none">78</p>
+            <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider mb-1">Total Clients</p>
+            <p className="text-[26px] font-black text-foreground leading-none">78</p>
           </div>
           <div className="bg-white border border-border/60 rounded-3xl p-5 shadow-sm">
-            <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Active Clients</p>
+            <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider mb-1">Active Clients</p>
             <p className="text-[26px] font-black text-[#00A56C] leading-none">64</p>
           </div>
           <div className="bg-white border border-border/60 rounded-3xl p-5 shadow-sm">
-            <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">New This Month</p>
+            <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider mb-1">New This Month</p>
             <p className="text-[26px] font-black text-blue-500 leading-none">6</p>
           </div>
           <div className="bg-white border border-border/60 rounded-3xl p-5 shadow-sm">
-            <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Satisfaction</p>
-            <p className="text-[26px] font-black text-amber-500 leading-none">4.6<span className="text-[14px] text-slate-400">/5</span></p>
+            <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider mb-1">Satisfaction</p>
+            <p className="text-[26px] font-black text-amber-500 leading-none">4.6<span className="text-[14px] text-muted-foreground">/5</span></p>
           </div>
         </div>
 
         <div className="bg-white border border-border/60 rounded-3xl p-6 shadow-sm">
           <div className="mb-6">
-            <h3 className="font-bold text-slate-900">Key Accounts</h3>
-            <p className="text-[11px] text-slate-500">Top revenue generating clients</p>
+            <h3 className="font-bold text-foreground">Key Accounts</h3>
+            <p className="text-[11px] text-muted-foreground">Top revenue generating clients</p>
           </div>
           <div className="space-y-4">
             {KEY_ACCOUNTS.map((account, i) => (
               <div key={i} className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-[14px] font-bold text-indigo-700">
+                  <div className="w-8 h-8 rounded-xl bg-primary/10 border border-indigo-100 flex items-center justify-center text-[14px] font-bold text-primary">
                     {account.name.charAt(0)}
                   </div>
                   <div>
-                    <p className="text-[13px] font-bold text-slate-900 leading-tight">{account.name}</p>
-                    <p className="text-[11px] text-slate-500">Client since {account.since}</p>
+                    <p className="text-[13px] font-bold text-foreground leading-tight">{account.name}</p>
+                    <p className="text-[11px] text-muted-foreground">Client since {account.since}</p>
                   </div>
                 </div>
                 <span className={cn("text-[10px] font-bold px-2 py-0.5 rounded-md border", 

@@ -6,7 +6,7 @@ import { formatCurrency, type Lead, type LeadStage } from "./sales-data";
 import { useSales } from "./SalesContext";
 
 const stageColors: Record<string, string> = {
-  "New Lead": "bg-indigo-100 text-indigo-700",
+  "New Lead": "bg-primary/10 text-primary",
   Contacted: "bg-violet-100 text-violet-700",
   Meeting: "bg-blue-100 text-blue-700",
   Demo: "bg-cyan-100 text-cyan-700",

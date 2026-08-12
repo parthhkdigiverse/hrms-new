@@ -14,42 +14,42 @@ export function ActivityAndAI() {
       <div>
         <CollapsibleSection section="Section 13" title="Today's Calendar">
         <div className="bg-white border border-border/60 rounded-3xl p-6 shadow-sm h-[320px] overflow-y-auto">
-          <p className="text-[11px] text-slate-500 mb-6">Meetings · birthdays · leaves · interviews · deadlines</p>
+          <p className="text-[11px] text-muted-foreground mb-6">Meetings · birthdays · leaves · interviews · deadlines</p>
           <div className="space-y-4">
             <div className="flex justify-between items-center">
               <div>
-                <p className="text-[13px] font-bold text-slate-900">Board sync</p>
-                <p className="text-[11px] text-slate-500">Meeting</p>
+                <p className="text-[13px] font-bold text-foreground">Board sync</p>
+                <p className="text-[11px] text-muted-foreground">Meeting</p>
               </div>
             </div>
             <div className="flex justify-between items-center">
               <div>
-                <p className="text-[13px] font-bold text-slate-900">Frontend Engineer</p>
-                <p className="text-[11px] text-slate-500">Interview</p>
+                <p className="text-[13px] font-bold text-foreground">Frontend Engineer</p>
+                <p className="text-[11px] text-muted-foreground">Interview</p>
               </div>
             </div>
             <div className="flex justify-between items-center">
               <div>
-                <p className="text-[13px] font-bold text-slate-900">Neha Patel</p>
-                <p className="text-[11px] text-slate-500">Birthday</p>
+                <p className="text-[13px] font-bold text-foreground">Neha Patel</p>
+                <p className="text-[11px] text-muted-foreground">Birthday</p>
               </div>
             </div>
             <div className="flex justify-between items-center">
               <div>
-                <p className="text-[13px] font-bold text-slate-900">Kite Social Launch</p>
-                <p className="text-[11px] text-slate-500">Deadline</p>
+                <p className="text-[13px] font-bold text-foreground">Kite Social Launch</p>
+                <p className="text-[11px] text-muted-foreground">Deadline</p>
               </div>
             </div>
             <div className="flex justify-between items-center">
               <div>
-                <p className="text-[13px] font-bold text-slate-900">Priya Nair – Sick</p>
-                <p className="text-[11px] text-slate-500">Leave</p>
+                <p className="text-[13px] font-bold text-foreground">Priya Nair – Sick</p>
+                <p className="text-[11px] text-muted-foreground">Leave</p>
               </div>
             </div>
             <div className="flex justify-between items-center">
               <div>
-                <p className="text-[13px] font-bold text-slate-900">Monthly town hall</p>
-                <p className="text-[11px] text-slate-500">Event</p>
+                <p className="text-[13px] font-bold text-foreground">Monthly town hall</p>
+                <p className="text-[11px] text-muted-foreground">Event</p>
               </div>
             </div>
           </div>
@@ -61,7 +61,7 @@ export function ActivityAndAI() {
       <div>
         <CollapsibleSection section="Section 14" title="Recent Activity">
         <div className="bg-white border border-border/60 rounded-3xl p-6 shadow-sm h-[320px] overflow-y-auto">
-          <p className="text-[11px] text-slate-500 mb-6">Everything happening across the company</p>
+          <p className="text-[11px] text-muted-foreground mb-6">Everything happening across the company</p>
           <div className="space-y-5">
             {ACTIVITY_FEED.map((activity, i) => {
               const Icon = IconMap[activity.icon];
@@ -69,14 +69,14 @@ export function ActivityAndAI() {
                 <div key={i} className="flex gap-3">
                   <div className={cn("mt-0.5 p-1.5 rounded-full bg-opacity-10 shrink-0", 
                     activity.color === 'emerald' ? 'bg-emerald-500 text-emerald-600' :
-                    activity.color === 'indigo' ? 'bg-indigo-500 text-indigo-600' :
+                    activity.color === 'indigo' ? 'bg-primary text-primary' :
                     activity.color === 'amber' ? 'bg-amber-500 text-amber-600' : 'bg-blue-500 text-blue-600'
                   )}>
                     {Icon && <Icon className="h-3 w-3" />}
                   </div>
                   <div>
-                    <p className="text-[12px] font-medium text-slate-900 leading-snug">{activity.title}</p>
-                    <p className="text-[10px] text-slate-500 mt-0.5">{activity.time}</p>
+                    <p className="text-[12px] font-medium text-foreground leading-snug">{activity.title}</p>
+                    <p className="text-[10px] text-muted-foreground mt-0.5">{activity.time}</p>
                   </div>
                 </div>
               )
@@ -88,7 +88,7 @@ export function ActivityAndAI() {
 
       {/* SECTION 15: AI Summary */}
       <div>
-        <CollapsibleSection section="Section 15" title="AI Summary" titleIcon={<Sparkles className="h-5 w-5 text-indigo-500" />}>
+        <CollapsibleSection section="Section 15" title="AI Summary" titleIcon={<Sparkles className="h-5 w-5 text-primary" />}>
         <div className="bg-indigo-900 rounded-3xl p-6 text-white shadow-sm h-[320px] overflow-y-auto relative">
           <p className="text-[11px] text-indigo-200 mb-6">Generated from attendance, sales, finance and delivery signals</p>
           

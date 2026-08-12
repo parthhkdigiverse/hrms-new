@@ -32,20 +32,20 @@ export function ManageDepartmentsModal({ isOpen, onClose }: ManageDepartmentsMod
   };
 
   return (
-    <div className="fixed inset-0 z-[60] overflow-y-auto bg-slate-900/50 backdrop-blur-sm animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-[60] overflow-y-auto bg-card/50 backdrop-blur-sm animate-in fade-in duration-200">
       <div className="flex min-h-full items-center justify-center p-4 text-center sm:p-6">
         <div 
           className="bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden flex flex-col text-left animate-in zoom-in-95 duration-200 relative my-auto"
           onClick={e => e.stopPropagation()}
         >
-          <div className="flex items-center justify-between px-6 py-5 border-b border-slate-100 bg-slate-50/50">
+          <div className="flex items-center justify-between px-6 py-5 border-b border-border/50 bg-muted/50/50">
             <div>
-              <h2 className="text-xl font-black text-slate-900">Manage Departments</h2>
-              <p className="text-sm text-slate-500 mt-1">Add or remove organization departments.</p>
+              <h2 className="text-xl font-black text-foreground">Manage Departments</h2>
+              <p className="text-sm text-muted-foreground mt-1">Add or remove organization departments.</p>
             </div>
             <button 
               onClick={onClose}
-              className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors"
+              className="p-2 text-muted-foreground hover:text-foreground/80 hover:bg-muted rounded-full transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
@@ -58,7 +58,7 @@ export function ManageDepartmentsModal({ isOpen, onClose }: ManageDepartmentsMod
                 value={newDept}
                 onChange={(e) => setNewDept(e.target.value)}
                 placeholder="New department name..."
-                className="flex-1 px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#00A56C]/20 focus:border-[#00A56C]/50 transition-all"
+                className="flex-1 px-4 py-2 bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#00A56C]/20 focus:border-[#00A56C]/50 transition-all"
               />
               <button 
                 type="submit"
@@ -72,11 +72,11 @@ export function ManageDepartmentsModal({ isOpen, onClose }: ManageDepartmentsMod
 
             <div className="space-y-2 max-h-[40vh] overflow-y-auto pr-2">
               {departments.length === 0 ? (
-                <p className="text-center text-sm text-slate-500 py-4">No departments found.</p>
+                <p className="text-center text-sm text-muted-foreground py-4">No departments found.</p>
               ) : (
                 departments.map(dept => (
-                  <div key={dept} className="flex items-center justify-between p-3 bg-white border border-slate-200 rounded-xl">
-                    <span className="text-sm font-bold text-slate-700">{dept}</span>
+                  <div key={dept} className="flex items-center justify-between p-3 bg-white border border-border rounded-xl">
+                    <span className="text-sm font-bold text-foreground/80">{dept}</span>
                     <button 
                       onClick={() => handleRemove(dept)}
                       className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg transition-colors"

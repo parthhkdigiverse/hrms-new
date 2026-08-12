@@ -146,37 +146,37 @@ export function Penalties() {
   return (
     <div className="space-y-8 h-[calc(100vh-8rem)] flex flex-col overflow-hidden pb-4">
       {/* Header/Stats */}
-      <div className="shrink-0 bg-white border border-slate-200 rounded-3xl p-6 shadow-sm relative overflow-hidden">
+      <div className="shrink-0 bg-card border border-border rounded-3xl p-6 shadow-sm relative overflow-hidden">
         <div className="absolute top-0 right-0 p-12 opacity-5 pointer-events-none">
-          <ShieldAlert className="w-64 h-64 text-slate-900" />
+          <ShieldAlert className="w-64 h-64 text-foreground" />
         </div>
         
         <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
-            <h1 className="text-2xl font-black text-slate-900 tracking-tight mb-2">Penalties & Warnings</h1>
-            <p className="text-sm text-slate-500 max-w-xl">
+            <h1 className="text-2xl font-black text-foreground tracking-tight mb-2">Penalties & Warnings</h1>
+            <p className="text-sm text-muted-foreground max-w-xl">
               Track disciplinary actions and warnings. Active penalties marked for payroll will automatically be deducted in the next cycle.
             </p>
           </div>
           
           <div className="flex gap-4">
-            <div className="bg-rose-50 border border-rose-100 rounded-2xl p-4 flex items-center gap-4 min-w-[160px]">
-              <div className="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center text-rose-500 shrink-0">
+            <div className="bg-destructive/10 border border-destructive/20 rounded-2xl p-4 flex items-center gap-4 min-w-[160px]">
+              <div className="w-10 h-10 bg-background rounded-xl shadow-sm flex items-center justify-center text-destructive shrink-0">
                 <AlertTriangle className="w-5 h-5" />
               </div>
               <div>
-                <p className="text-xs font-bold text-rose-600/70 uppercase tracking-wider mb-0.5">Active</p>
-                <p className="text-2xl font-black text-rose-700 leading-none">{activePenaltiesCount}</p>
+                <p className="text-xs font-bold text-destructive/70 uppercase tracking-wider mb-0.5">Active</p>
+                <p className="text-2xl font-black text-destructive leading-none">{activePenaltiesCount}</p>
               </div>
             </div>
             
-            <div className="bg-indigo-50 border border-indigo-100 rounded-2xl p-4 flex items-center gap-4 min-w-[160px]">
-              <div className="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center text-indigo-500 shrink-0">
+            <div className="bg-primary/10 border border-primary/20 rounded-2xl p-4 flex items-center gap-4 min-w-[160px]">
+              <div className="w-10 h-10 bg-background rounded-xl shadow-sm flex items-center justify-center text-primary shrink-0">
                 <DollarSign className="w-5 h-5" />
               </div>
               <div>
-                <p className="text-xs font-bold text-indigo-600/70 uppercase tracking-wider mb-0.5">Payroll Impact</p>
-                <p className="text-2xl font-black text-indigo-700 leading-none">${totalDeductions}</p>
+                <p className="text-xs font-bold text-primary/70 uppercase tracking-wider mb-0.5">Payroll Impact</p>
+                <p className="text-2xl font-black text-primary leading-none">${totalDeductions}</p>
               </div>
             </div>
           </div>
@@ -184,9 +184,9 @@ export function Penalties() {
       </div>
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-h-0 bg-white border border-slate-200 rounded-3xl shadow-sm overflow-hidden">
+      <div className="flex-1 flex flex-col min-h-0 bg-card border border-border rounded-3xl shadow-sm overflow-hidden">
         {/* Toolbar */}
-        <div className="p-4 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-50/50 shrink-0">
+        <div className="p-4 border-b border-border flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-muted/30 shrink-0">
           <div className="flex items-center gap-2 overflow-x-auto pb-2 sm:pb-0 scrollbar-hide">
             {(["All", "Penalty", "Warning"] as const).map(tab => (
               <button
@@ -195,8 +195,8 @@ export function Penalties() {
                 className={cn(
                   "px-4 py-2 rounded-xl text-sm font-bold whitespace-nowrap transition-all duration-200 border",
                   activeTab === tab 
-                    ? "bg-slate-900 text-white border-slate-900 shadow-md" 
-                    : "bg-white text-slate-600 border-slate-200 hover:border-slate-300 hover:bg-slate-50"
+                    ? "bg-primary text-primary-foreground border-primary shadow-md" 
+                    : "bg-background text-muted-foreground border-border hover:border-border hover:bg-muted"
                 )}
               >
                 {tab}
@@ -206,19 +206,19 @@ export function Penalties() {
           
           <div className="flex items-center gap-3">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <input 
                 type="text" 
                 placeholder="Search records..." 
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
-                className="w-full sm:w-64 pl-9 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all"
+                className="w-full sm:w-64 pl-9 pr-4 py-2.5 bg-background border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
               />
             </div>
             
             <Dialog open={isNewOpen} onOpenChange={setIsNewOpen}>
               <DialogTrigger asChild>
-                <button className="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl transition-colors flex items-center justify-center gap-2 shadow-sm shrink-0">
+                <button className="px-4 py-2.5 bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-xl transition-colors flex items-center justify-center gap-2 shadow-sm shrink-0">
                   <Plus className="w-4 h-4" />
                   <span className="hidden sm:inline">Add Record</span>
                 </button>
@@ -229,38 +229,38 @@ export function Penalties() {
                 </DialogHeader>
                 <form onSubmit={handleCreateRecord} className="space-y-4 pt-4">
                   <div className="space-y-2">
-                    <label className="text-sm font-bold text-slate-700">Record Type</label>
+                    <label className="text-sm font-bold text-foreground/80">Record Type</label>
                     <select 
                       value={newType}
                       onChange={e => setNewType(e.target.value as RecordType)}
-                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 font-medium"
+                      className="w-full px-3 py-2 bg-background border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 font-medium"
                     >
                       <option value="Penalty">Penalty (Financial impact possible)</option>
                       <option value="Warning">Warning (Written notice)</option>
                     </select>
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm font-bold text-slate-700">Employee Name</label>
+                    <label className="text-sm font-bold text-foreground/80">Employee Name</label>
                     <input 
                       type="text" 
                       required
                       placeholder="e.g. John Doe"
                       value={newEmpName}
                       onChange={e => setNewEmpName(e.target.value)}
-                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                      className="w-full px-3 py-2 bg-background border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
                     />
                   </div>
                   
                   {newType === "Penalty" && (
                     <div className="flex gap-4">
                       <div className="space-y-2 flex-1">
-                        <label className="text-sm font-bold text-slate-700">Deduction Amount ($)</label>
+                        <label className="text-sm font-bold text-foreground/80">Deduction Amount ($)</label>
                         <input 
                           type="number" 
                           placeholder="e.g. 50"
                           value={newAmount}
                           onChange={e => setNewAmount(e.target.value)}
-                          className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                          className="w-full px-3 py-2 bg-background border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
                         />
                       </div>
                       <div className="space-y-2 flex-1 flex flex-col justify-end pb-2">
@@ -269,36 +269,36 @@ export function Penalties() {
                             type="checkbox" 
                             checked={newImpact}
                             onChange={e => setNewImpact(e.target.checked)}
-                            className="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                            className="w-4 h-4 rounded border-border text-primary focus:ring-primary"
                           />
-                          <span className="text-sm font-bold text-slate-700">Affect Payroll</span>
+                          <span className="text-sm font-bold text-foreground/80">Affect Payroll</span>
                         </label>
                       </div>
                     </div>
                   )}
 
                   <div className="space-y-2">
-                    <label className="text-sm font-bold text-slate-700">Description / Reason</label>
+                    <label className="text-sm font-bold text-foreground/80">Description / Reason</label>
                     <textarea 
                       required
                       rows={3}
                       placeholder="Provide details..."
                       value={newDesc}
                       onChange={e => setNewDesc(e.target.value)}
-                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 resize-none"
+                      className="w-full px-3 py-2 bg-background border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 resize-none"
                     />
                   </div>
                   <div className="pt-4 flex justify-end gap-3">
                     <button 
                       type="button" 
                       onClick={() => setIsNewOpen(false)}
-                      className="px-4 py-2 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 font-bold text-sm rounded-xl transition-colors"
+                      className="px-4 py-2 bg-background border border-border text-foreground/80 hover:bg-muted font-bold text-sm rounded-xl transition-colors"
                     >
                       Cancel
                     </button>
                     <button 
                       type="submit"
-                      className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-xl transition-colors"
+                      className="px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-sm rounded-xl transition-colors"
                     >
                       Save Record
                     </button>
@@ -314,7 +314,7 @@ export function Penalties() {
                 </DialogHeader>
                 <form onSubmit={handleConfirmUpdate} className="space-y-4 pt-4">
                   <div className="space-y-2">
-                    <label className="text-sm font-bold text-slate-700">
+                    <label className="text-sm font-bold text-foreground/80">
                       Reason for {updateAction === "Waived" ? "Waiving" : "Resolving"}
                     </label>
                     <textarea 
@@ -323,20 +323,20 @@ export function Penalties() {
                       placeholder={`Why is this being ${updateAction.toLowerCase()}?`}
                       value={updateReason}
                       onChange={e => setUpdateReason(e.target.value)}
-                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 resize-none"
+                      className="w-full px-3 py-2 bg-background border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 resize-none"
                     />
                   </div>
                   <div className="pt-4 flex justify-end gap-3">
                     <button 
                       type="button" 
                       onClick={() => setIsUpdateOpen(false)}
-                      className="px-4 py-2 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 font-bold text-sm rounded-xl transition-colors"
+                      className="px-4 py-2 bg-background border border-border text-foreground/80 hover:bg-muted font-bold text-sm rounded-xl transition-colors"
                     >
                       Cancel
                     </button>
                     <button 
                       type="submit"
-                      className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-xl transition-colors"
+                      className="px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-sm rounded-xl transition-colors"
                     >
                       Confirm
                     </button>
@@ -351,11 +351,11 @@ export function Penalties() {
         <div className="flex-1 overflow-y-auto p-4">
           <div className="space-y-3">
             {filteredRecords.length > 0 ? filteredRecords.map(record => (
-              <div key={record.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-2xl border border-slate-100 hover:border-slate-200 bg-white transition-all shadow-sm hover:shadow-md group">
+              <div key={record.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-2xl border border-border/50 hover:border-border bg-card transition-all shadow-sm hover:shadow-md group">
                 <div className="flex items-start gap-4 flex-1">
                   <div className={cn(
                     "w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border",
-                    record.type === "Penalty" ? "bg-rose-50 text-rose-500 border-rose-100" :
+                    record.type === "Penalty" ? "bg-destructive/10 text-destructive border-destructive/20" :
                     "bg-amber-50 text-amber-500 border-amber-100"
                   )}>
                     {record.type === "Penalty" ? <AlertTriangle className="w-5 h-5" /> : 
@@ -364,50 +364,50 @@ export function Penalties() {
                   
                   <div>
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="font-bold text-slate-900">{record.employee.name}</span>
-                      <span className="text-slate-300">•</span>
-                      <span className="text-xs font-medium text-slate-500">{record.date}</span>
+                      <span className="font-bold text-foreground">{record.employee.name}</span>
+                      <span className="text-border">•</span>
+                      <span className="text-xs font-medium text-muted-foreground">{record.date}</span>
                     </div>
-                    <p className="text-sm text-slate-600 mb-2">{record.description}</p>
+                    <p className="text-sm text-foreground/80 mb-2">{record.description}</p>
                     
                     <div className="flex flex-wrap items-center gap-2">
                       <span className={cn(
                         "text-[10px] font-bold px-2 py-0.5 rounded-md uppercase tracking-wider",
-                        record.type === "Penalty" ? "bg-rose-100 text-rose-700" :
+                        record.type === "Penalty" ? "bg-destructive/10 text-destructive" :
                         "bg-amber-100 text-amber-700"
                       )}>
                         {record.type}
                       </span>
                       
                       {record.type === "Penalty" && record.amount !== null && (
-                        <span className="text-xs font-bold text-slate-600 bg-slate-100 px-2 py-0.5 rounded-md">
+                        <span className="text-xs font-bold text-foreground/80 bg-muted px-2 py-0.5 rounded-md">
                           Amount: ${record.amount}
                         </span>
                       )}
                       
                       {record.impactPayroll && record.status === "Active" && (
-                        <span className="text-[10px] font-bold bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded-md uppercase tracking-wider">
+                        <span className="text-[10px] font-bold bg-primary/10 text-primary px-2 py-0.5 rounded-md uppercase tracking-wider">
                           Affects Payroll
                         </span>
                       )}
                     </div>
                     
                     {record.resolutionReason && (
-                      <div className="mt-3 bg-slate-50 border border-slate-100 rounded-lg p-3">
-                        <p className="text-xs font-bold text-slate-700 mb-1">Reason for {record.status}:</p>
-                        <p className="text-sm text-slate-600">{record.resolutionReason}</p>
+                      <div className="mt-3 bg-muted/50 border border-border/50 rounded-lg p-3">
+                        <p className="text-xs font-bold text-foreground/80 mb-1">Reason for {record.status}:</p>
+                        <p className="text-sm text-foreground/80">{record.resolutionReason}</p>
                       </div>
                     )}
                   </div>
                 </div>
 
-                <div className="flex flex-row sm:flex-col items-center sm:items-end justify-between gap-3 shrink-0 pt-3 sm:pt-0 border-t border-slate-100 sm:border-0 mt-3 sm:mt-0">
+                <div className="flex flex-row sm:flex-col items-center sm:items-end justify-between gap-3 shrink-0 pt-3 sm:pt-0 border-t border-border/50 sm:border-0 mt-3 sm:mt-0">
                   <div className={cn(
                     "text-xs font-bold px-3 py-1 rounded-full border",
-                    record.status === "Active" ? "bg-slate-900 text-white border-slate-900" :
+                    record.status === "Active" ? "bg-primary text-primary-foreground border-primary" :
                     record.status === "Resolved" ? "bg-emerald-50 text-emerald-600 border-emerald-200" :
-                    record.status === "Waived" ? "bg-slate-100 text-slate-500 border-slate-200" :
-                    "bg-slate-50 text-slate-400 border-slate-200"
+                    record.status === "Waived" ? "bg-muted text-muted-foreground border-border" :
+                    "bg-muted/50 text-muted-foreground border-border"
                   )}>
                     {record.status}
                   </div>
@@ -416,7 +416,7 @@ export function Penalties() {
                     <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                       <button 
                         onClick={() => openUpdateDialog(record.id, "Waived")}
-                        className="px-3 py-1.5 text-xs font-bold text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
+                        className="px-3 py-1.5 text-xs font-bold text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors"
                       >
                         Waive
                       </button>
@@ -431,12 +431,12 @@ export function Penalties() {
                 </div>
               </div>
             )) : (
-              <div className="flex flex-col items-center justify-center py-16 text-center bg-slate-50/50 rounded-2xl border border-slate-100 border-dashed">
-                <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mb-4 shadow-sm border border-slate-100 text-slate-400">
+              <div className="flex flex-col items-center justify-center py-16 text-center bg-muted/20 rounded-2xl border border-border/50 border-dashed">
+                <div className="w-16 h-16 bg-background rounded-2xl flex items-center justify-center mb-4 shadow-sm border border-border/50 text-muted-foreground">
                   <ShieldAlert className="w-8 h-8" />
                 </div>
-                <h3 className="text-lg font-bold text-slate-700 mb-1">No records found</h3>
-                <p className="text-slate-500 text-sm max-w-sm">No disciplinary actions or warnings match your current filters.</p>
+                <h3 className="text-lg font-bold text-foreground/80 mb-1">No records found</h3>
+                <p className="text-muted-foreground text-sm max-w-sm">No disciplinary actions or warnings match your current filters.</p>
               </div>
             )}
           </div>

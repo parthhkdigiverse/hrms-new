@@ -141,32 +141,32 @@ export function Tasks() {
     <div className="space-y-6 h-[calc(100vh-8rem)] flex flex-col">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shrink-0">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Tasks</h1>
-          <p className="text-sm text-slate-500 mt-1">Manage your team's work and track progress.</p>
+          <h1 className="text-2xl font-bold text-foreground tracking-tight">Tasks</h1>
+          <p className="text-sm text-muted-foreground mt-1">Manage your team's work and track progress.</p>
         </div>
         
         <div className="flex items-center gap-3 w-full sm:w-auto">
           <div className="relative flex-1 sm:w-64">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
             <input 
               type="text" 
               placeholder="Search tasks..." 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+              className="w-full pl-9 pr-4 py-2 bg-white border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
             />
           </div>
           
-          <div className="flex items-center bg-white border border-slate-200 rounded-xl p-1">
+          <div className="flex items-center bg-white border border-border rounded-xl p-1">
             <button 
               onClick={() => setView("board")}
-              className={cn("p-1.5 rounded-lg transition-colors", view === "board" ? "bg-indigo-50 text-indigo-600" : "text-slate-400 hover:text-slate-600")}
+              className={cn("p-1.5 rounded-lg transition-colors", view === "board" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground/80")}
             >
               <LayoutGrid className="w-4 h-4" />
             </button>
             <button 
               onClick={() => setView("list")}
-              className={cn("p-1.5 rounded-lg transition-colors", view === "list" ? "bg-indigo-50 text-indigo-600" : "text-slate-400 hover:text-slate-600")}
+              className={cn("p-1.5 rounded-lg transition-colors", view === "list" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground/80")}
             >
               <ListIcon className="w-4 h-4" />
             </button>
@@ -183,7 +183,7 @@ export function Tasks() {
             }
           }}>
             <DialogTrigger asChild>
-              <button className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold rounded-xl flex items-center gap-2 transition-colors shadow-sm shrink-0">
+              <button className="px-4 py-2 bg-primary hover:bg-primary text-primary-foreground text-sm font-bold rounded-xl flex items-center gap-2 transition-colors shadow-sm shrink-0">
                 <Plus className="w-4 h-4" />
                 <span className="hidden sm:inline">New Task</span>
               </button>
@@ -194,33 +194,33 @@ export function Tasks() {
               </DialogHeader>
               <form onSubmit={handleCreateTask} className="space-y-4 pt-4">
                 <div className="space-y-2">
-                  <label className="text-sm font-bold text-slate-700">Task Title</label>
+                  <label className="text-sm font-bold text-foreground/80">Task Title</label>
                   <input 
                     type="text" 
                     required
                     placeholder="e.g. Design Logo"
                     value={newTaskTitle}
                     onChange={e => setNewTaskTitle(e.target.value)}
-                    className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                    className="w-full px-3 py-2 bg-white border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-bold text-slate-700">Description</label>
+                  <label className="text-sm font-bold text-foreground/80">Description</label>
                   <textarea 
                     rows={3}
                     placeholder="Task details..."
                     value={newTaskDesc}
                     onChange={e => setNewTaskDesc(e.target.value)}
-                    className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 resize-none"
+                    className="w-full px-3 py-2 bg-white border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 resize-none"
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <label className="text-sm font-bold text-slate-700">Priority</label>
+                    <label className="text-sm font-bold text-foreground/80">Priority</label>
                     <select
                       value={newTaskPriority}
                       onChange={e => setNewTaskPriority(e.target.value as Priority)}
-                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                      className="w-full px-3 py-2 bg-white border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
                     >
                       <option value="High">High</option>
                       <option value="Medium">Medium</option>
@@ -228,12 +228,12 @@ export function Tasks() {
                     </select>
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm font-bold text-slate-700">Due Date</label>
+                    <label className="text-sm font-bold text-foreground/80">Due Date</label>
                     <input 
                       type="date" 
                       value={newTaskDueDate}
                       onChange={e => setNewTaskDueDate(e.target.value)}
-                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                      className="w-full px-3 py-2 bg-white border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
                     />
                   </div>
                 </div>
@@ -241,13 +241,13 @@ export function Tasks() {
                   <button 
                     type="button" 
                     onClick={() => setIsNewTaskOpen(false)}
-                    className="px-4 py-2 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 font-bold text-sm rounded-xl transition-colors"
+                    className="px-4 py-2 bg-white border border-border text-foreground/80 hover:bg-muted/50 font-bold text-sm rounded-xl transition-colors"
                   >
                     Cancel
                   </button>
                   <button 
                     type="submit"
-                    className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-xl transition-colors"
+                    className="px-4 py-2 bg-primary hover:bg-primary text-primary-foreground font-bold text-sm rounded-xl transition-colors"
                   >
                     {editingTaskId ? "Save Changes" : "Create Task"}
                   </button>
@@ -266,7 +266,7 @@ export function Tasks() {
               return (
                 <div 
                   key={col.status} 
-                  className="w-80 flex flex-col bg-slate-50/50 rounded-2xl border border-slate-200 shrink-0"
+                  className="w-80 flex flex-col bg-muted/50/50 rounded-2xl border border-border shrink-0"
                   onDragOver={(e) => e.preventDefault()}
                   onDrop={(e) => {
                     e.preventDefault();
@@ -274,9 +274,9 @@ export function Tasks() {
                     setTasks(tasks.map(t => t.id === taskId ? { ...t, status: col.status } : t));
                   }}
                 >
-                  <div className="p-4 border-b border-slate-200 flex items-center justify-between">
-                    <h3 className="font-bold text-slate-700">{col.title}</h3>
-                    <span className="bg-slate-200 text-slate-600 text-xs font-bold px-2 py-0.5 rounded-full">{colTasks.length}</span>
+                  <div className="p-4 border-b border-border flex items-center justify-between">
+                    <h3 className="font-bold text-foreground/80">{col.title}</h3>
+                    <span className="bg-slate-200 text-foreground/80 text-xs font-bold px-2 py-0.5 rounded-full">{colTasks.length}</span>
                   </div>
                   
                   <div className="flex-1 p-3 overflow-y-auto space-y-3">
@@ -285,7 +285,7 @@ export function Tasks() {
                         key={task.id} 
                         draggable
                         onDragStart={(e) => e.dataTransfer.setData('taskId', task.id)}
-                        className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow group cursor-pointer"
+                        className="bg-white p-4 rounded-xl border border-border shadow-sm hover:shadow-md transition-shadow group cursor-pointer"
                       >
                         <div className="flex justify-between items-start mb-2">
                           <span className={cn("text-[10px] font-bold px-2 py-1 rounded-md uppercase tracking-wider", getPriorityColor(task.priority))}>
@@ -293,14 +293,14 @@ export function Tasks() {
                           </span>
                           <button 
                             onClick={(e) => { e.stopPropagation(); openEditTask(task); }}
-                            className="text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity hover:text-slate-700"
+                            className="text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity hover:text-foreground/80"
                           >
                             <MoreHorizontal className="w-4 h-4" />
                           </button>
                         </div>
                         
-                        <h4 className="font-bold text-slate-800 text-sm mb-1 leading-tight">{task.title}</h4>
-                        <p className="text-xs text-slate-500 mb-4 line-clamp-2">{task.description}</p>
+                        <h4 className="font-bold text-foreground text-sm mb-1 leading-tight">{task.title}</h4>
+                        <p className="text-xs text-muted-foreground mb-4 line-clamp-2">{task.description}</p>
                         
                         <div className="flex items-center justify-between mt-auto">
                           <div className="flex items-center -space-x-2">
@@ -309,7 +309,7 @@ export function Tasks() {
                             ))}
                           </div>
                           
-                          <div className="flex items-center gap-3 text-slate-400">
+                          <div className="flex items-center gap-3 text-muted-foreground">
                             {task.commentsCount > 0 && (
                               <div className="flex items-center gap-1 text-xs font-medium">
                                 <MessageSquare className="w-3 h-3" /> {task.commentsCount}
@@ -331,41 +331,41 @@ export function Tasks() {
           </div>
         </div>
       ) : (
-        <div className="flex-1 bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm flex flex-col">
+        <div className="flex-1 bg-white rounded-2xl border border-border overflow-hidden shadow-sm flex flex-col">
           <div className="overflow-x-auto flex-1">
             <table className="w-full text-left">
-              <thead className="bg-slate-50 border-b border-slate-200 sticky top-0">
+              <thead className="bg-muted/50 border-b border-border sticky top-0">
                 <tr>
-                  <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Task</th>
-                  <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Status</th>
-                  <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Priority</th>
-                  <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Due Date</th>
-                  <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Assignee</th>
+                  <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase tracking-wider">Task</th>
+                  <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase tracking-wider">Status</th>
+                  <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase tracking-wider">Priority</th>
+                  <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase tracking-wider">Due Date</th>
+                  <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase tracking-wider">Assignee</th>
                   <th className="px-6 py-4"></th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {filteredTasks.map(task => (
-                  <tr key={task.id} className="hover:bg-slate-50/50 transition-colors group cursor-pointer" onClick={() => !inlineEditingTaskId && startInlineEdit(task)}>
+                  <tr key={task.id} className="hover:bg-muted/50/50 transition-colors group cursor-pointer" onClick={() => !inlineEditingTaskId && startInlineEdit(task)}>
                     {inlineEditingTaskId === task.id ? (
                       <>
                         <td className="px-6 py-4">
                           <input 
                             value={inlineTaskTitle} 
                             onChange={(e) => setInlineTaskTitle(e.target.value)} 
-                            className="w-full px-2 py-1 text-sm font-bold border border-slate-200 rounded mb-1 focus:ring-2 focus:ring-indigo-500/20 focus:outline-none" 
+                            className="w-full px-2 py-1 text-sm font-bold border border-border rounded mb-1 focus:ring-2 focus:ring-primary/20 focus:outline-none" 
                           />
                           <input 
                             value={inlineTaskDesc} 
                             onChange={(e) => setInlineTaskDesc(e.target.value)} 
-                            className="w-full px-2 py-1 text-xs text-slate-500 border border-slate-200 rounded focus:ring-2 focus:ring-indigo-500/20 focus:outline-none" 
+                            className="w-full px-2 py-1 text-xs text-muted-foreground border border-border rounded focus:ring-2 focus:ring-primary/20 focus:outline-none" 
                           />
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <select 
                             value={inlineTaskStatus}
                             onChange={(e) => setInlineTaskStatus(e.target.value as TaskStatus)}
-                            className="px-2 py-1 text-xs font-semibold text-slate-700 bg-white border border-slate-200 rounded-md focus:outline-none"
+                            className="px-2 py-1 text-xs font-semibold text-foreground/80 bg-white border border-border rounded-md focus:outline-none"
                           >
                             <option value="Todo">Todo</option>
                             <option value="In Progress">In Progress</option>
@@ -377,7 +377,7 @@ export function Tasks() {
                           <select 
                             value={inlineTaskPriority}
                             onChange={(e) => setInlineTaskPriority(e.target.value as Priority)}
-                            className="px-2 py-1 text-xs font-bold border border-slate-200 rounded-md bg-white focus:outline-none"
+                            className="px-2 py-1 text-xs font-bold border border-border rounded-md bg-white focus:outline-none"
                           >
                             <option value="High">High</option>
                             <option value="Medium">Medium</option>
@@ -389,7 +389,7 @@ export function Tasks() {
                             type="date"
                             value={inlineTaskDueDate} 
                             onChange={(e) => setInlineTaskDueDate(e.target.value)} 
-                            className="px-2 py-1 text-sm text-slate-600 border border-slate-200 rounded bg-white focus:outline-none" 
+                            className="px-2 py-1 text-sm text-foreground/80 border border-border rounded bg-white focus:outline-none" 
                           />
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
@@ -401,19 +401,19 @@ export function Tasks() {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right" onClick={(e) => e.stopPropagation()}>
                           <div className="flex items-center justify-end gap-2">
-                            <button onClick={() => setInlineEditingTaskId(null)} className="px-2 py-1 text-xs font-bold text-slate-500 hover:bg-slate-200 rounded transition-colors">Cancel</button>
-                            <button onClick={saveInlineEdit} className="px-2 py-1 text-xs font-bold bg-indigo-600 text-white hover:bg-indigo-700 rounded transition-colors">Save</button>
+                            <button onClick={() => setInlineEditingTaskId(null)} className="px-2 py-1 text-xs font-bold text-muted-foreground hover:bg-slate-200 rounded transition-colors">Cancel</button>
+                            <button onClick={saveInlineEdit} className="px-2 py-1 text-xs font-bold bg-primary text-primary-foreground hover:bg-primary rounded transition-colors">Save</button>
                           </div>
                         </td>
                       </>
                     ) : (
                       <>
                         <td className="px-6 py-4">
-                          <div className="font-bold text-slate-900 text-sm mb-0.5">{task.title}</div>
+                          <div className="font-bold text-foreground text-sm mb-0.5">{task.title}</div>
                           <TooltipProvider>
                             <Tooltip>
                               <TooltipTrigger asChild>
-                                <div className="text-xs text-slate-500 truncate max-w-[250px] sm:max-w-md">{task.description}</div>
+                                <div className="text-xs text-muted-foreground truncate max-w-[250px] sm:max-w-md">{task.description}</div>
                               </TooltipTrigger>
                               <TooltipContent>
                                 <p className="max-w-xs text-sm">{task.description}</p>
@@ -422,14 +422,14 @@ export function Tasks() {
                           </TooltipProvider>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="text-xs font-semibold text-slate-700 bg-slate-100 px-2.5 py-1 rounded-md">{task.status}</span>
+                          <span className="text-xs font-semibold text-foreground/80 bg-muted px-2.5 py-1 rounded-md">{task.status}</span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span className={cn("text-[10px] font-bold px-2 py-1 rounded-md uppercase tracking-wider inline-block", getPriorityColor(task.priority))}>
                             {task.priority}
                           </span>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-600 flex items-center gap-1.5 pt-6">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground/80 flex items-center gap-1.5 pt-6">
                           <Calendar className="w-3.5 h-3.5" /> {new Date(task.dueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
@@ -440,7 +440,7 @@ export function Tasks() {
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right">
-                          <span className="text-xs font-medium text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity">Click row to edit</span>
+                          <span className="text-xs font-medium text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity">Click row to edit</span>
                         </td>
                       </>
                     )}

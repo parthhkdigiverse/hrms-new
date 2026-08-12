@@ -33,7 +33,7 @@ export function EmployeeList() {
       case 'Active': return 'bg-emerald-500';
       case 'On Leave': return 'bg-amber-500';
       case 'Remote': return 'bg-blue-500';
-      default: return 'bg-slate-500';
+      default: return 'bg-muted/500';
     }
   };
 
@@ -77,8 +77,8 @@ export function EmployeeList() {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-[28px] font-black text-slate-900 tracking-tight mb-2">Employee Directory</h1>
-          <p className="text-[14px] text-slate-500">Manage your team members and their account permissions here.</p>
+          <h1 className="text-[28px] font-black text-foreground tracking-tight mb-2">Employee Directory</h1>
+          <p className="text-[14px] text-muted-foreground">Manage your team members and their account permissions here.</p>
         </div>
         <button 
           onClick={openAddForm}
@@ -93,13 +93,13 @@ export function EmployeeList() {
       <div className="bg-white border border-border/60 rounded-2xl p-4 shadow-sm flex flex-col md:flex-row gap-4 justify-between items-center mb-8">
         <div className="flex w-full md:w-auto flex-1 gap-4">
           <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <input 
               type="text" 
               placeholder="Search by name or role..." 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 bg-slate-50 border-none rounded-xl text-[13px] focus:outline-none focus:ring-2 focus:ring-[#00A56C]/20 transition-all font-medium"
+              className="w-full pl-10 pr-4 py-2 bg-muted/50 border-none rounded-xl text-[13px] focus:outline-none focus:ring-2 focus:ring-[#00A56C]/20 transition-all font-medium"
             />
           </div>
           
@@ -112,7 +112,7 @@ export function EmployeeList() {
                   "px-4 py-2 rounded-xl text-[12px] font-bold transition-all border",
                   selectedDept === dept 
                     ? "bg-[#00A56C] text-white border-[#00A56C]" 
-                    : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
+                    : "bg-white text-foreground/80 border-border hover:bg-muted/50"
                 )}
               >
                 {dept}
@@ -121,12 +121,12 @@ export function EmployeeList() {
           </div>
         </div>
 
-        <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl">
+        <div className="flex items-center gap-1 bg-muted p-1 rounded-xl">
           <button 
             onClick={() => setViewMode('grid')}
             className={cn(
               "p-2 rounded-lg transition-all",
-              viewMode === 'grid' ? "bg-white shadow-sm text-slate-900" : "text-slate-500 hover:text-slate-900"
+              viewMode === 'grid' ? "bg-white shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"
             )}
           >
             <LayoutGrid className="w-4 h-4" />
@@ -135,7 +135,7 @@ export function EmployeeList() {
             onClick={() => setViewMode('list')}
             className={cn(
               "p-2 rounded-lg transition-all",
-              viewMode === 'list' ? "bg-white shadow-sm text-slate-900" : "text-slate-500 hover:text-slate-900"
+              viewMode === 'list' ? "bg-white shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"
             )}
           >
             <List className="w-4 h-4" />
@@ -147,17 +147,17 @@ export function EmployeeList() {
       {viewMode === 'grid' && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filteredEmployees.map((emp) => (
-            <div key={emp.id} className="group bg-white border border-slate-100 rounded-3xl p-6 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 relative">
+            <div key={emp.id} className="group bg-white border border-border/50 rounded-3xl p-6 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 relative">
               <div className="absolute top-4 right-4 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                 <button 
                   onClick={() => openEditForm(emp)}
-                  className="p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-600 rounded-full transition-colors"
+                  className="p-2 text-muted-foreground hover:bg-muted hover:text-foreground/80 rounded-full transition-colors"
                 >
                   <Edit2 className="w-4 h-4" />
                 </button>
                 <button 
                   onClick={() => handleDeleteEmployee(emp.id, emp.name)}
-                  className="p-2 text-slate-400 hover:bg-red-50 hover:text-red-600 rounded-full transition-colors"
+                  className="p-2 text-muted-foreground hover:bg-red-50 hover:text-red-600 rounded-full transition-colors"
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
@@ -174,10 +174,10 @@ export function EmployeeList() {
                   </span>
                 </div>
                 
-                <h3 className="text-[16px] font-black text-slate-900 mb-1">{emp.name}</h3>
-                <p className="text-[12px] font-medium text-slate-500 mb-4">{emp.role}</p>
+                <h3 className="text-[16px] font-black text-foreground mb-1">{emp.name}</h3>
+                <p className="text-[12px] font-medium text-muted-foreground mb-4">{emp.role}</p>
                 
-                <span className="px-3 py-1 bg-slate-50 text-slate-600 text-[10px] font-bold uppercase tracking-wider rounded-lg mb-6">
+                <span className="px-3 py-1 bg-muted/50 text-foreground/80 text-[10px] font-bold uppercase tracking-wider rounded-lg mb-6">
                   {emp.department}
                 </span>
 
@@ -199,46 +199,46 @@ export function EmployeeList() {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="bg-slate-50/50 border-b border-slate-100">
-                  <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-wider">Employee</th>
-                  <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-wider">Department</th>
-                  <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-wider">Status</th>
-                  <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-wider">Contact</th>
-                  <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-wider">Joined</th>
-                  <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-wider text-right">Actions</th>
+                <tr className="bg-muted/50/50 border-b border-border/50">
+                  <th className="px-6 py-4 text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Employee</th>
+                  <th className="px-6 py-4 text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Department</th>
+                  <th className="px-6 py-4 text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Status</th>
+                  <th className="px-6 py-4 text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Contact</th>
+                  <th className="px-6 py-4 text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Joined</th>
+                  <th className="px-6 py-4 text-[11px] font-bold text-muted-foreground uppercase tracking-wider text-right">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredEmployees.map((emp) => (
-                  <tr key={emp.id} className="border-b border-slate-50 hover:bg-slate-50/50 transition-colors group">
+                  <tr key={emp.id} className="border-b border-slate-50 hover:bg-muted/50/50 transition-colors group">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
                         <img src={emp.avatar} alt={emp.name} className="w-10 h-10 rounded-full object-cover" />
                         <div>
-                          <p className="text-[14px] font-bold text-slate-900">{emp.name}</p>
-                          <p className="text-[12px] text-slate-500">{emp.role}</p>
+                          <p className="text-[14px] font-bold text-foreground">{emp.name}</p>
+                          <p className="text-[12px] text-muted-foreground">{emp.role}</p>
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <span className="px-3 py-1 bg-slate-100 text-slate-600 text-[10px] font-bold rounded-lg">
+                      <span className="px-3 py-1 bg-muted text-foreground/80 text-[10px] font-bold rounded-lg">
                         {emp.department}
                       </span>
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2">
                         <span className={cn("w-2 h-2 rounded-full", getStatusColor(emp.status))} />
-                        <span className="text-[13px] font-medium text-slate-700">{emp.status}</span>
+                        <span className="text-[13px] font-medium text-foreground/80">{emp.status}</span>
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="flex flex-col gap-1 text-[12px] text-slate-500">
+                      <div className="flex flex-col gap-1 text-[12px] text-muted-foreground">
                         <span className="flex items-center gap-1"><Mail className="w-3 h-3" /> {emp.email}</span>
                         <span className="flex items-center gap-1"><Phone className="w-3 h-3" /> {emp.phone}</span>
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <span className="text-[13px] font-medium text-slate-700">{emp.joinDate}</span>
+                      <span className="text-[13px] font-medium text-foreground/80">{emp.joinDate}</span>
                     </td>
                     <td className="px-6 py-4 text-right">
                       <div className="flex justify-end gap-2">

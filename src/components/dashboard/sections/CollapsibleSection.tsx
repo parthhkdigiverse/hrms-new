@@ -23,11 +23,11 @@ export function CollapsibleSection({ section, title, children, defaultExpanded =
           <p className="text-[10px] font-bold text-[#00A56C] uppercase tracking-widest mb-0.5">{section}</p>
           <div className="flex items-center gap-2">
             {titleIcon}
-            <h2 className="text-[18px] font-black text-slate-900 tracking-tight group-hover:text-[#00A56C] transition-colors">{title}</h2>
+            <h2 className="text-[18px] font-black text-foreground tracking-tight group-hover:text-[#00A56C] transition-colors">{title}</h2>
           </div>
         </div>
-        <div className="h-8 w-8 rounded-full hover:bg-slate-100 flex items-center justify-center transition-colors">
-          <ChevronDown className={cn("h-5 w-5 text-slate-400 transition-transform duration-300", !isExpanded ? "rotate-180" : "")} />
+        <div className="h-8 w-8 rounded-full hover:bg-muted flex items-center justify-center transition-colors">
+          <ChevronDown className={cn("h-5 w-5 text-muted-foreground transition-transform duration-300", !isExpanded ? "rotate-180" : "")} />
         </div>
       </div>
       

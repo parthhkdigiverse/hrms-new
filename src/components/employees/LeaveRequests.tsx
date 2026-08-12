@@ -120,8 +120,8 @@ const getLeaveTypeColor = (type: string) => {
   switch (type) {
     case "Sick Leave": return "text-rose-600 bg-rose-50 border-rose-100";
     case "Casual Leave": return "text-amber-600 bg-amber-50 border-amber-100";
-    case "Annual Leave": return "text-indigo-600 bg-indigo-50 border-indigo-100";
-    case "Unpaid Leave": return "text-slate-600 bg-slate-50 border-slate-200";
+    case "Annual Leave": return "text-primary bg-primary/10 border-indigo-100";
+    case "Unpaid Leave": return "text-foreground/80 bg-muted/50 border-border";
     default: return "text-teal-600 bg-teal-50 border-teal-100";
   }
 };
@@ -209,8 +209,8 @@ export function LeaveRequests() {
     <div className="h-full flex flex-col space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-black text-slate-900 tracking-tight">Leave Requests</h1>
-          <p className="text-sm text-slate-500 mt-1">Manage and review employee time off</p>
+          <h1 className="text-2xl font-black text-foreground tracking-tight">Leave Requests</h1>
+          <p className="text-sm text-muted-foreground mt-1">Manage and review employee time off</p>
         </div>
         <div className="flex items-center gap-3 w-full sm:w-auto">
           <div className="relative flex-1 sm:flex-none">
@@ -219,31 +219,31 @@ export function LeaveRequests() {
               placeholder="Search employee..." 
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
-              className="w-full sm:w-64 pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-sm"
+              className="w-full sm:w-64 pl-10 pr-4 py-2 bg-white border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all shadow-sm"
             />
-            <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           </div>
-          <button className="px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-700 hover:bg-slate-50 shadow-sm flex items-center gap-2">
+          <button className="px-4 py-2 bg-white border border-border rounded-xl text-sm font-bold text-foreground/80 hover:bg-muted/50 shadow-sm flex items-center gap-2">
             Filter <ChevronDown className="w-4 h-4" />
           </button>
           
           <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
             <DialogTrigger asChild>
-              <button className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-bold shadow-sm flex items-center gap-2 transition-colors">
+              <button className="px-4 py-2 bg-primary hover:bg-primary text-primary-foreground rounded-xl text-sm font-bold shadow-sm flex items-center gap-2 transition-colors">
                 <Plus className="w-4 h-4" /> Add Leave
               </button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px] rounded-2xl">
               <DialogHeader>
-                <DialogTitle className="text-xl font-black text-slate-900">Request Leave</DialogTitle>
+                <DialogTitle className="text-xl font-black text-foreground">Request Leave</DialogTitle>
               </DialogHeader>
               <form onSubmit={handleAddLeave} className="space-y-4 mt-4">
                 <div className="space-y-2">
-                  <label className="text-sm font-bold text-slate-700">Leave Type</label>
+                  <label className="text-sm font-bold text-foreground/80">Leave Type</label>
                   <select 
                     value={newLeaveType}
                     onChange={e => setNewLeaveType(e.target.value)}
-                    className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                    className="w-full px-3 py-2 bg-white border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
                   >
                     {leaveTypes.map(type => (
                       <option key={type} value={type}>{type}</option>
@@ -253,35 +253,35 @@ export function LeaveRequests() {
                 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <label className="text-sm font-bold text-slate-700">Start Date</label>
+                    <label className="text-sm font-bold text-foreground/80">Start Date</label>
                     <input 
                       type="date" 
                       required
                       value={newStartDate}
                       onChange={e => setNewStartDate(e.target.value)}
-                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                      className="w-full px-3 py-2 bg-white border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm font-bold text-slate-700">End Date</label>
+                    <label className="text-sm font-bold text-foreground/80">End Date</label>
                     <input 
                       type="date" 
                       required
                       value={newEndDate}
                       onChange={e => setNewEndDate(e.target.value)}
-                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                      className="w-full px-3 py-2 bg-white border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
                     />
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-bold text-slate-700">Reason</label>
+                  <label className="text-sm font-bold text-foreground/80">Reason</label>
                   <textarea 
                     required
                     value={newReason}
                     onChange={e => setNewReason(e.target.value)}
                     placeholder="Briefly explain your reason..."
-                    className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm min-h-[100px] resize-none focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                    className="w-full px-3 py-2 bg-white border border-border rounded-xl text-sm min-h-[100px] resize-none focus:outline-none focus:ring-2 focus:ring-primary/20"
                   />
                 </div>
 
@@ -289,13 +289,13 @@ export function LeaveRequests() {
                   <button 
                     type="button" 
                     onClick={() => setIsAddOpen(false)}
-                    className="px-4 py-2 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 font-bold text-sm rounded-xl transition-colors"
+                    className="px-4 py-2 bg-white border border-border text-foreground/80 hover:bg-muted/50 font-bold text-sm rounded-xl transition-colors"
                   >
                     Cancel
                   </button>
                   <button 
                     type="submit"
-                    className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-xl transition-colors"
+                    className="px-4 py-2 bg-primary hover:bg-primary text-primary-foreground font-bold text-sm rounded-xl transition-colors"
                   >
                     Submit Request
                   </button>
@@ -306,7 +306,7 @@ export function LeaveRequests() {
         </div>
       </div>
 
-      <div className="flex border-b border-slate-200">
+      <div className="flex border-b border-border">
         {(["Pending", "Approved", "Rejected"] as LeaveStatus[]).map(status => (
           <button
             key={status}
@@ -314,8 +314,8 @@ export function LeaveRequests() {
             className={cn(
               "px-6 py-3 text-sm font-bold border-b-2 transition-colors relative",
               activeTab === status 
-                ? "border-indigo-600 text-indigo-600" 
-                : "border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300"
+                ? "border-primary text-primary" 
+                : "border-transparent text-muted-foreground hover:text-foreground/80 hover:border-border"
             )}
           >
             {status}
@@ -330,27 +330,27 @@ export function LeaveRequests() {
 
       <div className="flex-1 overflow-auto pb-6">
         {filteredRequests.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-64 bg-slate-50/50 rounded-3xl border border-dashed border-slate-200">
+          <div className="flex flex-col items-center justify-center h-64 bg-muted/50/50 rounded-3xl border border-dashed border-border">
             <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-sm mb-4">
-              <CalendarDays className="w-8 h-8 text-slate-300" />
+              <CalendarDays className="w-8 h-8 text-border" />
             </div>
-            <h3 className="text-slate-900 font-bold">No {activeTab.toLowerCase()} requests</h3>
-            <p className="text-slate-500 text-sm mt-1">You're all caught up!</p>
+            <h3 className="text-foreground font-bold">No {activeTab.toLowerCase()} requests</h3>
+            <p className="text-muted-foreground text-sm mt-1">You're all caught up!</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
             {filteredRequests.map(request => (
               <div 
                 key={request.id} 
-                className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm hover:shadow-md transition-shadow group relative overflow-hidden"
+                className="bg-white border border-border rounded-2xl p-5 shadow-sm hover:shadow-md transition-shadow group relative overflow-hidden"
               >
                 {/* Top header */}
                 <div className="flex justify-between items-start mb-4">
                   <div className="flex items-center gap-3">
                     <img src={request.avatar} alt={request.employeeName} className="w-12 h-12 rounded-full object-cover border-2 border-white shadow-sm" />
                     <div>
-                      <h3 className="font-bold text-slate-900 leading-tight">{request.employeeName}</h3>
-                      <p className="text-xs text-slate-500">{request.role} • {request.department}</p>
+                      <h3 className="font-bold text-foreground leading-tight">{request.employeeName}</h3>
+                      <p className="text-xs text-muted-foreground">{request.role} • {request.department}</p>
                     </div>
                   </div>
                   <div className={cn("px-2.5 py-1 rounded-full border text-[11px] font-bold flex items-center gap-1", getLeaveTypeColor(request.type))}>
@@ -360,24 +360,24 @@ export function LeaveRequests() {
                 </div>
 
                 {/* Details */}
-                <div className="space-y-3 bg-slate-50/50 rounded-xl p-4 border border-slate-100">
+                <div className="space-y-3 bg-muted/50/50 rounded-xl p-4 border border-border/50">
                   <div className="flex items-start gap-3">
-                    <Calendar className="w-4 h-4 text-slate-400 mt-0.5 shrink-0" />
+                    <Calendar className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
                     <div>
-                      <p className="text-sm font-bold text-slate-700">{request.startDate} to {request.endDate}</p>
-                      <p className="text-xs text-slate-500 font-medium mt-0.5">{request.durationDays} {request.durationDays === 1 ? 'Day' : 'Days'}</p>
+                      <p className="text-sm font-bold text-foreground/80">{request.startDate} to {request.endDate}</p>
+                      <p className="text-xs text-muted-foreground font-medium mt-0.5">{request.durationDays} {request.durationDays === 1 ? 'Day' : 'Days'}</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
                     <div className="w-4 h-4 rounded-full bg-slate-200/50 flex items-center justify-center shrink-0 mt-0.5">
-                      <span className="text-[10px] font-black text-slate-400">i</span>
+                      <span className="text-[10px] font-black text-muted-foreground">i</span>
                     </div>
-                    <p className="text-sm text-slate-600 italic line-clamp-2">"{request.reason}"</p>
+                    <p className="text-sm text-foreground/80 italic line-clamp-2">"{request.reason}"</p>
                   </div>
                 </div>
 
-                <div className="mt-4 pt-4 border-t border-slate-100 flex items-center justify-between">
-                  <p className="text-[11px] text-slate-400 font-medium">Applied on {request.appliedOn}</p>
+                <div className="mt-4 pt-4 border-t border-border/50 flex items-center justify-between">
+                  <p className="text-[11px] text-muted-foreground font-medium">Applied on {request.appliedOn}</p>
                   
                   {request.status === "Pending" && (
                     <div className="flex items-center gap-2">
@@ -390,7 +390,7 @@ export function LeaveRequests() {
                       </button>
                       <button 
                         onClick={() => handleAction(request.id, "Approved")}
-                        className="px-4 py-2 bg-slate-900 hover:bg-indigo-600 text-white text-sm font-bold rounded-lg transition-colors flex items-center gap-2 shadow-sm"
+                        className="px-4 py-2 bg-card hover:bg-primary text-primary-foreground text-sm font-bold rounded-lg transition-colors flex items-center gap-2 shadow-sm"
                       >
                         <Check className="w-4 h-4" /> Approve
                       </button>

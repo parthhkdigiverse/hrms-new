@@ -17,7 +17,7 @@ export function CompanyHealth() {
               <div className="flex justify-between items-start z-10">
                 <div className="flex items-center gap-1.5">
                   <span className="text-[14px] leading-none">{metric.emoji}</span>
-                  <p className="text-[11px] font-bold text-slate-500">{metric.label}</p>
+                  <p className="text-[11px] font-bold text-muted-foreground">{metric.label}</p>
                 </div>
                 <span className={cn("text-[10px] font-bold px-2 py-0.5 rounded-md flex items-center gap-0.5", 
                   isUp ? "bg-emerald-50 text-emerald-600" : "bg-rose-50 text-rose-600"
@@ -25,9 +25,9 @@ export function CompanyHealth() {
                   {metric.change}
                 </span>
               </div>
-              <p className="text-[26px] font-black text-slate-900 leading-none mt-3 z-10">{metric.value}</p>
+              <p className="text-[26px] font-black text-foreground leading-none mt-3 z-10">{metric.value}</p>
               
-              <div className="text-[10px] text-slate-400 mt-auto z-10">vs last month</div>
+              <div className="text-[10px] text-muted-foreground mt-auto z-10">vs last month</div>
               
               {/* Background Sparkline */}
               <div className="absolute inset-x-0 bottom-0 h-16 pointer-events-none opacity-40">

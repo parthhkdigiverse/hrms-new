@@ -64,55 +64,55 @@ export function Schedule() {
   };
   
   return (
-    <div className="flex flex-col h-[calc(100vh-6rem)] bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+    <div className="flex flex-col h-[calc(100vh-6rem)] bg-white rounded-2xl border border-border overflow-hidden shadow-sm">
       {/* Header */}
-      <header className="flex items-center justify-between px-6 py-4 border-b border-slate-200">
+      <header className="flex items-center justify-between px-6 py-4 border-b border-border">
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
-            <div className="p-2 bg-indigo-600 rounded-lg text-white">
+            <div className="p-2 bg-primary rounded-lg text-white">
               <CalendarIcon className="w-5 h-5" />
             </div>
-            <h1 className="text-xl font-bold text-slate-800 tracking-tight">Calendar</h1>
+            <h1 className="text-xl font-bold text-foreground tracking-tight">Calendar</h1>
           </div>
           
           <div className="h-6 w-px bg-slate-200 mx-2"></div>
           
-          <button onClick={today} className="px-4 py-1.5 text-sm font-semibold border border-slate-200 rounded-md hover:bg-slate-50 transition-colors">
+          <button onClick={today} className="px-4 py-1.5 text-sm font-semibold border border-border rounded-md hover:bg-muted/50 transition-colors">
             Today
           </button>
           
           <div className="flex items-center gap-1">
-            <button onClick={prev} className="p-1.5 hover:bg-slate-100 rounded-full transition-colors">
-              <ChevronLeft className="w-5 h-5 text-slate-600" />
+            <button onClick={prev} className="p-1.5 hover:bg-muted rounded-full transition-colors">
+              <ChevronLeft className="w-5 h-5 text-foreground/80" />
             </button>
-            <button onClick={next} className="p-1.5 hover:bg-slate-100 rounded-full transition-colors">
-              <ChevronRight className="w-5 h-5 text-slate-600" />
+            <button onClick={next} className="p-1.5 hover:bg-muted rounded-full transition-colors">
+              <ChevronRight className="w-5 h-5 text-foreground/80" />
             </button>
           </div>
           
-          <h2 className="text-xl font-medium text-slate-700 w-48">
+          <h2 className="text-xl font-medium text-foreground/80 w-48">
             {format(currentDate, "MMMM yyyy")}
           </h2>
         </div>
         
         <div className="flex items-center gap-3">
           <div className="relative">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
             <input 
               type="text" 
               placeholder="Search..." 
-              className="pl-9 pr-4 py-1.5 bg-slate-100 border-none rounded-lg text-sm focus:ring-2 focus:ring-indigo-500/20 outline-none w-48"
+              className="pl-9 pr-4 py-1.5 bg-muted border-none rounded-lg text-sm focus:ring-2 focus:ring-primary/20 outline-none w-48"
             />
           </div>
           
-          <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-lg">
+          <div className="flex items-center gap-1 bg-muted p-1 rounded-lg">
             {(["Month", "Week", "Day"] as ViewType[]).map(v => (
               <button
                 key={v}
                 onClick={() => setView(v)}
                 className={cn(
                   "px-3 py-1 text-sm font-medium rounded-md transition-all",
-                  view === v ? "bg-white text-indigo-600 shadow-sm" : "text-slate-600 hover:text-slate-900"
+                  view === v ? "bg-white text-primary shadow-sm" : "text-foreground/80 hover:text-foreground"
                 )}
               >
                 {v}
@@ -120,7 +120,7 @@ export function Schedule() {
             ))}
           </div>
           
-          <button className="flex items-center gap-2 px-3 py-1.5 bg-indigo-600 text-white text-sm font-semibold rounded-lg hover:bg-indigo-700 transition-colors shadow-sm ml-2">
+          <button className="flex items-center gap-2 px-3 py-1.5 bg-primary text-primary-foreground text-sm font-semibold rounded-lg hover:bg-primary transition-colors shadow-sm ml-2">
             <Plus className="w-4 h-4" /> Create
           </button>
         </div>
@@ -128,7 +128,7 @@ export function Schedule() {
       
       <div className="flex flex-1 overflow-hidden">
         {/* Sidebar */}
-        <aside className="w-64 border-r border-slate-200 p-4 hidden lg:flex flex-col gap-6 overflow-y-auto hide-scrollbar bg-slate-50/50">
+        <aside className="w-64 border-r border-border p-4 hidden lg:flex flex-col gap-6 overflow-y-auto hide-scrollbar bg-muted/50/50">
           <div className="-ml-2">
              <MiniCalendar 
                mode="single" 
@@ -140,21 +140,21 @@ export function Schedule() {
           
           <div className="space-y-4">
             <div className="flex items-center justify-between group cursor-pointer">
-              <h3 className="text-sm font-bold text-slate-800">My Calendars</h3>
-              <ChevronDown className="w-4 h-4 text-slate-400 group-hover:text-slate-600" />
+              <h3 className="text-sm font-bold text-foreground">My Calendars</h3>
+              <ChevronDown className="w-4 h-4 text-muted-foreground group-hover:text-foreground/80" />
             </div>
             <div className="space-y-2.5">
               <label className="flex items-center gap-3 cursor-pointer group">
-                <input type="checkbox" defaultChecked className="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500/20 border-slate-300" />
-                <span className="text-sm font-medium text-slate-700 group-hover:text-slate-900">My Schedule</span>
+                <input type="checkbox" defaultChecked className="w-4 h-4 rounded text-primary focus:ring-primary/20 border-border" />
+                <span className="text-sm font-medium text-foreground/80 group-hover:text-foreground">My Schedule</span>
               </label>
               <label className="flex items-center gap-3 cursor-pointer group">
-                <input type="checkbox" defaultChecked className="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500/20 border-slate-300" />
-                <span className="text-sm font-medium text-slate-700 group-hover:text-slate-900">Work Anniversaries</span>
+                <input type="checkbox" defaultChecked className="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500/20 border-border" />
+                <span className="text-sm font-medium text-foreground/80 group-hover:text-foreground">Work Anniversaries</span>
               </label>
               <label className="flex items-center gap-3 cursor-pointer group">
-                <input type="checkbox" defaultChecked className="w-4 h-4 rounded text-rose-600 focus:ring-rose-500/20 border-slate-300" />
-                <span className="text-sm font-medium text-slate-700 group-hover:text-slate-900">Birthdays</span>
+                <input type="checkbox" defaultChecked className="w-4 h-4 rounded text-rose-600 focus:ring-rose-500/20 border-border" />
+                <span className="text-sm font-medium text-foreground/80 group-hover:text-foreground">Birthdays</span>
               </label>
             </div>
           </div>
@@ -165,16 +165,16 @@ export function Schedule() {
           {view === "Month" && (
             <div className="flex-1 flex flex-col min-h-[600px]">
               {/* Days Header */}
-              <div className="grid grid-cols-7 border-b border-slate-200">
+              <div className="grid grid-cols-7 border-b border-border">
                 {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-                  <div key={day} className="py-2 text-center text-xs font-bold text-slate-500 uppercase tracking-wider">
+                  <div key={day} className="py-2 text-center text-xs font-bold text-muted-foreground uppercase tracking-wider">
                     {day}
                   </div>
                 ))}
               </div>
               
               {/* Month Grid */}
-              <div className="flex-1 grid grid-cols-7 border-l border-slate-200 auto-rows-fr">
+              <div className="flex-1 grid grid-cols-7 border-l border-border auto-rows-fr">
                 {monthDays.map((day, idx) => {
                   const dateStr = format(day, "yyyy-MM-dd");
                   const dayEvents = getEventsForDay(dateStr);
@@ -183,8 +183,8 @@ export function Schedule() {
                     <div 
                       key={day.toString()} 
                       className={cn(
-                        "p-1 border-r border-b border-slate-200 transition-colors hover:bg-slate-50 cursor-pointer overflow-hidden",
-                        !isSameMonth(day, monthStart) && "bg-slate-50/50 text-slate-400"
+                        "p-1 border-r border-b border-border transition-colors hover:bg-muted/50 cursor-pointer overflow-hidden",
+                        !isSameMonth(day, monthStart) && "bg-muted/50/50 text-muted-foreground"
                       )}
                       onClick={() => {
                         setCurrentDate(day);
@@ -194,9 +194,9 @@ export function Schedule() {
                       <div className="flex justify-center mb-1">
                         <span className={cn(
                           "w-7 h-7 flex items-center justify-center text-sm font-medium rounded-full",
-                          isToday(day) ? "bg-indigo-600 text-white" : 
-                          isSameDay(day, currentDate) ? "bg-indigo-100 text-indigo-700" :
-                          "text-slate-700"
+                          isToday(day) ? "bg-primary text-primary-foreground" : 
+                          isSameDay(day, currentDate) ? "bg-primary/10 text-primary" :
+                          "text-foreground/80"
                         )}>
                           {format(day, "d")}
                         </span>
@@ -225,15 +225,15 @@ export function Schedule() {
           {view === "Week" && (
             <div className="flex-1 flex flex-col min-h-[600px] relative">
               {/* Week Header */}
-              <div className="flex border-b border-slate-200 sticky top-0 bg-white z-20 ml-16">
+              <div className="flex border-b border-border sticky top-0 bg-white z-20 ml-16">
                 {weekDays.map(day => (
-                  <div key={day.toString()} className="flex-1 flex flex-col items-center justify-center py-3 border-l border-slate-200">
-                    <span className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-1">{format(day, "EEE")}</span>
+                  <div key={day.toString()} className="flex-1 flex flex-col items-center justify-center py-3 border-l border-border">
+                    <span className="text-xs font-semibold text-muted-foreground uppercase tracking-widest mb-1">{format(day, "EEE")}</span>
                     <span className={cn(
                       "text-xl flex items-center justify-center rounded-full w-10 h-10 transition-colors",
-                      isToday(day) ? "bg-indigo-600 text-white font-bold" : 
-                      isSameDay(day, currentDate) ? "bg-indigo-100 text-indigo-700 font-bold" :
-                      "text-slate-800 font-medium"
+                      isToday(day) ? "bg-primary text-primary-foreground font-bold" : 
+                      isSameDay(day, currentDate) ? "bg-primary/10 text-primary font-bold" :
+                      "text-foreground font-medium"
                     )}>
                       {format(day, "d")}
                     </span>
@@ -242,13 +242,13 @@ export function Schedule() {
               </div>
               
               {/* Time Grid */}
-              <div className="flex-1 overflow-y-auto relative bg-slate-50/30">
+              <div className="flex-1 overflow-y-auto relative bg-muted/50/30">
                 <div className="flex min-h-[960px]"> {/* 12 hours * 80px */}
                   {/* Time Axis */}
-                  <div className="w-16 flex-shrink-0 border-r border-slate-200 bg-white relative z-10">
+                  <div className="w-16 flex-shrink-0 border-r border-border bg-white relative z-10">
                     {hours.map(hour => (
                       <div key={hour} className="h-20 relative border-b border-transparent">
-                        <span className="absolute -top-2.5 right-3 text-[11px] font-semibold text-slate-400 bg-white px-1">
+                        <span className="absolute -top-2.5 right-3 text-[11px] font-semibold text-muted-foreground bg-white px-1">
                           {hour > 12 ? `${hour-12} PM` : hour === 12 ? "12 PM" : `${hour} AM`}
                         </span>
                       </div>
@@ -262,10 +262,10 @@ export function Schedule() {
                       const dayEvents = getEventsForDay(dateStr);
                       
                       return (
-                        <div key={day.toString()} className="flex-1 border-l border-slate-200 relative min-w-0">
+                        <div key={day.toString()} className="flex-1 border-l border-border relative min-w-0">
                           {/* Grid Lines */}
                           {hours.map(hour => (
-                            <div key={hour} className="h-20 border-b border-slate-200/60 w-full absolute left-0 right-0 pointer-events-none" style={{ top: `${(hour - 8) * 80}px` }}></div>
+                            <div key={hour} className="h-20 border-b border-border/60 w-full absolute left-0 right-0 pointer-events-none" style={{ top: `${(hour - 8) * 80}px` }}></div>
                           ))}
                           
                           {/* Events */}
@@ -307,13 +307,13 @@ export function Schedule() {
           )}
           
           {view === "Day" && (
-            <div className="flex-1 flex flex-col items-center justify-center p-12 text-center text-slate-500">
+            <div className="flex-1 flex flex-col items-center justify-center p-12 text-center text-muted-foreground">
               <CalendarIcon className="w-16 h-16 text-slate-200 mb-4" />
-              <h3 className="text-lg font-bold text-slate-700">Day View</h3>
-              <p className="text-sm mt-2">Currently showing <span className="font-semibold text-indigo-600">{format(currentDate, "MMMM do, yyyy")}</span>.</p>
+              <h3 className="text-lg font-bold text-foreground/80">Day View</h3>
+              <p className="text-sm mt-2">Currently showing <span className="font-semibold text-primary">{format(currentDate, "MMMM do, yyyy")}</span>.</p>
               <button 
                 onClick={() => setView("Week")}
-                className="mt-6 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-lg transition-colors"
+                className="mt-6 px-4 py-2 bg-muted hover:bg-slate-200 text-foreground/80 font-medium rounded-lg transition-colors"
               >
                 Back to Week View
               </button>

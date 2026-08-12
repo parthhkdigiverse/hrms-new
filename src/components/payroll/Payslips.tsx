@@ -30,7 +30,7 @@ export function Payslips() {
       {/* Top Page Header */}
       <div className="mb-8 flex items-end justify-between border-b border-border pb-6">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">Payslip</h1>
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">Payslip</h1>
           <p className="mt-1 text-[14px] text-muted-foreground">Pay period: 01 Jul 2026 – 31 Jul 2026</p>
         </div>
         
@@ -39,7 +39,7 @@ export function Payslips() {
             <select 
               value={selectedEmpId}
               onChange={(e) => setSelectedEmpId(e.target.value)}
-              className="appearance-none pl-4 pr-10 py-2 bg-white border border-border/80 rounded-lg text-[13px] font-semibold text-slate-700 outline-none focus:border-emerald-500 shadow-sm min-w-[200px]"
+              className="appearance-none pl-4 pr-10 py-2 bg-white border border-border/80 rounded-lg text-[13px] font-semibold text-foreground/80 outline-none focus:border-emerald-500 shadow-sm min-w-[200px]"
             >
               {MOCK_EMPLOYEES.map(emp => (
                 <option key={emp.id} value={emp.id}>{emp.name}</option>
@@ -48,16 +48,16 @@ export function Payslips() {
             <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
           </div>
           
-          <button className="flex items-center gap-2 bg-white border border-border/80 px-4 py-2 rounded-lg text-slate-700 text-[13px] font-semibold hover:bg-slate-50 transition-colors shadow-sm">
+          <button className="flex items-center gap-2 bg-white border border-border/80 px-4 py-2 rounded-lg text-foreground/80 text-[13px] font-semibold hover:bg-muted/50 transition-colors shadow-sm">
             <FileText className="h-4 w-4" /> PDF
           </button>
-          <button className="flex items-center gap-2 bg-white border border-border/80 px-4 py-2 rounded-lg text-slate-700 text-[13px] font-semibold hover:bg-slate-50 transition-colors shadow-sm">
+          <button className="flex items-center gap-2 bg-white border border-border/80 px-4 py-2 rounded-lg text-foreground/80 text-[13px] font-semibold hover:bg-muted/50 transition-colors shadow-sm">
             <Mail className="h-4 w-4" /> Email
           </button>
-          <button className="flex items-center gap-2 bg-white border border-border/80 px-4 py-2 rounded-lg text-slate-700 text-[13px] font-semibold hover:bg-slate-50 transition-colors shadow-sm">
+          <button className="flex items-center gap-2 bg-white border border-border/80 px-4 py-2 rounded-lg text-foreground/80 text-[13px] font-semibold hover:bg-muted/50 transition-colors shadow-sm">
             <MessageCircle className="h-4 w-4" /> WhatsApp
           </button>
-          <button className="flex items-center gap-2 bg-white border border-border/80 px-4 py-2 rounded-lg text-slate-700 text-[13px] font-semibold hover:bg-slate-50 transition-colors shadow-sm">
+          <button className="flex items-center gap-2 bg-white border border-border/80 px-4 py-2 rounded-lg text-foreground/80 text-[13px] font-semibold hover:bg-muted/50 transition-colors shadow-sm">
             <Printer className="h-4 w-4" /> Print
           </button>
           <button className="flex items-center gap-2 bg-[#0c7851] hover:bg-[#00925e] text-white px-5 py-2 rounded-lg text-[13px] font-semibold shadow-sm transition-colors">
@@ -93,40 +93,40 @@ export function Payslips() {
           </div>
           <div className="flex-1 grid grid-cols-3 gap-y-6 gap-x-8">
             <div>
-              <p className="text-[12px] text-slate-500 mb-1">Employee Name</p>
-              <p className="text-[14px] font-semibold text-slate-900">{selectedEmp.name}</p>
+              <p className="text-[12px] text-muted-foreground mb-1">Employee Name</p>
+              <p className="text-[14px] font-semibold text-foreground">{selectedEmp.name}</p>
             </div>
             <div>
-              <p className="text-[12px] text-slate-500 mb-1">Employee ID</p>
-              <p className="text-[14px] font-semibold text-slate-900">{selectedEmp.empId}</p>
+              <p className="text-[12px] text-muted-foreground mb-1">Employee ID</p>
+              <p className="text-[14px] font-semibold text-foreground">{selectedEmp.empId}</p>
             </div>
             <div>
-              <p className="text-[12px] text-slate-500 mb-1">Department</p>
-              <p className="text-[14px] font-semibold text-slate-900">{selectedEmp.department}</p>
+              <p className="text-[12px] text-muted-foreground mb-1">Department</p>
+              <p className="text-[14px] font-semibold text-foreground">{selectedEmp.department}</p>
             </div>
             <div>
-              <p className="text-[12px] text-slate-500 mb-1">Designation</p>
-              <p className="text-[14px] font-semibold text-slate-900">{selectedEmp.designation}</p>
+              <p className="text-[12px] text-muted-foreground mb-1">Designation</p>
+              <p className="text-[14px] font-semibold text-foreground">{selectedEmp.designation}</p>
             </div>
             <div>
-              <p className="text-[12px] text-slate-500 mb-1">Joining Date</p>
-              <p className="text-[14px] font-semibold text-slate-900">{selectedEmp.joiningDate}</p>
+              <p className="text-[12px] text-muted-foreground mb-1">Joining Date</p>
+              <p className="text-[14px] font-semibold text-foreground">{selectedEmp.joiningDate}</p>
             </div>
             <div>
-              <p className="text-[12px] text-slate-500 mb-1">Employment Type</p>
-              <p className="text-[14px] font-semibold text-slate-900">{selectedEmp.type}</p>
+              <p className="text-[12px] text-muted-foreground mb-1">Employment Type</p>
+              <p className="text-[14px] font-semibold text-foreground">{selectedEmp.type}</p>
             </div>
             <div>
-              <p className="text-[12px] text-slate-500 mb-1">Bank Account</p>
-              <p className="text-[14px] font-semibold text-slate-900">HDFC Bank ••••4821</p>
+              <p className="text-[12px] text-muted-foreground mb-1">Bank Account</p>
+              <p className="text-[14px] font-semibold text-foreground">HDFC Bank ••••4821</p>
             </div>
             <div>
-              <p className="text-[12px] text-slate-500 mb-1">PAN</p>
-              <p className="text-[14px] font-semibold text-slate-900">AXQPS4412J</p>
+              <p className="text-[12px] text-muted-foreground mb-1">PAN</p>
+              <p className="text-[14px] font-semibold text-foreground">AXQPS4412J</p>
             </div>
             <div>
-              <p className="text-[12px] text-slate-500 mb-1">UAN</p>
-              <p className="text-[14px] font-semibold text-slate-900">100234556711</p>
+              <p className="text-[12px] text-muted-foreground mb-1">UAN</p>
+              <p className="text-[14px] font-semibold text-foreground">100234556711</p>
             </div>
           </div>
         </div>
@@ -136,102 +136,102 @@ export function Payslips() {
           
           {/* Earnings */}
           <div>
-            <h4 className="text-[12px] font-semibold text-slate-400 uppercase tracking-wider mb-6">Earnings & Allowances</h4>
+            <h4 className="text-[12px] font-semibold text-muted-foreground uppercase tracking-wider mb-6">Earnings & Allowances</h4>
             <div className="space-y-4 mb-6">
               <div className="flex justify-between text-[14px]">
-                <span className="text-slate-500">Basic Salary</span>
-                <span className="font-semibold text-slate-900">₹36,800</span>
+                <span className="text-muted-foreground">Basic Salary</span>
+                <span className="font-semibold text-foreground">₹36,800</span>
               </div>
               <div className="flex justify-between text-[14px]">
-                <span className="text-slate-500">HRA</span>
-                <span className="font-semibold text-slate-900">₹18,400</span>
+                <span className="text-muted-foreground">HRA</span>
+                <span className="font-semibold text-foreground">₹18,400</span>
               </div>
               <div className="flex justify-between text-[14px]">
-                <span className="text-slate-500">Special Allowance</span>
-                <span className="font-semibold text-slate-900">₹12,880</span>
+                <span className="text-muted-foreground">Special Allowance</span>
+                <span className="font-semibold text-foreground">₹12,880</span>
               </div>
               <div className="flex justify-between text-[14px]">
-                <span className="text-slate-500">Medical Allowance</span>
-                <span className="font-semibold text-slate-900">₹4,600</span>
+                <span className="text-muted-foreground">Medical Allowance</span>
+                <span className="font-semibold text-foreground">₹4,600</span>
               </div>
               <div className="flex justify-between text-[14px]">
-                <span className="text-slate-500">Travel Allowance</span>
-                <span className="font-semibold text-slate-900">₹4,600</span>
+                <span className="text-muted-foreground">Travel Allowance</span>
+                <span className="font-semibold text-foreground">₹4,600</span>
               </div>
               <div className="flex justify-between text-[14px]">
-                <span className="text-slate-500">Internet Allowance</span>
-                <span className="font-semibold text-slate-900">₹2,760</span>
+                <span className="text-muted-foreground">Internet Allowance</span>
+                <span className="font-semibold text-foreground">₹2,760</span>
               </div>
               <div className="flex justify-between text-[14px]">
-                <span className="text-slate-500">Food Allowance</span>
-                <span className="font-semibold text-slate-900">₹3,680</span>
+                <span className="text-muted-foreground">Food Allowance</span>
+                <span className="font-semibold text-foreground">₹3,680</span>
               </div>
               <div className="flex justify-between text-[14px]">
-                <span className="text-slate-500">Performance Allowance</span>
-                <span className="font-semibold text-slate-900">₹5,520</span>
+                <span className="text-muted-foreground">Performance Allowance</span>
+                <span className="font-semibold text-foreground">₹5,520</span>
               </div>
               <div className="flex justify-between text-[14px]">
-                <span className="text-slate-500">Other Allowance</span>
-                <span className="font-semibold text-slate-900">₹2,760</span>
+                <span className="text-muted-foreground">Other Allowance</span>
+                <span className="font-semibold text-foreground">₹2,760</span>
               </div>
               <div className="flex justify-between text-[14px]">
-                <span className="text-slate-500">Overtime (6 hrs)</span>
-                <span className="font-semibold text-slate-900">₹5,304</span>
+                <span className="text-muted-foreground">Overtime (6 hrs)</span>
+                <span className="font-semibold text-foreground">₹5,304</span>
               </div>
               <div className="flex justify-between text-[14px]">
-                <span className="text-slate-500">Bonus</span>
-                <span className="font-semibold text-slate-900">₹8,000</span>
+                <span className="text-muted-foreground">Bonus</span>
+                <span className="font-semibold text-foreground">₹8,000</span>
               </div>
             </div>
           </div>
 
           {/* Deductions */}
           <div>
-            <h4 className="text-[12px] font-semibold text-slate-400 uppercase tracking-wider mb-6">Deductions</h4>
+            <h4 className="text-[12px] font-semibold text-muted-foreground uppercase tracking-wider mb-6">Deductions</h4>
             <div className="space-y-4 mb-6">
               <div className="flex justify-between text-[14px]">
-                <span className="text-slate-500">Professional Tax</span>
-                <span className="font-semibold text-slate-900">₹200</span>
+                <span className="text-muted-foreground">Professional Tax</span>
+                <span className="font-semibold text-foreground">₹200</span>
               </div>
               <div className="flex justify-between text-[14px]">
-                <span className="text-slate-500">TDS</span>
-                <span className="font-semibold text-slate-900">₹5,520</span>
+                <span className="text-muted-foreground">TDS</span>
+                <span className="font-semibold text-foreground">₹5,520</span>
               </div>
               <div className="flex justify-between text-[14px]">
-                <span className="text-slate-500">Provident Fund</span>
-                <span className="font-semibold text-slate-900">₹1,800</span>
+                <span className="text-muted-foreground">Provident Fund</span>
+                <span className="font-semibold text-foreground">₹1,800</span>
               </div>
               <div className="flex justify-between text-[14px]">
-                <span className="text-slate-500">ESIC</span>
-                <span className="font-semibold text-slate-900">₹0</span>
+                <span className="text-muted-foreground">ESIC</span>
+                <span className="font-semibold text-foreground">₹0</span>
               </div>
               <div className="flex justify-between text-[14px]">
-                <span className="text-slate-500">Health Insurance</span>
-                <span className="font-semibold text-slate-900">₹650</span>
+                <span className="text-muted-foreground">Health Insurance</span>
+                <span className="font-semibold text-foreground">₹650</span>
               </div>
               <div className="flex justify-between text-[14px]">
-                <span className="text-slate-500">Loan Recovery</span>
-                <span className="font-semibold text-slate-900">₹0</span>
+                <span className="text-muted-foreground">Loan Recovery</span>
+                <span className="font-semibold text-foreground">₹0</span>
               </div>
               <div className="flex justify-between text-[14px]">
-                <span className="text-slate-500">Advance Salary Recovery</span>
-                <span className="font-semibold text-slate-900">₹0</span>
+                <span className="text-muted-foreground">Advance Salary Recovery</span>
+                <span className="font-semibold text-foreground">₹0</span>
               </div>
               <div className="flex justify-between text-[14px]">
-                <span className="text-slate-500">Penalty</span>
-                <span className="font-semibold text-slate-900">₹0</span>
+                <span className="text-muted-foreground">Penalty</span>
+                <span className="font-semibold text-foreground">₹0</span>
               </div>
               <div className="flex justify-between text-[14px]">
-                <span className="text-slate-500">Late Coming Deduction</span>
-                <span className="font-semibold text-slate-900">₹0</span>
+                <span className="text-muted-foreground">Late Coming Deduction</span>
+                <span className="font-semibold text-foreground">₹0</span>
               </div>
               <div className="flex justify-between text-[14px]">
-                <span className="text-slate-500">Leave Deduction</span>
-                <span className="font-semibold text-slate-900">₹3,538</span>
+                <span className="text-muted-foreground">Leave Deduction</span>
+                <span className="font-semibold text-foreground">₹3,538</span>
               </div>
               <div className="flex justify-between text-[14px]">
-                <span className="text-slate-500">Other Deduction</span>
-                <span className="font-semibold text-slate-900">₹0</span>
+                <span className="text-muted-foreground">Other Deduction</span>
+                <span className="font-semibold text-foreground">₹0</span>
               </div>
             </div>
           </div>
@@ -241,12 +241,12 @@ export function Payslips() {
         {/* Totals Border Row */}
         <div className="px-8 pb-8 pt-4 grid grid-cols-2 gap-16 border-t border-border/40 mt-auto">
           <div className="flex justify-between items-center">
-            <span className="text-[14px] font-bold text-slate-900">Total Earnings</span>
-            <span className="text-[14px] font-bold text-slate-900">{formatCurrency(totalEarnings)}</span>
+            <span className="text-[14px] font-bold text-foreground">Total Earnings</span>
+            <span className="text-[14px] font-bold text-foreground">{formatCurrency(totalEarnings)}</span>
           </div>
           <div className="flex justify-between items-center">
-            <span className="text-[14px] font-bold text-slate-900">Total Deductions</span>
-            <span className="text-[14px] font-bold text-slate-900">{formatCurrency(totalDeductions)}</span>
+            <span className="text-[14px] font-bold text-foreground">Total Deductions</span>
+            <span className="text-[14px] font-bold text-foreground">{formatCurrency(totalDeductions)}</span>
           </div>
         </div>
 

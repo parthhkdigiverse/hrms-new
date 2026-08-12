@@ -73,7 +73,7 @@ function KanbanColumn({ stage, color, items, onDropCard }: { stage: string; colo
 function TableView({ data, onStageChange, activeStages }: { data: Lead[]; onStageChange: (id: string, stage: string) => void; activeStages: string[] }) {
   const { stages } = useSales();
   const stageColor: Record<string, string> = {
-    "New Lead": "bg-indigo-100 text-indigo-700",
+    "New Lead": "bg-primary/10 text-primary",
     Contacted: "bg-violet-100 text-violet-700",
     Meeting: "bg-blue-100 text-blue-700",
     Demo: "bg-cyan-100 text-cyan-700",

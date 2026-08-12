@@ -10,15 +10,15 @@ export function ProjectDelivery() {
         {/* Project KPIs */}
         <div className="grid grid-cols-2 gap-4">
           <div className="bg-white border border-border/60 rounded-3xl p-5 shadow-sm flex flex-col justify-between">
-            <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">Total Projects</p>
-            <p className="text-3xl font-black text-slate-900">42</p>
+            <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Total Projects</p>
+            <p className="text-3xl font-black text-foreground">42</p>
           </div>
           <div className="bg-white border border-border/60 rounded-3xl p-5 shadow-sm flex flex-col justify-between">
-            <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">Active</p>
+            <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Active</p>
             <p className="text-3xl font-black text-[#00A56C]">24</p>
           </div>
           <div className="bg-white border border-border/60 rounded-3xl p-5 shadow-sm flex flex-col justify-between">
-            <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">Completed</p>
+            <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Completed</p>
             <p className="text-3xl font-black text-blue-500">12</p>
           </div>
           <div className="bg-rose-50 border border-rose-100 rounded-3xl p-5 shadow-sm flex flex-col justify-between">
@@ -30,8 +30,8 @@ export function ProjectDelivery() {
             <p className="text-3xl font-black text-amber-600">2</p>
           </div>
           <div className="bg-white border border-border/60 rounded-3xl p-5 shadow-sm flex flex-col justify-between">
-            <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">Deadline Today</p>
-            <p className="text-3xl font-black text-slate-900">1</p>
+            <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Deadline Today</p>
+            <p className="text-3xl font-black text-foreground">1</p>
           </div>
         </div>
 
@@ -39,10 +39,10 @@ export function ProjectDelivery() {
         <div className="bg-white border border-border/60 rounded-3xl p-6 shadow-sm md:col-span-2">
           <div className="mb-6 flex justify-between items-center">
             <div>
-              <h3 className="font-bold text-slate-900">Gantt preview of live delivery</h3>
-              <p className="text-[11px] text-slate-500">Top active and at-risk projects</p>
+              <h3 className="font-bold text-foreground">Gantt preview of live delivery</h3>
+              <p className="text-[11px] text-muted-foreground">Top active and at-risk projects</p>
             </div>
-            <button className="text-[11px] font-bold text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-lg">View All</button>
+            <button className="text-[11px] font-bold text-primary bg-primary/10 px-3 py-1.5 rounded-lg">View All</button>
           </div>
           
           <div className="space-y-5">
@@ -50,8 +50,8 @@ export function ProjectDelivery() {
               <div key={i}>
                 <div className="flex justify-between items-end mb-2">
                   <div>
-                    <p className="text-[13px] font-bold text-slate-900">{proj.name}</p>
-                    <p className="text-[11px] text-slate-500">{proj.client}</p>
+                    <p className="text-[13px] font-bold text-foreground">{proj.name}</p>
+                    <p className="text-[11px] text-muted-foreground">{proj.client}</p>
                   </div>
                   <span className={cn("text-[10px] font-bold px-2 py-0.5 rounded-md border", 
                     proj.status === 'Delayed' ? 'text-rose-600 bg-rose-50 border-rose-100' :
@@ -61,7 +61,7 @@ export function ProjectDelivery() {
                     {proj.status}
                   </span>
                 </div>
-                <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+                <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
                   <div 
                     className={cn("h-full rounded-full transition-all duration-1000", 
                       proj.color === 'emerald' ? 'bg-[#00A56C]' : 

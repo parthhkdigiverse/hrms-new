@@ -195,18 +195,18 @@ export function SalaryStructure() {
                             {getInitials(emp.name)}
                           </div>
                           <div>
-                            <p className="font-bold text-slate-900">{emp.name}</p>
+                            <p className="font-bold text-foreground">{emp.name}</p>
                             <p className="text-xs text-muted-foreground">{emp.empId} · {emp.designation}</p>
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-slate-700 font-medium">{emp.department}</td>
-                      <td className="px-6 py-4 text-slate-700 font-medium">
+                      <td className="px-6 py-4 text-foreground/80 font-medium">{emp.department}</td>
+                      <td className="px-6 py-4 text-foreground/80 font-medium">
                         {emp.joiningDate.split(' ').slice(0,2).join(' ')}<br/>
                         {emp.joiningDate.split(' ')[2]}
                       </td>
-                      <td className="px-6 py-4 text-slate-700 font-medium">{emp.type}</td>
-                      <td className="px-6 py-4 text-slate-700 font-medium">
+                      <td className="px-6 py-4 text-foreground/80 font-medium">{emp.type}</td>
+                      <td className="px-6 py-4 text-foreground/80 font-medium">
                         {emp.effectiveDate.split(' ').slice(0,2).join(' ')}<br/>
                         {emp.effectiveDate.split(' ')[2]}
                       </td>
@@ -223,14 +223,14 @@ export function SalaryStructure() {
           <div className="rounded-2xl border border-border bg-white shadow-sm p-8 sticky top-8">
             <div className="flex items-start justify-between mb-8 pb-6 border-b border-border/60">
               <div>
-                <h2 className="text-xl font-bold text-slate-900">{selectedEmp.name}</h2>
+                <h2 className="text-xl font-bold text-foreground">{selectedEmp.name}</h2>
                 <p className="text-sm text-muted-foreground mt-1">{selectedEmp.empId} · {selectedEmp.designation}</p>
               </div>
               <div className="flex items-center gap-2">
                 {!isEditing ? (
                   <button 
                     onClick={handleEditClick}
-                    className="flex items-center gap-2 text-sm font-bold bg-white border border-border text-slate-700 px-4 py-2 rounded-lg hover:bg-slate-50 transition-colors shadow-sm"
+                    className="flex items-center gap-2 text-sm font-bold bg-white border border-border text-foreground/80 px-4 py-2 rounded-lg hover:bg-muted/50 transition-colors shadow-sm"
                   >
                     <Plus className="h-4 w-4" /> Revise Salary
                   </button>
@@ -339,7 +339,7 @@ export function SalaryStructure() {
 
               <div>
                 <h3 className="mb-4 flex items-center gap-2 font-bold">
-                  <History className="h-4 w-4 text-indigo-600" /> Salary Revision History
+                  <History className="h-4 w-4 text-primary" /> Salary Revision History
                 </h3>
                 {isEditing ? (
                   <div className="rounded-xl border border-border p-5 bg-emerald-50/50 space-y-4">
@@ -396,7 +396,7 @@ export function SalaryStructure() {
                           <div className={cn(
                             "absolute left-0 top-1.5 flex h-4 w-4 items-center justify-center rounded-full border-2 border-white",
                             hist.type === "Initial" ? "bg-slate-400" :
-                            hist.type === "Promotion" ? "bg-indigo-500" : "bg-emerald-500"
+                            hist.type === "Promotion" ? "bg-primary" : "bg-emerald-500"
                           )} />
                           <p className="text-[11px] font-bold text-muted-foreground flex items-center gap-1.5">
                             <Calendar className="h-3 w-3" /> {hist.date}

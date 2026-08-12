@@ -137,8 +137,8 @@ export function Hirings() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-black text-slate-900 tracking-tight">Job Openings</h1>
-          <p className="text-sm text-slate-500 mt-1">Manage active requisitions and hiring pipelines</p>
+          <h1 className="text-2xl font-black text-foreground tracking-tight">Job Openings</h1>
+          <p className="text-sm text-muted-foreground mt-1">Manage active requisitions and hiring pipelines</p>
         </div>
         <div className="flex items-center gap-3 w-full sm:w-auto">
           <div className="relative flex-1 sm:flex-none">
@@ -147,41 +147,41 @@ export function Hirings() {
               placeholder="Search jobs..." 
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
-              className="w-full sm:w-64 pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-sm"
+              className="w-full sm:w-64 pl-10 pr-4 py-2 bg-white border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all shadow-sm"
             />
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           </div>
-          <button className="p-2 bg-white border border-slate-200 rounded-xl text-slate-700 hover:bg-slate-50 shadow-sm transition-colors">
+          <button className="p-2 bg-white border border-border rounded-xl text-foreground/80 hover:bg-muted/50 shadow-sm transition-colors">
             <Filter className="w-4 h-4" />
           </button>
           <Dialog open={isPostOpen} onOpenChange={setIsPostOpen}>
             <DialogTrigger asChild>
-              <button className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-bold shadow-sm flex items-center gap-2 transition-colors whitespace-nowrap">
+              <button className="px-4 py-2 bg-primary hover:bg-primary text-primary-foreground rounded-xl text-sm font-bold shadow-sm flex items-center gap-2 transition-colors whitespace-nowrap">
                 <Plus className="w-4 h-4" /> Post Job
               </button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px] rounded-2xl">
               <DialogHeader>
-                <DialogTitle className="text-xl font-black text-slate-900">Post New Job</DialogTitle>
+                <DialogTitle className="text-xl font-black text-foreground">Post New Job</DialogTitle>
               </DialogHeader>
               <form onSubmit={handlePostJob} className="space-y-4 mt-4">
                 <div className="space-y-2">
-                  <label className="text-sm font-bold text-slate-700">Job Title</label>
+                  <label className="text-sm font-bold text-foreground/80">Job Title</label>
                   <input 
                     type="text" 
                     required
                     value={newTitle}
                     onChange={e => setNewTitle(e.target.value)}
-                    className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                    className="w-full px-3 py-2 bg-white border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <label className="text-sm font-bold text-slate-700">Department</label>
+                    <label className="text-sm font-bold text-foreground/80">Department</label>
                     <select 
                       value={newDepartment}
                       onChange={e => setNewDepartment(e.target.value)}
-                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                      className="w-full px-3 py-2 bg-white border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
                     >
                       {departments.map(dept => (
                         <option key={dept} value={dept}>{dept}</option>
@@ -189,11 +189,11 @@ export function Hirings() {
                     </select>
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm font-bold text-slate-700">Employment Type</label>
+                    <label className="text-sm font-bold text-foreground/80">Employment Type</label>
                     <select 
                       value={newType}
                       onChange={e => setNewType(e.target.value)}
-                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                      className="w-full px-3 py-2 bg-white border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
                     >
                       <option>Full-time</option>
                       <option>Part-time</option>
@@ -203,37 +203,37 @@ export function Hirings() {
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-bold text-slate-700">Location</label>
+                  <label className="text-sm font-bold text-foreground/80">Location</label>
                   <input 
                     type="text" 
                     placeholder="e.g. Remote or San Francisco, CA"
                     required
                     value={newLocation}
                     onChange={e => setNewLocation(e.target.value)}
-                    className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                    className="w-full px-3 py-2 bg-white border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-bold text-slate-700">Hiring Manager</label>
+                  <label className="text-sm font-bold text-foreground/80">Hiring Manager</label>
                   <input 
                     type="text" 
                     required
                     value={newHiringManager}
                     onChange={e => setNewHiringManager(e.target.value)}
-                    className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                    className="w-full px-3 py-2 bg-white border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
                   />
                 </div>
                 <div className="pt-4 flex justify-end gap-3">
                   <button 
                     type="button" 
                     onClick={() => setIsPostOpen(false)}
-                    className="px-4 py-2 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 font-bold text-sm rounded-xl transition-colors"
+                    className="px-4 py-2 bg-white border border-border text-foreground/80 hover:bg-muted/50 font-bold text-sm rounded-xl transition-colors"
                   >
                     Cancel
                   </button>
                   <button 
                     type="submit"
-                    className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-xl transition-colors"
+                    className="px-4 py-2 bg-primary hover:bg-primary text-primary-foreground font-bold text-sm rounded-xl transition-colors"
                   >
                     Post Job
                   </button>
@@ -252,10 +252,10 @@ export function Hirings() {
           { label: "Interviews Scheduled", value: "25", trend: "+5 this week" },
           { label: "Offers Extended", value: "3", trend: "1 accepted" },
         ].map(stat => (
-          <div key={stat.label} className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-            <p className="text-sm font-semibold text-slate-500 mb-1">{stat.label}</p>
+          <div key={stat.label} className="bg-white p-5 rounded-2xl border border-border shadow-sm">
+            <p className="text-sm font-semibold text-muted-foreground mb-1">{stat.label}</p>
             <div className="flex items-end gap-3">
-              <h3 className="text-2xl font-black text-slate-900">{stat.value}</h3>
+              <h3 className="text-2xl font-black text-foreground">{stat.value}</h3>
               <p className="text-xs font-medium text-emerald-600 mb-1">{stat.trend}</p>
             </div>
           </div>
@@ -265,12 +265,12 @@ export function Hirings() {
       {/* Grid of Job Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 pb-4">
         {filteredJobs.map(job => (
-          <div key={job.id} className="bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-all group flex flex-col">
-            <div className="p-5 border-b border-slate-100 flex-1">
+          <div key={job.id} className="bg-white rounded-2xl border border-border shadow-sm hover:shadow-md transition-all group flex flex-col">
+            <div className="p-5 border-b border-border/50 flex-1">
               <div className="flex justify-between items-start mb-4">
                 <div>
                   <div className="flex items-center gap-2 mb-2">
-                    <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-slate-100 text-slate-600">
+                    <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-muted text-foreground/80">
                       {job.department}
                     </span>
                     {job.status === "Active" ? (
@@ -279,60 +279,60 @@ export function Hirings() {
                       <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-amber-50 text-amber-600">Draft</span>
                     )}
                   </div>
-                  <h3 className="text-lg font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">{job.title}</h3>
+                  <h3 className="text-lg font-bold text-foreground group-hover:text-primary transition-colors">{job.title}</h3>
                 </div>
-                <button className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors">
+                <button className="p-1.5 text-muted-foreground hover:text-foreground/80 hover:bg-muted rounded-lg transition-colors">
                   <MoreHorizontal className="w-5 h-5" />
                 </button>
               </div>
 
               <div className="grid grid-cols-2 gap-y-3 mb-6">
-                <div className="flex items-center gap-2 text-sm text-slate-600 font-medium">
-                  <Briefcase className="w-4 h-4 text-slate-400" /> {job.type}
+                <div className="flex items-center gap-2 text-sm text-foreground/80 font-medium">
+                  <Briefcase className="w-4 h-4 text-muted-foreground" /> {job.type}
                 </div>
-                <div className="flex items-center gap-2 text-sm text-slate-600 font-medium">
-                  <MapPin className="w-4 h-4 text-slate-400" /> {job.location}
+                <div className="flex items-center gap-2 text-sm text-foreground/80 font-medium">
+                  <MapPin className="w-4 h-4 text-muted-foreground" /> {job.location}
                 </div>
-                <div className="flex items-center gap-2 text-sm text-slate-600 font-medium">
-                  <Clock className="w-4 h-4 text-slate-400" /> {job.postedDate}
+                <div className="flex items-center gap-2 text-sm text-foreground/80 font-medium">
+                  <Clock className="w-4 h-4 text-muted-foreground" /> {job.postedDate}
                 </div>
-                <div className="flex items-center gap-2 text-sm text-slate-600 font-medium">
-                  <Users className="w-4 h-4 text-slate-400" /> {job.applicants} applied
+                <div className="flex items-center gap-2 text-sm text-foreground/80 font-medium">
+                  <Users className="w-4 h-4 text-muted-foreground" /> {job.applicants} applied
                 </div>
               </div>
 
               {/* Pipeline Pipeline Bar */}
               <div className="space-y-2">
                 <div className="flex justify-between text-xs font-bold">
-                  <span className="text-slate-500">Pipeline Pipeline</span>
-                  <span className="text-indigo-600">{job.interviewing} Interviewing</span>
+                  <span className="text-muted-foreground">Pipeline Pipeline</span>
+                  <span className="text-primary">{job.interviewing} Interviewing</span>
                 </div>
-                <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden flex">
+                <div className="h-2 w-full bg-muted rounded-full overflow-hidden flex">
                   <div className="h-full bg-slate-300 rounded-l-full" style={{ width: '40%' }} />
-                  <div className="h-full bg-indigo-500" style={{ width: '30%' }} />
+                  <div className="h-full bg-primary" style={{ width: '30%' }} />
                   <div className="h-full bg-emerald-500 rounded-r-full" style={{ width: '10%' }} />
                 </div>
               </div>
             </div>
 
-            <div className="p-4 bg-slate-50/50 rounded-b-2xl flex items-center justify-between">
+            <div className="p-4 bg-muted/50/50 rounded-b-2xl flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <img src={job.managerAvatar} alt={job.hiringManager} className="w-8 h-8 rounded-full border-2 border-white shadow-sm" />
                 <div>
-                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Hiring Manager</p>
-                  <p className="text-xs font-semibold text-slate-700">{job.hiringManager}</p>
+                  <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Hiring Manager</p>
+                  <p className="text-xs font-semibold text-foreground/80">{job.hiringManager}</p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
                 <button 
                   onClick={() => setReferJob(job)}
-                  className="text-xs font-bold text-slate-500 hover:text-slate-700 flex items-center gap-1.5 transition-colors"
+                  className="text-xs font-bold text-muted-foreground hover:text-foreground/80 flex items-center gap-1.5 transition-colors"
                 >
                   <UserPlus className="w-3.5 h-3.5" /> Refer
                 </button>
                 <button 
                   onClick={() => setSelectedJob(job)}
-                  className="text-xs font-bold text-indigo-600 hover:text-indigo-700 flex items-center gap-1 transition-colors"
+                  className="text-xs font-bold text-primary hover:text-primary flex items-center gap-1 transition-colors"
                 >
                   View Details <ArrowUpRight className="w-3 h-3" />
                 </button>
@@ -350,41 +350,41 @@ export function Hirings() {
           </DialogHeader>
           {selectedJob && (
             <div className="space-y-6">
-              <div className="flex flex-wrap gap-4 pt-2 border-b border-slate-100 pb-4">
-                <div className="bg-slate-50 px-3 py-1.5 rounded-lg flex items-center gap-2">
-                  <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Department</span>
-                  <span className="text-sm font-bold text-slate-700">{selectedJob.department}</span>
+              <div className="flex flex-wrap gap-4 pt-2 border-b border-border/50 pb-4">
+                <div className="bg-muted/50 px-3 py-1.5 rounded-lg flex items-center gap-2">
+                  <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Department</span>
+                  <span className="text-sm font-bold text-foreground/80">{selectedJob.department}</span>
                 </div>
-                <div className="bg-slate-50 px-3 py-1.5 rounded-lg flex items-center gap-2">
-                  <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Location</span>
-                  <span className="text-sm font-bold text-slate-700">{selectedJob.location}</span>
+                <div className="bg-muted/50 px-3 py-1.5 rounded-lg flex items-center gap-2">
+                  <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Location</span>
+                  <span className="text-sm font-bold text-foreground/80">{selectedJob.location}</span>
                 </div>
-                <div className="bg-slate-50 px-3 py-1.5 rounded-lg flex items-center gap-2">
-                  <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Type</span>
-                  <span className="text-sm font-bold text-slate-700">{selectedJob.type}</span>
+                <div className="bg-muted/50 px-3 py-1.5 rounded-lg flex items-center gap-2">
+                  <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Type</span>
+                  <span className="text-sm font-bold text-foreground/80">{selectedJob.type}</span>
                 </div>
               </div>
               
               <div className="grid grid-cols-2 gap-6">
                 <div>
-                  <h4 className="text-sm font-bold text-slate-900 mb-3">Hiring Manager</h4>
+                  <h4 className="text-sm font-bold text-foreground mb-3">Hiring Manager</h4>
                   <div className="flex items-center gap-3">
                     <img src={selectedJob.managerAvatar} alt={selectedJob.hiringManager} className="w-10 h-10 rounded-full" />
                     <div>
-                      <p className="text-sm font-bold text-slate-700">{selectedJob.hiringManager}</p>
+                      <p className="text-sm font-bold text-foreground/80">{selectedJob.hiringManager}</p>
                     </div>
                   </div>
                 </div>
                 <div>
-                  <h4 className="text-sm font-bold text-slate-900 mb-3">Pipeline</h4>
+                  <h4 className="text-sm font-bold text-foreground mb-3">Pipeline</h4>
                   <div className="flex flex-col gap-2">
                     <div className="flex justify-between text-sm">
-                      <span className="text-slate-500 font-medium">Total Applicants</span>
-                      <span className="font-bold text-slate-900">{selectedJob.applicants}</span>
+                      <span className="text-muted-foreground font-medium">Total Applicants</span>
+                      <span className="font-bold text-foreground">{selectedJob.applicants}</span>
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span className="text-slate-500 font-medium">Interviewing</span>
-                      <span className="font-bold text-indigo-600">{selectedJob.interviewing}</span>
+                      <span className="text-muted-foreground font-medium">Interviewing</span>
+                      <span className="font-bold text-primary">{selectedJob.interviewing}</span>
                     </div>
                   </div>
                 </div>
@@ -409,37 +409,37 @@ export function Hirings() {
             className="space-y-4 pt-4"
           >
             <div className="space-y-2">
-              <label className="text-sm font-bold text-slate-700">Candidate Name</label>
-              <input type="text" required className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20" />
+              <label className="text-sm font-bold text-foreground/80">Candidate Name</label>
+              <input type="text" required className="w-full px-3 py-2 bg-white border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-bold text-slate-700">Candidate Email</label>
-              <input type="email" required className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20" />
+              <label className="text-sm font-bold text-foreground/80">Candidate Email</label>
+              <input type="email" required className="w-full px-3 py-2 bg-white border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-bold text-slate-700">LinkedIn Profile (Optional)</label>
-              <input type="url" className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20" />
+              <label className="text-sm font-bold text-foreground/80">LinkedIn Profile (Optional)</label>
+              <input type="url" className="w-full px-3 py-2 bg-white border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-bold text-slate-700">Resume / CV</label>
-              <input type="file" required className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" />
+              <label className="text-sm font-bold text-foreground/80">Resume / CV</label>
+              <input type="file" required className="w-full px-3 py-2 bg-white border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/10" />
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-bold text-slate-700">Why are they a good fit?</label>
-              <textarea required rows={3} className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20" />
+              <label className="text-sm font-bold text-foreground/80">Why are they a good fit?</label>
+              <textarea required rows={3} className="w-full px-3 py-2 bg-white border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
             </div>
             
             <div className="pt-4 flex justify-end gap-3">
               <button 
                 type="button" 
                 onClick={() => setReferJob(null)}
-                className="px-4 py-2 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 font-bold text-sm rounded-xl transition-colors"
+                className="px-4 py-2 bg-white border border-border text-foreground/80 hover:bg-muted/50 font-bold text-sm rounded-xl transition-colors"
               >
                 Cancel
               </button>
               <button 
                 type="submit"
-                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-xl transition-colors"
+                className="px-4 py-2 bg-primary hover:bg-primary text-primary-foreground font-bold text-sm rounded-xl transition-colors"
               >
                 Submit Referral
               </button>

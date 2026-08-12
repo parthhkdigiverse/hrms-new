@@ -52,23 +52,23 @@ export function Chat() {
   };
 
   return (
-    <div className="flex h-[calc(100vh-8rem)] bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+    <div className="flex h-[calc(100vh-8rem)] bg-card rounded-2xl border border-border overflow-hidden shadow-sm">
       {/* Sidebar */}
-      <div className="w-64 border-r border-slate-200 bg-slate-50/50 flex flex-col hidden md:flex">
-        <div className="p-4 border-b border-slate-200 flex items-center justify-between">
-          <h2 className="font-bold text-slate-800 tracking-tight">Messages</h2>
-          <button className="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">
+      <div className="w-64 border-r border-border bg-muted/10 flex flex-col hidden md:flex">
+        <div className="p-4 border-b border-border flex items-center justify-between">
+          <h2 className="font-bold text-foreground tracking-tight">Messages</h2>
+          <button className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors">
             <Plus className="w-4 h-4" />
           </button>
         </div>
         
         <div className="p-3">
           <div className="relative">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
             <input 
               type="text" 
               placeholder="Jump to..." 
-              className="w-full pl-9 pr-4 py-1.5 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+              className="w-full pl-9 pr-4 py-1.5 bg-background border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
             />
           </div>
         </div>
@@ -76,9 +76,9 @@ export function Chat() {
         <div className="flex-1 overflow-y-auto px-2 pb-4 space-y-6">
           {/* Channels */}
           <div>
-            <div className="px-2 mb-2 flex items-center justify-between text-xs font-bold text-slate-500 uppercase tracking-wider">
+            <div className="px-2 mb-2 flex items-center justify-between text-xs font-bold text-muted-foreground uppercase tracking-wider">
               <span>Channels</span>
-              <Plus className="w-3.5 h-3.5 cursor-pointer hover:text-slate-700" />
+              <Plus className="w-3.5 h-3.5 cursor-pointer hover:text-foreground" />
             </div>
             <div className="space-y-0.5">
               {CHANNELS.map(channel => (
@@ -88,8 +88,8 @@ export function Chat() {
                   className={cn(
                     "w-full flex items-center justify-between px-2 py-1.5 rounded-lg text-sm transition-colors",
                     activeChannel === channel.name 
-                      ? "bg-indigo-50 text-indigo-700 font-bold" 
-                      : "text-slate-600 hover:bg-slate-100 font-medium"
+                      ? "bg-primary/10 text-primary font-bold" 
+                      : "text-muted-foreground hover:bg-muted font-medium"
                   )}
                 >
                   <div className="flex items-center gap-2">
@@ -97,7 +97,7 @@ export function Chat() {
                     {channel.name}
                   </div>
                   {channel.unread > 0 && (
-                    <span className="bg-indigo-600 text-white text-[10px] font-bold px-1.5 rounded-full">
+                    <span className="bg-primary text-primary-foreground text-[10px] font-bold px-1.5 rounded-full">
                       {channel.unread}
                     </span>
                   )}
@@ -108,9 +108,9 @@ export function Chat() {
           
           {/* DMs */}
           <div>
-            <div className="px-2 mb-2 flex items-center justify-between text-xs font-bold text-slate-500 uppercase tracking-wider">
+            <div className="px-2 mb-2 flex items-center justify-between text-xs font-bold text-muted-foreground uppercase tracking-wider">
               <span>Direct Messages</span>
-              <Plus className="w-3.5 h-3.5 cursor-pointer hover:text-slate-700" />
+              <Plus className="w-3.5 h-3.5 cursor-pointer hover:text-foreground" />
             </div>
             <div className="space-y-0.5">
               {DIRECT_MESSAGES.map(dm => (
@@ -120,19 +120,19 @@ export function Chat() {
                   className={cn(
                     "w-full flex items-center justify-between px-2 py-1.5 rounded-lg text-sm transition-colors",
                     activeChannel === dm.name 
-                      ? "bg-indigo-50 text-indigo-700 font-bold" 
-                      : "text-slate-600 hover:bg-slate-100 font-medium"
+                      ? "bg-primary/10 text-primary font-bold" 
+                      : "text-muted-foreground hover:bg-muted font-medium"
                   )}
                 >
                   <div className="flex items-center gap-2">
                     <div className="relative">
                       <img src={dm.avatar} alt={dm.name} className="w-5 h-5 rounded-full" />
-                      {dm.online && <div className="absolute -bottom-0.5 -right-0.5 w-2 h-2 bg-emerald-500 border border-white rounded-full"></div>}
+                      {dm.online && <div className="absolute -bottom-0.5 -right-0.5 w-2 h-2 bg-emerald-500 border border-background rounded-full"></div>}
                     </div>
                     {dm.name}
                   </div>
                   {dm.unread > 0 && (
-                    <span className="bg-indigo-600 text-white text-[10px] font-bold px-1.5 rounded-full">
+                    <span className="bg-primary text-primary-foreground text-[10px] font-bold px-1.5 rounded-full">
                       {dm.unread}
                     </span>
                   )}
@@ -144,18 +144,18 @@ export function Chat() {
       </div>
       
       {/* Main Chat Area */}
-      <div className="flex-1 flex flex-col bg-white">
+      <div className="flex-1 flex flex-col bg-card">
         {/* Chat Header */}
-        <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-white shrink-0">
+        <div className="px-6 py-4 border-b border-border flex items-center justify-between bg-card shrink-0">
           <div className="flex items-center gap-3">
-            <h2 className="font-bold text-slate-800 text-lg tracking-tight flex items-center gap-1">
-              {activeChannel.toLowerCase() === activeChannel ? <Hash className="w-5 h-5 text-slate-400" /> : null}
+            <h2 className="font-bold text-foreground text-lg tracking-tight flex items-center gap-1">
+              {activeChannel.toLowerCase() === activeChannel ? <Hash className="w-5 h-5 text-muted-foreground" /> : null}
               {activeChannel}
             </h2>
           </div>
           
           <div className="flex items-center gap-1">
-            <button className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">
+            <button className="p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors">
               <MoreVertical className="w-5 h-5" />
             </button>
           </div>
@@ -168,14 +168,14 @@ export function Chat() {
               <img src={msg.avatar} alt={msg.sender} className="w-10 h-10 rounded-full shrink-0 shadow-sm" />
               <div className={cn("flex flex-col gap-1", msg.isMe ? "items-end" : "items-start")}>
                 <div className="flex items-baseline gap-2">
-                  <span className="font-bold text-sm text-slate-900">{msg.sender}</span>
-                  <span className="text-xs font-medium text-slate-400">{msg.time}</span>
+                  <span className="font-bold text-sm text-foreground">{msg.sender}</span>
+                  <span className="text-xs font-medium text-muted-foreground">{msg.time}</span>
                 </div>
                 <div className={cn(
                   "px-4 py-2.5 rounded-2xl text-sm leading-relaxed",
                   msg.isMe 
-                    ? "bg-indigo-600 text-white rounded-tr-none" 
-                    : "bg-slate-100 text-slate-800 rounded-tl-none"
+                    ? "bg-primary text-primary-foreground rounded-tr-none" 
+                    : "bg-muted text-foreground rounded-tl-none"
                 )}>
                   {msg.content}
                 </div>
@@ -185,9 +185,9 @@ export function Chat() {
         </div>
         
         {/* Message Input */}
-        <div className="p-4 bg-white border-t border-slate-200 shrink-0">
-          <form onSubmit={handleSend} className="relative flex items-end gap-2 bg-slate-50 border border-slate-200 rounded-xl p-2 focus-within:ring-2 focus-within:ring-indigo-500/20 focus-within:border-indigo-300 transition-all">
-            <button type="button" className="p-2 text-slate-400 hover:text-slate-600 transition-colors shrink-0">
+        <div className="p-4 bg-card border-t border-border shrink-0">
+          <form onSubmit={handleSend} className="relative flex items-end gap-2 bg-muted/20 border border-border rounded-xl p-2 focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary/50 transition-all">
+            <button type="button" className="p-2 text-muted-foreground hover:text-foreground transition-colors shrink-0">
               <Plus className="w-5 h-5" />
             </button>
             
@@ -195,7 +195,7 @@ export function Chat() {
               value={newMessage}
               onChange={e => setNewMessage(e.target.value)}
               placeholder={`Message ${activeChannel.toLowerCase() === activeChannel ? '#' : ''}${activeChannel}`}
-              className="w-full bg-transparent border-none focus:outline-none resize-none max-h-32 min-h-[2.5rem] py-2 text-sm text-slate-800"
+              className="w-full bg-transparent border-none focus:outline-none resize-none max-h-32 min-h-[2.5rem] py-2 text-sm text-foreground"
               rows={1}
               onKeyDown={e => {
                 if (e.key === 'Enter' && !e.shiftKey) {
@@ -206,23 +206,23 @@ export function Chat() {
             />
             
             <div className="flex items-center gap-1 shrink-0 pb-1">
-              <button type="button" className="p-1.5 text-slate-400 hover:text-slate-600 transition-colors hidden sm:block">
+              <button type="button" className="p-1.5 text-muted-foreground hover:text-foreground transition-colors hidden sm:block">
                 <Smile className="w-5 h-5" />
               </button>
-              <button type="button" className="p-1.5 text-slate-400 hover:text-slate-600 transition-colors hidden sm:block">
+              <button type="button" className="p-1.5 text-muted-foreground hover:text-foreground transition-colors hidden sm:block">
                 <Paperclip className="w-5 h-5" />
               </button>
               <button 
                 type="submit"
                 disabled={!newMessage.trim()}
-                className="p-1.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors ml-1"
+                className="p-1.5 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors ml-1"
               >
                 <Send className="w-4 h-4" />
               </button>
             </div>
           </form>
           <div className="text-center mt-2">
-            <span className="text-[10px] font-medium text-slate-400"><strong>Return</strong> to send, <strong>Shift + Return</strong> for new line</span>
+            <span className="text-[10px] font-medium text-muted-foreground"><strong>Return</strong> to send, <strong>Shift + Return</strong> for new line</span>
           </div>
         </div>
       </div>

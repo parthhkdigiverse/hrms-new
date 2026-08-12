@@ -151,11 +151,11 @@ export function AttendanceList() {
     <div className="h-full flex flex-col space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-black text-slate-900 tracking-tight">Daily Attendance</h1>
-          <p className="text-sm text-slate-500 mt-1">Past 7 Days</p>
+          <h1 className="text-2xl font-black text-foreground tracking-tight">Daily Attendance</h1>
+          <p className="text-sm text-muted-foreground mt-1">Past 7 Days</p>
         </div>
         <div className="flex items-center gap-3">
-          <button className="px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-700 hover:bg-slate-50 shadow-sm flex items-center gap-2">
+          <button className="px-4 py-2 bg-white border border-border rounded-xl text-sm font-bold text-foreground/80 hover:bg-muted/50 shadow-sm flex items-center gap-2">
             <Download className="w-4 h-4" /> Export
           </button>
         </div>
@@ -169,26 +169,26 @@ export function AttendanceList() {
           { label: "Late Arrivals", value: stats.late, color: "text-amber-600", bg: "bg-amber-50" },
           { label: "On Leave", value: stats.onLeave, color: "text-blue-600", bg: "bg-blue-50" },
         ].map((stat, i) => (
-          <div key={i} className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
-            <p className="text-sm font-bold text-slate-500">{stat.label}</p>
+          <div key={i} className="bg-white border border-border rounded-2xl p-5 shadow-sm">
+            <p className="text-sm font-bold text-muted-foreground">{stat.label}</p>
             <p className={cn("text-3xl font-black mt-2", stat.color)}>{stat.value}</p>
           </div>
         ))}
       </div>
 
       {/* Main Content Area */}
-      <div className="flex-1 bg-white border border-slate-200 rounded-3xl shadow-sm overflow-hidden flex flex-col">
+      <div className="flex-1 bg-white border border-border rounded-3xl shadow-sm overflow-hidden flex flex-col">
         {/* Toolbar */}
-        <div className="p-4 border-b border-slate-200 flex flex-col sm:flex-row justify-between items-center gap-4 bg-slate-50/50">
+        <div className="p-4 border-b border-border flex flex-col sm:flex-row justify-between items-center gap-4 bg-muted/50/50">
           <div className="relative w-full sm:w-72">
             <input 
               type="text" 
               placeholder="Search by name or role..." 
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-sm"
+              className="w-full pl-10 pr-4 py-2.5 bg-white border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all shadow-sm"
             />
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           </div>
           
           <div className="flex items-center gap-4 w-full sm:w-auto">
@@ -196,8 +196,8 @@ export function AttendanceList() {
               <PopoverTrigger asChild>
                 <button
                   className={cn(
-                    "flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm font-medium text-slate-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 hover:bg-slate-50 transition-colors",
-                    !dateRange && "text-slate-400"
+                    "flex items-center gap-2 px-4 py-2 bg-white border border-border rounded-xl text-sm font-medium text-foreground/80 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/20 hover:bg-muted/50 transition-colors",
+                    !dateRange && "text-muted-foreground"
                   )}
                 >
                   <CalendarIcon className="mr-1 h-4 w-4" />
@@ -235,8 +235,8 @@ export function AttendanceList() {
                   className={cn(
                     "px-4 py-2 rounded-xl text-sm font-bold whitespace-nowrap transition-all duration-200",
                     statusFilter === status 
-                      ? "bg-slate-900 text-white shadow-md" 
-                      : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 hover:text-slate-900"
+                      ? "bg-primary text-primary-foreground shadow-md" 
+                      : "bg-white text-foreground/80 border border-border hover:bg-muted/50 hover:text-foreground"
                   )}
                 >
                   {status}
@@ -249,58 +249,58 @@ export function AttendanceList() {
         {/* Table */}
         <div className="flex-1 overflow-auto">
           <table className="w-full text-left border-collapse">
-            <thead className="bg-slate-50/80 sticky top-0 z-10 backdrop-blur-sm">
+            <thead className="bg-muted/50/80 sticky top-0 z-10 backdrop-blur-sm">
               <tr>
-                <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-wider border-b border-slate-200">Employee</th>
-                <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-wider border-b border-slate-200">Date</th>
-                <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-wider border-b border-slate-200">Status</th>
-                <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-wider border-b border-slate-200">Check In</th>
-                <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-wider border-b border-slate-200">Check Out</th>
-                <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-wider border-b border-slate-200">Total Hours</th>
-                <th className="px-6 py-4 border-b border-slate-200"></th>
+                <th className="px-6 py-4 text-xs font-black text-muted-foreground uppercase tracking-wider border-b border-border">Employee</th>
+                <th className="px-6 py-4 text-xs font-black text-muted-foreground uppercase tracking-wider border-b border-border">Date</th>
+                <th className="px-6 py-4 text-xs font-black text-muted-foreground uppercase tracking-wider border-b border-border">Status</th>
+                <th className="px-6 py-4 text-xs font-black text-muted-foreground uppercase tracking-wider border-b border-border">Check In</th>
+                <th className="px-6 py-4 text-xs font-black text-muted-foreground uppercase tracking-wider border-b border-border">Check Out</th>
+                <th className="px-6 py-4 text-xs font-black text-muted-foreground uppercase tracking-wider border-b border-border">Total Hours</th>
+                <th className="px-6 py-4 border-b border-border"></th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
               {paginatedData.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-6 py-12 text-center text-slate-500">
+                  <td colSpan={7} className="px-6 py-12 text-center text-muted-foreground">
                     No attendance records found matching your filters.
                   </td>
                 </tr>
               ) : (
                 paginatedData.map((record) => (
-                  <tr key={record.employeeId} className="hover:bg-slate-50/50 transition-colors group">
+                  <tr key={record.employeeId} className="hover:bg-muted/50/50 transition-colors group">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
-                        <img src={record.avatar} alt={record.employeeName} className="w-10 h-10 rounded-full object-cover border border-slate-200" />
+                        <img src={record.avatar} alt={record.employeeName} className="w-10 h-10 rounded-full object-cover border border-border" />
                         <div>
-                          <p className="font-bold text-slate-900">{record.employeeName}</p>
-                          <p className="text-xs text-slate-500 font-medium">{record.role}</p>
+                          <p className="font-bold text-foreground">{record.employeeName}</p>
+                          <p className="text-xs text-muted-foreground font-medium">{record.role}</p>
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <span className="text-sm font-medium text-slate-700">{record.date}</span>
+                      <span className="text-sm font-medium text-foreground/80">{record.date}</span>
                     </td>
                     <td className="px-6 py-4">
                       {getStatusBadge(record.status)}
                     </td>
                     <td className="px-6 py-4">
-                      <span className="text-sm font-medium text-slate-700">{record.checkIn || "--:--"}</span>
+                      <span className="text-sm font-medium text-foreground/80">{record.checkIn || "--:--"}</span>
                     </td>
                     <td className="px-6 py-4">
-                      <span className="text-sm font-medium text-slate-700">{record.checkOut || "--:--"}</span>
+                      <span className="text-sm font-medium text-foreground/80">{record.checkOut || "--:--"}</span>
                     </td>
                     <td className="px-6 py-4">
                       <span className={cn(
                         "text-sm font-bold",
-                        record.totalHours ? "text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-md" : "text-slate-400"
+                        record.totalHours ? "text-primary bg-primary/10 px-2.5 py-1 rounded-md" : "text-muted-foreground"
                       )}>
                         {record.totalHours || "-"}
                       </span>
                     </td>
                     <td className="px-6 py-4 text-right">
-                      <button className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors opacity-0 group-hover:opacity-100">
+                      <button className="p-2 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg transition-colors opacity-0 group-hover:opacity-100">
                         <MoreHorizontal className="w-5 h-5" />
                       </button>
                     </td>
@@ -313,25 +313,25 @@ export function AttendanceList() {
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="p-4 border-t border-slate-200 bg-white flex items-center justify-between">
-            <p className="text-sm text-slate-500">
-              Showing <span className="font-bold text-slate-900">{(currentPage - 1) * itemsPerPage + 1}</span> to <span className="font-bold text-slate-900">{Math.min(currentPage * itemsPerPage, filteredData.length)}</span> of <span className="font-bold text-slate-900">{filteredData.length}</span> records
+          <div className="p-4 border-t border-border bg-white flex items-center justify-between">
+            <p className="text-sm text-muted-foreground">
+              Showing <span className="font-bold text-foreground">{(currentPage - 1) * itemsPerPage + 1}</span> to <span className="font-bold text-foreground">{Math.min(currentPage * itemsPerPage, filteredData.length)}</span> of <span className="font-bold text-foreground">{filteredData.length}</span> records
             </p>
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                 disabled={currentPage === 1}
-                className="p-2 border border-slate-200 rounded-lg text-slate-500 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="p-2 border border-border rounded-lg text-muted-foreground hover:bg-muted/50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
-              <div className="text-sm font-bold text-slate-700 px-2">
+              <div className="text-sm font-bold text-foreground/80 px-2">
                 Page {currentPage} of {totalPages}
               </div>
               <button
                 onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                 disabled={currentPage === totalPages}
-                className="p-2 border border-slate-200 rounded-lg text-slate-500 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="p-2 border border-border rounded-lg text-muted-foreground hover:bg-muted/50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 <ChevronRight className="w-4 h-4" />
               </button>

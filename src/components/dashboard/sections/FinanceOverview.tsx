@@ -18,15 +18,15 @@ export function FinanceOverview() {
             <p className="text-[26px] font-black text-rose-700 leading-none">{FINANCE_METRICS.todayExpense}</p>
           </div>
           <div className="bg-white border border-border/60 rounded-3xl p-5 shadow-sm flex flex-col justify-between col-span-2">
-            <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">Outstanding Payments</p>
-            <p className="text-3xl font-black text-slate-900">{FINANCE_METRICS.outstanding}</p>
+            <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Outstanding Payments</p>
+            <p className="text-3xl font-black text-foreground">{FINANCE_METRICS.outstanding}</p>
           </div>
           <div className="bg-white border border-border/60 rounded-3xl p-5 shadow-sm flex flex-col justify-between">
-            <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2 leading-tight">Pending Client Payments</p>
+            <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider mb-2 leading-tight">Pending Client Payments</p>
             <p className="text-[22px] font-black text-blue-500 mt-2">{FINANCE_METRICS.pendingClient}</p>
           </div>
           <div className="bg-white border border-border/60 rounded-3xl p-5 shadow-sm flex flex-col justify-between">
-            <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2 leading-tight">Pending Vendor Payments</p>
+            <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider mb-2 leading-tight">Pending Vendor Payments</p>
             <p className="text-[22px] font-black text-amber-500 mt-2">{FINANCE_METRICS.pendingVendor}</p>
           </div>
         </div>
@@ -34,8 +34,8 @@ export function FinanceOverview() {
         {/* Cash Flow */}
         <div className="bg-white border border-border/60 rounded-3xl p-6 shadow-sm">
           <div className="mb-6">
-            <h3 className="font-bold text-slate-900">Cash Flow</h3>
-            <p className="text-[11px] text-slate-500">Revenue vs expense (₹ thousands)</p>
+            <h3 className="font-bold text-foreground">Cash Flow</h3>
+            <p className="text-[11px] text-muted-foreground">Revenue vs expense (₹ thousands)</p>
           </div>
           <div className="h-[200px]">
             <ResponsiveContainer width="100%" height="100%">
@@ -64,8 +64,8 @@ export function FinanceOverview() {
         {/* Profit Trend */}
         <div className="bg-white border border-border/60 rounded-3xl p-6 shadow-sm">
           <div className="mb-6">
-            <h3 className="font-bold text-slate-900">Profit Trend</h3>
-            <p className="text-[11px] text-slate-500">Net profit per month</p>
+            <h3 className="font-bold text-foreground">Profit Trend</h3>
+            <p className="text-[11px] text-muted-foreground">Net profit per month</p>
           </div>
           <div className="h-[200px]">
             <ResponsiveContainer width="100%" height="100%">

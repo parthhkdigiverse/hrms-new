@@ -44,22 +44,22 @@ export function AddOrgNodeModal({ isOpen, onClose, onSubmit, parentName }: AddOr
   };
 
   return (
-    <div className="fixed inset-0 z-[60] overflow-y-auto bg-slate-900/50 backdrop-blur-sm animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-[60] overflow-y-auto bg-card/50 backdrop-blur-sm animate-in fade-in duration-200">
       <div className="flex min-h-full items-center justify-center p-4 text-center sm:p-6">
         <div 
           className="bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden flex flex-col text-left animate-in zoom-in-95 duration-200 relative my-auto"
           onClick={e => e.stopPropagation()}
         >
-          <div className="flex items-center justify-between px-6 py-5 border-b border-slate-100 bg-slate-50/50">
+          <div className="flex items-center justify-between px-6 py-5 border-b border-border/50 bg-muted/50/50">
             <div>
-              <h2 className="text-xl font-black text-slate-900">Add Team Member</h2>
-              <p className="text-sm text-slate-500 mt-1">
+              <h2 className="text-xl font-black text-foreground">Add Team Member</h2>
+              <p className="text-sm text-muted-foreground mt-1">
                 {parentName ? `Adding new report under ${parentName}` : 'Add a new member to the organization'}
               </p>
             </div>
             <button 
               onClick={onClose}
-              className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors"
+              className="p-2 text-muted-foreground hover:text-foreground/80 hover:bg-muted rounded-full transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
@@ -67,35 +67,35 @@ export function AddOrgNodeModal({ isOpen, onClose, onSubmit, parentName }: AddOr
 
           <form onSubmit={handleSubmit} className="p-6 space-y-4">
             <div className="space-y-2">
-              <label className="text-[12px] font-bold text-slate-700 uppercase tracking-wider">Full Name</label>
+              <label className="text-[12px] font-bold text-foreground/80 uppercase tracking-wider">Full Name</label>
               <input 
                 type="text" 
                 required
                 value={formData.name}
                 onChange={(e) => setFormData({...formData, name: e.target.value})}
-                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#00A56C]/20 focus:border-[#00A56C]/50 transition-all"
+                className="w-full px-4 py-2.5 bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#00A56C]/20 focus:border-[#00A56C]/50 transition-all"
                 placeholder="e.g. John Doe"
               />
             </div>
 
             <div className="space-y-2">
-              <label className="text-[12px] font-bold text-slate-700 uppercase tracking-wider">Job Role</label>
+              <label className="text-[12px] font-bold text-foreground/80 uppercase tracking-wider">Job Role</label>
               <input 
                 type="text" 
                 required
                 value={formData.role}
                 onChange={(e) => setFormData({...formData, role: e.target.value})}
-                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#00A56C]/20 focus:border-[#00A56C]/50 transition-all"
+                className="w-full px-4 py-2.5 bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#00A56C]/20 focus:border-[#00A56C]/50 transition-all"
                 placeholder="e.g. Senior Designer"
               />
             </div>
 
             <div className="space-y-2">
-              <label className="text-[12px] font-bold text-slate-700 uppercase tracking-wider">Department</label>
+              <label className="text-[12px] font-bold text-foreground/80 uppercase tracking-wider">Department</label>
               <select 
                 value={formData.department}
                 onChange={(e) => setFormData({...formData, department: e.target.value})}
-                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#00A56C]/20 focus:border-[#00A56C]/50 transition-all"
+                className="w-full px-4 py-2.5 bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#00A56C]/20 focus:border-[#00A56C]/50 transition-all"
               >
                 {departments.map(dept => (
                   <option key={dept} value={dept}>{dept}</option>
@@ -104,11 +104,11 @@ export function AddOrgNodeModal({ isOpen, onClose, onSubmit, parentName }: AddOr
             </div>
 
             <div className="space-y-2">
-              <label className="text-[12px] font-bold text-slate-700 uppercase tracking-wider">Status</label>
+              <label className="text-[12px] font-bold text-foreground/80 uppercase tracking-wider">Status</label>
               <select 
                 value={formData.status}
                 onChange={(e) => setFormData({...formData, status: e.target.value as 'Active' | 'On Leave' | 'Remote'})}
-                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#00A56C]/20 focus:border-[#00A56C]/50 transition-all"
+                className="w-full px-4 py-2.5 bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#00A56C]/20 focus:border-[#00A56C]/50 transition-all"
               >
                 <option value="Active">Active</option>
                 <option value="Remote">Remote</option>
@@ -120,7 +120,7 @@ export function AddOrgNodeModal({ isOpen, onClose, onSubmit, parentName }: AddOr
               <button 
                 type="button"
                 onClick={onClose}
-                className="px-6 py-2.5 text-sm font-bold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors"
+                className="px-6 py-2.5 text-sm font-bold text-foreground/80 hover:bg-muted rounded-xl transition-colors"
               >
                 Cancel
               </button>
