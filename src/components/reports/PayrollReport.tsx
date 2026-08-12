@@ -1,0 +1,159 @@
+import { IndianRupee, TrendingUp, TrendingDown, Landmark, Building2, Wallet } from "lucide-react";
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Legend, Cell, ComposedChart, Line } from 'recharts';
+
+const payrollTrend = [
+  { name: 'Jan', Base: 950000, Bonuses: 120000, Deductions: -45000 },
+  { name: 'Feb', Base: 950000, Bonuses: 90000, Deductions: -42000 },
+  { name: 'Mar', Base: 980000, Bonuses: 250000, Deductions: -50000 }, // Q1 Bonus
+  { name: 'Apr', Base: 1050000, Bonuses: 85000, Deductions: -55000 },
+  { name: 'May', Base: 1050000, Bonuses: 95000, Deductions: -52000 },
+  { name: 'Jun', Base: 1080000, Bonuses: 320000, Deductions: -58000 }, // Q2 Bonus
+];
+
+const departmentCost = [
+  { name: 'Engineering', value: 850000 },
+  { name: 'Sales', value: 350000 },
+  { name: 'Marketing', value: 200000 },
+  { name: 'HR', value: 120000 },
+  { name: 'Operations', value: 250000 },
+];
+const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899'];
+
+export function PayrollReport() {
+  return (
+    <div className="w-full max-w-7xl mx-auto space-y-8 animate-in fade-in duration-500">
+      
+      {/* Header */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+          <h1 className="text-3xl font-black tracking-tight text-foreground flex items-center gap-2">
+            <IndianRupee className="w-8 h-8 text-primary" />
+            Payroll Cost Analytics
+          </h1>
+          <p className="text-muted-foreground mt-1 text-sm font-medium">
+            Analyze HR expenses, salary distributions, and department-wise payroll costs.
+          </p>
+        </div>
+        <div className="flex items-center gap-3">
+          <select className="px-4 py-2.5 bg-card border border-border/50 text-foreground font-bold rounded-xl hover:bg-muted/50 transition-colors shadow-sm outline-none">
+            <option>Last 6 Months</option>
+            <option>This Year</option>
+            <option>Last Year</option>
+          </select>
+        </div>
+      </div>
+
+      {/* KPI Cards */}
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="bg-emerald-500/5 border border-emerald-500/20 rounded-2xl p-6 shadow-sm">
+          <div className="flex items-center justify-between mb-4">
+            <div className="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center">
+              <Landmark className="w-5 h-5" />
+            </div>
+            <span className="text-xs font-bold text-emerald-600 bg-emerald-500/10 px-2 py-1 rounded-md flex items-center gap-1">
+              <TrendingUp className="w-3 h-3" /> YTD
+            </span>
+          </div>
+          <div className="text-emerald-600 font-bold text-xs uppercase tracking-wider mb-1">Total Gross Pay</div>
+          <div className="text-3xl font-black text-emerald-700">₹ 8.24M</div>
+        </div>
+
+        <div className="bg-blue-500/5 border border-blue-500/20 rounded-2xl p-6 shadow-sm">
+          <div className="flex items-center justify-between mb-4">
+            <div className="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-600 flex items-center justify-center">
+              <Wallet className="w-5 h-5" />
+            </div>
+            <span className="text-xs font-bold text-emerald-600 bg-emerald-500/10 px-2 py-1 rounded-md flex items-center gap-1">
+              <TrendingUp className="w-3 h-3" /> YTD
+            </span>
+          </div>
+          <div className="text-blue-600 font-bold text-xs uppercase tracking-wider mb-1">Total Net Pay</div>
+          <div className="text-3xl font-black text-blue-700">₹ 7.82M</div>
+        </div>
+
+        <div className="bg-rose-500/5 border border-rose-500/20 rounded-2xl p-6 shadow-sm">
+          <div className="flex items-center justify-between mb-4">
+            <div className="w-10 h-10 rounded-xl bg-rose-500/10 text-rose-600 flex items-center justify-center">
+              <TrendingDown className="w-5 h-5" />
+            </div>
+          </div>
+          <div className="text-rose-600 font-bold text-xs uppercase tracking-wider mb-1">Total Deductions</div>
+          <div className="text-3xl font-black text-rose-700">₹ 420K</div>
+        </div>
+
+        <div className="bg-amber-500/5 border border-amber-500/20 rounded-2xl p-6 shadow-sm">
+          <div className="flex items-center justify-between mb-4">
+            <div className="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-600 flex items-center justify-center">
+              <TrendingUp className="w-5 h-5" />
+            </div>
+          </div>
+          <div className="text-amber-600 font-bold text-xs uppercase tracking-wider mb-1">Total Bonuses</div>
+          <div className="text-3xl font-black text-amber-700">₹ 960K</div>
+        </div>
+      </div>
+
+      {/* Charts Grid */}
+      <div className="grid gap-6 lg:grid-cols-3">
+        
+        {/* Payroll Trend */}
+        <div className="bg-card border border-border/50 rounded-3xl p-6 shadow-sm lg:col-span-2">
+          <h3 className="font-bold flex items-center gap-2 mb-6">
+            <IndianRupee className="w-5 h-5 text-primary" />
+            Payroll Cost Breakdown (Monthly)
+          </h3>
+          <div className="h-[350px] w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <ComposedChart data={payrollTrend} margin={{ top: 20, right: 30, left: 10, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" opacity={0.5} />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }} dy={10} />
+                <YAxis 
+                  axisLine={false} 
+                  tickLine={false} 
+                  tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }} 
+                  tickFormatter={(val) => `₹${(val / 1000).toFixed(0)}k`}
+                />
+                <Tooltip 
+                  cursor={{ fill: 'hsl(var(--muted)/0.5)' }}
+                  contentStyle={{ backgroundColor: 'hsl(var(--card))', borderColor: 'hsl(var(--border))', borderRadius: '12px', color: 'hsl(var(--foreground))' }}
+                />
+                <Legend wrapperStyle={{ paddingTop: '20px' }} />
+                <Bar dataKey="Base" stackId="a" fill="hsl(var(--primary))" radius={[0, 0, 4, 4]} />
+                <Bar dataKey="Bonuses" stackId="a" fill="#10b981" radius={[4, 4, 0, 0]} />
+                <Line type="monotone" dataKey="Deductions" stroke="#ef4444" strokeWidth={3} dot={{ r: 4 }} />
+              </ComposedChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* Dept Breakdown */}
+        <div className="bg-card border border-border/50 rounded-3xl p-6 shadow-sm">
+          <h3 className="font-bold flex items-center gap-2 mb-6">
+            <Building2 className="w-5 h-5 text-blue-500" />
+            Cost by Department
+          </h3>
+          <div className="h-[350px] w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={departmentCost} layout="vertical" margin={{ top: 0, right: 20, left: 10, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="hsl(var(--border))" opacity={0.3} />
+                <XAxis type="number" hide />
+                <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: 'hsl(var(--foreground))', fontWeight: 'bold' }} width={80} />
+                <Tooltip 
+                  cursor={{ fill: 'hsl(var(--muted)/0.5)' }}
+                  contentStyle={{ backgroundColor: 'hsl(var(--card))', borderColor: 'hsl(var(--border))', borderRadius: '12px', color: 'hsl(var(--foreground))' }}
+                  formatter={(value: number) => [`₹ ${value.toLocaleString()}`, 'Cost']}
+                />
+                <Bar dataKey="value" radius={[0, 6, 6, 0]} barSize={24}>
+                  {departmentCost.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  );
+}

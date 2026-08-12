@@ -51,6 +51,11 @@ import { CreateInvoice } from "@/components/invoice/CreateInvoice";
 import { CreateProforma } from "@/components/invoice/CreateProforma";
 import { InvoiceLedger } from "@/components/invoice/InvoiceLedger";
 import { InvoiceApprovals } from "@/components/approvals/InvoiceApprovals";
+import { ReportsOverview } from "@/components/reports/ReportsOverview";
+import { AttendanceReport } from "@/components/reports/AttendanceReport";
+import { PayrollReport } from "@/components/reports/PayrollReport";
+import { HiringFunnel } from "@/components/reports/HiringFunnel";
+import { WorkReport } from "@/components/reports/WorkReport";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -168,6 +173,13 @@ function Index() {
         {active === "/invoice/create" && <CreateInvoice onBack={() => setActive("/invoice/all")} />}
         {active === "/invoice/proforma" && <CreateProforma onBack={() => setActive("/invoice/all")} />}
 
+        {/* Reports */}
+        {active === "/reports" && <ReportsOverview />}
+        {active === "/reports/attendance" && <AttendanceReport />}
+        {active === "/reports/payroll" && <PayrollReport />}
+        {active === "/reports/hiring" && <HiringFunnel />}
+        {active === "/reports/work" && <WorkReport />}
+
         {/* Recruitment */}
         {active === "/recruitment/interviews" && <Interviews />}
         {active === "/recruitment/hirings" && <Hirings />}
@@ -191,7 +203,7 @@ function Index() {
         {active === "/activity-logs" && <ActivityLogs />}
 
         {/* Fallback original content for all other items */}
-        {active !== "/dashboard" && active !== "/schedule" && active !== "/work/logs" && active !== "/work/projects" && active !== "/tasks" && active !== "/chat" && active !== "/work/research" && active !== "/penalty" && active !== "/approvals/penalties" && active !== "/remarks" && active !== "/activity-logs" && !active.startsWith("/work/sales") && !active.startsWith("/payroll") && !active.startsWith("/employees") && !active.startsWith("/recruitment") && !active.startsWith("/workspace") && !active.startsWith("/approvals") && !active.startsWith("/invoice") && (
+        {active !== "/dashboard" && active !== "/schedule" && active !== "/work/logs" && active !== "/work/projects" && active !== "/tasks" && active !== "/chat" && active !== "/work/research" && active !== "/penalty" && active !== "/approvals/penalties" && active !== "/remarks" && active !== "/activity-logs" && !active.startsWith("/work/sales") && !active.startsWith("/payroll") && !active.startsWith("/employees") && !active.startsWith("/recruitment") && !active.startsWith("/workspace") && !active.startsWith("/approvals") && !active.startsWith("/invoice") && !active.startsWith("/reports") && (
           <>
             <header className="mb-8 max-w-3xl">
               <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
