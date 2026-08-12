@@ -162,15 +162,7 @@ export const navItems: NavItem[] = [
   },
   { title: "Tasks", url: "/tasks", icon: ClipboardList, section: "Work" },
   { title: "Chat", url: "/chat", icon: MessagesSquare, section: "Work", badge: 3 },
-  {
-    title: "Documents",
-    icon: Files,
-    section: "Work",
-    children: [
-      { title: "Employee Documents", url: "/documents/employee" },
-      { title: "Document Generator", url: "/documents/generator" },
-    ],
-  },
+
   {
     title: "Workspace",
     icon: MonitorPlay,
