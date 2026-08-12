@@ -42,6 +42,8 @@ import { ActivityLogs } from "@/components/admin/ActivityLogs";
 import { SeatingArrangement } from "@/components/workspace/SeatingArrangement";
 import { ResourceManagement } from "@/components/workspace/ResourceManagement";
 import { Gallery } from "@/components/workspace/Gallery";
+import { Documents } from "@/components/documents/Documents";
+import { DocumentGenerator } from "@/components/documents/DocumentGenerator";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -145,6 +147,8 @@ function Index() {
         {active === "/employees/org" && <OrgStructure />}
         {active === "/employees/attendance" && <AttendanceList />}
         {active === "/employees/leave-requests" && <LeaveRequests />}
+        {active === "/employees/documents" && <Documents setActive={setActive} />}
+        {active === "/employees/documents/generate" && <DocumentGenerator onBack={() => setActive("/employees/documents")} />}
         {(active === "/penalty" || active === "/approvals/penalties") && <Penalties />}
         {active === "/remarks" && <Remarks />}
 

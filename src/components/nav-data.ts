@@ -86,6 +86,7 @@ export const navItems: NavItem[] = [
       { title: "Org Structure", url: "/employees/org" },
       { title: "Attendance List", url: "/employees/attendance" },
       { title: "Leave Requests", url: "/employees/leave-requests", badge: 4 },
+      { title: "Documents", url: "/employees/documents" },
     ],
   },
   {
