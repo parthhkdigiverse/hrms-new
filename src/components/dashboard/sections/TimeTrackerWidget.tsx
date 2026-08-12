@@ -1,6 +1,33 @@
 import { useState, useEffect } from "react";
 import { Clock, Coffee, LogIn, LogOut, CheckCircle2 } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
+
+const CATEGORIES = ["Today's Work", "Upcoming Work", "Research", "Activity", "Meeting"];
+
+type Task = { id: string, title: string, date?: string, isCustom?: boolean };
+const MOCK_TASKS_DATA: Record<string, Task[]> = {
+  "Today's Work": [
+    { id: "1", title: "make feedback forms" },
+    { id: "2", title: "HRMS UI", date: "2026-08-08", isCustom: true },
+    { id: "3", title: "create super admin panel and discuss about it", date: "2026-08-08" },
+    { id: "4", title: "Wifi ip block issue solved", date: "2026-08-10" },
+  ],
+  "Upcoming Work": [
+    { id: "5", title: "Prepare Q4 Marketing Strategy" },
+    { id: "6", title: "Team Performance Reviews", date: "2026-08-15" }
+  ],
+  "Research": [
+    { id: "7", title: "Competitor Analysis: Acme Corp" }
+  ],
+  "Activity": [
+    { id: "8", title: "Code Review: PR #1042" }
+  ],
+  "Meeting": [
+    { id: "9", title: "Client Sync: TechNova" },
+    { id: "10", title: "Daily Standup" }
+  ]
+};
 
 type PunchStatus = "Punched Out" | "Punched In" | "On Break";
 
@@ -10,6 +37,13 @@ export function TimeTrackerWidget() {
   const [breakSeconds, setBreakSeconds] = useState(0);
   const [punchInTime, setPunchInTime] = useState<string | null>(null);
   const [punchOutTime, setPunchOutTime] = useState<string | null>(null);
+  const [isPunchInModalOpen, setIsPunchInModalOpen] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<string>(CATEGORIES[0] || "Today's Work");
+  const [selectedTask, setSelectedTask] = useState("");
+  const [isAddingCustom, setIsAddingCustom] = useState(false);
+  const [customTask, setCustomTask] = useState("");
+  const [activeTask, setActiveTask] = useState<string | null>(null);
+  const [activeTaskSeconds, setActiveTaskSeconds] = useState(0);
 
   // Simulated timer
   useEffect(() => {
@@ -18,6 +52,7 @@ export function TimeTrackerWidget() {
     if (status === "Punched In") {
       interval = setInterval(() => {
         setWorkSeconds(s => s + 1);
+        setActiveTaskSeconds(s => s + 1);
       }, 1000);
     } else if (status === "On Break") {
       interval = setInterval(() => {
@@ -38,13 +73,29 @@ export function TimeTrackerWidget() {
   const handlePunch = () => {
     const timeString = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     if (status === "Punched Out") {
-      setStatus("Punched In");
-      if (!punchInTime) {
-        setPunchInTime(timeString);
-      }
+      setIsPunchInModalOpen(true);
     } else {
       setStatus("Punched Out");
       setPunchOutTime(timeString);
+      setActiveTask(null);
+    }
+  };
+
+  const confirmPunchIn = () => {
+    const timeString = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    
+    // Ensure we have a valid task before punching in
+    const finalTask = customTask.trim() || selectedTask;
+    if (!finalTask) return;
+
+    setIsPunchInModalOpen(false);
+    setStatus("Punched In");
+    if (finalTask !== activeTask) {
+      setActiveTaskSeconds(0);
+    }
+    setActiveTask(finalTask);
+    if (!punchInTime) {
+      setPunchInTime(timeString);
     }
   };
 
@@ -103,15 +154,25 @@ export function TimeTrackerWidget() {
 
         {/* Timers & Times */}
         <div className="flex items-center gap-8 px-8 border-x border-border/50">
-          <div className="flex gap-8">
-            <div>
-              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Work Hours</p>
-              <p className="text-3xl font-black font-mono text-foreground">{formatTime(workSeconds)}</p>
+          <div className="flex flex-col justify-center">
+            <div className="flex gap-8">
+              <div>
+                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Work Hours</p>
+                <p className="text-3xl font-black font-mono text-foreground">{formatTime(workSeconds)}</p>
+              </div>
+              <div>
+                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Break Hours</p>
+                <p className="text-3xl font-black font-mono text-muted-foreground">{formatTime(breakSeconds)}</p>
+              </div>
             </div>
-            <div>
-              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Break Hours</p>
-              <p className="text-3xl font-black font-mono text-muted-foreground">{formatTime(breakSeconds)}</p>
-            </div>
+            {activeTask && status !== "Punched Out" && (
+              <div className="flex items-center gap-2 mt-3 pt-2 border-t border-border/40">
+                <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></div>
+                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Task:</span>
+                <span className="text-xs font-bold text-foreground truncate max-w-[150px]">{activeTask}</span>
+                <span className="text-xs font-mono font-bold text-primary ml-auto">{formatTime(activeTaskSeconds)}</span>
+              </div>
+            )}
           </div>
           <div className="hidden lg:flex flex-col gap-2 pl-8 border-l border-border/50">
             <div>
@@ -161,6 +222,123 @@ export function TimeTrackerWidget() {
         </div>
 
       </div>
+
+      <Dialog open={isPunchInModalOpen} onOpenChange={setIsPunchInModalOpen}>
+        <DialogContent className="sm:max-w-[650px] p-0 overflow-hidden bg-background border-border shadow-xl">
+          <div className="p-6 pb-4 bg-card">
+            <DialogHeader>
+              <DialogTitle className="text-2xl font-black text-foreground tracking-tight">Update Activity</DialogTitle>
+              <p className="text-sm text-muted-foreground mt-1.5 font-medium">What will you be working on right now?</p>
+            </DialogHeader>
+          </div>
+
+          {/* Categories */}
+          <div className="px-6 border-b border-border bg-card">
+            <div className="flex gap-2 overflow-x-auto hide-scrollbar pb-4">
+              {CATEGORIES.map(cat => (
+                <button
+                  key={cat}
+                  onClick={() => {
+                    setSelectedCategory(cat);
+                    setIsAddingCustom(false);
+                  }}
+                  className={cn(
+                    "px-4 py-2 rounded-full text-sm font-bold whitespace-nowrap transition-all duration-300",
+                    selectedCategory === cat 
+                      ? "bg-primary text-primary-foreground shadow-md shadow-primary/20" 
+                      : "bg-transparent text-foreground/80 hover:bg-muted/60"
+                  )}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Tasks */}
+          <div className="p-6 bg-muted/30">
+            <h3 className="text-sm font-bold text-foreground mb-4">Select Task</h3>
+            <div className="flex flex-col gap-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+              {MOCK_TASKS_DATA[selectedCategory]?.map((task: Task) => (
+                <button
+                  key={task.id}
+                  onClick={() => {
+                    setSelectedTask(task.title);
+                    setIsAddingCustom(false);
+                    setCustomTask("");
+                  }}
+                  className={cn(
+                    "w-full flex items-center justify-between text-left px-5 py-4 rounded-2xl border transition-all duration-300 group",
+                    selectedTask === task.title && !isAddingCustom
+                      ? "border-primary bg-primary/5 shadow-[0_4px_20px_rgba(0,165,108,0.08)] ring-1 ring-primary/20" 
+                      : "border-border/60 bg-card hover:border-primary/40 hover:shadow-sm"
+                  )}
+                >
+                  <div className="flex items-center gap-3">
+                    <span className={cn(
+                      "font-bold text-sm",
+                      selectedTask === task.title && !isAddingCustom ? "text-primary" : "text-foreground"
+                    )}>
+                      {task.title}
+                    </span>
+                    {task.date && (
+                      <span className="text-[10px] font-bold px-2 py-1 rounded-md bg-rose-50 text-rose-500">
+                        {task.date}
+                      </span>
+                    )}
+                  </div>
+                  {task.isCustom && (
+                    <span className="text-[11px] font-medium text-muted-foreground bg-muted px-2 py-1 rounded-md">
+                      Custom Task
+                    </span>
+                  )}
+                </button>
+              ))}
+
+              {!isAddingCustom ? (
+                <button
+                  onClick={() => {
+                    setIsAddingCustom(true);
+                    setSelectedTask("");
+                  }}
+                  className="w-full text-left px-5 py-4 rounded-2xl border border-dashed border-primary/50 text-primary bg-primary/5 hover:bg-primary/10 transition-colors font-bold text-sm"
+                >
+                  + Add Custom Work (Not Listed)
+                </button>
+              ) : (
+                <div className="w-full px-5 py-4 rounded-2xl border border-primary ring-1 ring-primary/20 bg-card shadow-sm animate-in fade-in slide-in-from-top-2 duration-300">
+                  <p className="text-[11px] font-bold text-primary uppercase tracking-widest mb-2">New Custom Task</p>
+                  <input
+                    type="text"
+                    autoFocus
+                    placeholder="E.g. Brainstorming new logo ideas..."
+                    value={customTask}
+                    onChange={(e) => setCustomTask(e.target.value)}
+                    className="w-full bg-transparent text-sm font-bold text-foreground placeholder:text-muted-foreground focus:outline-none"
+                  />
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Footer */}
+          <div className="p-5 border-t border-border bg-card flex justify-end items-center gap-3">
+            <button
+              onClick={() => setIsPunchInModalOpen(false)}
+              className="px-6 py-2.5 rounded-xl font-bold text-sm text-foreground/70 hover:bg-muted transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={confirmPunchIn}
+              disabled={(!selectedTask && !customTask.trim())}
+              className="px-6 py-2.5 bg-primary text-primary-foreground font-bold text-sm rounded-xl shadow-md hover:bg-primary/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Save & Punch In
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
