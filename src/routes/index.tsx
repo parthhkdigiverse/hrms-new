@@ -35,6 +35,7 @@ import { WorkLogs } from "@/components/work/WorkLogs";
 import { Tasks } from "@/components/work/Tasks";
 import { Chat } from "@/components/work/Chat";
 import { Research } from "@/components/work/Research";
+import { Projects } from "@/components/work/Projects";
 import { Penalties } from "@/components/employees/Penalties";
 import { Remarks } from "@/components/employees/Remarks";
 import { ActivityLogs } from "@/components/admin/ActivityLogs";
@@ -153,6 +154,7 @@ function Index() {
 
         {/* Work */}
         {active === "/work/logs" && <WorkLogs />}
+        {active === "/work/projects" && <Projects />}
         {active === "/tasks" && <Tasks />}
         {active === "/chat" && <Chat />}
         {active === "/work/research" && <Research />}
@@ -161,7 +163,7 @@ function Index() {
         {active === "/activity-logs" && <ActivityLogs />}
 
         {/* Fallback original content for all other items */}
-        {active !== "/dashboard" && active !== "/schedule" && active !== "/work/logs" && active !== "/tasks" && active !== "/chat" && active !== "/work/research" && active !== "/penalty" && active !== "/approvals/penalties" && active !== "/remarks" && active !== "/activity-logs" && !active.startsWith("/work/sales") && !active.startsWith("/payroll") && !active.startsWith("/employees") && !active.startsWith("/recruitment") && (
+        {active !== "/dashboard" && active !== "/schedule" && active !== "/work/logs" && active !== "/work/projects" && active !== "/tasks" && active !== "/chat" && active !== "/work/research" && active !== "/penalty" && active !== "/approvals/penalties" && active !== "/remarks" && active !== "/activity-logs" && !active.startsWith("/work/sales") && !active.startsWith("/payroll") && !active.startsWith("/employees") && !active.startsWith("/recruitment") && (
           <>
             <header className="mb-8 max-w-3xl">
               <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
