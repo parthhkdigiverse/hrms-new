@@ -1,0 +1,300 @@
+import { useState } from "react";
+import { Search, Plus, Filter, Clock, CheckCircle2, XCircle, MoreHorizontal, FileText, ScrollText } from "lucide-react";
+import { format } from "date-fns";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { toast } from "sonner";
+import { cn } from "@/lib/utils";
+
+type WorkLog = {
+  id: string;
+  employee: string;
+  avatar: string;
+  date: string;
+  project: string;
+  task: string;
+  hours: number;
+  status: "Approved" | "Pending" | "Rejected";
+  description: string;
+};
+
+const MOCK_LOGS: WorkLog[] = [
+  { id: "1", employee: "Sarah Connor", avatar: "https://i.pravatar.cc/150?u=sarah", date: "2026-08-12", project: "Mobile App Redesign", task: "UI Mockups", hours: 4.5, status: "Approved", description: "Completed initial wireframes for onboarding." },
+  { id: "2", employee: "John Doe", avatar: "https://i.pravatar.cc/150?u=john", date: "2026-08-12", project: "Backend API", task: "Database Migration", hours: 6, status: "Pending", description: "Started migration scripts for user table." },
+  { id: "3", employee: "Emily Chen", avatar: "https://i.pravatar.cc/150?u=emily", date: "2026-08-11", project: "Marketing Site", task: "SEO Optimization", hours: 3, status: "Approved", description: "Updated meta tags and alt text across all pages." },
+  { id: "4", employee: "Michael Brown", avatar: "https://i.pravatar.cc/150?u=michael", date: "2026-08-11", project: "Mobile App Redesign", task: "Bug Fixing", hours: 2.5, status: "Rejected", description: "Fixed login screen crash." },
+];
+
+export function WorkLogs() {
+  const [logs, setLogs] = useState(MOCK_LOGS);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isLogTimeOpen, setIsLogTimeOpen] = useState(false);
+  
+  // New Log Form State
+  const [newDate, setNewDate] = useState(format(new Date(), "yyyy-MM-dd"));
+  const [newProject, setNewProject] = useState("");
+  const [newTask, setNewTask] = useState("");
+  const [newHours, setNewHours] = useState("");
+  const [newDescription, setNewDescription] = useState("");
+
+  const handleLogTime = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newDate || !newProject || !newHours) {
+      toast.error("Please fill all required fields");
+      return;
+    }
+    
+    const newLog: WorkLog = {
+      id: Math.random().toString(36).substr(2, 9),
+      employee: "Alex Johnson (You)",
+      avatar: "https://i.pravatar.cc/150?u=alex",
+      date: newDate,
+      project: newProject,
+      task: newTask || "General",
+      hours: parseFloat(newHours),
+      status: "Pending",
+      description: newDescription,
+    };
+    
+    setLogs([newLog, ...logs]);
+    setIsLogTimeOpen(false);
+    toast.success("Time logged successfully!");
+    
+    // Reset form
+    setNewProject("");
+    setNewTask("");
+    setNewHours("");
+    setNewDescription("");
+  };
+
+  const filteredLogs = logs.filter(log => 
+    log.employee.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    log.project.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    log.task.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const totalHours = logs.reduce((sum, log) => sum + log.hours, 0);
+  const pendingCount = logs.filter(l => l.status === "Pending").length;
+
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Work Logs</h1>
+          <p className="text-sm text-slate-500 mt-1">Track and manage employee time and activities</p>
+        </div>
+        
+        <div className="flex items-center gap-3 w-full sm:w-auto">
+          <div className="relative flex-1 sm:w-64">
+            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+            <input 
+              type="text" 
+              placeholder="Search logs..." 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-9 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+            />
+          </div>
+          
+          <button className="px-3 py-2 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 rounded-xl flex items-center gap-2 transition-colors shrink-0">
+            <Filter className="w-4 h-4" />
+            <span className="text-sm font-bold hidden sm:inline">Filter</span>
+          </button>
+          
+          <Dialog open={isLogTimeOpen} onOpenChange={setIsLogTimeOpen}>
+            <DialogTrigger asChild>
+              <button className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold rounded-xl flex items-center gap-2 transition-colors shadow-sm shrink-0">
+                <Plus className="w-4 h-4" />
+                <span className="hidden sm:inline">Log Time</span>
+              </button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Log Time</DialogTitle>
+              </DialogHeader>
+              <form onSubmit={handleLogTime} className="space-y-4 pt-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-bold text-slate-700">Date</label>
+                  <input 
+                    type="date" 
+                    required
+                    value={newDate}
+                    onChange={e => setNewDate(e.target.value)}
+                    className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-sm font-bold text-slate-700">Project</label>
+                    <input 
+                      type="text" 
+                      placeholder="e.g. Mobile App"
+                      required
+                      value={newProject}
+                      onChange={e => setNewProject(e.target.value)}
+                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-bold text-slate-700">Hours</label>
+                    <input 
+                      type="number" 
+                      step="0.1"
+                      min="0.1"
+                      max="24"
+                      placeholder="e.g. 4.5"
+                      required
+                      value={newHours}
+                      onChange={e => setNewHours(e.target.value)}
+                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-bold text-slate-700">Task</label>
+                  <input 
+                    type="text" 
+                    placeholder="e.g. Bug Fixing"
+                    value={newTask}
+                    onChange={e => setNewTask(e.target.value)}
+                    className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-bold text-slate-700">Description</label>
+                  <textarea 
+                    rows={3}
+                    placeholder="What did you work on?"
+                    value={newDescription}
+                    onChange={e => setNewDescription(e.target.value)}
+                    className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 resize-none"
+                  />
+                </div>
+                <div className="pt-4 flex justify-end gap-3">
+                  <button 
+                    type="button" 
+                    onClick={() => setIsLogTimeOpen(false)}
+                    className="px-4 py-2 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 font-bold text-sm rounded-xl transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button 
+                    type="submit"
+                    className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-xl transition-colors"
+                  >
+                    Save Log
+                  </button>
+                </div>
+              </form>
+            </DialogContent>
+          </Dialog>
+        </div>
+      </div>
+
+      {/* Stats */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="bg-white p-5 rounded-2xl border border-slate-200 flex items-center justify-between">
+          <div>
+            <p className="text-sm font-bold text-slate-500 mb-1">Total Hours Logged</p>
+            <p className="text-3xl font-black text-slate-900">{totalHours}h</p>
+          </div>
+          <div className="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center">
+            <Clock className="w-6 h-6 text-indigo-600" />
+          </div>
+        </div>
+        <div className="bg-white p-5 rounded-2xl border border-slate-200 flex items-center justify-between">
+          <div>
+            <p className="text-sm font-bold text-slate-500 mb-1">Pending Approvals</p>
+            <p className="text-3xl font-black text-amber-600">{pendingCount}</p>
+          </div>
+          <div className="w-12 h-12 bg-amber-50 rounded-xl flex items-center justify-center">
+            <Clock className="w-6 h-6 text-amber-600" />
+          </div>
+        </div>
+        <div className="bg-white p-5 rounded-2xl border border-slate-200 flex items-center justify-between">
+          <div>
+            <p className="text-sm font-bold text-slate-500 mb-1">Approved Logs</p>
+            <p className="text-3xl font-black text-emerald-600">{logs.length - pendingCount}</p>
+          </div>
+          <div className="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center">
+            <CheckCircle2 className="w-6 h-6 text-emerald-600" />
+          </div>
+        </div>
+      </div>
+
+      {/* Logs Table */}
+      <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead className="bg-slate-50 border-b border-slate-200">
+              <tr>
+                <th className="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Employee</th>
+                <th className="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Date & Time</th>
+                <th className="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Project / Task</th>
+                <th className="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Description</th>
+                <th className="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Status</th>
+                <th className="px-6 py-4 text-right text-xs font-bold text-slate-500 uppercase tracking-wider">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {filteredLogs.map((log) => (
+                <tr key={log.id} className="hover:bg-slate-50/50 transition-colors group">
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="flex items-center gap-3">
+                      <img src={log.avatar} alt={log.employee} className="w-9 h-9 rounded-full object-cover border-2 border-white shadow-sm" />
+                      <div className="font-bold text-slate-900 text-sm">{log.employee}</div>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm font-semibold text-slate-900">{format(new Date(log.date), "MMM d, yyyy")}</div>
+                    <div className="text-xs font-medium text-slate-500 flex items-center gap-1 mt-0.5">
+                      <Clock className="w-3 h-3" /> {log.hours} hours
+                    </div>
+                  </td>
+                  <td className="px-6 py-4">
+                    <div className="text-sm font-bold text-indigo-600">{log.project}</div>
+                    <div className="text-xs font-medium text-slate-500 flex items-center gap-1 mt-0.5">
+                      <FileText className="w-3 h-3" /> {log.task}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4">
+                    <div className="text-sm text-slate-600 line-clamp-2 max-w-xs">{log.description}</div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span className={cn(
+                      "px-2.5 py-1 rounded-full text-xs font-bold flex items-center gap-1.5 w-fit",
+                      log.status === "Approved" && "bg-emerald-50 text-emerald-700",
+                      log.status === "Pending" && "bg-amber-50 text-amber-700",
+                      log.status === "Rejected" && "bg-rose-50 text-rose-700"
+                    )}>
+                      {log.status === "Approved" && <CheckCircle2 className="w-3.5 h-3.5" />}
+                      {log.status === "Pending" && <Clock className="w-3.5 h-3.5" />}
+                      {log.status === "Rejected" && <XCircle className="w-3.5 h-3.5" />}
+                      {log.status}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <button className="p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors">
+                      <MoreHorizontal className="w-5 h-5" />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+              
+              {filteredLogs.length === 0 && (
+                <tr>
+                  <td colSpan={6} className="px-6 py-12 text-center">
+                    <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-slate-100 mb-4">
+                      <ScrollText className="w-6 h-6 text-slate-400" />
+                    </div>
+                    <h3 className="text-sm font-bold text-slate-900">No logs found</h3>
+                    <p className="text-sm text-slate-500 mt-1">Try adjusting your search or filters.</p>
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+}

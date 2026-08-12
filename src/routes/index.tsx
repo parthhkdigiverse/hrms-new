@@ -31,6 +31,9 @@ import { SettingsProvider } from "@/components/payroll/SettingsContext";
 import { Interviews } from "@/components/recruitment/Interviews";
 import { Hirings } from "@/components/recruitment/Hirings";
 import { Schedule } from "@/components/schedule/Schedule";
+import { WorkLogs } from "@/components/work/WorkLogs";
+import { Tasks } from "@/components/work/Tasks";
+import { Chat } from "@/components/work/Chat";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -142,8 +145,13 @@ function Index() {
         {/* Schedule */}
         {active === "/schedule" && <Schedule />}
 
+        {/* Work */}
+        {active === "/work/logs" && <WorkLogs />}
+        {active === "/tasks" && <Tasks />}
+        {active === "/chat" && <Chat />}
+
         {/* Fallback original content for all other items */}
-        {active !== "/dashboard" && active !== "/schedule" && !active.startsWith("/work/sales") && !active.startsWith("/payroll") && !active.startsWith("/employees") && !active.startsWith("/recruitment") && (
+        {active !== "/dashboard" && active !== "/schedule" && active !== "/work/logs" && active !== "/tasks" && active !== "/chat" && !active.startsWith("/work/sales") && !active.startsWith("/payroll") && !active.startsWith("/employees") && !active.startsWith("/recruitment") && (
           <>
             <header className="mb-8 max-w-3xl">
               <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
