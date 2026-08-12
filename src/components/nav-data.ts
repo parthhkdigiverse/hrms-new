@@ -180,7 +180,6 @@ export const navItems: NavItem[] = [
       { title: "Seating Arrangement", url: "/workspace/seating" },
       { title: "Resource Management", url: "/workspace/resources" },
       { title: "Gallery", url: "/workspace/gallery" },
-      { title: "Assets", url: "/workspace/assets" },
     ],
   },
   { title: "Penalty", url: "/penalty", icon: MessageSquareWarning, section: "Workplace" },

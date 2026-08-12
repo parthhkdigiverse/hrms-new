@@ -39,6 +39,9 @@ import { Projects } from "@/components/work/Projects";
 import { Penalties } from "@/components/employees/Penalties";
 import { Remarks } from "@/components/employees/Remarks";
 import { ActivityLogs } from "@/components/admin/ActivityLogs";
+import { SeatingArrangement } from "@/components/workspace/SeatingArrangement";
+import { ResourceManagement } from "@/components/workspace/ResourceManagement";
+import { Gallery } from "@/components/workspace/Gallery";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -159,11 +162,16 @@ function Index() {
         {active === "/chat" && <Chat />}
         {active === "/work/research" && <Research />}
 
+        {/* Workspace */}
+        {active === "/workspace/seating" && <SeatingArrangement />}
+        {active === "/workspace/resources" && <ResourceManagement />}
+        {active === "/workspace/gallery" && <Gallery />}
+
         {/* Admin */}
         {active === "/activity-logs" && <ActivityLogs />}
 
         {/* Fallback original content for all other items */}
-        {active !== "/dashboard" && active !== "/schedule" && active !== "/work/logs" && active !== "/work/projects" && active !== "/tasks" && active !== "/chat" && active !== "/work/research" && active !== "/penalty" && active !== "/approvals/penalties" && active !== "/remarks" && active !== "/activity-logs" && !active.startsWith("/work/sales") && !active.startsWith("/payroll") && !active.startsWith("/employees") && !active.startsWith("/recruitment") && (
+        {active !== "/dashboard" && active !== "/schedule" && active !== "/work/logs" && active !== "/work/projects" && active !== "/tasks" && active !== "/chat" && active !== "/work/research" && active !== "/penalty" && active !== "/approvals/penalties" && active !== "/remarks" && active !== "/activity-logs" && !active.startsWith("/work/sales") && !active.startsWith("/payroll") && !active.startsWith("/employees") && !active.startsWith("/recruitment") && !active.startsWith("/workspace") && (
           <>
             <header className="mb-8 max-w-3xl">
               <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">

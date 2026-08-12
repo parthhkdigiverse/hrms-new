@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Search, Plus, Filter, MoreHorizontal, LayoutGrid, List, Briefcase, Calendar, Clock, Star, Circle, Trash2, Edit2, Archive, ArrowLeft, Users, DollarSign, FolderGit2, CheckCircle2 } from "lucide-react";
+import { Search, Plus, Filter, MoreHorizontal, LayoutGrid, List, Briefcase, Calendar, Clock, Star, Circle, Trash2, Edit2, Archive, ArrowLeft, Users, DollarSign, FolderGit2, CheckCircle2, Settings2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
@@ -229,8 +229,8 @@ export function Projects() {
   const [newProjectName, setNewProjectName] = useState("");
   const [newProjectBudget, setNewProjectBudget] = useState("");
   const [newProjectCategory, setNewProjectCategory] = useState("");
-  const [isAddingCategory, setIsAddingCategory] = useState(false);
-  const [newCategoryInput, setNewCategoryInput] = useState("");
+  const [isManageCategoriesModalOpen, setIsManageCategoriesModalOpen] = useState(false);
+  const [newCategoryName, setNewCategoryName] = useState("");
 
   const [editingProject, setEditingProject] = useState<Project | null>(null);
 
@@ -290,27 +290,29 @@ export function Projects() {
   };
 
   const handleAddCategory = () => {
-    if (newCategoryInput.trim() && !categories.includes(newCategoryInput.trim())) {
-      setCategories([...categories, newCategoryInput.trim()]);
-      setNewProjectCategory(newCategoryInput.trim());
+    if (newCategoryName.trim() && !categories.includes(newCategoryName.trim())) {
+      setCategories([...categories, newCategoryName.trim()]);
+      setNewCategoryName("");
     }
-    setIsAddingCategory(false);
-    setNewCategoryInput("");
   };
 
-  const handleDeleteCategory = () => {
-    if (categories.length <= 1) return; // Prevent deleting the last category
+  const handleDeleteCategory = (categoryToDelete: string) => {
+    if (categories.length <= 1) {
+      alert("Cannot delete the last category.");
+      return;
+    }
     
-    // We shouldn't delete categories that are currently in use by projects
-    const isCategoryInUse = projects.some(p => p.category === newProjectCategory);
+    const isCategoryInUse = projects.some(p => p.category === categoryToDelete);
     if (isCategoryInUse) {
       alert("Cannot delete this category because it is currently in use by a project.");
       return;
     }
 
-    const newCategories = categories.filter(c => c !== newProjectCategory);
+    const newCategories = categories.filter(c => c !== categoryToDelete);
     setCategories(newCategories);
-    setNewProjectCategory(newCategories[0] || "");
+    if (newProjectCategory === categoryToDelete) {
+      setNewProjectCategory(newCategories[0] || "");
+    }
   };
 
   const getStatusColor = (status: ProjectStatus) => {
@@ -713,63 +715,29 @@ export function Projects() {
                 />
               </div>
               <div>
-                <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Category</label>
-                {!isAddingCategory ? (
-                  <div className="flex gap-2">
-                    <select 
-                      value={newProjectCategory}
-                      onChange={(e) => setNewProjectCategory(e.target.value)}
-                      className={cn(
-                        "w-full px-4 py-3 bg-muted/50 border border-border/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium appearance-none",
-                        !newProjectCategory && "text-muted-foreground"
-                      )}
-                    >
-                      <option value="" disabled>Select Category</option>
-                      {categories.map(cat => (
-                        <option key={cat} value={cat}>{cat}</option>
-                      ))}
-                    </select>
-                    <button 
-                      onClick={() => setIsAddingCategory(true)}
-                      className="px-3 bg-muted/50 border border-border/50 rounded-xl hover:bg-muted transition-colors flex items-center justify-center text-muted-foreground hover:text-foreground"
-                      title="Add New Category"
-                    >
-                      <Plus className="w-5 h-5" />
-                    </button>
-                    {categories.length > 1 && (
-                      <button 
-                        onClick={handleDeleteCategory}
-                        className="px-3 bg-muted/50 border border-border/50 rounded-xl hover:bg-rose-500/10 hover:text-rose-600 hover:border-rose-500/30 transition-colors flex items-center justify-center text-muted-foreground"
-                        title="Delete Selected Category"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    )}
-                  </div>
-                ) : (
-                  <div className="flex gap-2">
-                    <input 
-                      type="text" 
-                      value={newCategoryInput}
-                      onChange={(e) => setNewCategoryInput(e.target.value)}
-                      placeholder="e.g. E-commerce"
-                      className="w-full px-4 py-3 bg-muted/50 border border-border/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium"
-                      autoFocus
-                    />
-                    <button 
-                      onClick={handleAddCategory}
-                      className="px-4 bg-primary text-primary-foreground rounded-xl hover:bg-primary/90 transition-colors font-bold text-sm"
-                    >
-                      Save
-                    </button>
-                    <button 
-                      onClick={() => setIsAddingCategory(false)}
-                      className="px-3 text-muted-foreground hover:bg-muted rounded-xl transition-colors"
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                )}
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest block">Category</label>
+                  <button 
+                    type="button"
+                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); setIsManageCategoriesModalOpen(true); }}
+                    className="text-xs font-bold text-primary hover:underline flex items-center gap-1"
+                  >
+                    <Settings2 className="w-3 h-3" /> Manage Categories
+                  </button>
+                </div>
+                <select 
+                  value={newProjectCategory}
+                  onChange={(e) => setNewProjectCategory(e.target.value)}
+                  className={cn(
+                    "w-full px-4 py-3 bg-muted/50 border border-border/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium appearance-none",
+                    !newProjectCategory && "text-muted-foreground"
+                  )}
+                >
+                  <option value="" disabled>Select Category</option>
+                  {categories.map(cat => (
+                    <option key={cat} value={cat}>{cat}</option>
+                  ))}
+                </select>
               </div>
             </div>
             <div className="p-6 pt-4 bg-muted/30 border-t border-border/50 flex justify-end gap-3">
@@ -787,6 +755,63 @@ export function Projects() {
                 Create Project
               </button>
             </div>
+            
+            {/* Nested Manage Categories Modal */}
+            <Dialog open={isManageCategoriesModalOpen} onOpenChange={setIsManageCategoriesModalOpen}>
+              <DialogContent className="sm:max-w-[400px] rounded-3xl p-0 overflow-hidden border-border/50 shadow-2xl z-[100]">
+                <div className="p-6 pb-4">
+                  <DialogHeader>
+                    <DialogTitle className="text-2xl font-black tracking-tight">Manage Categories</DialogTitle>
+                  </DialogHeader>
+                </div>
+                
+                <div className="p-6 pt-0 space-y-4">
+                  <div className="flex gap-2">
+                    <input 
+                      type="text" 
+                      value={newCategoryName}
+                      onChange={(e) => setNewCategoryName(e.target.value)}
+                      placeholder="e.g. E-Commerce"
+                      className="flex-1 px-4 py-2.5 bg-muted/50 border border-border/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium"
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') handleAddCategory();
+                      }}
+                    />
+                    <button 
+                      onClick={handleAddCategory}
+                      disabled={!newCategoryName.trim()}
+                      className="px-4 py-2.5 bg-foreground text-background font-bold rounded-xl shadow-md hover:bg-foreground/90 transition-all disabled:opacity-50"
+                    >
+                      Add
+                    </button>
+                  </div>
+                  
+                  <div className="space-y-2 mt-4 max-h-[250px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-muted">
+                    {categories.map(cat => (
+                      <div key={cat} className="flex items-center justify-between p-3 bg-muted/30 border border-border/50 rounded-xl">
+                        <span className="font-bold text-sm">{cat}</span>
+                        <button 
+                          onClick={() => handleDeleteCategory(cat)}
+                          className="p-1.5 text-muted-foreground hover:text-rose-500 hover:bg-rose-500/10 rounded-lg transition-colors"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                
+                <div className="p-6 pt-4 bg-muted/30 border-t border-border/50 flex justify-end">
+                  <button 
+                    onClick={() => setIsManageCategoriesModalOpen(false)}
+                    className="px-5 py-2.5 bg-foreground text-background font-bold rounded-xl hover:bg-foreground/90 transition-colors"
+                  >
+                    Done
+                  </button>
+                </div>
+              </DialogContent>
+            </Dialog>
+            
           </DialogContent>
         </Dialog>
 
@@ -819,7 +844,16 @@ export function Projects() {
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Category</label>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest block">Category</label>
+                    <button 
+                      type="button"
+                      onClick={(e) => { e.preventDefault(); e.stopPropagation(); setIsManageCategoriesModalOpen(true); }}
+                      className="text-xs font-bold text-primary hover:underline flex items-center gap-1"
+                    >
+                      <Settings2 className="w-3 h-3" /> Manage Categories
+                    </button>
+                  </div>
                   <select 
                     value={editingProject.category}
                     onChange={(e) => setEditingProject({...editingProject, category: e.target.value})}
@@ -872,6 +906,63 @@ export function Projects() {
                 Save Changes
               </button>
             </div>
+            
+            {/* Nested Manage Categories Modal for Edit */}
+            <Dialog open={isManageCategoriesModalOpen} onOpenChange={setIsManageCategoriesModalOpen}>
+              <DialogContent className="sm:max-w-[400px] rounded-3xl p-0 overflow-hidden border-border/50 shadow-2xl z-[100]">
+                <div className="p-6 pb-4">
+                  <DialogHeader>
+                    <DialogTitle className="text-2xl font-black tracking-tight">Manage Categories</DialogTitle>
+                  </DialogHeader>
+                </div>
+                
+                <div className="p-6 pt-0 space-y-4">
+                  <div className="flex gap-2">
+                    <input 
+                      type="text" 
+                      value={newCategoryName}
+                      onChange={(e) => setNewCategoryName(e.target.value)}
+                      placeholder="e.g. E-Commerce"
+                      className="flex-1 px-4 py-2.5 bg-muted/50 border border-border/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium"
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') handleAddCategory();
+                      }}
+                    />
+                    <button 
+                      onClick={handleAddCategory}
+                      disabled={!newCategoryName.trim()}
+                      className="px-4 py-2.5 bg-foreground text-background font-bold rounded-xl shadow-md hover:bg-foreground/90 transition-all disabled:opacity-50"
+                    >
+                      Add
+                    </button>
+                  </div>
+                  
+                  <div className="space-y-2 mt-4 max-h-[250px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-muted">
+                    {categories.map(cat => (
+                      <div key={cat} className="flex items-center justify-between p-3 bg-muted/30 border border-border/50 rounded-xl">
+                        <span className="font-bold text-sm">{cat}</span>
+                        <button 
+                          onClick={() => handleDeleteCategory(cat)}
+                          className="p-1.5 text-muted-foreground hover:text-rose-500 hover:bg-rose-500/10 rounded-lg transition-colors"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                
+                <div className="p-6 pt-4 bg-muted/30 border-t border-border/50 flex justify-end">
+                  <button 
+                    onClick={() => setIsManageCategoriesModalOpen(false)}
+                    className="px-5 py-2.5 bg-foreground text-background font-bold rounded-xl hover:bg-foreground/90 transition-colors"
+                  >
+                    Done
+                  </button>
+                </div>
+              </DialogContent>
+            </Dialog>
+
           </DialogContent>
         </Dialog>
       </div>
@@ -1033,7 +1124,6 @@ export function Projects() {
           </div>
         </DialogContent>
       </Dialog>
-
     </div>
   );
 }
