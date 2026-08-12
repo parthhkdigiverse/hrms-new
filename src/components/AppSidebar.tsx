@@ -375,7 +375,7 @@ function SidebarBody({
                     title={collapsed ? item.title : undefined}
                     onClick={() => (hasChildren ? toggleGroup(item.title) : item.url && go(item.url))}
                     className={cn(
-                      "flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm transition-colors",
+                      "group flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm transition-colors",
                       collapsed && "justify-center px-0",
                       selfActive
                         ? "bg-sidebar-primary font-semibold text-sidebar-primary-foreground"
@@ -396,6 +396,19 @@ function SidebarBody({
                               isOpen && "rotate-180",
                             )}
                           />
+                        )}
+                        {!hasChildren && (
+                          <span
+                            role="button"
+                            aria-label={`Pin ${item.title}`}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              togglePin(item.title);
+                            }}
+                            className="hidden shrink-0 text-sidebar-muted group-hover:block hover:text-sidebar-foreground"
+                          >
+                            <Pin className="h-3.5 w-3.5" />
+                          </span>
                         )}
                       </>
                     )}
