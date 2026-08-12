@@ -1,12 +1,15 @@
+import { useState } from "react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { WEEKLY_ATTENDANCE } from "../dashboard-data";
 import { CollapsibleSection } from "./CollapsibleSection";
 
 export function AttendanceAnalytics() {
+  const [currentMonthDate, setCurrentMonthDate] = useState(new Date());
+
   const generateHeatmap = () => {
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = today.getMonth();
+    const year = currentMonthDate.getFullYear();
+    const month = currentMonthDate.getMonth();
     
     // get first day of month (0-6 where 0 is Sunday, 1 is Monday...)
     const firstDay = new Date(year, month, 1).getDay();
@@ -103,9 +106,25 @@ export function AttendanceAnalytics() {
 
         {/* Heatmap Calendar */}
         <div className="bg-white border border-border/60 rounded-3xl p-6 shadow-sm md:col-span-3">
-          <div className="mb-6">
-            <h3 className="font-bold text-slate-900">Heatmap Calendar</h3>
-            <p className="text-[11px] text-slate-500">Attendance intensity for {new Date().toLocaleString('default', { month: 'long', year: 'numeric' })}</p>
+          <div className="mb-6 flex justify-between items-center">
+            <div>
+              <h3 className="font-bold text-slate-900">Heatmap Calendar</h3>
+              <p className="text-[11px] text-slate-500">Attendance intensity for {currentMonthDate.toLocaleString('default', { month: 'long', year: 'numeric' })}</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <button 
+                onClick={() => setCurrentMonthDate(new Date(currentMonthDate.getFullYear(), currentMonthDate.getMonth() - 1, 1))}
+                className="w-8 h-8 flex items-center justify-center rounded-lg bg-slate-50 text-slate-500 hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              <button 
+                onClick={() => setCurrentMonthDate(new Date(currentMonthDate.getFullYear(), currentMonthDate.getMonth() + 1, 1))}
+                className="w-8 h-8 flex items-center justify-center rounded-lg bg-slate-50 text-slate-500 hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
           </div>
           <div className="flex flex-col gap-2">
             {/* Days Header */}
