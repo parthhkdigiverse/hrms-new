@@ -63,6 +63,8 @@ import { FinancialPlan } from "@/components/finance/FinancialPlan";
 import { FinancialSummary } from "@/components/finance/FinancialSummary";
 import { OtherTransactions } from "@/components/finance/OtherTransactions";
 import { AuditLogs } from "@/components/finance/AuditLogs";
+import { TrainingDashboard } from "@/components/training/TrainingDashboard";
+import { CoursePlayer } from "@/components/training/CoursePlayer";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -211,13 +213,17 @@ function Index() {
         {active === "/workspace/resources" && <ResourceManagement />}
         {active === "/workspace/gallery" && <Gallery />}
 
+        {/* Training & Learning */}
+        {active.startsWith("/learn/") && !active.startsWith("/learn/course/") && <TrainingDashboard active={active} setActive={setActive} />}
+        {active.startsWith("/learn/course/") && <CoursePlayer active={active} setActive={setActive} />}
+
         {/* Admin */}
         {active === "/activity-logs" && <ActivityLogs />}
         {active === "/activity-tracker" && <ActivityTracker />}
         {active === "/restrictions" && <Restrictions />}
 
         {/* Fallback original content for all other items */}
-        {active !== "/dashboard" && active !== "/schedule" && active !== "/work/logs" && active !== "/work/projects" && active !== "/tasks" && active !== "/chat" && active !== "/work/research" && active !== "/penalty" && active !== "/approvals/penalties" && active !== "/remarks" && active !== "/activity-logs" && active !== "/activity-tracker" && active !== "/restrictions" && !active.startsWith("/work/sales") && !active.startsWith("/payroll") && !active.startsWith("/employees") && !active.startsWith("/recruitment") && !active.startsWith("/workspace") && !active.startsWith("/approvals") && !active.startsWith("/invoice") && !active.startsWith("/reports") && !active.startsWith("/finance") && (
+        {active !== "/dashboard" && active !== "/schedule" && active !== "/work/logs" && active !== "/work/projects" && active !== "/tasks" && active !== "/chat" && active !== "/work/research" && active !== "/penalty" && active !== "/approvals/penalties" && active !== "/remarks" && active !== "/activity-logs" && active !== "/activity-tracker" && active !== "/restrictions" && !active.startsWith("/work/sales") && !active.startsWith("/payroll") && !active.startsWith("/employees") && !active.startsWith("/recruitment") && !active.startsWith("/workspace") && !active.startsWith("/approvals") && !active.startsWith("/invoice") && !active.startsWith("/reports") && !active.startsWith("/finance") && !active.startsWith("/learn") && (
           <>
             <header className="mb-8 max-w-3xl">
               <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
