@@ -27,44 +27,6 @@ const MOCK_LOGS: WorkLog[] = [
 export function WorkLogs() {
   const [logs, setLogs] = useState(MOCK_LOGS);
   const [searchQuery, setSearchQuery] = useState("");
-  const [isLogTimeOpen, setIsLogTimeOpen] = useState(false);
-  
-  // New Log Form State
-  const [newDate, setNewDate] = useState(format(new Date(), "yyyy-MM-dd"));
-  const [newProject, setNewProject] = useState("");
-  const [newTask, setNewTask] = useState("");
-  const [newHours, setNewHours] = useState("");
-  const [newDescription, setNewDescription] = useState("");
-
-  const handleLogTime = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newDate || !newProject || !newHours) {
-      toast.error("Please fill all required fields");
-      return;
-    }
-    
-    const newLog: WorkLog = {
-      id: Math.random().toString(36).substr(2, 9),
-      employee: "Alex Johnson (You)",
-      avatar: "https://i.pravatar.cc/150?u=alex",
-      date: newDate,
-      project: newProject,
-      task: newTask || "General",
-      hours: parseFloat(newHours),
-      status: "Pending",
-      description: newDescription,
-    };
-    
-    setLogs([newLog, ...logs]);
-    setIsLogTimeOpen(false);
-    toast.success("Time logged successfully!");
-    
-    // Reset form
-    setNewProject("");
-    setNewTask("");
-    setNewHours("");
-    setNewDescription("");
-  };
 
   const filteredLogs = logs.filter(log => 
     log.employee.toLowerCase().includes(searchQuery.toLowerCase()) || 
@@ -99,94 +61,6 @@ export function WorkLogs() {
             <Filter className="w-4 h-4" />
             <span className="text-sm font-bold hidden sm:inline">Filter</span>
           </button>
-          
-          <Dialog open={isLogTimeOpen} onOpenChange={setIsLogTimeOpen}>
-            <DialogTrigger asChild>
-              <button className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold rounded-xl flex items-center gap-2 transition-colors shadow-sm shrink-0">
-                <Plus className="w-4 h-4" />
-                <span className="hidden sm:inline">Log Time</span>
-              </button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
-              <DialogHeader>
-                <DialogTitle>Log Time</DialogTitle>
-              </DialogHeader>
-              <form onSubmit={handleLogTime} className="space-y-4 pt-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-bold text-slate-700">Date</label>
-                  <input 
-                    type="date" 
-                    required
-                    value={newDate}
-                    onChange={e => setNewDate(e.target.value)}
-                    className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <label className="text-sm font-bold text-slate-700">Project</label>
-                    <input 
-                      type="text" 
-                      placeholder="e.g. Mobile App"
-                      required
-                      value={newProject}
-                      onChange={e => setNewProject(e.target.value)}
-                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-bold text-slate-700">Hours</label>
-                    <input 
-                      type="number" 
-                      step="0.1"
-                      min="0.1"
-                      max="24"
-                      placeholder="e.g. 4.5"
-                      required
-                      value={newHours}
-                      onChange={e => setNewHours(e.target.value)}
-                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
-                    />
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-bold text-slate-700">Task</label>
-                  <input 
-                    type="text" 
-                    placeholder="e.g. Bug Fixing"
-                    value={newTask}
-                    onChange={e => setNewTask(e.target.value)}
-                    className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-bold text-slate-700">Description</label>
-                  <textarea 
-                    rows={3}
-                    placeholder="What did you work on?"
-                    value={newDescription}
-                    onChange={e => setNewDescription(e.target.value)}
-                    className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 resize-none"
-                  />
-                </div>
-                <div className="pt-4 flex justify-end gap-3">
-                  <button 
-                    type="button" 
-                    onClick={() => setIsLogTimeOpen(false)}
-                    className="px-4 py-2 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 font-bold text-sm rounded-xl transition-colors"
-                  >
-                    Cancel
-                  </button>
-                  <button 
-                    type="submit"
-                    className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-xl transition-colors"
-                  >
-                    Save Log
-                  </button>
-                </div>
-              </form>
-            </DialogContent>
-          </Dialog>
         </div>
       </div>
 
