@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Calendar as CalendarIcon, Clock, Users, Tv, Presentation, ShieldAlert, Armchair, Plus, Settings2, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { ConfirmModal } from "@/components/ui/confirm-modal";
 
 export interface Resource {
   id: string;
@@ -59,6 +60,14 @@ export function ResourceManagement() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isManageTypesModalOpen, setIsManageTypesModalOpen] = useState(false);
   const [newTypeName, setNewTypeName] = useState("");
+
+  const [confirmModalState, setConfirmModalState] = useState<{
+    isOpen: boolean;
+    title: string;
+    description: string;
+    itemName?: string;
+    action: () => void;
+  }>({ isOpen: false, title: "", description: "", action: () => {} });
   
   const [newName, setNewName] = useState("");
   const [newType, setNewType] = useState("Equipment");
@@ -94,18 +103,27 @@ export function ResourceManagement() {
     }
   };
 
-  const handleDeleteType = (typeToDelete: string) => {
+  const confirmDeleteType = (typeToDelete: string) => {
     if (resources.some(r => r.type === typeToDelete)) {
       alert(`Cannot delete type "${typeToDelete}" because it is currently assigned to one or more resources.`);
       return;
     }
-    setResourceTypes(resourceTypes.filter(t => t !== typeToDelete));
-    if (newType === typeToDelete) {
-      setNewType(resourceTypes[0] || "");
-    }
-    if (filterType === typeToDelete) {
-      setFilterType(null);
-    }
+    
+    setConfirmModalState({
+      isOpen: true,
+      title: "Delete Resource Type",
+      description: "Are you sure you want to delete this resource type? This action cannot be undone.",
+      itemName: typeToDelete,
+      action: () => {
+        setResourceTypes(resourceTypes.filter(t => t !== typeToDelete));
+        if (newType === typeToDelete) {
+          setNewType(resourceTypes[0] || "");
+        }
+        if (filterType === typeToDelete) {
+          setFilterType(null);
+        }
+      }
+    });
   };
 
 
@@ -334,7 +352,7 @@ export function ResourceManagement() {
                 <div key={type} className="flex items-center justify-between p-3 bg-muted/30 border border-border/50 rounded-xl">
                   <span className="font-bold text-sm">{type}</span>
                   <button 
-                    onClick={() => handleDeleteType(type)}
+                    onClick={() => confirmDeleteType(type)}
                     className="p-1.5 text-muted-foreground hover:text-rose-500 hover:bg-rose-500/10 rounded-lg transition-colors"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -357,6 +375,15 @@ export function ResourceManagement() {
           </div>
         </DialogContent>
       </Dialog>
+
+      <ConfirmModal 
+        isOpen={confirmModalState.isOpen}
+        onClose={() => setConfirmModalState(prev => ({ ...prev, isOpen: false }))}
+        onConfirm={confirmModalState.action}
+        title={confirmModalState.title}
+        description={confirmModalState.description}
+        itemName={confirmModalState.itemName}
+      />
     </div>
   );
 }

@@ -3,6 +3,7 @@ import { Search, Plus, Filter, MoreHorizontal, LayoutGrid, List, Briefcase, Cale
 import { cn } from "@/lib/utils";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { ConfirmModal } from "@/components/ui/confirm-modal";
 
 type ProjectStatus = "In Progress" | "In Review" | "Completed" | "On Hold";
 type ClientStatus = "Active" | "Archived";
@@ -232,6 +233,14 @@ export function Projects() {
   const [isManageCategoriesModalOpen, setIsManageCategoriesModalOpen] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState("");
 
+  const [confirmModalState, setConfirmModalState] = useState<{
+    isOpen: boolean;
+    title: string;
+    description: string;
+    itemName?: string;
+    action: () => void;
+  }>({ isOpen: false, title: "", description: "", action: () => {} });
+
   const [editingProject, setEditingProject] = useState<Project | null>(null);
 
   const handleCreateClient = () => {
@@ -296,7 +305,7 @@ export function Projects() {
     }
   };
 
-  const handleDeleteCategory = (categoryToDelete: string) => {
+  const confirmDeleteCategory = (categoryToDelete: string) => {
     if (categories.length <= 1) {
       alert("Cannot delete the last category.");
       return;
@@ -308,11 +317,54 @@ export function Projects() {
       return;
     }
 
-    const newCategories = categories.filter(c => c !== categoryToDelete);
-    setCategories(newCategories);
-    if (newProjectCategory === categoryToDelete) {
-      setNewProjectCategory(newCategories[0] || "");
-    }
+    setConfirmModalState({
+      isOpen: true,
+      title: "Delete Category",
+      description: "Are you sure you want to delete this category? This action cannot be undone.",
+      itemName: categoryToDelete,
+      action: () => {
+        const newCategories = categories.filter(c => c !== categoryToDelete);
+        setCategories(newCategories);
+        if (newProjectCategory === categoryToDelete) {
+          setNewProjectCategory(newCategories[0] || "");
+        }
+      }
+    });
+  };
+
+  const confirmDeleteProject = (project: Project) => {
+    setConfirmModalState({
+      isOpen: true,
+      title: "Delete Project",
+      description: "Are you sure you want to delete this project? All associated data will be permanently removed.",
+      itemName: project.name,
+      action: () => {
+        setProjects(projects.filter(p => p.id !== project.id));
+        setClients(clients.map(c => 
+          c.id === project.clientId ? { ...c, activeProjects: Math.max(0, c.activeProjects - 1) } : c
+        ));
+        if (selectedProjectId === project.id) {
+          setSelectedProjectId(null);
+        }
+      }
+    });
+  };
+
+  const confirmDeleteClient = (client: Client) => {
+    setConfirmModalState({
+      isOpen: true,
+      title: "Delete Client",
+      description: "Are you sure you want to delete this client? All associated projects will also be permanently deleted.",
+      itemName: client.name,
+      action: () => {
+        setClients(clients.filter(c => c.id !== client.id));
+        setProjects(projects.filter(p => p.clientId !== client.id));
+        if (selectedClientId === client.id) {
+          setSelectedClientId(null);
+          setSelectedProjectId(null);
+        }
+      }
+    });
   };
 
   const getStatusColor = (status: ProjectStatus) => {
@@ -621,9 +673,12 @@ export function Projects() {
                       </DropdownMenuItem>
                       <DropdownMenuSeparator className="bg-border/50" />
                       <DropdownMenuItem className="rounded-xl cursor-pointer py-2.5 focus:bg-amber-500/10 focus:text-amber-600 font-medium text-amber-600 transition-colors">
-                        <Archive className="w-4 h-4 mr-2" /> Archive Project
+                        <Archive className="w-4 h-4 mr-2" /> Archive
                       </DropdownMenuItem>
-                      <DropdownMenuItem className="rounded-xl cursor-pointer py-2.5 focus:bg-rose-500/10 focus:text-rose-600 font-medium text-rose-600 transition-colors">
+                      <DropdownMenuItem 
+                        onClick={(e) => { e.stopPropagation(); confirmDeleteProject(project); }}
+                        className="rounded-xl cursor-pointer py-2.5 focus:bg-rose-500/10 focus:text-rose-600 font-medium text-rose-600 transition-colors"
+                      >
                         <Trash2 className="w-4 h-4 mr-2" /> Delete
                       </DropdownMenuItem>
                     </DropdownMenuContent>
@@ -791,7 +846,7 @@ export function Projects() {
                       <div key={cat} className="flex items-center justify-between p-3 bg-muted/30 border border-border/50 rounded-xl">
                         <span className="font-bold text-sm">{cat}</span>
                         <button 
-                          onClick={() => handleDeleteCategory(cat)}
+                          onClick={() => confirmDeleteCategory(cat)}
                           className="p-1.5 text-muted-foreground hover:text-rose-500 hover:bg-rose-500/10 rounded-lg transition-colors"
                         >
                           <Trash2 className="w-4 h-4" />
@@ -942,7 +997,7 @@ export function Projects() {
                       <div key={cat} className="flex items-center justify-between p-3 bg-muted/30 border border-border/50 rounded-xl">
                         <span className="font-bold text-sm">{cat}</span>
                         <button 
-                          onClick={() => handleDeleteCategory(cat)}
+                          onClick={() => confirmDeleteCategory(cat)}
                           className="p-1.5 text-muted-foreground hover:text-rose-500 hover:bg-rose-500/10 rounded-lg transition-colors"
                         >
                           <Trash2 className="w-4 h-4" />
@@ -1044,7 +1099,10 @@ export function Projects() {
                   <DropdownMenuItem className="rounded-xl cursor-pointer py-2.5 focus:bg-amber-500/10 focus:text-amber-600 font-medium text-amber-600 transition-colors">
                     <Archive className="w-4 h-4 mr-2" /> Archive Client
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="rounded-xl cursor-pointer py-2.5 focus:bg-rose-500/10 focus:text-rose-600 font-medium text-rose-600 transition-colors">
+                  <DropdownMenuItem 
+                    onClick={(e) => { e.stopPropagation(); confirmDeleteClient(client); }}
+                    className="rounded-xl cursor-pointer py-2.5 focus:bg-rose-500/10 focus:text-rose-600 font-medium text-rose-600 transition-colors"
+                  >
                     <Trash2 className="w-4 h-4 mr-2" /> Delete
                   </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -1124,6 +1182,14 @@ export function Projects() {
           </div>
         </DialogContent>
       </Dialog>
+      <ConfirmModal 
+        isOpen={confirmModalState.isOpen}
+        onClose={() => setConfirmModalState(prev => ({ ...prev, isOpen: false }))}
+        onConfirm={confirmModalState.action}
+        title={confirmModalState.title}
+        description={confirmModalState.description}
+        itemName={confirmModalState.itemName}
+      />
     </div>
   );
 }
