@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Search, Download, Plus, RefreshCw, Wallet, Building2, Calendar, Filter, ArrowDownLeft, ArrowUpRight, ArrowRight, Edit3, Trash2 } from "lucide-react";
+import { Search, Download, Plus, RefreshCw, Wallet, Building2, Calendar, Filter, ArrowDownLeft, ArrowUpRight, ArrowRight, Edit3, Trash2, X } from "lucide-react";
 
 const mockCreditTransactions = [
   { id: 'INV-001', date: '15/6/2026', amount: 1234.00, category: 'Sales', description: 'test', service: 'fgh', remarks: '1. Payment is due w...' },
@@ -13,8 +13,12 @@ export function Transactions() {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeAccountTab, setActiveAccountTab] = useState<"bank" | "cash">("cash");
 
+  // Modal States
+  const [isAddCreditOpen, setIsAddCreditOpen] = useState(false);
+  const [isAddDebtOpen, setIsAddDebtOpen] = useState(false);
+
   return (
-    <div className="w-full max-w-[1400px] mx-auto space-y-6 animate-in fade-in duration-500 pb-12">
+    <div className="w-full max-w-[1400px] mx-auto space-y-6 animate-in fade-in duration-500 pb-12 relative">
       
       {/* Header */}
       <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4">
@@ -36,10 +40,16 @@ export function Transactions() {
           <button className="px-4 py-2 bg-background border border-border/50 text-foreground font-bold rounded-lg hover:bg-muted/50 transition-colors shadow-sm flex items-center gap-2 text-sm">
             <Download className="w-4 h-4 text-indigo-500" /> Export Ledger
           </button>
-          <button className="px-4 py-2 bg-emerald-600 text-white font-bold rounded-lg hover:bg-emerald-700 transition-colors shadow-sm flex items-center gap-2 text-sm">
+          <button 
+            onClick={() => setIsAddCreditOpen(true)}
+            className="px-4 py-2 bg-emerald-600 text-white font-bold rounded-lg hover:bg-emerald-700 transition-colors shadow-sm flex items-center gap-2 text-sm"
+          >
             <Plus className="w-4 h-4" /> Add Credit (Invoice)
           </button>
-          <button className="px-4 py-2 bg-rose-600 text-white font-bold rounded-lg hover:bg-rose-700 transition-colors shadow-sm flex items-center gap-2 text-sm">
+          <button 
+            onClick={() => setIsAddDebtOpen(true)}
+            className="px-4 py-2 bg-rose-600 text-white font-bold rounded-lg hover:bg-rose-700 transition-colors shadow-sm flex items-center gap-2 text-sm"
+          >
             <Plus className="w-4 h-4" /> Add Debt (Expense)
           </button>
         </div>
@@ -201,7 +211,10 @@ export function Transactions() {
                 <p className="text-xs text-muted-foreground font-medium mt-1">Auto-synced invoices and income</p>
               </div>
             </div>
-            <button className="px-4 py-2 bg-emerald-600 text-white font-bold rounded-lg hover:bg-emerald-700 transition-colors shadow-sm flex items-center gap-2 text-sm shrink-0">
+            <button 
+              onClick={() => setIsAddCreditOpen(true)}
+              className="px-4 py-2 bg-emerald-600 text-white font-bold rounded-lg hover:bg-emerald-700 transition-colors shadow-sm flex items-center gap-2 text-sm shrink-0"
+            >
               <Plus className="w-4 h-4" /> Add Credit
             </button>
           </div>
@@ -258,7 +271,10 @@ export function Transactions() {
                 <p className="text-xs text-muted-foreground font-medium mt-1">Automatic numbering (YYMMXXX format)</p>
               </div>
             </div>
-            <button className="px-4 py-2 bg-rose-600 text-white font-bold rounded-lg hover:bg-rose-700 transition-colors shadow-sm flex items-center gap-2 text-sm shrink-0">
+            <button 
+              onClick={() => setIsAddDebtOpen(true)}
+              className="px-4 py-2 bg-rose-600 text-white font-bold rounded-lg hover:bg-rose-700 transition-colors shadow-sm flex items-center gap-2 text-sm shrink-0"
+            >
               <Plus className="w-4 h-4" /> Add Debt
             </button>
           </div>
@@ -306,6 +322,120 @@ export function Transactions() {
         </div>
 
       </div>
+
+      {/* --- ADD CREDIT MODAL --- */}
+      {isAddCreditOpen && (
+        <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-card border border-border/50 shadow-2xl rounded-2xl w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-200">
+            <div className="p-4 border-b border-border/50 flex justify-between items-center bg-emerald-500/5">
+              <div>
+                <h3 className="font-black text-lg text-foreground">Add Credit (Income / Invoice)</h3>
+                <p className="text-xs font-medium text-muted-foreground">Record incoming funds.</p>
+              </div>
+              <button onClick={() => setIsAddCreditOpen(false)} className="p-2 hover:bg-muted rounded-full transition-colors">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="p-6 space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-muted-foreground">Invoice Number / Ref</label>
+                  <input type="text" placeholder="e.g. INV-001" className="w-full px-3 py-2 bg-background border border-border/50 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-muted-foreground">Date *</label>
+                  <input type="date" className="w-full px-3 py-2 bg-background border border-border/50 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-muted-foreground">Amount (₹) *</label>
+                  <input type="number" placeholder="0.00" className="w-full px-3 py-2 bg-background border border-border/50 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-muted-foreground">Category *</label>
+                  <select className="w-full px-3 py-2 bg-background border border-border/50 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20">
+                    <option>Sales</option>
+                    <option>Services</option>
+                    <option>Other</option>
+                  </select>
+                </div>
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-muted-foreground">Descriptions</label>
+                <input type="text" placeholder="Short description" className="w-full px-3 py-2 bg-background border border-border/50 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-muted-foreground">Services</label>
+                <input type="text" placeholder="Service details" className="w-full px-3 py-2 bg-background border border-border/50 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-muted-foreground">Remarks</label>
+                <textarea rows={2} placeholder="Any additional notes" className="w-full px-3 py-2 bg-background border border-border/50 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
+              </div>
+            </div>
+            <div className="p-4 border-t border-border/50 flex justify-end gap-2 bg-muted/10">
+              <button onClick={() => setIsAddCreditOpen(false)} className="px-4 py-2 font-bold text-sm bg-background border border-border/50 rounded-lg hover:bg-muted transition-colors">Cancel</button>
+              <button onClick={() => setIsAddCreditOpen(false)} className="px-4 py-2 font-bold text-sm bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors">Save Credit</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* --- ADD DEBT MODAL --- */}
+      {isAddDebtOpen && (
+        <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-card border border-border/50 shadow-2xl rounded-2xl w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-200">
+            <div className="p-4 border-b border-border/50 flex justify-between items-center bg-rose-500/5">
+              <div>
+                <h3 className="font-black text-lg text-foreground">Add Debt (Expense / Bill)</h3>
+                <p className="text-xs font-medium text-muted-foreground">Record an outbound expense.</p>
+              </div>
+              <button onClick={() => setIsAddDebtOpen(false)} className="p-2 hover:bg-muted rounded-full transition-colors">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="p-6 space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-muted-foreground">Expense No. / Ref</label>
+                  <input type="text" placeholder="Auto-generated if empty" className="w-full px-3 py-2 bg-background border border-border/50 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-muted-foreground">Date *</label>
+                  <input type="date" className="w-full px-3 py-2 bg-background border border-border/50 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-muted-foreground">Amount (₹) *</label>
+                  <input type="number" placeholder="0.00" className="w-full px-3 py-2 bg-background border border-border/50 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-muted-foreground">Category *</label>
+                  <select className="w-full px-3 py-2 bg-background border border-border/50 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20">
+                    <option>General</option>
+                    <option>Office</option>
+                    <option>Travel</option>
+                  </select>
+                </div>
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-muted-foreground">Things</label>
+                <input type="text" placeholder="What was purchased?" className="w-full px-3 py-2 bg-background border border-border/50 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-muted-foreground">Narrative</label>
+                <textarea rows={2} placeholder="Expense description or narrative" className="w-full px-3 py-2 bg-background border border-border/50 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
+              </div>
+            </div>
+            <div className="p-4 border-t border-border/50 flex justify-end gap-2 bg-muted/10">
+              <button onClick={() => setIsAddDebtOpen(false)} className="px-4 py-2 font-bold text-sm bg-background border border-border/50 rounded-lg hover:bg-muted transition-colors">Cancel</button>
+              <button onClick={() => setIsAddDebtOpen(false)} className="px-4 py-2 font-bold text-sm bg-rose-600 text-white rounded-lg hover:bg-rose-700 transition-colors">Save Expense</button>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );
