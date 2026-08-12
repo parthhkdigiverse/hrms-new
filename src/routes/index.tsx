@@ -34,6 +34,7 @@ import { Schedule } from "@/components/schedule/Schedule";
 import { WorkLogs } from "@/components/work/WorkLogs";
 import { Tasks } from "@/components/work/Tasks";
 import { Chat } from "@/components/work/Chat";
+import { Research } from "@/components/work/Research";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -149,9 +150,10 @@ function Index() {
         {active === "/work/logs" && <WorkLogs />}
         {active === "/tasks" && <Tasks />}
         {active === "/chat" && <Chat />}
+        {active === "/work/research" && <Research />}
 
         {/* Fallback original content for all other items */}
-        {active !== "/dashboard" && active !== "/schedule" && active !== "/work/logs" && active !== "/tasks" && active !== "/chat" && !active.startsWith("/work/sales") && !active.startsWith("/payroll") && !active.startsWith("/employees") && !active.startsWith("/recruitment") && (
+        {active !== "/dashboard" && active !== "/schedule" && active !== "/work/logs" && active !== "/tasks" && active !== "/chat" && active !== "/work/research" && !active.startsWith("/work/sales") && !active.startsWith("/payroll") && !active.startsWith("/employees") && !active.startsWith("/recruitment") && (
           <>
             <header className="mb-8 max-w-3xl">
               <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
