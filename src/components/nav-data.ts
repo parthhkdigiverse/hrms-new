@@ -127,7 +127,7 @@ export const navItems: NavItem[] = [
       { title: "Transactions", url: "/finance/transactions" },
       { title: "Plan", url: "/finance/plan" },
       { title: "Summary", url: "/finance/summary" },
-      { title: "Client Transactions", url: "/finance/clients" },
+      { title: "Other Transactions", url: "/finance/clients" },
       { title: "Audit Logs", url: "/finance/audit" },
     ],
   },
