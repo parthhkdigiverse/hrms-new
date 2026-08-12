@@ -4,6 +4,7 @@ import { format } from "date-fns";
 import { DateRange } from "react-day-picker";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { useEmployeesContext } from "./EmployeeContext";
 
@@ -20,6 +21,8 @@ interface AttendanceRecord {
   checkIn: string | null;
   checkOut: string | null;
   totalHours: string | null;
+  breakHours: string | null;
+  logs: { action: string; time: string; type: "punch" | "break" }[];
 }
 
 export function AttendanceList() {
@@ -31,6 +34,7 @@ export function AttendanceList() {
     to: new Date(),
   });
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedRecord, setSelectedRecord] = useState<AttendanceRecord | null>(null);
   const itemsPerPage = 10;
 
   // Generate mock attendance data based on actual employees for the last 7 days
@@ -53,21 +57,33 @@ export function AttendanceList() {
         let checkOut: string | null = "05:30 PM";
         let totalHours: string | null = "8.5h";
 
+        let breakHours: string | null = "1h";
+        let logs: { action: string; time: string; type: "punch" | "break" }[] = [];
+
         if (hash % 10 === 0) {
           status = "Absent";
           checkIn = null;
           checkOut = null;
           totalHours = null;
+          breakHours = null;
         } else if (hash % 7 === 0) {
           status = "On Leave";
           checkIn = null;
           checkOut = null;
           totalHours = null;
+          breakHours = null;
         } else if (hash % 5 === 0) {
           status = "Late";
           checkIn = "10:15 AM";
           checkOut = "06:00 PM";
           totalHours = "7.75h";
+          breakHours = "0.75h";
+          logs = [
+            { action: "Punched In", time: "10:15 AM", type: "punch" },
+            { action: "Break In", time: "01:30 PM", type: "break" },
+            { action: "Break Out", time: "02:15 PM", type: "break" },
+            { action: "Punched Out", time: "06:00 PM", type: "punch" },
+          ];
         } else {
           // Randomize check-in times slightly for Present
           const mins = (hash % 15).toString().padStart(2, '0');
@@ -75,6 +91,12 @@ export function AttendanceList() {
           if (45 + (hash % 15) >= 60) {
             checkIn = `09:${(45 + (hash % 15) - 60).toString().padStart(2, '0')} AM`;
           }
+          logs = [
+            { action: "Punched In", time: checkIn, type: "punch" },
+            { action: "Break In", time: "12:30 PM", type: "break" },
+            { action: "Break Out", time: "01:30 PM", type: "break" },
+            { action: "Punched Out", time: checkOut || "05:30 PM", type: "punch" },
+          ];
         }
 
         records.push({
@@ -87,7 +109,9 @@ export function AttendanceList() {
           status,
           checkIn,
           checkOut,
-          totalHours
+          totalHours,
+          breakHours,
+          logs
         });
       });
     }
@@ -256,6 +280,7 @@ export function AttendanceList() {
                 <th className="px-6 py-4 text-xs font-black text-muted-foreground uppercase tracking-wider border-b border-border">Status</th>
                 <th className="px-6 py-4 text-xs font-black text-muted-foreground uppercase tracking-wider border-b border-border">Check In</th>
                 <th className="px-6 py-4 text-xs font-black text-muted-foreground uppercase tracking-wider border-b border-border">Check Out</th>
+                <th className="px-6 py-4 text-xs font-black text-muted-foreground uppercase tracking-wider border-b border-border">Break Hours</th>
                 <th className="px-6 py-4 text-xs font-black text-muted-foreground uppercase tracking-wider border-b border-border">Total Hours</th>
                 <th className="px-6 py-4 border-b border-border"></th>
               </tr>
@@ -294,13 +319,24 @@ export function AttendanceList() {
                     <td className="px-6 py-4">
                       <span className={cn(
                         "text-sm font-bold",
+                        record.breakHours ? "text-amber-600 bg-amber-50 px-2.5 py-1 rounded-md" : "text-muted-foreground"
+                      )}>
+                        {record.breakHours || "-"}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className={cn(
+                        "text-sm font-bold",
                         record.totalHours ? "text-primary bg-primary/10 px-2.5 py-1 rounded-md" : "text-muted-foreground"
                       )}>
                         {record.totalHours || "-"}
                       </span>
                     </td>
                     <td className="px-6 py-4 text-right">
-                      <button className="p-2 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg transition-colors opacity-0 group-hover:opacity-100">
+                      <button 
+                        onClick={() => setSelectedRecord(record)}
+                        className="p-2 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
+                      >
                         <MoreHorizontal className="w-5 h-5" />
                       </button>
                     </td>
@@ -339,6 +375,51 @@ export function AttendanceList() {
           </div>
         )}
       </div>
+
+      <Dialog open={!!selectedRecord} onOpenChange={(open) => !open && setSelectedRecord(null)}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Attendance Logs</DialogTitle>
+          </DialogHeader>
+          <div className="mt-4">
+            {selectedRecord && (
+              <>
+                <div className="flex items-center gap-4 mb-6 pb-4 border-b border-border/50">
+                  <img src={selectedRecord.avatar} alt={selectedRecord.employeeName} className="w-12 h-12 rounded-full border border-border" />
+                  <div>
+                    <p className="font-bold text-foreground">{selectedRecord.employeeName}</p>
+                    <p className="text-sm text-muted-foreground">{selectedRecord.date}</p>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  {selectedRecord.logs && selectedRecord.logs.length > 0 ? (
+                    selectedRecord.logs.map((log, i) => (
+                      <div key={i} className="flex gap-4 relative">
+                        {i !== selectedRecord.logs.length - 1 && (
+                          <div className="absolute left-2.5 top-6 bottom-[-16px] w-0.5 bg-border/50"></div>
+                        )}
+                        <div className={cn(
+                          "w-5 h-5 rounded-full flex items-center justify-center shrink-0 mt-0.5 border-2 border-white ring-1",
+                          log.type === "punch" ? "bg-primary ring-primary/30" : "bg-amber-500 ring-amber-500/30"
+                        )}></div>
+                        <div className="bg-muted/30 rounded-xl p-3 flex-1 border border-border/50">
+                          <p className="text-sm font-bold text-foreground/80">{log.action}</p>
+                          <p className="text-xs font-medium text-muted-foreground mt-0.5">{log.time}</p>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-center py-6 text-muted-foreground">
+                      No logs available for this day.
+                    </div>
+                  )}
+                </div>
+              </>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

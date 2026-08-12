@@ -44,16 +44,16 @@ export function EmployeePerformance() {
         </div>
 
         {/* Spotlight Carousel */}
-        <div className="bg-card rounded-3xl p-6 text-white shadow-sm relative overflow-hidden flex flex-col justify-between">
+        <div className="bg-primary rounded-3xl p-6 text-primary-foreground shadow-sm relative overflow-hidden flex flex-col justify-between">
           <div className="absolute top-0 right-0 p-4 opacity-10">
             <Sparkles className="h-32 w-32" />
           </div>
           <div>
-            <h3 className="text-xs font-bold text-border uppercase tracking-wider mb-6 flex items-center justify-between">
+            <h3 className="text-xs font-bold text-primary-foreground/70 uppercase tracking-wider mb-6 flex items-center justify-between">
               Spotlight
               <div className="flex gap-1">
                 {SPOTLIGHT_EMPLOYEES.map((_, i) => (
-                  <div key={i} className={cn("h-1 rounded-full transition-all duration-300", i === currentSpotlight ? "w-3 bg-white" : "w-1 bg-white/30")} />
+                  <div key={i} className={cn("h-1 rounded-full transition-all duration-300", i === currentSpotlight ? "w-3 bg-primary-foreground" : "w-1 bg-primary-foreground/30")} />
                 ))}
               </div>
             </h3>
@@ -61,7 +61,7 @@ export function EmployeePerformance() {
               <p className="text-3xl font-black mb-1 animate-in fade-in slide-in-from-right-4 duration-500" key={spotlight?.name}>
                 {spotlight?.name}
               </p>
-              <p className="text-muted-foreground text-sm animate-in fade-in slide-in-from-right-4 duration-500 delay-75" key={spotlight?.role}>
+              <p className="text-primary-foreground/80 text-sm animate-in fade-in slide-in-from-right-4 duration-500 delay-75" key={spotlight?.role}>
                 {spotlight?.role}
               </p>
             </div>

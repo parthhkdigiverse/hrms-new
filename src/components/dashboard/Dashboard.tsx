@@ -1,4 +1,5 @@
 import { DashboardHeader } from "./sections/DashboardHeader";
+import { TimeTrackerWidget } from "./sections/TimeTrackerWidget";
 import { CompanyHealth } from "./sections/CompanyHealth";
 import { EmployeePerformance } from "./sections/EmployeePerformance";
 import { AttendanceAnalytics } from "./sections/AttendanceAnalytics";
@@ -16,6 +17,9 @@ export function Dashboard() {
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 pb-24">
       {/* SECTION 01: Header */}
       <DashboardHeader />
+
+      {/* SECTION 01b: Time Tracker Widget */}
+      <TimeTrackerWidget />
 
       {/* SECTION 02: Company Health (12 Metrics) */}
       <CompanyHealth />
