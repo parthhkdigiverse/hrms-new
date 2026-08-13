@@ -41,6 +41,15 @@ import { Remarks } from "@/components/employees/Remarks";
 import { ActivityLogs } from "@/components/admin/ActivityLogs";
 import { ActivityTracker } from "@/components/admin/ActivityTracker";
 import { Restrictions } from "@/components/admin/Restrictions";
+import { CEODashboard } from "@/components/admin/CEODashboard";
+import { B2BModule } from "@/components/admin/b2b/B2BModule";
+import { CollaborationModule } from "@/components/admin/collaboration/CollaborationModule";
+import { FranchiseModule } from "@/components/admin/franchise/FranchiseModule";
+import { MeetingsModule } from "@/components/admin/meetings/MeetingsModule";
+import { TasksModule } from "@/components/admin/tasks/TasksModule";
+import { ReportsModule } from "@/components/admin/reports/ReportsModule";
+import { NotificationsModule } from "@/components/admin/notifications/NotificationsModule";
+import { SettingsModule } from "@/components/admin/settings/SettingsModule";
 import { SeatingArrangement } from "@/components/workspace/SeatingArrangement";
 import { ResourceManagement } from "@/components/workspace/ResourceManagement";
 import { Gallery } from "@/components/workspace/Gallery";
@@ -217,13 +226,22 @@ function Index() {
         {active.startsWith("/learn/") && !active.startsWith("/learn/course/") && <TrainingDashboard active={active} setActive={setActive} />}
         {active.startsWith("/learn/course/") && <CoursePlayer active={active} setActive={setActive} />}
 
-        {/* Admin */}
+        {/* Admin & Command Center */}
+        {active === "/ceo-dashboard" && <CEODashboard active={active} />}
+        {active.startsWith("/ceo-dashboard/b2b") && <B2BModule active={active} />}
+        {active === "/ceo-dashboard/collaboration" && <CollaborationModule />}
+        {active === "/ceo-dashboard/franchise" && <FranchiseModule />}
+        {active === "/ceo-dashboard/meetings" && <MeetingsModule />}
+        {active === "/ceo-dashboard/tasks" && <TasksModule />}
+        {active === "/ceo-dashboard/reports" && <ReportsModule />}
+        {active === "/ceo-dashboard/notifications" && <NotificationsModule />}
+        {active === "/ceo-dashboard/settings" && <SettingsModule />}
         {active === "/activity-logs" && <ActivityLogs />}
         {active === "/activity-tracker" && <ActivityTracker />}
         {active === "/restrictions" && <Restrictions />}
 
         {/* Fallback original content for all other items */}
-        {active !== "/dashboard" && active !== "/schedule" && active !== "/work/logs" && active !== "/work/projects" && active !== "/tasks" && active !== "/chat" && active !== "/work/research" && active !== "/penalty" && active !== "/approvals/penalties" && active !== "/remarks" && active !== "/activity-logs" && active !== "/activity-tracker" && active !== "/restrictions" && !active.startsWith("/work/sales") && !active.startsWith("/payroll") && !active.startsWith("/employees") && !active.startsWith("/recruitment") && !active.startsWith("/workspace") && !active.startsWith("/approvals") && !active.startsWith("/invoice") && !active.startsWith("/reports") && !active.startsWith("/finance") && !active.startsWith("/learn") && (
+        {active !== "/dashboard" && active !== "/schedule" && active !== "/work/logs" && active !== "/work/projects" && active !== "/tasks" && active !== "/chat" && active !== "/work/research" && active !== "/penalty" && active !== "/approvals/penalties" && active !== "/remarks" && active !== "/activity-logs" && active !== "/activity-tracker" && active !== "/restrictions" && !active.startsWith("/ceo-dashboard") && !active.startsWith("/work/sales") && !active.startsWith("/payroll") && !active.startsWith("/employees") && !active.startsWith("/recruitment") && !active.startsWith("/workspace") && !active.startsWith("/approvals") && !active.startsWith("/invoice") && !active.startsWith("/reports") && !active.startsWith("/finance") && !active.startsWith("/learn") && (
           <>
             <header className="mb-8 max-w-3xl">
               <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">

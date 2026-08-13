@@ -35,6 +35,13 @@ import {
   Settings2,
   PlayCircle,
   Gift,
+  Handshake,
+  Target,
+  Cpu,
+  Store,
+  CheckSquare,
+  BarChart2,
+  Bell,
   type LucideIcon,
 } from "lucide-react";
 
@@ -178,6 +185,37 @@ export const navItems: NavItem[] = [
   },
   { title: "Penalty", url: "/penalty", icon: MessageSquareWarning, section: "Workplace" },
   { title: "Remarks", url: "/remarks", icon: Star, section: "Workplace" },
+  {
+    title: "Dashboard",
+    icon: LayoutDashboard,
+    section: "Command Center",
+    children: [
+      { title: "CEO Overview", url: "/ceo-dashboard" }
+    ]
+  },
+  {
+    title: "B2B Partnership",
+    icon: Handshake,
+    section: "Command Center",
+    children: [
+      { title: "Overview", url: "/ceo-dashboard/b2b" },
+      { title: "Partners", url: "/ceo-dashboard/b2b/partners" },
+      { title: "Leads", url: "/ceo-dashboard/b2b/leads" },
+      { title: "Opportunities", url: "/ceo-dashboard/b2b/opportunities" },
+      { title: "Deals", url: "/ceo-dashboard/b2b/deals" },
+      { title: "Invoices", url: "/ceo-dashboard/b2b/invoices" },
+      { title: "Commission", url: "/ceo-dashboard/b2b/commission" },
+      { title: "Monthly Settlement", url: "/ceo-dashboard/b2b/settlement" },
+      { title: "Partner Performance", url: "/ceo-dashboard/b2b/performance" }
+    ]
+  },
+  { title: "Tech Collaboration", url: "/ceo-dashboard/collaboration", icon: Cpu, section: "Command Center" },
+  { title: "Franchise", url: "/ceo-dashboard/franchise", icon: Store, section: "Command Center" },
+  { title: "Meetings & Follow-ups", url: "/ceo-dashboard/meetings", icon: CalendarDays, section: "Command Center" },
+  { title: "Tasks", url: "/ceo-dashboard/tasks", icon: CheckSquare, section: "Command Center" },
+  { title: "Reports", url: "/ceo-dashboard/reports", icon: BarChart2, section: "Command Center" },
+  { title: "Notifications", url: "/ceo-dashboard/notifications", icon: Bell, section: "Command Center" },
+  { title: "Settings", url: "/ceo-dashboard/settings", icon: Settings, section: "Command Center" },
   { title: "Activity Tracker", url: "/activity-tracker", icon: Activity, section: "Admin" },
   {
     title: "Manage Learning",
@@ -198,6 +236,7 @@ export const navItems: NavItem[] = [
 
 export const sectionOrder = [
   "Overview",
+  "Command Center",
   "People",
   "Finance",
   "Work",
