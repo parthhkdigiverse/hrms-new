@@ -127,7 +127,7 @@ function SidebarBody({
       }
       const child = item.children?.find((c) => c.url === url);
       if (child) {
-        title = child.title;
+        title = `${item.title} — ${child.title}`;
         break;
       }
     }
@@ -177,7 +177,8 @@ function SidebarBody({
     for (const item of navItems) {
       if (item.url && pinned.includes(item.title)) out.push({ title: item.title, url: item.url });
       for (const c of item.children ?? []) {
-        if (pinned.includes(c.title)) out.push({ title: c.title, url: c.url });
+        const compoundTitle = `${item.title} — ${c.title}`;
+        if (pinned.includes(compoundTitle) || pinned.includes(c.title)) out.push({ title: compoundTitle, url: c.url });
       }
     }
     return out;
@@ -444,7 +445,7 @@ function SidebarBody({
                             aria-label={`Pin ${child.title}`}
                             onClick={(e) => {
                               e.stopPropagation();
-                              togglePin(child.title);
+                              togglePin(`${item.title} — ${child.title}`);
                             }}
                             className="hidden shrink-0 text-sidebar-muted group-hover:block"
                           >
