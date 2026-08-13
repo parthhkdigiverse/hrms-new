@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Search, AlertTriangle, MessageSquareWarning, ThumbsUp, ShieldAlert, Plus, DollarSign, CheckCircle2, XCircle, Filter } from "lucide-react";
+import { Search, AlertTriangle, MessageSquareWarning, ThumbsUp, ShieldAlert, Plus, IndianRupee, CheckCircle2, XCircle, Filter } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -172,11 +172,11 @@ export function Penalties() {
             
             <div className="bg-primary/10 border border-primary/20 rounded-2xl p-4 flex items-center gap-4 min-w-[160px]">
               <div className="w-10 h-10 bg-background rounded-xl shadow-sm flex items-center justify-center text-primary shrink-0">
-                <DollarSign className="w-5 h-5" />
+                <IndianRupee className="w-5 h-5" />
               </div>
               <div>
                 <p className="text-xs font-bold text-primary/70 uppercase tracking-wider mb-0.5">Payroll Impact</p>
-                <p className="text-2xl font-black text-primary leading-none">${totalDeductions}</p>
+                <p className="text-2xl font-black text-primary leading-none">₹{totalDeductions}</p>
               </div>
             </div>
           </div>
@@ -254,7 +254,7 @@ export function Penalties() {
                   {newType === "Penalty" && (
                     <div className="flex gap-4">
                       <div className="space-y-2 flex-1">
-                        <label className="text-sm font-bold text-foreground/80">Deduction Amount ($)</label>
+                        <label className="text-sm font-bold text-foreground/80">Deduction Amount (₹)</label>
                         <input 
                           type="number" 
                           placeholder="e.g. 50"
@@ -381,7 +381,7 @@ export function Penalties() {
                       
                       {record.type === "Penalty" && record.amount !== null && (
                         <span className="text-xs font-bold text-foreground/80 bg-muted px-2 py-0.5 rounded-md">
-                          Amount: ${record.amount}
+                          Amount: ₹{record.amount}
                         </span>
                       )}
                       

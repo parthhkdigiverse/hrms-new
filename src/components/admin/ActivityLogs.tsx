@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Search, ShieldAlert, Activity, Users, DollarSign, Settings, TerminalSquare, AlertTriangle, Key } from "lucide-react";
+import { Search, ShieldAlert, Activity, Users, IndianRupee, Settings, TerminalSquare, AlertTriangle, Key } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type LogCategory = "All" | "Auth" | "People" | "Payroll" | "System";
@@ -86,7 +86,7 @@ const getCategoryIcon = (category: LogCategory) => {
   switch (category) {
     case "Auth": return <Key className="w-4 h-4" />;
     case "People": return <Users className="w-4 h-4" />;
-    case "Payroll": return <DollarSign className="w-4 h-4" />;
+    case "Payroll": return <IndianRupee className="w-4 h-4" />;
     case "System": return <Settings className="w-4 h-4" />;
     default: return <Activity className="w-4 h-4" />;
   }

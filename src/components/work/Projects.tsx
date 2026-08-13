@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Search, Plus, Filter, MoreHorizontal, LayoutGrid, List, Briefcase, Calendar, Clock, Star, Circle, Trash2, Edit2, Archive, ArrowLeft, Users, DollarSign, FolderGit2, CheckCircle2, Settings2 } from "lucide-react";
+import { Search, Plus, Filter, MoreHorizontal, LayoutGrid, List, Briefcase, Calendar, Clock, Star, Circle, Trash2, Edit2, Archive, ArrowLeft, Users, IndianRupee, FolderGit2, CheckCircle2, Settings2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
@@ -447,7 +447,7 @@ export function Projects() {
             
             <div className="bg-card border border-border/60 rounded-3xl p-6 flex items-center gap-5 shadow-sm">
               <div className="w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-500 flex items-center justify-center shrink-0">
-                <DollarSign className="w-6 h-6" />
+                <IndianRupee className="w-6 h-6" />
               </div>
               <div>
                 <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Budget</p>
@@ -603,7 +603,7 @@ export function Projects() {
           </div>
           <div className="bg-card border border-border/60 rounded-3xl p-6 flex items-center gap-5 shadow-sm">
             <div className="w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-500 flex items-center justify-center shrink-0">
-              <DollarSign className="w-6 h-6" />
+              <IndianRupee className="w-6 h-6" />
             </div>
             <div>
               <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Total Budget</p>
