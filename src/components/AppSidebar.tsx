@@ -466,17 +466,23 @@ function SidebarBody({
         )}
       </nav>
 
-      <div className="flex items-center gap-2 border-t border-sidebar-border px-3 py-3">
+      <button 
+        onClick={() => go("/profile")}
+        className={cn(
+          "flex items-center gap-2 border-t border-sidebar-border px-3 py-3 w-full text-left transition-colors cursor-pointer",
+          active === "/profile" ? "bg-sidebar-accent" : "hover:bg-sidebar-accent/50"
+        )}
+      >
         <div className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-sidebar-accent text-xs font-bold text-sidebar-accent-foreground">
           AR
         </div>
         {!collapsed && (
           <div className="min-w-0">
-            <p className="truncate text-sm font-medium">Aarav R.</p>
+            <p className={cn("truncate text-sm font-medium", active === "/profile" ? "text-sidebar-foreground" : "")}>Aarav R.</p>
             <p className="truncate text-[11px] text-sidebar-muted">HR Admin</p>
           </div>
         )}
-      </div>
+      </button>
     </>
   );
 }

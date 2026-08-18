@@ -71,6 +71,7 @@ import { OtherTransactions } from "@/components/finance/OtherTransactions";
 import { AuditLogs } from "@/components/finance/AuditLogs";
 import { TrainingDashboard } from "@/components/training/TrainingDashboard";
 import { CoursePlayer } from "@/components/training/CoursePlayer";
+import { UserProfile } from "@/components/profile/UserProfile";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -234,8 +235,11 @@ function Index() {
         {active === "/activity-tracker" && <ActivityTracker />}
         {active === "/restrictions" && <Restrictions />}
 
+        {/* User Profile */}
+        {active === "/profile" && <UserProfile />}
+
         {/* Fallback original content for all other items */}
-        {active !== "/dashboard" && active !== "/schedule" && active !== "/work/logs" && active !== "/work/projects" && active !== "/tasks" && active !== "/chat" && active !== "/work/research" && active !== "/penalty" && active !== "/approvals/penalties" && active !== "/remarks" && active !== "/activity-logs" && active !== "/activity-tracker" && active !== "/restrictions" && !active.startsWith("/ceo-dashboard") && !active.startsWith("/work/sales") && !active.startsWith("/payroll") && !active.startsWith("/employees") && !active.startsWith("/recruitment") && !active.startsWith("/workspace") && !active.startsWith("/approvals") && !active.startsWith("/invoice") && !active.startsWith("/reports") && !active.startsWith("/finance") && !active.startsWith("/learn") && (
+        {active !== "/dashboard" && active !== "/profile" && active !== "/schedule" && active !== "/work/logs" && active !== "/work/projects" && active !== "/tasks" && active !== "/chat" && active !== "/work/research" && active !== "/penalty" && active !== "/approvals/penalties" && active !== "/remarks" && active !== "/activity-logs" && active !== "/activity-tracker" && active !== "/restrictions" && !active.startsWith("/ceo-dashboard") && !active.startsWith("/work/sales") && !active.startsWith("/payroll") && !active.startsWith("/employees") && !active.startsWith("/recruitment") && !active.startsWith("/workspace") && !active.startsWith("/approvals") && !active.startsWith("/invoice") && !active.startsWith("/reports") && !active.startsWith("/finance") && !active.startsWith("/learn") && (
           <>
             <header className="mb-8 max-w-3xl">
               <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
