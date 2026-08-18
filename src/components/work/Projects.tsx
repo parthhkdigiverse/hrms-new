@@ -205,6 +205,11 @@ export function Projects() {
   const [activeTab, setActiveTab] = useState(TABS[0]);
   const [searchQuery, setSearchQuery] = useState("");
   
+  const [clientSort, setClientSort] = useState<"name" | "budgetDesc" | "projectsDesc">("name");
+  const [clientFilterCategories, setClientFilterCategories] = useState<string[]>([]);
+  const [projectFilterStatuses, setProjectFilterStatuses] = useState<ProjectStatus[]>([]);
+  const [projectFilterCategories, setProjectFilterCategories] = useState<string[]>([]);
+  
   const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
 
@@ -384,7 +389,21 @@ export function Projects() {
     if (activeTab === "Active Clients" && client.status !== "Active") return false;
     if (activeTab === "Archived Clients" && client.status !== "Archived") return false;
     if (searchQuery && !client.name.toLowerCase().includes(searchQuery.toLowerCase())) return false;
+    if (clientFilterCategories.length > 0) {
+      const hasProjectInCategory = projects.some(p => p.clientId === client.id && clientFilterCategories.includes(p.category));
+      if (!hasProjectInCategory) return false;
+    }
     return true;
+  }).sort((a, b) => {
+    if (clientSort === "budgetDesc") {
+      const budgetA = parseInt(a.totalBudget.replace(/[^0-9]/g, '')) || 0;
+      const budgetB = parseInt(b.totalBudget.replace(/[^0-9]/g, '')) || 0;
+      return budgetB - budgetA;
+    }
+    if (clientSort === "projectsDesc") {
+      return b.activeProjects - a.activeProjects;
+    }
+    return a.name.localeCompare(b.name);
   });
 
   if (selectedClientId) {
@@ -559,7 +578,12 @@ export function Projects() {
       );
     }
 
-    const clientProjects = projects.filter(p => p.clientId === client.id);
+    const clientProjects = projects.filter(p => {
+      if (p.clientId !== client.id) return false;
+      if (projectFilterStatuses.length > 0 && !projectFilterStatuses.includes(p.status)) return false;
+      if (projectFilterCategories.length > 0 && !projectFilterCategories.includes(p.category)) return false;
+      return true;
+    });
 
     return (
       <div className="w-full max-w-7xl mx-auto space-y-8 animate-in fade-in duration-500">
@@ -584,10 +608,78 @@ export function Projects() {
             </div>
           </div>
           
-          <button onClick={() => setIsNewProjectModalOpen(true)} className="flex items-center gap-2 px-4 py-2.5 bg-primary text-primary-foreground font-bold text-sm rounded-xl hover:bg-primary/90 transition-all shadow-sm">
-            <Plus className="w-4 h-4" />
-            <span className="hidden sm:inline">New Project</span>
-          </button>
+          <div className="flex items-center gap-3">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="flex items-center gap-2 px-4 py-2.5 bg-card border border-border/60 text-foreground font-bold text-sm rounded-xl hover:bg-muted/80 transition-all shadow-sm">
+                  <Filter className="w-4 h-4 text-muted-foreground" />
+                  <span className="hidden sm:inline">Filter</span>
+                  {(projectFilterStatuses.length > 0 || projectFilterCategories.length > 0) && (
+                    <span className="w-2 h-2 rounded-full bg-primary ml-1"></span>
+                  )}
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56 rounded-2xl p-2 border-border/60 shadow-xl bg-background/95 backdrop-blur-md z-50">
+                <div className="px-2 py-1.5 text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1 flex justify-between items-center">
+                  <span>Status</span>
+                  {(projectFilterStatuses.length > 0 || projectFilterCategories.length > 0) && (
+                    <button 
+                      onClick={(e) => { e.stopPropagation(); setProjectFilterStatuses([]); setProjectFilterCategories([]); }}
+                      className="text-[10px] text-primary hover:underline"
+                    >
+                      Clear All
+                    </button>
+                  )}
+                </div>
+                {["In Progress", "In Review", "Completed", "On Hold"].map(status => (
+                  <DropdownMenuItem 
+                    key={status}
+                    onSelect={(e) => { 
+                      e.preventDefault(); 
+                      setProjectFilterStatuses(prev => 
+                        prev.includes(status as ProjectStatus) 
+                          ? prev.filter(s => s !== status) 
+                          : [...prev, status as ProjectStatus]
+                      ); 
+                    }}
+                    className={cn(
+                      "rounded-xl cursor-pointer py-2 focus:bg-primary/10 focus:text-primary font-medium transition-colors flex items-center justify-between",
+                      projectFilterStatuses.includes(status as ProjectStatus) && "bg-primary/10 text-primary"
+                    )}
+                  >
+                    <span>{status}</span>
+                    {projectFilterStatuses.includes(status as ProjectStatus) && <CheckCircle2 className="w-4 h-4" />}
+                  </DropdownMenuItem>
+                ))}
+                <DropdownMenuSeparator className="bg-border/50 my-2" />
+                <div className="px-2 py-1.5 text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1">Category</div>
+                {categories.map(cat => (
+                  <DropdownMenuItem 
+                    key={cat}
+                    onSelect={(e) => { 
+                      e.preventDefault(); 
+                      setProjectFilterCategories(prev => 
+                        prev.includes(cat) 
+                          ? prev.filter(c => c !== cat) 
+                          : [...prev, cat]
+                      ); 
+                    }}
+                    className={cn(
+                      "rounded-xl cursor-pointer py-2 focus:bg-primary/10 focus:text-primary font-medium transition-colors flex items-center justify-between",
+                      projectFilterCategories.includes(cat) && "bg-primary/10 text-primary"
+                    )}
+                  >
+                    <span>{cat}</span>
+                    {projectFilterCategories.includes(cat) && <CheckCircle2 className="w-4 h-4" />}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <button onClick={() => setIsNewProjectModalOpen(true)} className="flex items-center gap-2 px-4 py-2.5 bg-primary text-primary-foreground font-bold text-sm rounded-xl hover:bg-primary/90 transition-all shadow-sm">
+              <Plus className="w-4 h-4" />
+              <span className="hidden sm:inline">New Project</span>
+            </button>
+          </div>
         </div>
 
         {/* Summary Section */}
@@ -1037,6 +1129,103 @@ export function Projects() {
               className="w-full pl-9 pr-4 py-2.5 bg-card border border-border/60 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all shadow-sm"
             />
           </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="flex items-center gap-2 px-4 py-2.5 bg-card border border-border/60 text-foreground font-bold text-sm rounded-xl hover:bg-muted/80 transition-all shadow-sm">
+                <Filter className="w-4 h-4 text-muted-foreground" />
+                <span className="hidden sm:inline">Filter & Sort</span>
+                {clientFilterCategories.length > 0 && (
+                  <span className="w-2 h-2 rounded-full bg-primary ml-1"></span>
+                )}
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56 rounded-2xl p-2 border-border/60 shadow-xl bg-background/95 backdrop-blur-md z-50">
+              <div className="px-2 py-1.5 text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1 flex justify-between items-center">
+                <span>Status</span>
+              </div>
+              {TABS.map(tab => (
+                <DropdownMenuItem 
+                  key={tab}
+                  onSelect={(e) => { e.preventDefault(); setActiveTab(tab); }}
+                  className={cn(
+                    "rounded-xl cursor-pointer py-2 focus:bg-primary/10 focus:text-primary font-medium transition-colors flex items-center justify-between",
+                    activeTab === tab && "bg-primary/10 text-primary"
+                  )}
+                >
+                  <span>{tab}</span>
+                  {activeTab === tab && <CheckCircle2 className="w-4 h-4" />}
+                </DropdownMenuItem>
+              ))}
+              <DropdownMenuSeparator className="bg-border/50 my-2" />
+              <div className="px-2 py-1.5 text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1">Sort By</div>
+              <DropdownMenuItem 
+                onSelect={(e) => { e.preventDefault(); setClientSort("name"); }}
+                className={cn(
+                  "rounded-xl cursor-pointer py-2 focus:bg-primary/10 focus:text-primary font-medium transition-colors flex items-center justify-between",
+                  clientSort === "name" && "bg-primary/10 text-primary"
+                )}
+              >
+                <span>A-Z Name</span>
+                {clientSort === "name" && <CheckCircle2 className="w-4 h-4" />}
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                onSelect={(e) => { e.preventDefault(); setClientSort("budgetDesc"); }}
+                className={cn(
+                  "rounded-xl cursor-pointer py-2 focus:bg-primary/10 focus:text-primary font-medium transition-colors flex items-center justify-between",
+                  clientSort === "budgetDesc" && "bg-primary/10 text-primary"
+                )}
+              >
+                <span>Highest Budget</span>
+                {clientSort === "budgetDesc" && <CheckCircle2 className="w-4 h-4" />}
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                onSelect={(e) => { e.preventDefault(); setClientSort("projectsDesc"); }}
+                className={cn(
+                  "rounded-xl cursor-pointer py-2 focus:bg-primary/10 focus:text-primary font-medium transition-colors flex items-center justify-between",
+                  clientSort === "projectsDesc" && "bg-primary/10 text-primary"
+                )}
+              >
+                <span>Most Projects</span>
+                {clientSort === "projectsDesc" && <CheckCircle2 className="w-4 h-4" />}
+              </DropdownMenuItem>
+              <DropdownMenuSeparator className="bg-border/50 my-2" />
+              <div className="px-2 py-1.5 text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1">Project Category</div>
+              {categories.map(cat => (
+                <DropdownMenuItem 
+                  key={cat}
+                  onSelect={(e) => { 
+                    e.preventDefault(); 
+                    setClientFilterCategories(prev => 
+                      prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat]
+                    ); 
+                  }}
+                  className={cn(
+                    "rounded-xl cursor-pointer py-2 focus:bg-primary/10 focus:text-primary font-medium transition-colors flex items-center justify-between",
+                    clientFilterCategories.includes(cat) && "bg-primary/10 text-primary"
+                  )}
+                >
+                  <span>{cat}</span>
+                  {clientFilterCategories.includes(cat) && <CheckCircle2 className="w-4 h-4" />}
+                </DropdownMenuItem>
+              ))}
+              {(clientFilterCategories.length > 0 || clientSort !== "name" || activeTab !== TABS[0]) && (
+                <>
+                  <DropdownMenuSeparator className="bg-border/50 my-2" />
+                  <DropdownMenuItem 
+                    onSelect={(e) => { 
+                      e.preventDefault(); 
+                      setClientFilterCategories([]); 
+                      setClientSort("name");
+                      setActiveTab(TABS[0]);
+                    }}
+                    className="rounded-xl cursor-pointer py-2 focus:bg-rose-500/10 focus:text-rose-500 text-rose-500 font-bold transition-colors flex items-center justify-center"
+                  >
+                    Clear All Filters
+                  </DropdownMenuItem>
+                </>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
           <button onClick={() => setIsNewClientModalOpen(true)} className="flex items-center gap-2 px-4 py-2.5 bg-primary text-primary-foreground font-bold text-sm rounded-xl hover:bg-primary/90 transition-all shadow-sm">
             <Plus className="w-4 h-4" />
             <span className="hidden sm:inline">New Client</span>
