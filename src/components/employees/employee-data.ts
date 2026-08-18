@@ -11,6 +11,44 @@ export interface Employee {
   joinDate: string;
   avatar: string;
   performanceScore: number; // Out of 100
+  
+  // Extended HRMS-1 fields (optional for backward compatibility with mock data)
+  firstName?: string;
+  middleName?: string;
+  lastName?: string;
+  password?: string;
+  dob?: string;
+  salary?: string;
+  upiId?: string;
+  accountNumber?: string;
+  ifscCode?: string;
+  bankName?: string;
+  accountHolderName?: string;
+  parentName?: string;
+  parentNumber?: string;
+  relation?: string;
+  aadharCard?: string;
+  panCard?: string;
+  sub_department?: string;
+  designation?: string;
+  startTime?: string;
+  endTime?: string;
+  workMode?: string;
+  activelyUsingHRMS?: boolean;
+  gender?: string;
+  position?: string;
+  requiredDocuments?: string[];
+  hasBond?: boolean;
+  bondStartDate?: string;
+  bondEndDate?: string;
+  hasNoticePeriod?: boolean;
+  noticePeriodDays?: string;
+  noticePeriodStartDate?: string;
+  hasResignation?: boolean;
+  resignationDate?: string;
+  hasEmployment?: boolean;
+  employmentStartDate?: string;
+  bondsHistory?: any[];
 }
 
 export const AVAILABLE_DEPARTMENTS = [
