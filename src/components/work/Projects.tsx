@@ -247,8 +247,8 @@ export function Projects() {
   const [newProjectName, setNewProjectName] = useState("");
   const [newProjectBudget, setNewProjectBudget] = useState("");
   const [newProjectCategory, setNewProjectCategory] = useState("");
-  const [newProjectStartDate, setNewProjectStartDate] = useState(new Date().toISOString().split('T')[0]);
-  const [newProjectEndDate, setNewProjectEndDate] = useState(new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]);
+  const [newProjectStartDate, setNewProjectStartDate] = useState(new Date().toISOString().split('T')[0] || "");
+  const [newProjectEndDate, setNewProjectEndDate] = useState(new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] || "");
   const [isManageCategoriesModalOpen, setIsManageCategoriesModalOpen] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState("");
   const [showNewProjectErrors, setShowNewProjectErrors] = useState(false);
@@ -303,8 +303,8 @@ export function Projects() {
       category: newProjectCategory,
       status: "In Progress",
       progress: 0,
-      startDate: newProjectStartDate || new Date().toISOString().split('T')[0],
-      endDate: newProjectEndDate || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      startDate: newProjectStartDate || (new Date().toISOString().split('T')[0] as string),
+      endDate: newProjectEndDate || (new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] as string),
       budget: newProjectBudget || "₹0",
       team: [{ name: "User", avatar: "https://i.pravatar.cc/150?u=user" }]
     };
@@ -882,7 +882,7 @@ export function Projects() {
                         <CalendarUI
                           initialFocus
                           mode="range"
-                          defaultMonth={customDateRange?.from}
+                          defaultMonth={customDateRange?.from || new Date()}
                           selected={customDateRange}
                           onSelect={(range) => {
                              setCustomDateRange(range);
