@@ -45,10 +45,7 @@ import { CEODashboard } from "@/components/admin/CEODashboard";
 import { B2BModule } from "@/components/admin/b2b/B2BModule";
 import { CollaborationModule } from "@/components/admin/collaboration/CollaborationModule";
 import { FranchiseModule } from "@/components/admin/franchise/FranchiseModule";
-import { MeetingsModule } from "@/components/admin/meetings/MeetingsModule";
-import { TasksModule } from "@/components/admin/tasks/TasksModule";
 import { ReportsModule } from "@/components/admin/reports/ReportsModule";
-import { NotificationsModule } from "@/components/admin/notifications/NotificationsModule";
 import { SettingsModule } from "@/components/admin/settings/SettingsModule";
 import { SeatingArrangement } from "@/components/workspace/SeatingArrangement";
 import { ResourceManagement } from "@/components/workspace/ResourceManagement";
@@ -231,10 +228,7 @@ function Index() {
         {active.startsWith("/ceo-dashboard/b2b") && <B2BModule active={active} />}
         {active === "/ceo-dashboard/collaboration" && <CollaborationModule />}
         {active === "/ceo-dashboard/franchise" && <FranchiseModule />}
-        {active === "/ceo-dashboard/meetings" && <MeetingsModule />}
-        {active === "/ceo-dashboard/tasks" && <TasksModule />}
         {active === "/ceo-dashboard/reports" && <ReportsModule />}
-        {active === "/ceo-dashboard/notifications" && <NotificationsModule />}
         {active === "/ceo-dashboard/settings" && <SettingsModule />}
         {active === "/activity-logs" && <ActivityLogs />}
         {active === "/activity-tracker" && <ActivityTracker />}

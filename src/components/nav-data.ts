@@ -211,10 +211,7 @@ export const navItems: NavItem[] = [
   },
   { title: "Tech Collaboration", url: "/ceo-dashboard/collaboration", icon: Cpu, section: "Command Center" },
   { title: "Franchise", url: "/ceo-dashboard/franchise", icon: Store, section: "Command Center" },
-  { title: "Meetings & Follow-ups", url: "/ceo-dashboard/meetings", icon: CalendarDays, section: "Command Center" },
-  { title: "Tasks", url: "/ceo-dashboard/tasks", icon: CheckSquare, section: "Command Center" },
   { title: "Reports", url: "/ceo-dashboard/reports", icon: BarChart2, section: "Command Center" },
-  { title: "Notifications", url: "/ceo-dashboard/notifications", icon: Bell, section: "Command Center" },
   { title: "Settings", url: "/ceo-dashboard/settings", icon: Settings, section: "Command Center" },
   { title: "Activity Tracker", url: "/activity-tracker", icon: Activity, section: "Admin" },
   {
