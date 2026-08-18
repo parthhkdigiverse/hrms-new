@@ -1,4 +1,5 @@
 import { CalendarDays, Plus, Activity } from "lucide-react";
+import { toast } from "sonner";
 
 export function MeetingsModule() {
   return (
@@ -13,7 +14,7 @@ export function MeetingsModule() {
           <h1 className="text-3xl md:text-4xl font-black tracking-tight text-foreground">Meetings & Follow-ups</h1>
           <p className="text-muted-foreground mt-2 font-medium">Schedule and track your executive meetings.</p>
         </div>
-        <button className="flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-xl text-sm font-bold shadow-md hover:bg-primary/90 transition-colors">
+        <button onClick={() => toast.success("Opening Meeting Scheduler...")} className="flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-xl text-sm font-bold shadow-md hover:bg-primary/90 transition-colors">
           <Plus className="w-4 h-4" /> Schedule Meeting
         </button>
       </div>

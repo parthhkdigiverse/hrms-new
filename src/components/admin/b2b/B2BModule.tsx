@@ -7,6 +7,8 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
+import { toast } from "sonner";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 
 // --- Sub-components ---
 
@@ -100,9 +102,41 @@ function B2BPartners() {
     <div className="bg-card border border-border/50 rounded-3xl p-6 shadow-sm">
       <div className="flex justify-between items-center mb-6">
         <h3 className="text-lg font-black">Partner Directory</h3>
-        <button className="flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-xl text-sm font-bold shadow-md hover:bg-primary/90 transition-colors">
-          <Plus className="w-4 h-4" /> Add Partner
-        </button>
+        <Dialog>
+          <DialogTrigger asChild>
+            <button className="flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-xl text-sm font-bold shadow-md hover:bg-primary/90 transition-colors">
+              <Plus className="w-4 h-4" /> Add Partner
+            </button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[425px] rounded-2xl">
+            <DialogHeader>
+              <DialogTitle className="text-xl font-black">Add New Partner</DialogTitle>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="space-y-2">
+                <label className="text-xs font-bold uppercase text-muted-foreground">Company Name</label>
+                <input className="w-full flex h-10 rounded-xl border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2" placeholder="e.g. Acme Corp" />
+              </div>
+              <div className="space-y-2">
+                <label className="text-xs font-bold uppercase text-muted-foreground">Partner Type</label>
+                <select className="w-full flex h-10 rounded-xl border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
+                  <option>Technology</option>
+                  <option>Consulting</option>
+                  <option>Manufacturing</option>
+                </select>
+              </div>
+              <div className="space-y-2">
+                <label className="text-xs font-bold uppercase text-muted-foreground">Primary Contact Email</label>
+                <input type="email" className="w-full flex h-10 rounded-xl border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2" placeholder="contact@company.com" />
+              </div>
+            </div>
+            <DialogFooter>
+              <button onClick={() => toast.success("Partner invitation sent successfully!")} className="w-full bg-primary text-primary-foreground px-4 py-2 rounded-xl text-sm font-bold shadow-md hover:bg-primary/90 transition-colors">
+                Send Invitation
+              </button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
       <div className="overflow-x-auto">
         <table className="w-full text-left border-collapse">
@@ -129,7 +163,7 @@ function B2BPartners() {
                 <td className="p-4 font-bold">{partner.deals}</td>
                 <td className="p-4 font-bold text-emerald-600">{partner.value}</td>
                 <td className="p-4 text-right">
-                  <button className="p-2 hover:bg-muted rounded-lg transition-colors"><MoreVertical className="w-4 h-4 text-muted-foreground" /></button>
+                  <button onClick={() => toast.info(`Viewing details for ${partner.name}`)} className="p-2 hover:bg-muted rounded-lg transition-colors"><MoreVertical className="w-4 h-4 text-muted-foreground" /></button>
                 </td>
               </tr>
             ))}

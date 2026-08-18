@@ -6,6 +6,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { AreaChart, Area, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
+import { toast } from "sonner";
 
 export function CollaborationModule() {
   const metrics = [
@@ -113,7 +114,7 @@ export function CollaborationModule() {
       <div className="bg-card border border-border/50 rounded-3xl p-6 shadow-sm">
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-lg font-black">Collaboration Partners</h3>
-          <button className="flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-xl text-sm font-bold shadow-md hover:bg-primary/90 transition-colors">
+          <button onClick={() => toast.success("Opening New Tech Partner Form...")} className="flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-xl text-sm font-bold shadow-md hover:bg-primary/90 transition-colors">
             <Plus className="w-4 h-4" /> Add Partner
           </button>
         </div>
@@ -138,7 +139,7 @@ export function CollaborationModule() {
                   <td className="p-4 font-bold">{partner.activeProjects}</td>
                   <td className="p-4 font-bold text-emerald-600">⭐ {partner.rating}</td>
                   <td className="p-4 text-right">
-                    <button className="p-2 hover:bg-muted rounded-lg transition-colors"><MoreVertical className="w-4 h-4 text-muted-foreground" /></button>
+                    <button onClick={() => toast.info(`Managing partnership with ${partner.name}`)} className="p-2 hover:bg-muted rounded-lg transition-colors"><MoreVertical className="w-4 h-4 text-muted-foreground" /></button>
                   </td>
                 </tr>
               ))}

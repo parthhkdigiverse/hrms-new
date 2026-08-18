@@ -5,6 +5,7 @@ import {
   Clock, ArrowDownRight, Activity
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 export function CEODashboard({ active = "/ceo-dashboard" }: { active?: string }) {
   const [timeRange, setTimeRange] = useState("This Month");
@@ -119,7 +120,7 @@ export function CEODashboard({ active = "/ceo-dashboard" }: { active?: string })
               Comprehensive B2B, Franchise, and Collaboration revenue charts will be visualized here.
             </p>
             <div className="mt-8 flex gap-4">
-              <button className="px-5 py-2 bg-primary text-primary-foreground font-bold rounded-xl shadow-md">
+              <button onClick={() => toast.success("Generating growth report...")} className="px-5 py-2 bg-primary text-primary-foreground font-bold rounded-xl shadow-md">
                 Generate Report
               </button>
             </div>
@@ -138,7 +139,7 @@ export function CEODashboard({ active = "/ceo-dashboard" }: { active?: string })
                     <div className="w-2 h-2 rounded-full bg-amber-500 shrink-0" />
                     <p className="font-bold text-sm text-foreground">{item.title}</p>
                   </div>
-                  <button className="flex items-center gap-1 text-xs font-black uppercase text-amber-600 hover:text-amber-700 transition-colors px-3 py-1.5 bg-amber-500/10 rounded-lg shrink-0">
+                  <button onClick={() => toast.info(`Action triggered: ${item.action} for ${item.title}`)} className="flex items-center gap-1 text-xs font-black uppercase text-amber-600 hover:text-amber-700 transition-colors px-3 py-1.5 bg-amber-500/10 rounded-lg shrink-0">
                     {item.action} <ArrowRight className="w-3 h-3" />
                   </button>
                 </div>
@@ -167,7 +168,7 @@ export function CEODashboard({ active = "/ceo-dashboard" }: { active?: string })
                 </div>
               ))}
             </div>
-            <button className="w-full mt-6 py-2.5 text-sm font-bold text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-xl transition-colors border border-transparent hover:border-border/50">
+            <button onClick={() => toast.success("Loading all historical activity...")} className="w-full mt-6 py-2.5 text-sm font-bold text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-xl transition-colors border border-transparent hover:border-border/50">
               View All Activity
             </button>
           </div>
@@ -177,7 +178,7 @@ export function CEODashboard({ active = "/ceo-dashboard" }: { active?: string })
             <h3 className="text-sm font-black tracking-tight mb-4 uppercase text-primary/80">Quick Actions</h3>
             <div className="space-y-2">
               {['Review pending B2B settlements', 'Approve new Franchise territories', 'Allocate Tech Collaboration projects', 'Check upcoming executive meetings'].map((action, i) => (
-                <button key={i} className="w-full flex items-center justify-between p-3 bg-background border border-border/50 rounded-xl hover:border-primary/30 hover:shadow-md transition-all text-left group">
+                <button key={i} onClick={() => toast.info(`Opening: ${action}`)} className="w-full flex items-center justify-between p-3 bg-background border border-border/50 rounded-xl hover:border-primary/30 hover:shadow-md transition-all text-left group">
                   <span className="text-xs font-bold text-foreground group-hover:text-primary transition-colors">{action}</span>
                   <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
                 </button>

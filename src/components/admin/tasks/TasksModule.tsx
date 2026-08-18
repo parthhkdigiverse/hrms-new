@@ -1,4 +1,5 @@
 import { CheckSquare, Plus } from "lucide-react";
+import { toast } from "sonner";
 
 export function TasksModule() {
   return (
@@ -13,7 +14,7 @@ export function TasksModule() {
           <h1 className="text-3xl md:text-4xl font-black tracking-tight text-foreground">My Tasks</h1>
           <p className="text-muted-foreground mt-2 font-medium">Manage your action items.</p>
         </div>
-        <button className="flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-xl text-sm font-bold shadow-md hover:bg-primary/90 transition-colors">
+        <button onClick={() => toast.success("Opening Task Editor...")} className="flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-xl text-sm font-bold shadow-md hover:bg-primary/90 transition-colors">
           <Plus className="w-4 h-4" /> Add Task
         </button>
       </div>

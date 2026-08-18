@@ -4,6 +4,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
+import { toast } from "sonner";
 
 export function FranchiseModule() {
   const metrics = [
@@ -131,7 +132,7 @@ export function FranchiseModule() {
       <div className="bg-card border border-border/50 rounded-3xl p-6 shadow-sm">
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-lg font-black">Territory Allocations</h3>
-          <button className="flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-xl text-sm font-bold shadow-md hover:bg-primary/90 transition-colors">
+          <button onClick={() => toast.success("Opening New Allocation Menu...")} className="flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-xl text-sm font-bold shadow-md hover:bg-primary/90 transition-colors">
             <Plus className="w-4 h-4" /> New Allocation
           </button>
         </div>
@@ -162,7 +163,7 @@ export function FranchiseModule() {
                   <td className="p-4 text-sm font-medium">{territory.partner}</td>
                   <td className={cn("p-4 font-bold", territory.expires === 'Tomorrow' ? 'text-rose-500' : 'text-muted-foreground')}>{territory.expires}</td>
                   <td className="p-4 text-right">
-                    <button className="p-2 hover:bg-muted rounded-lg transition-colors"><MoreVertical className="w-4 h-4 text-muted-foreground" /></button>
+                    <button onClick={() => toast.info(`Options for ${territory.name}`)} className="p-2 hover:bg-muted rounded-lg transition-colors"><MoreVertical className="w-4 h-4 text-muted-foreground" /></button>
                   </td>
                 </tr>
               ))}

@@ -1,4 +1,5 @@
 import { Bell, Check } from "lucide-react";
+import { toast } from "sonner";
 
 export function NotificationsModule() {
   return (
@@ -13,7 +14,7 @@ export function NotificationsModule() {
           <h1 className="text-3xl md:text-4xl font-black tracking-tight text-foreground">Notifications</h1>
           <p className="text-muted-foreground mt-2 font-medium">Your recent alerts and updates.</p>
         </div>
-        <button className="flex items-center gap-2 bg-muted text-foreground px-4 py-2 rounded-xl text-sm font-bold shadow-sm hover:bg-muted/80 transition-colors">
+        <button onClick={() => toast.success("All notifications marked as read.")} className="flex items-center gap-2 bg-muted text-foreground px-4 py-2 rounded-xl text-sm font-bold shadow-sm hover:bg-muted/80 transition-colors">
           <Check className="w-4 h-4" /> Mark All as Read
         </button>
       </div>
