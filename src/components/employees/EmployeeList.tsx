@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Search, Filter, LayoutGrid, List, MoreVertical, Phone, Mail, Plus, MapPin, Edit2, Trash2 } from "lucide-react";
+import { Search, Filter, LayoutGrid, List, MoreVertical, Phone, Mail, Plus, MapPin, Edit2, Trash2, Key } from "lucide-react";
 import { EMPLOYEES, Employee } from "./employee-data";
 import { useDepartments } from "./DepartmentContext";
 import { EmployeeProfileModal } from "./EmployeeProfileModal";
@@ -177,9 +177,24 @@ export function EmployeeList() {
                 <h3 className="text-[16px] font-black text-foreground mb-1">{emp.name}</h3>
                 <p className="text-[12px] font-medium text-muted-foreground mb-4">{emp.role}</p>
                 
-                <span className="px-3 py-1 bg-muted/50 text-foreground/80 text-[10px] font-bold uppercase tracking-wider rounded-lg mb-6">
+                <span className="px-3 py-1 bg-muted/50 text-foreground/80 text-[10px] font-bold uppercase tracking-wider rounded-lg mb-4">
                   {emp.department}
                 </span>
+
+                <div className="w-full flex flex-col gap-2 mb-6 text-[12px] text-muted-foreground bg-muted/20 p-3 rounded-2xl border border-border/50">
+                  <div className="flex items-center justify-center gap-2">
+                    <Mail className="w-3.5 h-3.5 text-primary/70" />
+                    <span className="truncate">{emp.email || "No email"}</span>
+                  </div>
+                  <div className="flex items-center justify-center gap-2">
+                    <Phone className="w-3.5 h-3.5 text-primary/70" />
+                    <span>{emp.phone || "No phone"}</span>
+                  </div>
+                  <div className="flex items-center justify-center gap-2">
+                    <Key className="w-3.5 h-3.5 text-primary/70" />
+                    <span className="truncate">{emp.password || "No password set"}</span>
+                  </div>
+                </div>
 
                 <button 
                   onClick={() => setSelectedEmployee(emp)}
