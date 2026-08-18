@@ -126,7 +126,7 @@ export function SubmittedDocuments() {
                       </span>
                     </td>
                     <td className="p-4 text-sm text-muted-foreground font-medium">
-                      {doc.submittedAt ? new Date(doc.submittedAt).toLocaleDateString() : "-"}
+                      {doc.submittedAt ? new Date(doc.submittedAt).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }) : "-"}
                     </td>
                     <td className="p-4">
                       <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">

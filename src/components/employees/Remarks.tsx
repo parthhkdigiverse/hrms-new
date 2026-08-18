@@ -107,7 +107,7 @@ export function Remarks() {
         role: "Team Member",
         avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(newEmpName)}&background=random`
       },
-      dateSubmitted: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+      dateSubmitted: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }),
       satisfactionScore: newScore,
       remark: newRemark,
       keyChallenges: newChallenges.trim() || null,

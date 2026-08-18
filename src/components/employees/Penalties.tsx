@@ -121,7 +121,7 @@ export function Penalties() {
         avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(newEmpName)}&background=random`
       },
       type: newType,
-      date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+      date: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }),
       description: newDesc,
       status: "Active",
       amount: newType === "Penalty" ? parseFloat(newAmount) || 0 : null,

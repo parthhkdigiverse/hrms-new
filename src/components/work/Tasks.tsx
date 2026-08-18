@@ -430,7 +430,7 @@ export function Tasks() {
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground/80 flex items-center gap-1.5 pt-6">
-                          <Calendar className="w-3.5 h-3.5" /> {new Date(task.dueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                          <Calendar className="w-3.5 h-3.5" /> {format(new Date(task.dueDate), "dd/MM/yyyy")}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center -space-x-2">

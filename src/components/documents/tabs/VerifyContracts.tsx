@@ -137,7 +137,7 @@ export function VerifyContracts() {
                       </span>
                     </td>
                     <td className="p-4 text-sm text-muted-foreground font-medium">
-                      {new Date(contract.uploadedAt).toLocaleDateString()}
+                      {new Date(contract.uploadedAt).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })}
                     </td>
                     <td className="p-4">
                       <div className="flex justify-end gap-2">

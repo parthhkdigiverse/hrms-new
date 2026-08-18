@@ -119,7 +119,7 @@ export function WorkLogs() {
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-semibold text-foreground">{format(new Date(log.date), "MMM d, yyyy")}</div>
+                    <div className="text-sm font-semibold text-foreground">{format(new Date(log.date), "dd/MM/yyyy")}</div>
                     <div className="text-xs font-medium text-muted-foreground flex items-center gap-1 mt-0.5">
                       <Clock className="w-3 h-3" /> {log.hours} hours
                     </div>

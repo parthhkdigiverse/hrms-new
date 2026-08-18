@@ -531,7 +531,7 @@ export function Projects() {
               </div>
               <div>
                 <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Timeline</p>
-                <h3 className="text-sm font-black text-foreground">{new Date(project.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - {new Date(project.endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</h3>
+                <h3 className="text-sm font-black text-foreground">{format(new Date(project.startDate), "dd/MM/yyyy")} - {format(new Date(project.endDate), "dd/MM/yyyy")}</h3>
               </div>
             </div>
           </div>
@@ -598,7 +598,7 @@ export function Projects() {
                         </div>
                         <div>
                           <p className={cn("font-bold", i < 2 ? "line-through text-muted-foreground" : "text-foreground")}>{task}</p>
-                          <p className="text-xs font-medium text-muted-foreground mt-0.5">Due {new Date(Date.now() + i * 7 * 24 * 60 * 60 * 1000).toLocaleDateString()}</p>
+                          <p className="text-xs font-medium text-muted-foreground mt-0.5">Due {format(new Date(Date.now() + i * 7 * 24 * 60 * 60 * 1000), "dd/MM/yyyy")}</p>
                         </div>
                      </div>
                    ))}
@@ -839,11 +839,11 @@ export function Projects() {
                       {campaignDateRange === "Custom" && customDateRange?.from ? (
                         customDateRange.to ? (
                           <>
-                            {format(customDateRange.from, "LLL dd, y")} -{" "}
-                            {format(customDateRange.to, "LLL dd, y")}
+                            {format(customDateRange.from, "dd/MM/yyyy")} -{" "}
+                            {format(customDateRange.to, "dd/MM/yyyy")}
                           </>
                         ) : (
-                          format(customDateRange.from, "LLL dd, y")
+                          format(customDateRange.from, "dd/MM/yyyy")
                         )
                       ) : (
                         campaignDateRange
@@ -1070,7 +1070,7 @@ export function Projects() {
 
                   <div className="flex items-center gap-1.5 px-3 py-1.5 bg-muted/30 rounded-lg border border-border/30">
                     <Calendar className="w-3.5 h-3.5 text-muted-foreground" />
-                    <span className="text-xs font-bold text-foreground/80">{new Date(project.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - {new Date(project.endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
+                    <span className="text-xs font-bold text-foreground/80">{format(new Date(project.startDate), "dd/MM/yyyy")} - {format(new Date(project.endDate), "dd/MM/yyyy")}</span>
                   </div>
                 </div>
 

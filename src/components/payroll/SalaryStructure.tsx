@@ -56,7 +56,7 @@ export function SalaryStructure() {
       .reduce((sum: number, c: any) => sum + Number(c.amount), 0);
 
     const newHistoryEntry = {
-      date: new Date(editForm.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
+      date: new Date(editForm.date).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }),
       amount: newGross,
       reason: editForm.reason,
       actionBy: "HR Admin", 

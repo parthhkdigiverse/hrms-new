@@ -458,7 +458,7 @@ export function SalesDashboard({ setActive, onAction }: { setActive?: (path: str
         <div>
           <h1 className="text-2xl font-black tracking-tight sm:text-3xl">CEO Sales Dashboard</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            {new Date().toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long", year: "numeric" })} · Complete sales operating system for HK DigiVerse
+            {new Date().toLocaleDateString("en-GB", { day: '2-digit', month: '2-digit', year: 'numeric' })} · Complete sales operating system for HK DigiVerse
           </p>
         </div>
         <div className="flex items-center gap-2">
