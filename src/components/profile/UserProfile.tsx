@@ -1,14 +1,22 @@
 import { useState } from "react";
 import { User, Briefcase, CreditCard, FileText, Mail, Phone, MapPin, Building, Calendar, Key, Shield, CheckCircle2, ChevronRight, Edit2 } from "lucide-react";
-import { EMPLOYEES } from "@/components/employees/employee-data";
 import { cn } from "@/lib/utils";
+import { useEmployeesContext } from "@/components/employees/EmployeeContext";
+import { EmployeeFormModal } from "@/components/employees/EmployeeFormModal";
+import { toast } from "sonner";
 
 type TabType = 'overview' | 'personal' | 'financial' | 'offboarding';
 
 export function UserProfile() {
+  const { employees, updateEmployee } = useEmployeesContext();
   // Use EMP-002 (Aarav Mehta) as the current logged in user
-  const user = EMPLOYEES.find(e => e.id === "EMP-002") || EMPLOYEES[0];
+  const user = employees.find(e => e.id === "EMP-002") || employees[0];
   const [activeTab, setActiveTab] = useState<TabType>('overview');
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
+  if (!user) {
+    return <div className="p-8 text-center text-muted-foreground">User not found</div>;
+  }
 
   const tabs = [
     { id: 'overview', label: 'Overview', icon: User },
@@ -19,7 +27,6 @@ export function UserProfile() {
   
   // Mock some of the extensive fields for Aarav since dummy data doesn't have them yet
   const profileData = {
-    ...user,
     firstName: "Aarav",
     lastName: "R.",
     dob: "1992-05-15",
@@ -44,7 +51,8 @@ export function UserProfile() {
     bondStartDate: "2020-02-15",
     bondEndDate: "2022-02-15",
     hasNoticePeriod: false,
-    requiredDocuments: ["10th Marksheet", "12th Marksheet", "Degree Certificate", "Aadhar Card", "PAN Card"]
+    requiredDocuments: ["10th Marksheet", "12th Marksheet", "Degree Certificate", "Aadhar Card", "PAN Card"],
+    ...user
   };
 
   return (
@@ -77,7 +85,10 @@ export function UserProfile() {
             </div>
             
             <div className="flex gap-3 w-full md:w-auto mt-4 md:mt-0">
-              <button className="flex items-center gap-2 bg-muted hover:bg-muted/80 text-foreground/80 px-4 py-2.5 rounded-xl font-bold transition-colors text-sm">
+              <button 
+                onClick={() => setIsEditModalOpen(true)}
+                className="flex items-center gap-2 bg-muted hover:bg-muted/80 text-foreground/80 px-4 py-2.5 rounded-xl font-bold transition-colors text-sm"
+              >
                 <Edit2 className="w-4 h-4" /> Edit Profile
               </button>
             </div>
@@ -341,6 +352,18 @@ export function UserProfile() {
 
         </div>
       </div>
+
+      <EmployeeFormModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        initialData={profileData as any}
+        isSelfEdit={true}
+        onSubmit={(updatedData) => {
+          updateEmployee(user.id, updatedData);
+          toast.success("Profile updated successfully!");
+          setIsEditModalOpen(false);
+        }}
+      />
     </div>
   );
 }

@@ -10,6 +10,7 @@ interface EmployeeFormModalProps {
   onClose: () => void;
   onSubmit: (employee: Partial<Employee>) => void;
   initialData?: Employee | null;
+  isSelfEdit?: boolean;
 }
 
 type TabType = 'personal' | 'work' | 'bank' | 'offboarding';
@@ -54,7 +55,7 @@ const REQUIRED_DOCUMENTS_LIST = [
   "Bank Passbook / Cancelled Cheque"
 ];
 
-export function EmployeeFormModal({ isOpen, onClose, onSubmit, initialData }: EmployeeFormModalProps) {
+export function EmployeeFormModal({ isOpen, onClose, onSubmit, initialData, isSelfEdit }: EmployeeFormModalProps) {
   const { departments } = useDepartments();
   const [activeTab, setActiveTab] = useState<TabType>('personal');
   
@@ -363,12 +364,16 @@ export function EmployeeFormModal({ isOpen, onClose, onSubmit, initialData }: Em
 
                 {/* 2. WORK DETAILS */}
                 <div className={cn("space-y-6 animate-in fade-in slide-in-from-right-4 duration-300", activeTab === 'work' ? 'block' : 'hidden')}>
-                  <div className="pb-4 border-b border-border/50">
-                    <h3 className="text-lg font-black">Work & Organization</h3>
-                    <p className="text-sm text-muted-foreground">Roles, scheduling, and placement.</p>
+                  <div className="pb-4 border-b border-border/50 flex justify-between items-start">
+                    <div>
+                      <h3 className="text-lg font-black">Work & Organization</h3>
+                      <p className="text-sm text-muted-foreground">Roles, scheduling, and placement.</p>
+                    </div>
+                    {isSelfEdit && <span className="bg-muted px-3 py-1 rounded-lg text-xs font-bold text-muted-foreground">Read Only</span>}
                   </div>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <fieldset disabled={isSelfEdit} className="space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
                       <label className="text-[12px] font-bold text-foreground/80 uppercase tracking-wider">System Role *</label>
                       <select 
@@ -458,7 +463,8 @@ export function EmployeeFormModal({ isOpen, onClose, onSubmit, initialData }: Em
                         className="w-full px-4 py-2.5 bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all"
                       />
                     </div>
-                  </div>
+                    </div>
+                  </fieldset>
                 </div>
 
                 {/* 3. BANK & DOCS */}
@@ -472,8 +478,8 @@ export function EmployeeFormModal({ isOpen, onClose, onSubmit, initialData }: Em
                     <div className="space-y-2">
                       <label className="text-[12px] font-bold text-foreground/80 uppercase tracking-wider">Monthly Salary</label>
                       <input 
-                        type="number" value={formData.salary || ''} onChange={(e) => handleInputChange('salary', e.target.value)}
-                        className="w-full px-4 py-2.5 bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all"
+                        type="number" disabled={isSelfEdit} value={formData.salary || ''} onChange={(e) => handleInputChange('salary', e.target.value)}
+                        className={cn("w-full px-4 py-2.5 bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all", isSelfEdit && "opacity-60 cursor-not-allowed")}
                         placeholder="e.g. 50000"
                       />
                     </div>
@@ -538,8 +544,11 @@ export function EmployeeFormModal({ isOpen, onClose, onSubmit, initialData }: Em
                   </div>
 
                   <div className="pt-6 border-t border-border/50">
-                    <h4 className="text-sm font-bold mb-4">Required Documents Checklist</h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-muted/20 p-5 rounded-2xl border border-border/50">
+                    <div className="flex justify-between items-center mb-4">
+                      <h4 className="text-sm font-bold">Required Documents Checklist</h4>
+                      {isSelfEdit && <span className="bg-muted px-3 py-1 rounded-lg text-xs font-bold text-muted-foreground">Read Only</span>}
+                    </div>
+                    <fieldset disabled={isSelfEdit} className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-muted/20 p-5 rounded-2xl border border-border/50">
                       {REQUIRED_DOCUMENTS_LIST.map((docName) => {
                         const isChecked = formData.requiredDocuments?.includes(docName) || false;
                         return (
@@ -561,19 +570,23 @@ export function EmployeeFormModal({ isOpen, onClose, onSubmit, initialData }: Em
                           </label>
                         );
                       })}
-                    </div>
+                    </fieldset>
                   </div>
                 </div>
 
                 {/* 4. BONDS & EXIT */}
                 <div className={cn("space-y-8 animate-in fade-in slide-in-from-right-4 duration-300", activeTab === 'offboarding' ? 'block' : 'hidden')}>
-                  <div className="pb-4 border-b border-border/50">
-                    <h3 className="text-lg font-black">Bonds, Contracts & Exit</h3>
-                    <p className="text-sm text-muted-foreground">Manage legal and timeline obligations.</p>
+                  <div className="pb-4 border-b border-border/50 flex justify-between items-start">
+                    <div>
+                      <h3 className="text-lg font-black">Bonds, Contracts & Exit</h3>
+                      <p className="text-sm text-muted-foreground">Manage legal and timeline obligations.</p>
+                    </div>
+                    {isSelfEdit && <span className="bg-muted px-3 py-1 rounded-lg text-xs font-bold text-muted-foreground">Read Only</span>}
                   </div>
                   
-                  {/* Bonds */}
-                  <div className="p-5 rounded-2xl border border-border/60 bg-muted/30 space-y-5">
+                  <fieldset disabled={isSelfEdit} className="space-y-8">
+                    {/* Bonds */}
+                    <div className="p-5 rounded-2xl border border-border/60 bg-muted/30 space-y-5">
                     <label className="flex items-center gap-3 cursor-pointer">
                       <input 
                         type="checkbox" 
@@ -671,6 +684,7 @@ export function EmployeeFormModal({ isOpen, onClose, onSubmit, initialData }: Em
                       </div>
                     )}
                   </div>
+                  </fieldset>
 
                 </div>
 
