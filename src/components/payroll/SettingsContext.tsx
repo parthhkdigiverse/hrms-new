@@ -12,12 +12,14 @@ const SettingsContext = createContext<SettingsContextType | undefined>(undefined
 
 export function SettingsProvider({ children }: { children: ReactNode }) {
   const [leaveTypes, setLeaveTypes] = useState<string[]>(() => {
-    const saved = localStorage.getItem("hrms_leave_types");
-    if (saved) {
-      try {
-        return JSON.parse(saved);
-      } catch (e) {
-        return defaultLeaveTypes;
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem("hrms_leave_types");
+      if (saved) {
+        try {
+          return JSON.parse(saved);
+        } catch (e) {
+          return defaultLeaveTypes;
+        }
       }
     }
     return defaultLeaveTypes;

@@ -17,7 +17,7 @@ const departmentCost = [
   { name: 'HR', value: 120000 },
   { name: 'Operations', value: 250000 },
 ];
-const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899'];
+const COLORS = ['var(--chart-1)', 'var(--chart-2)', 'var(--chart-3)', 'var(--chart-4)', 'var(--chart-5)'];
 
 export function PayrollReport() {
   return (
@@ -104,22 +104,24 @@ export function PayrollReport() {
           <div className="h-[350px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <ComposedChart data={payrollTrend} margin={{ top: 20, right: 30, left: 10, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" opacity={0.5} />
-                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }} dy={10} />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" opacity={0.5} />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: "var(--muted-foreground)" }} dy={10} />
                 <YAxis 
                   axisLine={false} 
                   tickLine={false} 
-                  tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }} 
+                  tick={{ fontSize: 12, fill: 'var(--muted-foreground)' }} 
                   tickFormatter={(val) => `₹${(val / 1000).toFixed(0)}k`}
                 />
                 <Tooltip 
-                  cursor={{ fill: 'hsl(var(--muted)/0.5)' }}
-                  contentStyle={{ backgroundColor: 'hsl(var(--card))', borderColor: 'hsl(var(--border))', borderRadius: '12px', color: 'hsl(var(--foreground))' }}
+                  contentStyle={{ backgroundColor: "var(--card)", borderColor: "var(--border)", borderRadius: "12px", color: "var(--foreground)", boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)", padding: "12px" }}
+                  labelStyle={{ color: "var(--muted-foreground)", marginBottom: "4px", fontWeight: "bold" }}
+                  itemStyle={{ fontWeight: "bold" }}
+                  cursor={{ fill: "var(--muted)", opacity: 0.2 }}
                 />
                 <Legend wrapperStyle={{ paddingTop: '20px' }} />
-                <Bar dataKey="Base" stackId="a" fill="#3b82f6" radius={[0, 0, 4, 4]} />
-                <Bar dataKey="Bonuses" stackId="a" fill="#10b981" radius={[4, 4, 0, 0]} />
-                <Line type="monotone" dataKey="Deductions" stroke="#ef4444" strokeWidth={3} dot={{ r: 4 }} />
+                <Bar dataKey="Base" fill="var(--chart-1)" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="Bonuses" fill="var(--chart-2)" radius={[4, 4, 0, 0]} />
+                <Line type="monotone" dataKey="Deductions" stroke="var(--destructive)" strokeWidth={3} dot={{ r: 4 }} />
               </ComposedChart>
             </ResponsiveContainer>
           </div>
@@ -134,12 +136,12 @@ export function PayrollReport() {
           <div className="h-[350px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={departmentCost} layout="vertical" margin={{ top: 0, right: 20, left: 10, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="hsl(var(--border))" opacity={0.3} />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" opacity={0.5} />
                 <XAxis type="number" hide />
-                <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: 'hsl(var(--foreground))', fontWeight: 'bold' }} width={80} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: "var(--muted-foreground)" }} type="category" />
                 <Tooltip 
                   cursor={{ fill: 'hsl(var(--muted)/0.5)' }}
-                  contentStyle={{ backgroundColor: 'hsl(var(--card))', borderColor: 'hsl(var(--border))', borderRadius: '12px', color: 'hsl(var(--foreground))' }}
+                  contentStyle={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', borderRadius: '12px', color: 'var(--foreground)' }}
                   formatter={(value: number) => [`₹ ${value.toLocaleString()}`, 'Cost']}
                 />
                 <Bar dataKey="value" radius={[0, 6, 6, 0]} barSize={24}>

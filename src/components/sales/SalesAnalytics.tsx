@@ -60,8 +60,8 @@ export function SalesAnalytics({ onAction }: { onAction?: (action: string) => vo
                 <YAxis tick={{ fontSize: 11 }} tickFormatter={(v) => `₹${v}L`} />
                 <Tooltip formatter={(v: number) => [`₹${v}L`, ""]} />
                 <Legend />
-                <Area type="monotone" dataKey="target" stroke="#94a3b8" strokeDasharray="4 4" fill="none" strokeWidth={2} name="Target" />
-                <Area type="monotone" dataKey="revenue" stroke="#10b981" fill="url(#aRevGrad)" strokeWidth={2.5} name="Revenue" />
+                <Area type="monotone" dataKey="target" stroke="var(--chart-1)" strokeDasharray="4 4" fill="none" strokeWidth={2} name="Target" />
+                <Area type="monotone" dataKey="revenue" stroke="var(--chart-2)" fill="url(#aRevGrad)" strokeWidth={2.5} name="Revenue" />
               </AreaChart>
             </ResponsiveContainer>
           </div>
@@ -110,8 +110,8 @@ export function SalesAnalytics({ onAction }: { onAction?: (action: string) => vo
                 <YAxis dataKey="source" type="category" tick={{ fontSize: 10 }} width={75} />
                 <Tooltip />
                 <Legend />
-                <Bar dataKey="leads" fill="#6366f1" radius={[0, 4, 4, 0]} barSize={10} name="Leads" />
-                <Bar dataKey="won" fill="#10b981" radius={[0, 4, 4, 0]} barSize={10} name="Won" />
+                <Bar dataKey="leads" fill="var(--chart-1)" radius={[0, 4, 4, 0]} barSize={10} name="Leads" />
+                <Bar dataKey="won" fill="var(--chart-2)" radius={[0, 4, 4, 0]} barSize={10} name="Won" />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -154,8 +154,8 @@ export function SalesAnalytics({ onAction }: { onAction?: (action: string) => vo
                 <YAxis tick={{ fontSize: 11 }} tickFormatter={(v) => `₹${v}L`} />
                 <Tooltip formatter={(v: number) => [`₹${v}L`, ""]} />
                 <Legend />
-                <Bar dataKey="revenue" fill="#10b981" radius={[4, 4, 0, 0]} barSize={16} name="Revenue" />
-                <Bar dataKey="target" fill="#94a3b8" radius={[4, 4, 0, 0]} barSize={16} name="Target" />
+                <Bar dataKey="revenue" fill="var(--chart-1)" radius={[4, 4, 0, 0]} barSize={16} name="Revenue" />
+                <Bar dataKey="target" fill="var(--chart-2)" radius={[4, 4, 0, 0]} barSize={16} name="Target" />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -170,7 +170,7 @@ export function SalesAnalytics({ onAction }: { onAction?: (action: string) => vo
                 <XAxis dataKey="quarter" tick={{ fontSize: 10 }} />
                 <YAxis tick={{ fontSize: 11 }} tickFormatter={(v) => `₹${v}L`} />
                 <Tooltip formatter={(v: number, name: string) => [name === "revenue" ? `₹${v}L` : `${v}%`, name === "revenue" ? "Revenue" : "Growth"]} />
-                <Bar dataKey="revenue" fill="#6366f1" radius={[6, 6, 0, 0]} barSize={32} name="Revenue">
+                <Bar dataKey="revenue" fill="var(--chart-1)" radius={[6, 6, 0, 0]} barSize={32} name="Revenue">
                   {quarterlyGrowth.map((entry, i) => (
                     <Cell key={i} fill={entry.growth >= 0 ? "#6366f1" : "#ef4444"} />
                   ))}
@@ -192,7 +192,7 @@ export function SalesAnalytics({ onAction }: { onAction?: (action: string) => vo
                 <XAxis dataKey="month" tick={{ fontSize: 11 }} />
                 <YAxis tick={{ fontSize: 11 }} tickFormatter={(v) => `₹${v}L`} />
                 <Tooltip formatter={(v: number) => [`₹${v}L`, ""]} />
-                <Line type="monotone" dataKey="forecast" stroke="#8b5cf6" strokeWidth={2.5} strokeDasharray="6 3" dot={{ r: 4 }} name="Forecast" />
+                <Line type="monotone" dataKey="forecast" stroke="var(--chart-1)" strokeWidth={2.5} strokeDasharray="6 3" dot={{ r: 4 }} name="Forecast" />
               </LineChart>
             </ResponsiveContainer>
           </div>
@@ -207,7 +207,7 @@ export function SalesAnalytics({ onAction }: { onAction?: (action: string) => vo
                 <XAxis dataKey="month" tick={{ fontSize: 11 }} />
                 <YAxis tick={{ fontSize: 11 }} tickFormatter={(v) => `₹${v}L`} domain={[1.4, 2.0]} />
                 <Tooltip formatter={(v: number) => [`₹${v}L`, "Deal Size"]} />
-                <Line type="monotone" dataKey="size" stroke="#10b981" strokeWidth={2.5} dot={{ r: 4, fill: "#10b981" }} />
+                <Line type="monotone" dataKey="size" stroke="var(--chart-1)" strokeWidth={2.5} dot={{ r: 4, fill: "var(--chart-1)" }} />
               </LineChart>
             </ResponsiveContainer>
           </div>

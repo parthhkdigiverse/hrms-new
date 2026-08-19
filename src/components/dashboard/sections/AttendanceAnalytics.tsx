@@ -60,19 +60,23 @@ export function AttendanceAnalytics() {
           <div className="h-[250px] mt-4">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={WEEKLY_ATTENDANCE} margin={{ top: 10, right: 0, left: -20, bottom: 0 }} barGap={2}>
-                <CartesianGrid strokeDasharray="0" vertical={false} stroke="#f1f5f9" />
-                <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#64748b' }} dy={10} />
-                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#64748b' }} ticks={[0, 40, 80, 120, 160]} domain={[0, 160]} />
-                <Tooltip contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} cursor={{fill: 'transparent'}} />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" opacity={0.5} />
+                <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: 'var(--muted-foreground)' }} dy={10} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: 'var(--muted-foreground)' }} ticks={[0, 40, 80, 120, 160]} domain={[0, 160]} />
+                <Tooltip 
+                  contentStyle={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', borderRadius: '12px', color: 'var(--foreground)', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                  itemStyle={{ color: 'var(--primary)', fontWeight: 'bold' }}
+                  cursor={{ fill: 'var(--muted)', opacity: 0.2 }}
+                />
                 <Legend 
                   iconType="circle" 
                   wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} 
                   formatter={(value) => <span className="text-muted-foreground font-medium capitalize">{value}</span>}
                 />
-                <Bar dataKey="present" fill="#20b2aa" radius={[4, 4, 0, 0]} barSize={16} />
-                <Bar dataKey="late" fill="#f5a623" radius={[4, 4, 0, 0]} barSize={16} />
-                <Bar dataKey="wfh" fill="#4a90e2" radius={[4, 4, 0, 0]} barSize={16} />
-                <Bar dataKey="absent" fill="#e74c3c" radius={[4, 4, 0, 0]} barSize={16} />
+                <Bar dataKey="present" fill="var(--chart-1)" radius={[4, 4, 0, 0]} barSize={16} />
+                <Bar dataKey="late" fill="var(--chart-2)" radius={[4, 4, 0, 0]} barSize={16} />
+                <Bar dataKey="wfh" fill="var(--chart-3)" radius={[4, 4, 0, 0]} barSize={16} />
+                <Bar dataKey="absent" fill="var(--destructive)" radius={[4, 4, 0, 0]} barSize={16} />
               </BarChart>
             </ResponsiveContainer>
           </div>

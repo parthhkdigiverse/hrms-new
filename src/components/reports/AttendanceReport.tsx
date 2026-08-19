@@ -20,7 +20,7 @@ const leaveTypes = [
   { name: 'Maternity', value: 15 },
   { name: 'Unpaid', value: 10 },
 ];
-const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444'];
+const COLORS = ['var(--chart-1)', 'var(--chart-2)', 'var(--chart-3)', 'var(--chart-4)', 'var(--chart-5)'];
 
 export function AttendanceReport() {
   return (
@@ -107,17 +107,19 @@ export function AttendanceReport() {
           <div className="h-[350px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={dailyAttendance} margin={{ top: 20, right: 30, left: -20, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" opacity={0.5} />
-                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }} dy={10} />
-                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }} />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" opacity={0.5} />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: "var(--muted-foreground)" }} dy={10} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: "var(--muted-foreground)" }} />
                 <Tooltip 
-                  cursor={{ fill: 'hsl(var(--muted)/0.5)' }}
-                  contentStyle={{ backgroundColor: 'hsl(var(--card))', borderColor: 'hsl(var(--border))', borderRadius: '12px', color: 'hsl(var(--foreground))' }}
+                  contentStyle={{ backgroundColor: "var(--card)", borderColor: "var(--border)", borderRadius: "12px", color: "var(--foreground)", boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)", padding: "12px" }}
+                  labelStyle={{ color: "var(--muted-foreground)", marginBottom: "4px", fontWeight: "bold" }}
+                  itemStyle={{ fontWeight: "bold" }}
+                  cursor={{ fill: "var(--muted)", opacity: 0.2 }}
                 />
                 <Legend wrapperStyle={{ paddingTop: '20px' }} />
-                <Bar dataKey="Present" stackId="a" fill="#10b981" radius={[0, 0, 0, 0]} />
-                <Bar dataKey="Leave" stackId="a" fill="#3b82f6" radius={[0, 0, 0, 0]} />
-                <Bar dataKey="Absent" stackId="a" fill="#ef4444" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="Present" fill="var(--chart-1)" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="Leave" fill="var(--chart-2)" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="Absent" fill="var(--destructive)" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -147,10 +149,12 @@ export function AttendanceReport() {
                   ))}
                 </Pie>
                 <Tooltip 
-                  contentStyle={{ backgroundColor: 'hsl(var(--card))', borderColor: 'hsl(var(--border))', borderRadius: '12px', color: 'hsl(var(--foreground))' }}
-                  itemStyle={{ fontWeight: 'bold' }}
+                  contentStyle={{ backgroundColor: "var(--card)", borderColor: "var(--border)", borderRadius: "12px", color: "var(--foreground)", boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)", padding: "12px" }}
+                  labelStyle={{ color: "var(--muted-foreground)", marginBottom: "4px", fontWeight: "bold" }}
+                  itemStyle={{ fontWeight: "bold" }}
+                  cursor={{ fill: "var(--muted)", opacity: 0.2 }}
                 />
-                <Legend verticalAlign="bottom" height={36} />
+                <Legend verticalAlign="bottom" height={40} wrapperStyle={{ paddingTop: '20px' }} />
               </PieChart>
             </ResponsiveContainer>
           </div>

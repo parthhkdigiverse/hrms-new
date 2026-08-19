@@ -36,7 +36,7 @@ export function CollaborationModule() {
     { name: 'Incoming (Insourced)', value: 15 },
     { name: 'Outgoing (Outsourced)', value: 9 },
   ];
-  const COLORS = ['#059669', '#A7F3D0'];
+  const COLORS = ['var(--chart-1)', 'var(--chart-2)', 'var(--chart-3)', 'var(--chart-4)', 'var(--chart-5)'];
 
   return (
     <div className="p-6 md:p-8 max-w-7xl mx-auto space-y-8 pb-24">
@@ -76,11 +76,16 @@ export function CollaborationModule() {
                     <stop offset="95%" stopColor="#059669" stopOpacity={0}/>
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
-                <XAxis dataKey="month" stroke="#6B7280" fontSize={12} tickLine={false} axisLine={false} />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" opacity={0.5} />
+                <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: "var(--muted-foreground)" }} dy={10} />
                 <YAxis stroke="#6B7280" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `₹${value/1000}k`} />
-                <Tooltip cursor={{ fill: 'transparent' }} contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
-                <Area type="monotone" dataKey="value" stroke="#059669" strokeWidth={3} fillOpacity={1} fill="url(#colorValue)" />
+                <Tooltip 
+                  contentStyle={{ backgroundColor: "var(--card)", borderColor: "var(--border)", borderRadius: "12px", color: "var(--foreground)", boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)", padding: "12px" }}
+                  labelStyle={{ color: "var(--muted-foreground)", marginBottom: "4px", fontWeight: "bold" }}
+                  itemStyle={{ fontWeight: "bold" }}
+                  cursor={{ fill: "var(--muted)", opacity: 0.2 }}
+                />
+                <Area type="monotone" dataKey="value" stroke="var(--chart-1)" strokeWidth={3} fillOpacity={1} fill="url(#colorValue)" />
               </AreaChart>
             </ResponsiveContainer>
           </div>
@@ -103,8 +108,13 @@ export function CollaborationModule() {
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
-                <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
-                <Legend verticalAlign="bottom" height={36} wrapperStyle={{ fontSize: '12px' }} />
+                <Tooltip 
+                  contentStyle={{ backgroundColor: "var(--card)", borderColor: "var(--border)", borderRadius: "12px", color: "var(--foreground)", boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)", padding: "12px" }}
+                  labelStyle={{ color: "var(--muted-foreground)", marginBottom: "4px", fontWeight: "bold" }}
+                  itemStyle={{ fontWeight: "bold" }}
+                  cursor={{ fill: "var(--muted)", opacity: 0.2 }}
+                />
+                <Legend verticalAlign="bottom" height={40} wrapperStyle={{ fontSize: '12px', paddingTop: '20px' }} />
               </PieChart>
             </ResponsiveContainer>
           </div>

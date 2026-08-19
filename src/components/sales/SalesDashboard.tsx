@@ -146,8 +146,8 @@ function HealthScore() {
       <p className="mb-3 text-xs font-bold uppercase tracking-widest text-emerald-700">Sales Health Score</p>
       <div className="relative h-28 w-28">
         <svg className="h-28 w-28 -rotate-90" viewBox="0 0 100 100">
-          <circle cx="50" cy="50" r="42" fill="none" stroke="#d1fae5" strokeWidth="8" />
-          <circle cx="50" cy="50" r="42" fill="none" stroke="#10b981" strokeWidth="8" strokeDasharray={circumference} strokeDashoffset={offset} strokeLinecap="round" className="transition-all duration-1000" />
+          <circle cx="50" cy="50" r="42" fill="none" stroke="var(--muted)" strokeWidth="8" />
+          <circle cx="50" cy="50" r="42" fill="none" stroke="var(--chart-1)" strokeWidth="8" strokeDasharray={circumference} strokeDashoffset={offset} strokeLinecap="round" className="transition-all duration-1000" />
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
           <span className="text-3xl font-black text-emerald-700">{score}</span>
@@ -216,8 +216,8 @@ function RevenueChart() {
             <XAxis dataKey="month" tick={{ fontSize: 11 }} />
             <YAxis tick={{ fontSize: 11 }} tickFormatter={(v) => `₹${v}L`} />
             <Tooltip formatter={(v: number) => [`₹${v}L`, ""]} />
-            <Area type="monotone" dataKey="target" stroke="#94a3b8" strokeDasharray="4 4" fill="none" strokeWidth={2} />
-            <Area type="monotone" dataKey="revenue" stroke="#10b981" fill="url(#revGrad)" strokeWidth={2.5} />
+            <Area type="monotone" dataKey="target" stroke="var(--chart-1)" strokeDasharray="4 4" fill="none" strokeWidth={2} />
+            <Area type="monotone" dataKey="revenue" stroke="var(--chart-2)" fill="url(#revGrad)" strokeWidth={2.5} />
           </AreaChart>
         </ResponsiveContainer>
       </div>
@@ -270,8 +270,8 @@ function LeadSourceChart() {
             <XAxis type="number" tick={{ fontSize: 11 }} />
             <YAxis dataKey="source" type="category" tick={{ fontSize: 10 }} width={75} />
             <Tooltip />
-            <Bar dataKey="leads" fill="#6366f1" radius={[0, 4, 4, 0]} barSize={12} name="Leads" />
-            <Bar dataKey="won" fill="#10b981" radius={[0, 4, 4, 0]} barSize={12} name="Won" />
+            <Bar dataKey="leads" fill="var(--chart-1)" radius={[0, 4, 4, 0]} barSize={12} name="Leads" />
+            <Bar dataKey="won" fill="var(--chart-2)" radius={[0, 4, 4, 0]} barSize={12} name="Won" />
           </BarChart>
         </ResponsiveContainer>
       </div>

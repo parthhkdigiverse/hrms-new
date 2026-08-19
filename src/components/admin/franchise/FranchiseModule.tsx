@@ -45,7 +45,7 @@ export function FranchiseModule() {
     { name: 'Reserved', value: 8 },
     { name: 'Available', value: 45 },
   ];
-  const COLORS = ['#059669', '#34D399', '#A7F3D0'];
+  const COLORS = ['var(--chart-1)', 'var(--chart-2)', 'var(--chart-3)', 'var(--chart-4)', 'var(--chart-5)'];
 
   return (
     <div className="p-6 md:p-8 max-w-7xl mx-auto space-y-8 pb-24">
@@ -79,11 +79,16 @@ export function FranchiseModule() {
           <div className="flex-1 w-full h-[250px]">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={funnelData} layout="vertical" margin={{ top: 0, right: 20, left: 20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#E5E7EB" />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" opacity={0.5} />
                 <XAxis type="number" hide />
-                <YAxis dataKey="stage" type="category" stroke="#6B7280" fontSize={12} tickLine={false} axisLine={false} />
-                <Tooltip cursor={{ fill: 'transparent' }} contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
-                <Bar dataKey="count" fill="#059669" radius={[0, 4, 4, 0]} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: "var(--muted-foreground)" }} type="category" />
+                <Tooltip 
+                  contentStyle={{ backgroundColor: "var(--card)", borderColor: "var(--border)", borderRadius: "12px", color: "var(--foreground)", boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)", padding: "12px" }}
+                  labelStyle={{ color: "var(--muted-foreground)", marginBottom: "4px", fontWeight: "bold" }}
+                  itemStyle={{ fontWeight: "bold" }}
+                  cursor={{ fill: "var(--muted)", opacity: 0.2 }}
+                />
+                <Bar dataKey="count" fill="var(--chart-1)" radius={[0, 4, 4, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -93,12 +98,17 @@ export function FranchiseModule() {
           <div className="flex-1 w-full h-[250px]">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={leadsData}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
-                <XAxis dataKey="month" stroke="#6B7280" fontSize={12} tickLine={false} axisLine={false} />
-                <YAxis stroke="#6B7280" fontSize={12} tickLine={false} axisLine={false} />
-                <Tooltip cursor={{ fill: 'transparent' }} contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
-                <Line type="monotone" dataKey="leads" name="Total Leads" stroke="#059669" strokeWidth={3} dot={false} />
-                <Line type="monotone" dataKey="converted" name="Converted" stroke="#34D399" strokeWidth={3} dot={false} />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" opacity={0.5} />
+                <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: "var(--muted-foreground)" }} dy={10} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: "var(--muted-foreground)" }} />
+                <Tooltip 
+                  contentStyle={{ backgroundColor: "var(--card)", borderColor: "var(--border)", borderRadius: "12px", color: "var(--foreground)", boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)", padding: "12px" }}
+                  labelStyle={{ color: "var(--muted-foreground)", marginBottom: "4px", fontWeight: "bold" }}
+                  itemStyle={{ fontWeight: "bold" }}
+                  cursor={{ fill: "var(--muted)", opacity: 0.2 }}
+                />
+                <Line type="monotone" dataKey="leads" name="Total Leads" stroke="var(--chart-1)" strokeWidth={3} dot={false} />
+                <Line type="monotone" dataKey="converted" name="Converted" stroke="var(--chart-2)" strokeWidth={3} dot={false} />
               </LineChart>
             </ResponsiveContainer>
           </div>
@@ -121,8 +131,13 @@ export function FranchiseModule() {
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
-                <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
-                <Legend verticalAlign="bottom" height={36} wrapperStyle={{ fontSize: '12px' }} />
+                <Tooltip 
+                  contentStyle={{ backgroundColor: "var(--card)", borderColor: "var(--border)", borderRadius: "12px", color: "var(--foreground)", boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)", padding: "12px" }}
+                  labelStyle={{ color: "var(--muted-foreground)", marginBottom: "4px", fontWeight: "bold" }}
+                  itemStyle={{ fontWeight: "bold" }}
+                  cursor={{ fill: "var(--muted)", opacity: 0.2 }}
+                />
+                <Legend verticalAlign="bottom" height={40} wrapperStyle={{ fontSize: '12px', paddingTop: '20px' }} />
               </PieChart>
             </ResponsiveContainer>
           </div>
