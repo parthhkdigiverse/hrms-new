@@ -88,9 +88,9 @@ export const TOP_PERFORMERS = [
 ];
 
 export const SPOTLIGHT_EMPLOYEES = [
-  { name: "Riya Shah", role: "Employee of the Month · Development" },
+  { name: "Parince", role: "Employee of the Month", image: "/prince.jpg" },
   { name: "Aarav Mehta", role: "Top Closer · Sales" },
-  { name: "Neha Patel", role: "Creative Star · Design" }
+  { name: "Neha Patel", role: "Creative Star · Design", image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=800&auto=format&fit=crop&q=80" }
 ];
 
 export const LATE_LEADERBOARD = [

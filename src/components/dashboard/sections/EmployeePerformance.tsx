@@ -3,18 +3,36 @@ import { Sparkles, Trophy } from "lucide-react";
 import { TOP_PERFORMERS, NEEDS_ATTENTION, LATE_LEADERBOARD, SPOTLIGHT_EMPLOYEES } from "../dashboard-data";
 import { cn } from "@/lib/utils";
 import { CollapsibleSection } from "./CollapsibleSection";
+import { SpotlightEditor, SpotlightEmployee } from "./SpotlightEditor";
 
 export function EmployeePerformance() {
   const [currentSpotlight, setCurrentSpotlight] = useState(0);
+  const [spotlights, setSpotlightsState] = useState<SpotlightEmployee[]>([]);
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentSpotlight((prev) => (prev + 1) % SPOTLIGHT_EMPLOYEES.length);
-    }, 3000);
-    return () => clearInterval(timer);
+    const saved = localStorage.getItem("dashboard-spotlights");
+    if (saved) {
+      setSpotlightsState(JSON.parse(saved));
+    } else {
+      setSpotlightsState(SPOTLIGHT_EMPLOYEES);
+    }
   }, []);
 
-  const spotlight = SPOTLIGHT_EMPLOYEES[currentSpotlight];
+  const setSpotlights = (data: SpotlightEmployee[]) => {
+    setSpotlightsState(data);
+    localStorage.setItem("dashboard-spotlights", JSON.stringify(data));
+    setCurrentSpotlight(0);
+  };
+
+  useEffect(() => {
+    if (spotlights.length === 0) return;
+    const timer = setInterval(() => {
+      setCurrentSpotlight((prev) => (prev + 1) % spotlights.length);
+    }, 3000);
+    return () => clearInterval(timer);
+  }, [spotlights.length]);
+
+  const spotlight = spotlights[currentSpotlight] || spotlights[0];
 
   return (
     <div className="mb-12">
@@ -44,24 +62,43 @@ export function EmployeePerformance() {
         </div>
 
         {/* Spotlight Carousel */}
-        <div className="bg-primary rounded-3xl p-6 text-primary-foreground shadow-sm relative overflow-hidden flex flex-col justify-between">
-          <div className="absolute top-0 right-0 p-4 opacity-10">
-            <Sparkles className="h-32 w-32" />
+        <div 
+          className={cn(
+            "rounded-3xl p-6 shadow-sm relative overflow-hidden flex flex-col justify-between transition-all duration-500 group", 
+            !(spotlight && 'image' in spotlight && spotlight.image) && "bg-primary"
+          )}
+          style={(spotlight && 'image' in spotlight && spotlight.image) ? {
+            backgroundImage: `url(${spotlight.image})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center"
+          } : undefined}
+        >
+          <SpotlightEditor spotlights={spotlights} setSpotlights={setSpotlights} />
+          
+          {(spotlight && 'image' in spotlight && spotlight.image) && (
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/10 z-0" />
+          )}
+          <div className="absolute top-0 right-0 p-4 opacity-10 z-0">
+            <Sparkles className={cn("h-32 w-32", (spotlight && 'image' in spotlight && spotlight.image) ? "text-white" : "")} />
           </div>
-          <div>
-            <h3 className="text-xs font-bold text-primary-foreground/70 uppercase tracking-wider mb-6 flex items-center justify-between">
+          <div className="relative z-10 h-full flex flex-col justify-between">
+            <h3 className={cn("text-xs font-bold uppercase tracking-wider mb-6 flex items-center justify-between", (spotlight && 'image' in spotlight && spotlight.image) ? "text-white/80" : "text-primary-foreground/70")}>
               Spotlight
               <div className="flex gap-1">
-                {SPOTLIGHT_EMPLOYEES.map((_, i) => (
-                  <div key={i} className={cn("h-1 rounded-full transition-all duration-300", i === currentSpotlight ? "w-3 bg-primary-foreground" : "w-1 bg-primary-foreground/30")} />
+                {spotlights.map((_, i) => (
+                  <div key={i} className={cn("h-1 rounded-full transition-all duration-300", 
+                    i === currentSpotlight 
+                      ? ((spotlight && 'image' in spotlight && spotlight.image) ? "w-3 bg-white" : "w-3 bg-primary-foreground") 
+                      : ((spotlight && 'image' in spotlight && spotlight.image) ? "w-1 bg-white/30" : "w-1 bg-primary-foreground/30")
+                  )} />
                 ))}
               </div>
             </h3>
             <div className="min-h-[80px]">
-              <p className="text-3xl font-black mb-1 animate-in fade-in slide-in-from-right-4 duration-500" key={spotlight?.name}>
+              <p className={cn("text-3xl font-black mb-1 animate-in fade-in slide-in-from-right-4 duration-500", (spotlight && 'image' in spotlight && spotlight.image) ? "text-white" : "text-primary-foreground")} key={spotlight?.name}>
                 {spotlight?.name}
               </p>
-              <p className="text-primary-foreground/80 text-sm animate-in fade-in slide-in-from-right-4 duration-500 delay-75" key={spotlight?.role}>
+              <p className={cn("text-sm animate-in fade-in slide-in-from-right-4 duration-500 delay-75", (spotlight && 'image' in spotlight && spotlight.image) ? "text-white/80" : "text-primary-foreground/80")} key={spotlight?.role}>
                 {spotlight?.role}
               </p>
             </div>
