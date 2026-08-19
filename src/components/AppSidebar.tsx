@@ -350,7 +350,7 @@ function SidebarBody({
                       : "hover:bg-sidebar-accent",
                   )}
                 >
-                  <Clock className="h-3.5 w-3.5 shrink-0 text-sidebar-muted" />
+                  <Clock className={cn("h-3.5 w-3.5 shrink-0", active === r.url ? "text-sidebar-primary-foreground" : "text-sidebar-muted")} />
                   <span className="truncate">{r.title}</span>
                 </button>
               ))}

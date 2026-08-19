@@ -3,6 +3,14 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 interface ThemeContextType {
   color: string;
   setColor: (color: string) => void;
+  isGradient: boolean;
+  setIsGradient: (isGradient: boolean) => void;
+  gradientType: "linear" | "radial";
+  setGradientType: (type: "linear" | "radial") => void;
+  gradientDirection: string;
+  setGradientDirection: (direction: string) => void;
+  gradientColor2: string;
+  setGradientColor2: (color: string) => void;
   radius: number;
   setRadius: (radius: number) => void;
   fontFamily: string;
@@ -56,6 +64,11 @@ function hexToHSL(H: string) {
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [color, setColor] = useState<string>("#10b981");
+  const [isGradient, setIsGradient] = useState<boolean>(false);
+  const [gradientType, setGradientType] = useState<"linear" | "radial">("linear");
+  const [gradientDirection, setGradientDirection] = useState<string>("to right");
+  const [gradientColor2, setGradientColor2] = useState<string>("#0284c7");
+
   const [radius, setRadius] = useState<number>(0.75);
   const [fontFamily, setFontFamily] = useState<string>("Inter");
   const [logoUrl, setLogoUrl] = useState<string>("");
@@ -63,12 +76,22 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const savedColor = localStorage.getItem("app-theme-color");
+    const savedIsGradient = localStorage.getItem("app-theme-is-gradient");
+    const savedGradientType = localStorage.getItem("app-theme-gradient-type");
+    const savedGradientDirection = localStorage.getItem("app-theme-gradient-direction");
+    const savedGradientColor2 = localStorage.getItem("app-theme-gradient-color2");
+
     const savedRadius = localStorage.getItem("app-theme-radius");
     const savedFont = localStorage.getItem("app-theme-font");
     const savedLogo = localStorage.getItem("app-theme-logo");
     const savedName = localStorage.getItem("app-theme-name");
 
     if (savedColor) setColor(savedColor);
+    if (savedIsGradient) setIsGradient(savedIsGradient === "true");
+    if (savedGradientType) setGradientType(savedGradientType as "linear" | "radial");
+    if (savedGradientDirection) setGradientDirection(savedGradientDirection);
+    if (savedGradientColor2) setGradientColor2(savedGradientColor2);
+
     if (savedRadius) setRadius(parseFloat(savedRadius));
     if (savedFont) setFontFamily(savedFont);
     if (savedLogo) setLogoUrl(savedLogo);
@@ -108,15 +131,48 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       : `'${fontFamily}', sans-serif`;
 
     localStorage.setItem("app-theme-color", color);
+    localStorage.setItem("app-theme-is-gradient", isGradient.toString());
+    localStorage.setItem("app-theme-gradient-type", gradientType);
+    localStorage.setItem("app-theme-gradient-direction", gradientDirection);
+    localStorage.setItem("app-theme-gradient-color2", gradientColor2);
+
     localStorage.setItem("app-theme-radius", radius.toString());
     localStorage.setItem("app-theme-font", fontFamily);
     localStorage.setItem("app-theme-logo", logoUrl);
     localStorage.setItem("app-theme-name", companyName);
-  }, [color, radius, fontFamily, logoUrl, companyName]);
+
+    // Apply gradient override
+    let styleEl = document.getElementById("theme-gradient-override");
+    if (!styleEl) {
+      styleEl = document.createElement("style");
+      styleEl.id = "theme-gradient-override";
+      document.head.appendChild(styleEl);
+    }
+
+    if (isGradient) {
+      const hsl2 = hexToHSL(gradientColor2);
+      const color2 = `hsl(${hsl2.h}, ${hsl2.s}%, ${hsl2.l}%)`;
+      const bgImage = gradientType === "linear" 
+        ? `linear-gradient(${gradientDirection}, var(--primary), ${color2})`
+        : `radial-gradient(circle, var(--primary), ${color2})`;
+      
+      styleEl.innerHTML = `
+        .bg-primary, .bg-sidebar-primary {
+          background-image: ${bgImage} !important;
+        }
+      `;
+    } else {
+      styleEl.innerHTML = "";
+    }
+  }, [color, isGradient, gradientType, gradientDirection, gradientColor2, radius, fontFamily, logoUrl, companyName]);
 
   return (
     <ThemeContext.Provider value={{ 
       color, setColor, 
+      isGradient, setIsGradient,
+      gradientType, setGradientType,
+      gradientDirection, setGradientDirection,
+      gradientColor2, setGradientColor2,
       radius, setRadius, 
       fontFamily, setFontFamily, 
       logoUrl, setLogoUrl, 

@@ -101,6 +101,10 @@ function FontSelector({ value, onChange }: { value: string; onChange: (v: string
 export function AdminSettings() {
   const { 
     color, setColor, 
+    isGradient, setIsGradient,
+    gradientType, setGradientType,
+    gradientDirection, setGradientDirection,
+    gradientColor2, setGradientColor2,
     radius, setRadius, 
     fontFamily, setFontFamily, 
     logoUrl, setLogoUrl, 
@@ -171,28 +175,89 @@ export function AdminSettings() {
           </p>
           
           <div className="flex flex-col gap-4 mt-auto">
-            <div className="flex items-center gap-4 p-4 border border-border rounded-2xl bg-muted/30">
-              <div className="relative w-16 h-16 rounded-full overflow-hidden border-4 border-background shadow-md shrink-0">
-                <input
-                  type="color"
-                  value={color}
-                  onChange={(e) => setColor(e.target.value)}
-                  className="absolute inset-[-10px] w-24 h-24 cursor-pointer"
-                />
+            {/* Gradient Toggle */}
+            <div className="flex items-center justify-between p-3 border border-border rounded-xl bg-muted/20">
+              <span className="text-sm font-bold text-foreground">Enable Gradient</span>
+              <div className={`w-10 h-6 rounded-full transition-colors relative cursor-pointer ${isGradient ? 'bg-primary' : 'bg-muted border border-border/50'}`} onClick={() => setIsGradient(!isGradient)}>
+                <div className={`absolute top-1 left-1 w-4 h-4 rounded-full bg-white transition-transform ${isGradient ? 'translate-x-4' : ''}`} />
               </div>
-              <div className="flex-1 min-w-0">
-                <div className="text-sm font-bold">Brand Color</div>
-                <div className="text-xs text-muted-foreground uppercase">{color}</div>
+            </div>
+
+            <div className="flex flex-col gap-4 p-4 border border-border rounded-2xl bg-muted/30">
+              {/* Primary Color */}
+              <div className="flex items-center gap-4">
+                <div className="relative w-12 h-12 rounded-xl overflow-hidden border-2 border-background shadow-sm shrink-0">
+                  <input
+                    type="color"
+                    value={color}
+                    onChange={(e) => setColor(e.target.value)}
+                    className="absolute inset-[-10px] w-20 h-20 cursor-pointer"
+                  />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="text-sm font-bold">{isGradient ? "Start Color" : "Brand Color"}</div>
+                  <div className="text-xs text-muted-foreground uppercase">{color}</div>
+                </div>
               </div>
-              <Paintbrush className="w-5 h-5 ml-auto text-muted-foreground opacity-50 shrink-0" />
+
+              {/* Gradient Settings */}
+              {isGradient && (
+                <>
+                  <div className="flex items-center gap-4">
+                    <div className="relative w-12 h-12 rounded-xl overflow-hidden border-2 border-background shadow-sm shrink-0">
+                      <input
+                        type="color"
+                        value={gradientColor2}
+                        onChange={(e) => setGradientColor2(e.target.value)}
+                        className="absolute inset-[-10px] w-20 h-20 cursor-pointer"
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm font-bold">End Color</div>
+                      <div className="text-xs text-muted-foreground uppercase">{gradientColor2}</div>
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-2 mt-2">
+                    <div>
+                      <label className="block text-[10px] font-bold text-muted-foreground uppercase mb-1">Type</label>
+                      <select 
+                        value={gradientType}
+                        onChange={(e) => setGradientType(e.target.value as "linear" | "radial")}
+                        className="w-full text-xs p-2 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/50"
+                      >
+                        <option value="linear">Linear</option>
+                        <option value="radial">Radial</option>
+                      </select>
+                    </div>
+                    {gradientType === "linear" && (
+                      <div>
+                        <label className="block text-[10px] font-bold text-muted-foreground uppercase mb-1">Direction</label>
+                        <select 
+                          value={gradientDirection}
+                          onChange={(e) => setGradientDirection(e.target.value)}
+                          className="w-full text-xs p-2 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/50"
+                        >
+                          <option value="to right">Right</option>
+                          <option value="to left">Left</option>
+                          <option value="to bottom">Bottom</option>
+                          <option value="to top">Top</option>
+                          <option value="to bottom right">Bottom Right</option>
+                          <option value="to top left">Top Left</option>
+                        </select>
+                      </div>
+                    )}
+                  </div>
+                </>
+              )}
             </div>
 
             {/* Generated Palette Preview */}
             <div className="mt-2">
               <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Generated Palette</div>
               <div className="flex gap-2 w-full">
-                <div className="flex-1 h-8 rounded-md shadow-sm border border-border/50 transition-colors" style={{ backgroundColor: 'var(--primary)' }} title="Primary" />
-                <div className="flex-1 h-8 rounded-md shadow-sm border border-border/50 transition-colors" style={{ backgroundColor: 'var(--sidebar)' }} title="Sidebar" />
+                <div className="flex-1 h-8 rounded-md shadow-sm border border-border/50 transition-colors bg-primary" title="Primary" />
+                <div className="flex-1 h-8 rounded-md shadow-sm border border-border/50 transition-colors bg-sidebar-primary" title="Sidebar" />
                 <div className="flex-1 h-8 rounded-md shadow-sm border border-border/50 transition-colors" style={{ backgroundColor: 'var(--chart-1)' }} title="Chart 1" />
                 <div className="flex-1 h-8 rounded-md shadow-sm border border-border/50 transition-colors" style={{ backgroundColor: 'var(--chart-2)' }} title="Chart 2" />
                 <div className="flex-1 h-8 rounded-md shadow-sm border border-border/50 transition-colors" style={{ backgroundColor: 'var(--chart-3)' }} title="Chart 3" />
