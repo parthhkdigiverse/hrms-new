@@ -62,37 +62,38 @@ export function AddOrgNodeModal({ isOpen, onClose, onSubmit, parentName }: AddOr
             </button>
           </div>
 
-          <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          <form onSubmit={handleSubmit} className="flex flex-col max-h-[70vh]">
+            <div className="p-6 md:p-8 space-y-6 overflow-y-auto">
             <div className="space-y-2">
-              <label className="text-[12px] font-bold text-foreground/80 uppercase tracking-wider">Full Name</label>
+              <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Full Name</label>
               <input 
                 type="text" 
                 required
                 value={formData.name}
                 onChange={(e) => setFormData({...formData, name: e.target.value})}
-                className="w-full px-4 py-2.5 bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#00A56C]/20 focus:border-[#00A56C]/50 transition-all"
+                className="w-full px-4 py-3 bg-muted/50 border border-border/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium"
                 placeholder="e.g. John Doe"
               />
             </div>
 
             <div className="space-y-2">
-              <label className="text-[12px] font-bold text-foreground/80 uppercase tracking-wider">Job Role</label>
+              <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Job Role</label>
               <input 
                 type="text" 
                 required
                 value={formData.role}
                 onChange={(e) => setFormData({...formData, role: e.target.value})}
-                className="w-full px-4 py-2.5 bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#00A56C]/20 focus:border-[#00A56C]/50 transition-all"
+                className="w-full px-4 py-3 bg-muted/50 border border-border/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium"
                 placeholder="e.g. Senior Designer"
               />
             </div>
 
             <div className="space-y-2">
-              <label className="text-[12px] font-bold text-foreground/80 uppercase tracking-wider">Department</label>
+              <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Department</label>
               <select 
                 value={formData.department}
                 onChange={(e) => setFormData({...formData, department: e.target.value})}
-                className="w-full px-4 py-2.5 bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#00A56C]/20 focus:border-[#00A56C]/50 transition-all"
+                className="w-full px-4 py-3 bg-muted/50 border border-border/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium"
               >
                 {departments.map(dept => (
                   <option key={dept} value={dept}>{dept}</option>
@@ -101,11 +102,11 @@ export function AddOrgNodeModal({ isOpen, onClose, onSubmit, parentName }: AddOr
             </div>
 
             <div className="space-y-2">
-              <label className="text-[12px] font-bold text-foreground/80 uppercase tracking-wider">Status</label>
+              <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Status</label>
               <select 
                 value={formData.status}
                 onChange={(e) => setFormData({...formData, status: e.target.value as 'Active' | 'On Leave' | 'Remote'})}
-                className="w-full px-4 py-2.5 bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#00A56C]/20 focus:border-[#00A56C]/50 transition-all"
+                className="w-full px-4 py-3 bg-muted/50 border border-border/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium"
               >
                 <option value="Active">Active</option>
                 <option value="Remote">Remote</option>
@@ -113,17 +114,18 @@ export function AddOrgNodeModal({ isOpen, onClose, onSubmit, parentName }: AddOr
               </select>
             </div>
 
-            <div className="pt-4 flex justify-end gap-3">
+            </div>
+            <div className="px-6 md:px-8 py-4 md:py-6 bg-muted/30 border-t border-border/50 flex justify-end gap-3 mt-auto shrink-0">
               <button 
                 type="button"
                 onClick={onClose}
-                className="px-6 py-2.5 text-sm font-bold text-foreground/80 hover:bg-muted rounded-xl transition-colors"
+                className="px-5 py-2.5 rounded-xl font-bold text-muted-foreground hover:bg-muted transition-colors"
               >
                 Cancel
               </button>
               <button 
                 type="submit"
-                className="px-6 py-2.5 text-sm font-bold text-white bg-[#00A56C] hover:bg-[#00A56C]/90 rounded-xl transition-all shadow-sm shadow-emerald-500/20 active:scale-95"
+                className="px-6 py-2.5 bg-primary text-primary-foreground font-bold rounded-xl shadow-md hover:bg-primary/90 transition-all"
               >
                 Add Member
               </button>

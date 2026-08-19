@@ -200,7 +200,8 @@ export function Tasks() {
             </button>
           </DialogClose>
         </div>
-              <form onSubmit={handleCreateTask} className="space-y-4 pt-4">
+              <form onSubmit={handleCreateTask} className="flex flex-col max-h-[70vh]">
+                <div className="p-6 md:p-8 space-y-6 overflow-y-auto">
                 <div className="space-y-2">
                   <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Task Title</label>
                   <input 
@@ -245,7 +246,8 @@ export function Tasks() {
                     />
                   </div>
                 </div>
-                <div className="pt-4 flex justify-end gap-3">
+                </div>
+<div className="px-6 md:px-8 py-4 md:py-6 bg-muted/30 border-t border-border/50 flex justify-end gap-3 mt-auto shrink-0">
                   <button 
                     type="button" 
                     onClick={() => setIsNewTaskOpen(false)}

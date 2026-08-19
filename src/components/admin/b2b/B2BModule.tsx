@@ -1,10 +1,10 @@
 import { useState } from "react";
-import {  
+import { X,   
   Building2, Users, IndianRupee, Target, Briefcase, Handshake, 
   MapPin, AlertTriangle, ArrowRight, ArrowUpRight, CheckCircle2, 
   Clock, ArrowDownRight, Activity, Search, Filter, Plus, FileText, 
-  MoreVertical, Check, X
- } from "lucide-react";
+  MoreVertical, Check
+  } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
 import { toast } from "sonner";

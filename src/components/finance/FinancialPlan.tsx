@@ -162,7 +162,7 @@ export function FinancialPlan() {
                 <input type="text" placeholder="e.g. MARKETING EXPENSES" className="w-full px-3 py-2 bg-background border border-border/50 rounded-lg text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500/20 uppercase" />
               </div>
             </div>
-            <div className="p-4 border-t border-border/50 flex justify-end gap-2 bg-muted/10">
+            <div className="px-6 md:px-8 py-4 md:py-6 bg-muted/30 border-t border-border/50 flex justify-end gap-3 mt-auto shrink-0">
               <button onClick={() => setIsAddCategoryOpen(false)} className="px-4 py-2 font-bold text-sm bg-background border border-border/50 rounded-lg hover:bg-muted transition-colors text-muted-foreground">Cancel</button>
               <button onClick={() => setIsAddCategoryOpen(false)} className="px-4 py-2 font-bold text-sm bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors shadow-sm">Save Category</button>
             </div>
@@ -205,7 +205,7 @@ export function FinancialPlan() {
                 </div>
               </div>
             </div>
-            <div className="p-4 border-t border-border/50 flex justify-end gap-2 bg-muted/10">
+            <div className="px-6 md:px-8 py-4 md:py-6 bg-muted/30 border-t border-border/50 flex justify-end gap-3 mt-auto shrink-0">
               <button onClick={() => { setIsAddRowOpen(false); setIsEditRowOpen(false); }} className="px-4 py-2 font-bold text-sm bg-background border border-border/50 rounded-lg hover:bg-muted transition-colors text-muted-foreground">Cancel</button>
               <button onClick={() => { setIsAddRowOpen(false); setIsEditRowOpen(false); }} className="px-4 py-2 font-bold text-sm bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-opacity shadow-sm">Save Row</button>
             </div>

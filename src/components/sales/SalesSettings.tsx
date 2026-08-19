@@ -508,7 +508,7 @@ export function SalesSettings() {
                         </div>
                       )}
 
-                      <div className="flex items-center justify-end gap-2 mt-1">
+                      <div className="px-6 md:px-8 py-4 md:py-6 bg-muted/30 border-t border-border/50 flex justify-end gap-3 mt-auto shrink-0">
                         <button onClick={saveEditCategory} className="text-emerald-600 hover:text-emerald-700 font-medium text-sm">Save</button>
                         <button onClick={() => { setEditingCategoryIdx(null); setIsEditIconPickerOpen(false); }} className="text-muted-foreground hover:text-foreground font-medium text-sm">Cancel</button>
                       </div>

@@ -250,7 +250,7 @@ export function LeaveRequests() {
           </DialogClose>
         </div>
               <form onSubmit={handleAddLeave} className="flex flex-col max-h-[70vh]">
-                <div className="p-6 md:p-8 space-y-6 overflow-y-auto">
+                <div className="p-6 md:p-8 space-y-6 overflow-y-auto max-h-[70vh]">
                   <div className="space-y-2">
                     <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Leave Type</label>
                     <select 

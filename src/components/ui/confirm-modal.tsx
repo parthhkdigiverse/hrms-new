@@ -48,14 +48,12 @@ export function ConfirmModal({
               {description}
             </p>
 
-            <div className="pt-4 flex justify-end gap-3">
+            <div className="px-6 md:px-8 py-4 md:py-6 bg-muted/30 border-t border-border/50 flex justify-end gap-3 mt-auto shrink-0">
               <button 
                 type="button"
                 onClick={onClose}
-                className="px-6 py-2.5 text-sm font-bold text-foreground/80 hover:bg-muted rounded-xl transition-colors"
-              >
-                Cancel
-              </button>
+                className="px-5 py-2.5 rounded-xl font-bold text-muted-foreground hover:bg-muted transition-colors"
+              >Cancel</button>
               <button 
                 type="button"
                 onClick={() => {
