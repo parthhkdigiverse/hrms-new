@@ -1,5 +1,6 @@
 import { X, Calendar, MapPin, Phone, Mail, Briefcase, Award, TrendingUp, Clock, CheckCircle2 } from "lucide-react";
 import { Employee } from "./employee-data";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 
 interface EmployeeProfileModalProps {
@@ -36,12 +37,8 @@ export function EmployeeProfileModal({ employee, onClose }: EmployeeProfileModal
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-card/50 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="flex min-h-full items-center justify-center p-4 text-center sm:p-6">
-        <div 
-          className="bg-white w-full max-w-3xl rounded-3xl shadow-2xl overflow-hidden flex flex-col text-left animate-in zoom-in-95 duration-200 relative my-auto"
-          onClick={e => e.stopPropagation()}
-        >
+    <Dialog open={!!employee} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="max-w-3xl p-0 overflow-hidden rounded-3xl gap-0 border-border/60 shadow-2xl [&>button]:hidden bg-white">
         {/* Header Background */}
         <div className="h-32 shrink-0 bg-gradient-to-r from-emerald-500 to-teal-600 relative">
           <button 
@@ -55,8 +52,8 @@ export function EmployeeProfileModal({ employee, onClose }: EmployeeProfileModal
         {/* Profile Content */}
         <div className="px-8 pb-8 pt-0 relative flex-1">
           {/* Avatar & Basic Info */}
-          <div className="flex flex-col md:flex-row gap-6 items-start md:items-end -mt-12 mb-8">
-            <div className="relative">
+          <div className="flex flex-col md:flex-row gap-4 md:gap-6 items-start md:items-end mb-8">
+            <div className="relative -mt-12">
               <img 
                 src={employee.avatar} 
                 alt={employee.name} 
@@ -70,7 +67,8 @@ export function EmployeeProfileModal({ employee, onClose }: EmployeeProfileModal
               </span>
             </div>
             
-            <div className="flex-1">
+            
+            <div className="flex-1 pt-2 md:pt-0 pb-1">
               <h2 className="text-3xl font-black text-foreground tracking-tight">{employee.name}</h2>
               <p className="text-[15px] font-medium text-muted-foreground">{employee.role} · <span className="text-[#00A56C]">{employee.department}</span></p>
             </div>
@@ -176,10 +174,8 @@ export function EmployeeProfileModal({ employee, onClose }: EmployeeProfileModal
               </div>
             </div>
           </div>
-
         </div>
-      </div>
-    </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }

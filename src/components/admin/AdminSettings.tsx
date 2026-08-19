@@ -52,11 +52,11 @@ function FontSelector({ value, onChange }: { value: string; onChange: (v: string
       <button 
         onClick={() => { setOpen(!open); setSearch(""); }}
         className="w-full flex items-center justify-between px-4 py-2.5 rounded-xl border border-border bg-background text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/50"
-        style={{ fontFamily: selected.value === "System" ? "inherit" : selected.value }}
+        style={{ fontFamily: selected?.value === "System" ? "inherit" : selected?.value }}
       >
         <span className="flex items-center gap-2">
           <Type className="w-4 h-4 text-muted-foreground" />
-          {selected.label}
+          {selected?.label}
         </span>
       </button>
 

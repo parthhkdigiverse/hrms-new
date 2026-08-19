@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Users, Search, Download, Plus, Filter, ChevronDown, ChevronRight, Calendar, Edit3, Trash2, X } from "lucide-react";
+import { Download, Plus, Edit3, Trash2, ArrowUpRight, ArrowDownRight, Search, FileText, ChevronRight, Briefcase, Calendar, Info, X, Users, Filter, ChevronDown } from "lucide-react";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 const mockClientData = [
   {
@@ -220,10 +221,9 @@ export function OtherTransactions() {
       </div>
 
       {/* --- ADD / EDIT TRANSACTION MODAL --- */}
-      {isAddTxOpen && (
-        <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-card border border-border/50 shadow-2xl rounded-2xl w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-200">
-            <div className="p-4 border-b border-border/50 flex justify-between items-center bg-primary/5">
+      <Dialog open={isAddTxOpen} onOpenChange={setIsAddTxOpen}>
+        <DialogContent className="max-w-lg p-0 overflow-hidden rounded-2xl gap-0 border-border/50 shadow-2xl [&>button]:hidden bg-card">
+          <div className="p-4 border-b border-border/50 flex justify-between items-center bg-primary/5">
               <div>
                 <h3 className="font-black text-lg text-foreground">Add/Edit Client Transaction</h3>
                 <p className="text-xs font-medium text-muted-foreground">Record a new inflow or outflow.</p>
@@ -278,15 +278,13 @@ export function OtherTransactions() {
               <button onClick={() => setIsAddTxOpen(false)} className="px-4 py-2 font-bold text-sm bg-background border border-border/50 rounded-lg hover:bg-muted transition-colors text-muted-foreground">Cancel</button>
               <button onClick={() => setIsAddTxOpen(false)} className="px-4 py-2 font-bold text-sm bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-opacity shadow-sm">Save Transaction</button>
             </div>
-          </div>
-        </div>
-      )}
+        </DialogContent>
+      </Dialog>
 
       {/* --- MANAGE CLIENT MODAL --- */}
-      {isManageClientOpen && (
-        <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-card border border-border/50 shadow-2xl rounded-2xl w-full max-w-2xl overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col max-h-[90vh]">
-            <div className="p-4 border-b border-border/50 flex justify-between items-center bg-indigo-500/5 shrink-0">
+      <Dialog open={isManageClientOpen} onOpenChange={setIsManageClientOpen}>
+        <DialogContent className="max-w-2xl p-0 overflow-hidden rounded-2xl gap-0 border-border/50 shadow-2xl [&>button]:hidden bg-card flex flex-col max-h-[90vh]">
+          <div className="p-4 border-b border-border/50 flex justify-between items-center bg-indigo-500/5 shrink-0">
               <div>
                 <h3 className="font-black text-lg text-foreground">Manage Category: Software Sales</h3>
                 <p className="text-xs font-medium text-muted-foreground">View summaries and add new transactions quickly.</p>
@@ -357,9 +355,8 @@ export function OtherTransactions() {
               <button onClick={() => setIsManageClientOpen(false)} className="px-4 py-2 font-bold text-sm bg-background border border-border/50 rounded-lg hover:bg-muted transition-colors text-muted-foreground">Close</button>
               <button onClick={() => setIsManageClientOpen(false)} className="px-4 py-2 font-bold text-sm bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors shadow-sm">Save Transaction</button>
             </div>
-          </div>
-        </div>
-      )}
+        </DialogContent>
+      </Dialog>
 
     </div>
   );

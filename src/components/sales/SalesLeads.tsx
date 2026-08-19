@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
-import { Search, Plus, Filter, ChevronDown, X } from "lucide-react";
+import { Search, Plus, Filter, Download, MoreVertical, X, Calendar, Phone, Mail, MessageSquare } from "lucide-react";
+import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { formatCurrency, type Lead, type LeadStage } from "./sales-data";
@@ -219,13 +220,12 @@ export function SalesLeads({ onAction }: { onAction?: (action: string) => void }
       </p>
 
       {/* Side Drawer */}
-      {selectedLead && (
-        <div className="fixed inset-0 z-50 flex justify-end">
-          <div className="absolute inset-0 bg-black/40" onClick={() => setSelectedLead(null)} />
-          <div className="relative w-full max-w-md animate-in slide-in-from-right overflow-y-auto border-l border-border bg-background p-6 shadow-2xl">
-            <button onClick={() => setSelectedLead(null)} className="absolute right-4 top-4 rounded-lg p-1 hover:bg-accent">
-              <X className="h-5 w-5" />
-            </button>
+      <Sheet open={selectedLead !== null} onOpenChange={(open) => !open && setSelectedLead(null)}>
+        <SheetContent className="w-full max-w-md p-6 overflow-y-auto bg-background border-l border-border [&>button]:hidden shadow-2xl">
+          <button onClick={() => setSelectedLead(null)} className="absolute right-4 top-4 rounded-lg p-1 hover:bg-accent z-10">
+            <X className="h-5 w-5" />
+          </button>
+          {selectedLead && (
             <div className="space-y-5">
               <div>
                 <p className="text-xs font-bold text-muted-foreground">{selectedLead.id}</p>
@@ -278,9 +278,9 @@ export function SalesLeads({ onAction }: { onAction?: (action: string) => void }
                 <button onClick={(e) => { e.stopPropagation(); toast("Drafting email..."); }} className="flex-1 rounded-xl border border-border py-2 text-sm font-semibold hover:bg-accent">Email</button>
               </div>
             </div>
-          </div>
-        </div>
-      )}
+          )}
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }

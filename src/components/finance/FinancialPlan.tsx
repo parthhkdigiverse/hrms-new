@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Search, Download, Target, Plus, Info, Edit3, Trash2, ArrowRight, X } from "lucide-react";
+import { Download, ChevronDown, CheckCircle2, TrendingUp, TrendingDown, DollarSign, Target, Calendar, BarChart2, Plus, Edit3, Save, X, Search, Info, Trash2, ArrowRight } from "lucide-react";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 const mockPlanData = {
   "FINANCIAL - REVENUE": [
@@ -145,10 +146,9 @@ export function FinancialPlan() {
       </div>
 
       {/* --- ADD CATEGORY MODAL --- */}
-      {isAddCategoryOpen && (
-        <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-card border border-border/50 shadow-2xl rounded-2xl w-full max-w-sm overflow-hidden animate-in zoom-in-95 duration-200">
-            <div className="p-4 border-b border-border/50 flex justify-between items-center bg-indigo-500/5">
+      <Dialog open={isAddCategoryOpen} onOpenChange={setIsAddCategoryOpen}>
+        <DialogContent className="max-w-sm p-0 overflow-hidden rounded-2xl gap-0 border-border/50 shadow-2xl [&>button]:hidden bg-card">
+          <div className="p-4 border-b border-border/50 flex justify-between items-center bg-indigo-500/5">
               <h3 className="font-black text-lg text-foreground flex items-center gap-2">
                 <Plus className="w-5 h-5 text-indigo-600" /> Add Category
               </h3>
@@ -166,15 +166,13 @@ export function FinancialPlan() {
               <button onClick={() => setIsAddCategoryOpen(false)} className="px-4 py-2 font-bold text-sm bg-background border border-border/50 rounded-lg hover:bg-muted transition-colors text-muted-foreground">Cancel</button>
               <button onClick={() => setIsAddCategoryOpen(false)} className="px-4 py-2 font-bold text-sm bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors shadow-sm">Save Category</button>
             </div>
-          </div>
-        </div>
-      )}
+        </DialogContent>
+      </Dialog>
 
       {/* --- ADD/EDIT ROW MODAL --- */}
-      {(isAddRowOpen || isEditRowOpen) && (
-        <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-card border border-border/50 shadow-2xl rounded-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200">
-            <div className="p-4 border-b border-border/50 flex justify-between items-center bg-primary/5">
+      <Dialog open={isAddRowOpen || isEditRowOpen} onOpenChange={(open) => { if (!open) { setIsAddRowOpen(false); setIsEditRowOpen(false); } }}>
+        <DialogContent className="max-w-md p-0 overflow-hidden rounded-2xl gap-0 border-border/50 shadow-2xl [&>button]:hidden bg-card">
+          <div className="p-4 border-b border-border/50 flex justify-between items-center bg-primary/5">
               <h3 className="font-black text-lg text-foreground flex items-center gap-2">
                 {isEditRowOpen ? <Edit3 className="w-5 h-5 text-primary" /> : <Plus className="w-5 h-5 text-primary" />}
                 {isEditRowOpen ? "Edit Target / Metric" : `Add Row to ${activeCategory}`}
@@ -211,9 +209,8 @@ export function FinancialPlan() {
               <button onClick={() => { setIsAddRowOpen(false); setIsEditRowOpen(false); }} className="px-4 py-2 font-bold text-sm bg-background border border-border/50 rounded-lg hover:bg-muted transition-colors text-muted-foreground">Cancel</button>
               <button onClick={() => { setIsAddRowOpen(false); setIsEditRowOpen(false); }} className="px-4 py-2 font-bold text-sm bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-opacity shadow-sm">Save Row</button>
             </div>
-          </div>
-        </div>
-      )}
+        </DialogContent>
+      </Dialog>
 
     </div>
   );

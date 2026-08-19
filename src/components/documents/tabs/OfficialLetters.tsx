@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Search, Plus, Mail, Clock, CheckCircle2, AlertCircle, FilePlus, Send, X } from "lucide-react";
+import { Search, Plus, Filter, FileText, CheckCircle2, Clock, X, Download, Eye, Upload, Printer, Mail, FilePlus, Send } from "lucide-react";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 
 type RequestStatus = "Pending" | "Approved" | "Sent" | "Rejected";
@@ -87,10 +88,9 @@ export function OfficialLetters({ onNavigate }: { onNavigate?: ((path: string) =
         </button>
       </div>
 
-      {isAddMode && (
-        <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in">
-          <div className="bg-card border border-border/50 rounded-2xl w-full max-w-lg shadow-xl flex flex-col">
-            <div className="flex items-center justify-between p-6 border-b border-border/50">
+      <Dialog open={isAddMode} onOpenChange={setIsAddMode}>
+        <DialogContent className="max-w-lg p-0 overflow-hidden rounded-2xl gap-0 border-border/50 shadow-xl [&>button]:hidden bg-card flex flex-col">
+          <div className="flex items-center justify-between p-6 border-b border-border/50">
               <h2 className="text-xl font-bold">New Letter Request</h2>
               <button 
                 onClick={() => setIsAddMode(false)}
@@ -162,9 +162,8 @@ export function OfficialLetters({ onNavigate }: { onNavigate?: ((path: string) =
                 Submit Request
               </button>
             </div>
-          </div>
-        </div>
-      )}
+        </DialogContent>
+      </Dialog>
 
       <div className="bg-card border border-border/50 rounded-3xl overflow-hidden shadow-sm">
         <div className="overflow-x-auto">

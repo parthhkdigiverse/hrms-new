@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Search, Filter, CheckCircle2, Clock, Check, X, FileText, Download, Building2 } from "lucide-react";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 
 type ApprovalStatus = "Pending" | "Approved" | "Rejected";
@@ -185,14 +186,13 @@ export function InvoiceApprovals() {
       </div>
 
       {/* Review Modal */}
-      {reviewModalOpen && selectedInvoice && (
-        <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in">
-          <div className="bg-card border border-border/50 rounded-2xl w-full max-w-lg shadow-xl flex flex-col max-h-[90vh]">
-            <div className="flex items-center justify-between p-6 border-b border-border/50">
-              <div>
-                <h2 className="text-xl font-bold">Review {selectedInvoice.invoiceNumber}</h2>
-                <p className="text-sm text-muted-foreground">{selectedInvoice.clientName}</p>
-              </div>
+      <Dialog open={reviewModalOpen} onOpenChange={(open) => !open && setReviewModalOpen(false)}>
+        <DialogContent className="max-w-lg p-0 overflow-hidden rounded-2xl gap-0 border-border/50 shadow-xl [&>button]:hidden bg-card flex flex-col max-h-[90vh]">
+          <div className="flex items-center justify-between p-6 border-b border-border/50">
+            <div>
+              <h2 className="text-xl font-bold">Review {selectedInvoice?.invoiceNumber}</h2>
+              <p className="text-sm text-muted-foreground">{selectedInvoice?.clientName}</p>
+            </div>
               <button 
                 onClick={() => setReviewModalOpen(false)}
                 className="p-2 text-muted-foreground hover:bg-muted/50 rounded-lg transition-colors"
@@ -205,7 +205,7 @@ export function InvoiceApprovals() {
               <div className="flex justify-between items-center bg-muted/30 p-4 rounded-xl border border-border/50">
                 <div>
                   <div className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1">Invoice Amount</div>
-                  <div className="text-2xl font-black text-foreground">{selectedInvoice.amount}</div>
+                  <div className="text-2xl font-black text-foreground">{selectedInvoice?.amount}</div>
                 </div>
                 <button className="p-3 bg-card border border-border/50 text-foreground rounded-xl hover:bg-muted/50 transition-colors shadow-sm" title="Download Draft PDF">
                   <Download className="w-5 h-5" />
@@ -243,9 +243,8 @@ export function InvoiceApprovals() {
                 <Check className="w-4 h-4" /> Approve
               </button>
             </div>
-          </div>
-        </div>
-      )}
+        </DialogContent>
+      </Dialog>
 
     </div>
   );

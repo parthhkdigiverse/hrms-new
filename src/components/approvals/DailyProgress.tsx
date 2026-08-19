@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Search, Filter, CheckCircle2, Clock, Star, Activity, User, Eye, X, MessageSquare } from "lucide-react";
+import { Search, Filter, CheckCircle2, Clock, Check, X, Star, AlertCircle, MessageSquare, Activity, User, Eye } from "lucide-react";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 
 type VerificationStatus = "Pending" | "Verified";
@@ -292,27 +293,20 @@ export function DailyProgress() {
       </div>
 
       {/* Verification Modal */}
-      {verifyModalOpen && selectedRecord && (
-        <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in">
-          <div className="bg-card border border-border/50 rounded-2xl w-full max-w-3xl shadow-xl flex flex-col max-h-[90vh]">
-            
-            {/* Modal Header */}
-            <div className="flex items-center justify-between p-6 border-b border-border/50">
+      <Dialog open={verifyModalOpen} onOpenChange={(open) => !open && setVerifyModalOpen(false)}>
+        <DialogContent className="max-w-3xl p-0 overflow-hidden rounded-2xl gap-0 border-border/50 shadow-xl flex flex-col max-h-[90vh] bg-card">
+          
+          {/* Modal Header */}
+          <div className="flex items-center justify-between p-6 border-b border-border/50 shrink-0">
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-xl">
-                  {selectedRecord.employeeName.charAt(0)}
+                  {selectedRecord?.employeeName.charAt(0)}
                 </div>
                 <div>
-                  <h2 className="text-xl font-bold">{selectedRecord.employeeName}</h2>
-                  <p className="text-sm text-muted-foreground">{selectedRecord.role} • Submitted at {selectedRecord.submittedAt}</p>
+                  <h2 className="text-xl font-bold">{selectedRecord?.employeeName}</h2>
+                  <p className="text-sm text-muted-foreground">{selectedRecord?.role} • Submitted at {selectedRecord?.submittedAt}</p>
                 </div>
               </div>
-              <button 
-                onClick={() => setVerifyModalOpen(false)}
-                className="p-2 text-muted-foreground hover:bg-muted/50 rounded-lg transition-colors"
-              >
-                <X className="w-5 h-5" />
-              </button>
             </div>
             
             {/* Modal Body */}
@@ -326,7 +320,7 @@ export function DailyProgress() {
                       <CheckCircle2 className="w-5 h-5" />
                       Completed Today
                     </h3>
-                    {selectedRecord.tasksDone.length > 0 ? (
+                    {selectedRecord && selectedRecord.tasksDone.length > 0 ? (
                       <ul className="space-y-3">
                         {selectedRecord.tasksDone.map(task => (
                           <li key={task.id} className="flex items-start gap-3 bg-emerald-500/5 p-3 rounded-xl border border-emerald-500/10">
@@ -345,7 +339,7 @@ export function DailyProgress() {
                       <Clock className="w-5 h-5" />
                       Pending / Blocked
                     </h3>
-                    {selectedRecord.tasksPending.length > 0 ? (
+                    {selectedRecord && selectedRecord.tasksPending.length > 0 ? (
                       <ul className="space-y-3">
                         {selectedRecord.tasksPending.map(task => (
                           <li key={task.id} className="flex items-start gap-3 bg-amber-500/5 p-3 rounded-xl border border-amber-500/10">
@@ -355,7 +349,7 @@ export function DailyProgress() {
                         ))}
                       </ul>
                     ) : (
-                      <div className="text-sm text-muted-foreground p-4 bg-muted/30 rounded-xl text-center">No pending tasks reported.</div>
+                      <div className="text-sm text-muted-foreground p-4 bg-muted/30 rounded-xl text-center">No pending tasks! 🎉</div>
                     )}
                   </div>
                 </div>
@@ -403,10 +397,10 @@ export function DailyProgress() {
                     />
                   </div>
                   
-                  {selectedRecord.verificationStatus === "Verified" && (
+                  {selectedRecord?.verificationStatus === "Verified" && (
                     <div className="bg-emerald-500/10 text-emerald-700 p-4 rounded-xl text-sm font-medium flex items-center gap-2 border border-emerald-500/20">
                       <CheckCircle2 className="w-5 h-5" />
-                      Verified by {selectedRecord.verifiedBy}
+                      Verified by {selectedRecord?.verifiedBy}
                     </div>
                   )}
                 </div>
@@ -427,13 +421,12 @@ export function DailyProgress() {
                 disabled={currentRating === 0}
                 className="px-6 py-2.5 bg-primary text-primary-foreground hover:bg-primary/90 font-bold rounded-xl transition-colors disabled:opacity-50 shadow-sm"
               >
-                {selectedRecord.verificationStatus === "Verified" ? "Update Verification" : "Approve & Verify"}
+                {selectedRecord?.verificationStatus === "Verified" ? "Update Verification" : "Approve & Verify"}
               </button>
             </div>
             
-          </div>
-        </div>
-      )}
+        </DialogContent>
+      </Dialog>
 
     </div>
   );

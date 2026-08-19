@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Search, Download, Plus, RefreshCw, Wallet, Building2, Calendar, Filter, ArrowDownLeft, ArrowUpRight, ArrowRight, Edit3, Trash2, X } from "lucide-react";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 const mockCreditTransactions = [
   { id: 'INV-001', date: '15/6/2026', amount: 1234.00, category: 'Sales', description: 'test', service: 'fgh', remarks: '1. Payment is due w...' },
@@ -324,10 +325,9 @@ export function Transactions() {
       </div>
 
       {/* --- ADD CREDIT MODAL --- */}
-      {isAddCreditOpen && (
-        <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-card border border-border/50 shadow-2xl rounded-2xl w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-200">
-            <div className="p-4 border-b border-border/50 flex justify-between items-center bg-emerald-500/5">
+      <Dialog open={isAddCreditOpen} onOpenChange={setIsAddCreditOpen}>
+        <DialogContent className="max-w-lg p-0 overflow-hidden rounded-2xl gap-0 border-border/50 shadow-2xl [&>button]:hidden bg-card">
+          <div className="p-4 border-b border-border/50 flex justify-between items-center bg-emerald-500/5">
               <div>
                 <h3 className="font-black text-lg text-foreground">Add Credit (Income / Invoice)</h3>
                 <p className="text-xs font-medium text-muted-foreground">Record incoming funds.</p>
@@ -378,15 +378,13 @@ export function Transactions() {
               <button onClick={() => setIsAddCreditOpen(false)} className="px-4 py-2 font-bold text-sm bg-background border border-border/50 rounded-lg hover:bg-muted transition-colors">Cancel</button>
               <button onClick={() => setIsAddCreditOpen(false)} className="px-4 py-2 font-bold text-sm bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors">Save Credit</button>
             </div>
-          </div>
-        </div>
-      )}
+        </DialogContent>
+      </Dialog>
 
       {/* --- ADD DEBT MODAL --- */}
-      {isAddDebtOpen && (
-        <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-card border border-border/50 shadow-2xl rounded-2xl w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-200">
-            <div className="p-4 border-b border-border/50 flex justify-between items-center bg-rose-500/5">
+      <Dialog open={isAddDebtOpen} onOpenChange={setIsAddDebtOpen}>
+        <DialogContent className="max-w-lg p-0 overflow-hidden rounded-2xl gap-0 border-border/50 shadow-2xl [&>button]:hidden bg-card">
+          <div className="p-4 border-b border-border/50 flex justify-between items-center bg-rose-500/5">
               <div>
                 <h3 className="font-black text-lg text-foreground">Add Debt (Expense / Bill)</h3>
                 <p className="text-xs font-medium text-muted-foreground">Record an outbound expense.</p>
@@ -433,9 +431,8 @@ export function Transactions() {
               <button onClick={() => setIsAddDebtOpen(false)} className="px-4 py-2 font-bold text-sm bg-background border border-border/50 rounded-lg hover:bg-muted transition-colors">Cancel</button>
               <button onClick={() => setIsAddDebtOpen(false)} className="px-4 py-2 font-bold text-sm bg-rose-600 text-white rounded-lg hover:bg-rose-700 transition-colors">Save Expense</button>
             </div>
-          </div>
-        </div>
-      )}
+        </DialogContent>
+      </Dialog>
 
     </div>
   );

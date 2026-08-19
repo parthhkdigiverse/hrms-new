@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { X } from "lucide-react";
+import { X, User, Briefcase, Building2, ShieldAlert } from "lucide-react";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { OrgNodeData } from "./org-data";
 import { toast } from "sonner";
 import { useDepartments } from "./DepartmentContext";
@@ -44,12 +45,8 @@ export function AddOrgNodeModal({ isOpen, onClose, onSubmit, parentName }: AddOr
   };
 
   return (
-    <div className="fixed inset-0 z-[60] overflow-y-auto bg-card/50 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="flex min-h-full items-center justify-center p-4 text-center sm:p-6">
-        <div 
-          className="bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden flex flex-col text-left animate-in zoom-in-95 duration-200 relative my-auto"
-          onClick={e => e.stopPropagation()}
-        >
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="max-w-md p-0 overflow-hidden rounded-3xl gap-0 border-border/60 shadow-2xl [&>button]:hidden bg-white">
           <div className="flex items-center justify-between px-6 py-5 border-b border-border/50 bg-muted/50/50">
             <div>
               <h2 className="text-xl font-black text-foreground">Add Team Member</h2>
@@ -132,8 +129,7 @@ export function AddOrgNodeModal({ isOpen, onClose, onSubmit, parentName }: AddOr
               </button>
             </div>
           </form>
-        </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }

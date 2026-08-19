@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { X, User, Briefcase, CreditCard, FileText, ChevronRight, Check } from "lucide-react";
+import { User, Briefcase, FileText, Check, ChevronRight, Upload, X, MapPin, Phone, Mail, Building2, CreditCard, ShieldAlert } from "lucide-react";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Employee, EmployeeStatus } from "./employee-data";
 import { useDepartments } from "./DepartmentContext";
 import { toast } from "sonner";
@@ -198,25 +199,21 @@ export function EmployeeFormModal({ isOpen, onClose, onSubmit, initialData, isSe
   ];
 
   return (
-    <div className="fixed inset-0 z-[60] overflow-y-auto bg-background/80 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="flex min-h-full items-center justify-center p-4 text-center sm:p-6">
-        <div 
-          className="bg-card w-full max-w-5xl border border-border/60 rounded-[2rem] shadow-2xl overflow-hidden flex flex-col text-left animate-in zoom-in-95 duration-200 relative my-auto"
-          onClick={e => e.stopPropagation()}
-        >
-          {/* Header */}
-          <div className="flex items-center justify-between px-8 py-6 border-b border-border/50 bg-muted/30">
-            <div>
-              <h2 className="text-2xl font-black tracking-tight">{initialData ? 'Edit Employee Profile' : 'Add New Employee'}</h2>
-              <p className="text-sm text-muted-foreground mt-1">Complete all sections to register a new member in the organization.</p>
-            </div>
-            <button 
-              onClick={onClose}
-              className="p-2 text-muted-foreground hover:text-foreground/80 hover:bg-muted rounded-full transition-colors"
-            >
-              <X className="w-5 h-5" />
-            </button>
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="max-w-5xl p-0 overflow-hidden rounded-[2rem] gap-0 border-border/60 shadow-2xl [&>button]:hidden bg-card">
+        {/* Header */}
+        <div className="flex items-center justify-between px-8 py-6 border-b border-border/50 bg-muted/30">
+          <div>
+            <h2 className="text-2xl font-black tracking-tight">{initialData ? 'Edit Employee Profile' : 'Add New Employee'}</h2>
+            <p className="text-sm text-muted-foreground mt-1">Complete all sections to register a new member in the organization.</p>
           </div>
+          <button 
+            onClick={onClose}
+            className="p-2 text-muted-foreground hover:text-foreground/80 hover:bg-muted rounded-full transition-colors"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
 
           <div className="flex flex-col md:flex-row h-[70vh] max-h-[800px]">
             {/* Sidebar Tabs */}
@@ -715,9 +712,7 @@ export function EmployeeFormModal({ isOpen, onClose, onSubmit, initialData, isSe
               </button>
             </div>
           </div>
-
-        </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }

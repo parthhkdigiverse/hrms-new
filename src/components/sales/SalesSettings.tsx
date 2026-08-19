@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { cn } from "@/lib/utils";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { 
   Building2, Users, MapPin, DollarSign, Calendar, Target,
   Briefcase, TrendingUp, CheckCircle2, ShieldAlert, BadgeCent,
@@ -692,71 +693,67 @@ export function SalesSettings() {
       </div>
 
       {/* Delete Confirmation Modal */}
-      {deleteConfirm.isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm animate-in fade-in">
-          <div className="w-full max-w-sm rounded-3xl bg-white p-6 shadow-xl animate-in zoom-in-95">
-            <h3 className="text-xl font-black tracking-tight mb-2">Delete {deleteConfirm.type === 'category' ? 'Category' : deleteConfirm.type === 'source' ? 'Source' : 'Stage'}</h3>
-            <p className="text-sm text-muted-foreground mb-6">
-              Are you sure you want to delete <span className="font-bold text-foreground">"{deleteConfirm.name}"</span>? This action cannot be undone.
-            </p>
-            <div className="flex gap-3">
-              <button 
-                onClick={() => setDeleteConfirm({ isOpen: false, type: null, index: -1, name: "" })}
-                className="flex-1 rounded-xl border border-border py-2.5 text-sm font-semibold hover:bg-accent transition-colors"
-              >
-                Cancel
-              </button>
-              <button 
-                onClick={executeDelete}
-                className="flex-1 rounded-xl bg-rose-600 py-2.5 text-sm font-semibold text-white hover:bg-rose-700 transition-colors"
-              >
-                Delete
-              </button>
-            </div>
+      <Dialog open={deleteConfirm.isOpen} onOpenChange={(open) => !open && setDeleteConfirm({ isOpen: false, type: null, index: -1, name: "" })}>
+        <DialogContent className="max-w-sm p-6 overflow-hidden rounded-3xl gap-0 border-border/60 shadow-xl [&>button]:hidden bg-white">
+          <h3 className="text-xl font-black tracking-tight mb-2">Delete {deleteConfirm.type === 'category' ? 'Category' : deleteConfirm.type === 'source' ? 'Source' : 'Stage'}</h3>
+          <p className="text-sm text-muted-foreground mb-6">
+            Are you sure you want to delete <span className="font-bold text-foreground">"{deleteConfirm.name}"</span>? This action cannot be undone.
+          </p>
+          <div className="flex gap-3">
+            <button 
+              onClick={() => setDeleteConfirm({ isOpen: false, type: null, index: -1, name: "" })}
+              className="flex-1 rounded-xl border border-border py-2.5 text-sm font-semibold hover:bg-accent transition-colors"
+            >
+              Cancel
+            </button>
+            <button 
+              onClick={executeDelete}
+              className="flex-1 rounded-xl bg-rose-600 py-2.5 text-sm font-semibold text-white hover:bg-rose-700 transition-colors"
+            >
+              Delete
+            </button>
           </div>
-        </div>
-      )}
+        </DialogContent>
+      </Dialog>
 
       {/* Edit Permissions Modal */}
-      {editRoleIdx !== null && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-in fade-in">
-          <div className="w-full max-w-lg rounded-3xl bg-white p-6 shadow-xl animate-in zoom-in-95 max-h-[90vh] flex flex-col">
-            <h3 className="text-xl font-black tracking-tight mb-2">Edit {permissions[editRoleIdx]?.role || "Role"} Permissions</h3>
-            <p className="text-sm text-muted-foreground mb-6">
-              Select the capabilities this role should have access to.
-            </p>
-            
-            <div className="overflow-y-auto pr-2 mb-6 space-y-2 flex-1">
-              {AVAILABLE_PERMISSIONS.map(p => (
-                <label key={p} className="flex items-center gap-3 rounded-xl border border-border p-3 cursor-pointer hover:bg-muted/50 transition-colors">
-                  <input 
-                    type="checkbox" 
-                    checked={tempPerms.includes(p)}
-                    onChange={() => handleTogglePerm(p)}
-                    className="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-600"
-                  />
-                  <span className="text-sm font-medium">{p}</span>
-                </label>
-              ))}
-            </div>
-
-            <div className="flex gap-3 pt-2 mt-auto">
-              <button 
-                onClick={() => setEditRoleIdx(null)}
-                className="flex-1 rounded-xl border border-border py-2.5 text-sm font-semibold hover:bg-accent transition-colors"
-              >
-                Cancel
-              </button>
-              <button 
-                onClick={handleSavePermissions}
-                className="flex-1 rounded-xl bg-emerald-600 py-2.5 text-sm font-semibold text-white hover:bg-emerald-700 transition-colors"
-              >
-                Save Changes
-              </button>
-            </div>
+      <Dialog open={editRoleIdx !== null} onOpenChange={(open) => !open && setEditRoleIdx(null)}>
+        <DialogContent className="max-w-lg p-6 overflow-hidden rounded-3xl gap-0 border-border/60 shadow-xl max-h-[90vh] flex flex-col [&>button]:hidden bg-white">
+          <h3 className="text-xl font-black tracking-tight mb-2">Edit {editRoleIdx !== null ? permissions[editRoleIdx]?.role : "Role"} Permissions</h3>
+          <p className="text-sm text-muted-foreground mb-6">
+            Select the capabilities this role should have access to.
+          </p>
+          
+          <div className="overflow-y-auto pr-2 mb-6 space-y-2 flex-1">
+            {AVAILABLE_PERMISSIONS.map(p => (
+              <label key={p} className="flex items-center gap-3 rounded-xl border border-border p-3 cursor-pointer hover:bg-muted/50 transition-colors">
+                <input 
+                  type="checkbox" 
+                  checked={tempPerms.includes(p)}
+                  onChange={() => handleTogglePerm(p)}
+                  className="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-600"
+                />
+                <span className="text-sm font-medium">{p}</span>
+              </label>
+            ))}
           </div>
-        </div>
-      )}
+
+          <div className="flex gap-3 pt-2 mt-auto">
+            <button 
+              onClick={() => setEditRoleIdx(null)}
+              className="flex-1 rounded-xl border border-border py-2.5 text-sm font-semibold hover:bg-accent transition-colors"
+            >
+              Cancel
+            </button>
+            <button 
+              onClick={handleSavePermissions}
+              className="flex-1 rounded-xl bg-emerald-600 py-2.5 text-sm font-semibold text-white hover:bg-emerald-700 transition-colors"
+            >
+              Save Changes
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
