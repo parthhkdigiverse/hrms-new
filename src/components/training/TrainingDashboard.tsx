@@ -43,7 +43,7 @@ export function TrainingDashboard({ active, setActive }: { active: string, setAc
   if (active === "/learn/audit") internalTab = "Roles & Audit";
 
   return (
-    <div className="w-full max-w-[1500px] mx-auto animate-in fade-in duration-500 pb-12">
+    <div className="w-full animate-in fade-in duration-500 pb-12">
       
       {/* MAIN CONTENT AREA */}
       <div className="w-full space-y-8">

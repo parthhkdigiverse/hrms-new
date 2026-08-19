@@ -340,7 +340,7 @@ export function OrgStructure() {
   };
 
   return (
-    <div className="w-full max-w-[1400px] mx-auto animate-in fade-in zoom-in-95 duration-300 flex flex-col h-[calc(100vh-120px)]">
+    <div className="w-full animate-in fade-in zoom-in-95 duration-300 flex flex-col h-[calc(100vh-120px)]">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6 shrink-0">
         <div>

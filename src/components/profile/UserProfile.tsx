@@ -56,7 +56,7 @@ export function UserProfile() {
   };
 
   return (
-    <div className="w-full h-full max-w-7xl mx-auto flex flex-col animate-in fade-in duration-300">
+    <div className="w-full h-full flex flex-col animate-in fade-in duration-300">
       
       {/* Header Profile Card */}
       <div className="bg-white border border-border/60 rounded-3xl overflow-hidden mb-6 shadow-sm relative shrink-0">

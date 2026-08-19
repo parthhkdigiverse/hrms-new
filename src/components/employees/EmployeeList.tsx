@@ -73,7 +73,7 @@ export function EmployeeList() {
   };
 
   return (
-    <div className="w-full max-w-[1400px] mx-auto animate-in fade-in zoom-in-95 duration-300">
+    <div className="w-full animate-in fade-in zoom-in-95 duration-300">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
         <div>

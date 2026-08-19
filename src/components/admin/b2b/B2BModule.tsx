@@ -118,31 +118,79 @@ function B2BPartners() {
               <Plus className="w-4 h-4" /> Add Partner
             </button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px] rounded-2xl">
-            <DialogHeader>
-              <DialogTitle className="text-xl font-black">Add New Partner</DialogTitle>
+          <DialogContent className="sm:max-w-[500px] p-0 border-none bg-card rounded-2xl shadow-2xl overflow-hidden">
+            <DialogHeader className="px-6 pt-6 pb-4 border-b border-border/40 bg-muted/20">
+              <DialogTitle className="text-2xl font-black">Add Partner</DialogTitle>
+              <p className="text-sm text-muted-foreground mt-1">This prototype stores records in memory only.</p>
             </DialogHeader>
-            <div className="grid gap-4 py-4">
-              <div className="space-y-2">
-                <label className="text-xs font-bold uppercase text-muted-foreground">Company Name</label>
-                <input className="w-full flex h-10 rounded-xl border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2" placeholder="e.g. Acme Corp" />
+
+            <div className="p-6 space-y-5">
+              <div className="space-y-1.5">
+                <label className="text-sm font-bold text-foreground">Name <span className="text-rose-500">*</span></label>
+                <div className="relative">
+                  <input 
+                    type="text" 
+                    placeholder="e.g. ABC Packaging Pvt Ltd" 
+                    className="w-full bg-background border border-border/50 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all pr-10" 
+                  />
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1 text-muted-foreground">
+                    <Users className="w-4 h-4" />
+                  </div>
+                </div>
               </div>
-              <div className="space-y-2">
-                <label className="text-xs font-bold uppercase text-muted-foreground">Partner Type</label>
-                <select className="w-full flex h-10 rounded-xl border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
-                  <option>Technology</option>
-                  <option>Consulting</option>
-                  <option>Manufacturing</option>
-                </select>
+
+              <div className="space-y-1.5">
+                <label className="text-sm font-bold text-foreground">Contact person <span className="text-rose-500">*</span></label>
+                <input 
+                  type="text" 
+                  placeholder="e.g. Nirav Shah" 
+                  className="w-full bg-background border border-border/50 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" 
+                />
               </div>
-              <div className="space-y-2">
-                <label className="text-xs font-bold uppercase text-muted-foreground">Primary Contact Email</label>
-                <input type="email" className="w-full flex h-10 rounded-xl border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2" placeholder="contact@company.com" />
+
+              <div className="space-y-1.5">
+                <label className="text-sm font-bold text-foreground">Phone</label>
+                <input 
+                  type="text" 
+                  placeholder="+91 98250 41200" 
+                  className="w-full bg-background border border-border/50 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" 
+                />
+                <p className="text-xs text-muted-foreground mt-1 font-medium">Used for follow-up calls.</p>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-sm font-bold text-foreground">City</label>
+                <input 
+                  type="text" 
+                  placeholder="e.g. Surat, Gujarat" 
+                  className="w-full bg-background border border-border/50 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" 
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-sm font-bold text-foreground">Notes</label>
+                <textarea 
+                  placeholder="Add context for this record..." 
+                  className="w-full bg-background border border-border/50 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all resize-none h-24"
+                ></textarea>
               </div>
             </div>
-            <DialogFooter>
-              <button onClick={() => toast.success("Partner invitation sent successfully!")} className="w-full bg-primary text-primary-foreground px-4 py-2 rounded-xl text-sm font-bold shadow-md hover:bg-primary/90 transition-colors">
-                Send Invitation
+
+            <DialogFooter className="px-6 py-4 border-t border-border/40 bg-muted/20 flex gap-2 justify-end sm:justify-end">
+              <button 
+                onClick={() => document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }))}
+                className="px-6 py-2.5 rounded-xl font-bold text-sm bg-background border border-border hover:bg-muted transition-colors shadow-sm"
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={() => {
+                  toast.success("Partner added successfully!");
+                  document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+                }}
+                className="px-6 py-2.5 rounded-xl font-bold text-sm bg-[#0070AA] text-white hover:bg-[#0070AA]/90 transition-colors shadow-sm"
+              >
+                Save
               </button>
             </DialogFooter>
           </DialogContent>
@@ -220,7 +268,7 @@ export function B2BModule({ active }: { active: string }) {
   const currentTab = active.split("/").pop();
 
   return (
-    <div className="p-6 md:p-8 max-w-7xl mx-auto space-y-8 pb-24">
+    <div className="w-full space-y-8 animate-in fade-in duration-500">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>

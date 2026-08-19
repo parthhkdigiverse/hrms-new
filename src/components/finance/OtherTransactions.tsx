@@ -41,7 +41,7 @@ export function OtherTransactions() {
   };
 
   return (
-    <div className="w-full max-w-[1400px] mx-auto space-y-6 animate-in fade-in duration-500 pb-12 relative">
+    <div className="w-full space-y-6 animate-in fade-in duration-500 pb-12 relative">
       
       {/* Header */}
       <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4">

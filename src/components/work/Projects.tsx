@@ -18,6 +18,8 @@ interface Client {
   name: string;
   logo: string;
   totalBudget: string;
+  outstandingPayment: string;
+  onboardingDate: string;
   activeProjects: number;
   status: ClientStatus;
   contacts: { name: string; avatar: string }[];
@@ -44,6 +46,8 @@ const INITIAL_CLIENTS: Client[] = [
     name: "TechNova Solutions",
     logo: "https://i.pravatar.cc/150?u=technova",
     totalBudget: "₹345,000",
+    outstandingPayment: "₹45,000",
+    onboardingDate: "2025-01-15",
     activeProjects: 3,
     status: "Active",
     contacts: [
@@ -56,6 +60,8 @@ const INITIAL_CLIENTS: Client[] = [
     name: "Acme Corp",
     logo: "https://i.pravatar.cc/150?u=acme",
     totalBudget: "₹120,000",
+    outstandingPayment: "₹0",
+    onboardingDate: "2025-03-20",
     activeProjects: 1,
     status: "Active",
     contacts: [{ name: "Bob", avatar: "https://i.pravatar.cc/150?u=bob" }]
@@ -65,6 +71,8 @@ const INITIAL_CLIENTS: Client[] = [
     name: "Global Retail Inc.",
     logo: "https://i.pravatar.cc/150?u=global",
     totalBudget: "₹450,000",
+    outstandingPayment: "₹150,000",
+    onboardingDate: "2024-11-10",
     activeProjects: 4,
     status: "Active",
     contacts: [
@@ -77,6 +85,8 @@ const INITIAL_CLIENTS: Client[] = [
     name: "Startup Hub",
     logo: "https://i.pravatar.cc/150?u=startup",
     totalBudget: "₹15,000",
+    outstandingPayment: "₹0",
+    onboardingDate: "2025-06-05",
     activeProjects: 0,
     status: "Archived",
     contacts: [{ name: "Eve", avatar: "https://i.pravatar.cc/150?u=eve" }]
@@ -278,6 +288,8 @@ export function Projects() {
       name: newClientName,
       logo: `https://i.pravatar.cc/150?u=${encodeURIComponent(newClientName)}`,
       totalBudget: newClientBudget || "₹0",
+      outstandingPayment: "₹0",
+      onboardingDate: new Date().toISOString().split('T')[0] || "",
       activeProjects: 0,
       status: "Active",
       contacts: [{ name: "User", avatar: "https://i.pravatar.cc/150?u=user" }]
@@ -466,7 +478,7 @@ export function Projects() {
       if (!project) return null;
 
       return (
-        <div className="w-full max-w-7xl mx-auto space-y-8 animate-in fade-in duration-500">
+        <div className="w-full space-y-8 animate-in fade-in duration-500">
           {/* Detail View Header */}
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div className="flex items-center gap-4">
@@ -637,7 +649,7 @@ export function Projects() {
     });
 
     return (
-      <div className="w-full max-w-7xl mx-auto space-y-8 animate-in fade-in duration-500">
+      <div className="w-full space-y-8 animate-in fade-in duration-500">
         {/* Detail View Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div className="flex items-center gap-4">
@@ -734,38 +746,56 @@ export function Projects() {
         </div>
 
         {/* Summary Section */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-card border border-border/60 rounded-3xl p-6 flex items-center gap-5 shadow-sm">
-            <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
-              <FolderGit2 className="w-6 h-6" />
-            </div>
-            <div>
-              <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Total Projects</p>
-              <h3 className="text-3xl font-black text-foreground font-mono">{clientProjects.length}</h3>
-            </div>
-          </div>
-          <div className="bg-card border border-border/60 rounded-3xl p-6 flex items-center gap-5 shadow-sm">
-            <div className="w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-500 flex items-center justify-center shrink-0">
-              <IndianRupee className="w-6 h-6" />
-            </div>
-            <div>
-              <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Total Budget</p>
-              <h3 className="text-3xl font-black text-foreground font-mono">{client.totalBudget}</h3>
-            </div>
-          </div>
-          <div className="bg-card border border-border/60 rounded-3xl p-6 flex items-center gap-5 shadow-sm">
-            <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 text-indigo-500 flex items-center justify-center shrink-0">
-              <Users className="w-6 h-6" />
-            </div>
-            <div>
-              <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Key Contacts</p>
-              <div className="flex -space-x-2">
-                {client.contacts.map((contact, i) => (
-                  <div key={i} className="w-8 h-8 rounded-full border-2 border-card overflow-hidden bg-muted shadow-sm">
-                    <img src={contact.avatar} alt={contact.name} className="w-full h-full object-cover" />
-                  </div>
-                ))}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
+          <div className="bg-card border border-border/60 rounded-3xl p-5 flex flex-col justify-center shadow-sm">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-8 h-8 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                <FolderGit2 className="w-4 h-4" />
               </div>
+              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Total Projects</p>
+            </div>
+            <h3 className="text-2xl font-black text-foreground font-mono">{clientProjects.length}</h3>
+          </div>
+          <div className="bg-card border border-border/60 rounded-3xl p-5 flex flex-col justify-center shadow-sm">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-8 h-8 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center shrink-0">
+                <IndianRupee className="w-4 h-4" />
+              </div>
+              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Total Budget</p>
+            </div>
+            <h3 className="text-2xl font-black text-foreground font-mono">{client.totalBudget}</h3>
+          </div>
+          <div className="bg-card border border-border/60 rounded-3xl p-5 flex flex-col justify-center shadow-sm">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-8 h-8 rounded-xl bg-rose-500/10 text-rose-500 flex items-center justify-center shrink-0">
+                <TrendingUp className="w-4 h-4" />
+              </div>
+              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Outstanding</p>
+            </div>
+            <h3 className="text-2xl font-black text-foreground font-mono">{client.outstandingPayment}</h3>
+          </div>
+          <div className="bg-card border border-border/60 rounded-3xl p-5 flex flex-col justify-center shadow-sm">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center shrink-0">
+                <Calendar className="w-4 h-4" />
+              </div>
+              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Onboarded</p>
+            </div>
+            <h3 className="text-2xl font-black text-foreground font-mono">{client.onboardingDate ? format(new Date(client.onboardingDate), "dd MMM yyyy") : "-"}</h3>
+          </div>
+          <div className="bg-card border border-border/60 rounded-3xl p-5 flex flex-col justify-center shadow-sm">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-8 h-8 rounded-xl bg-indigo-500/10 text-indigo-500 flex items-center justify-center shrink-0">
+                <Users className="w-4 h-4" />
+              </div>
+              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Contacts</p>
+            </div>
+            <div className="flex -space-x-2">
+              {client.contacts.map((contact, i) => (
+                <div key={i} className="w-8 h-8 rounded-full border-2 border-card overflow-hidden bg-muted shadow-sm">
+                  <img src={contact.avatar} alt={contact.name} className="w-full h-full object-cover" />
+                </div>
+              ))}
             </div>
           </div>
         </div>
@@ -1427,7 +1457,7 @@ export function Projects() {
   }
 
   return (
-    <div className="w-full max-w-7xl mx-auto space-y-6 animate-in fade-in duration-500">
+    <div className="w-full space-y-6 animate-in fade-in duration-500">
       
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -1613,14 +1643,22 @@ export function Projects() {
             </div>
 
             {/* Footer Summary */}
-            <div className="flex justify-between items-center pt-4 border-t border-border/40 relative z-10">
+            <div className="grid grid-cols-2 gap-4 pt-4 border-t border-border/40 relative z-10">
               <div className="flex flex-col">
                 <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Active Projects</span>
                 <span className="text-lg font-black text-foreground">{projects.filter(p => p.clientId === client.id).length}</span>
               </div>
               <div className="flex flex-col text-right">
+                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Onboarded</span>
+                <span className="text-sm mt-1 font-black text-foreground">{client.onboardingDate ? format(new Date(client.onboardingDate), "MMM yyyy") : "-"}</span>
+              </div>
+              <div className="flex flex-col">
                 <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Total Budget</span>
-                <span className="text-lg font-black font-mono text-primary">{client.totalBudget}</span>
+                <span className="text-sm mt-1 font-black font-mono text-primary">{client.totalBudget}</span>
+              </div>
+              <div className="flex flex-col text-right">
+                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Outstanding</span>
+                <span className="text-sm mt-1 font-black font-mono text-destructive">{client.outstandingPayment}</span>
               </div>
             </div>
 

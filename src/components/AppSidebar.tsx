@@ -27,7 +27,7 @@ function Badge({ count }: { count: number }) {
   if (count <= 0) return null;
   return (
     <span 
-      className="ml-auto shrink-0 rounded-full bg-sidebar-primary w-2 h-2 shadow-[0_0_8px_rgba(0,0,0,0.15)] shadow-sidebar-primary/50" 
+      className="ml-auto shrink-0 rounded-full bg-[#00A56C] w-2.5 h-2.5 shadow-sm shadow-[#00A56C]/30" 
       aria-label={`${count} notifications`} 
     />
   );

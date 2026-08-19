@@ -49,7 +49,7 @@ export function CoursePlayer({ active, setActive }: { active: string, setActive:
   const [activeModule, setActiveModule] = useState("m2");
 
   return (
-    <div className="w-full max-w-[1400px] mx-auto space-y-6 animate-in fade-in duration-500 pb-12">
+    <div className="w-full space-y-6 animate-in fade-in duration-500 pb-12">
       
       {/* Header */}
       <div className="flex items-center justify-between gap-4 bg-card border border-border/50 rounded-2xl p-4 shadow-sm">

@@ -25,7 +25,7 @@ export function Payslips() {
   const initials = selectedEmp.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
 
   return (
-    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-[1200px] mx-auto pb-12">
+    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 pb-12">
       
       {/* Top Page Header */}
       <div className="mb-8 flex items-end justify-between border-b border-border pb-6">
