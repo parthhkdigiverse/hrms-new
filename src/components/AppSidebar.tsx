@@ -21,6 +21,7 @@ import {
   sectionOrder,
   type NavItem,
 } from "./nav-data";
+import { useTheme } from "./ThemeProvider";
 
 function Badge({ count }: { count: number }) {
   return (
@@ -100,8 +101,11 @@ function SidebarBody({
   onClose?: () => void;
   isLocked?: boolean;
 }) {
+  const { logoUrl, companyName } = useTheme();
   const [query, setQuery] = useState("");
-  const [openGroups, setOpenGroups] = useState<string[]>(["Approvals Hub"]);
+  const [openGroups, setOpenGroups] = useState<string[]>(
+    navItems.filter((i) => i.children?.length).map((i) => i.title),
+  );
   const [pinned, setPinned] = useState<string[]>(["Attendance"]);
   const [collapsedSections, setCollapsedSections] = useState<string[]>([]);
   const [recents, setRecents] = useState<{ title: string; url: string }[]>(() => {
@@ -208,13 +212,19 @@ function SidebarBody({
 
   return (
     <>
-      <div className="flex items-center gap-2 px-3 py-3">
-        <div className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-sidebar-primary text-sm font-black text-sidebar-primary-foreground">
-          H
-        </div>
+      <div className="flex h-14 shrink-0 items-center gap-3 border-b border-sidebar-border px-3">
+        {logoUrl ? (
+          <div className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-white border border-border overflow-hidden">
+            <img src={logoUrl} alt="Logo" className="max-w-full max-h-full object-contain p-0.5" />
+          </div>
+        ) : (
+          <div className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-sidebar-primary text-sm font-black text-sidebar-primary-foreground">
+            {companyName.charAt(0)}
+          </div>
+        )}
         {!collapsed && (
           <div className="min-w-0">
-            <p className="truncate text-sm font-bold">HR Suite</p>
+            <p className="truncate text-sm font-bold">{companyName}</p>
             <p className="truncate text-[11px] text-sidebar-muted">Workspace</p>
           </div>
         )}
@@ -240,7 +250,7 @@ function SidebarBody({
         )}
       </div>
 
-      <div className="px-3 pb-2">
+      <div className="px-3 pb-2 pt-3">
         <CreateMenu collapsed={collapsed} onNavigate={go} />
       </div>
 
@@ -488,6 +498,7 @@ function SidebarBody({
 }
 
 export function AppSidebar({ active = "/dashboard", setActive }: { active?: string; setActive?: (url: string) => void }) {
+  const { logoUrl, companyName } = useTheme();
   const [collapsed, setCollapsed] = useState(false);
   // Default to internal state if no setActive is provided (for backward compatibility if used elsewhere)
   const [internalActive, setInternalActive] = useState(active);
@@ -518,7 +529,7 @@ export function AppSidebar({ active = "/dashboard", setActive }: { active?: stri
         >
           <Menu className="h-5 w-5" />
         </button>
-        <p className="text-sm font-bold">HR Suite</p>
+        <p className="text-sm font-bold">{companyName}</p>
       </header>
 
       {/* Mobile drawer */}
