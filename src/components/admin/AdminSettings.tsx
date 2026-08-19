@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Settings, Save, Palette, Paintbrush, Type, Square, Image as ImageIcon, Briefcase, X } from "lucide-react";
+import { Settings, Save, Palette, Paintbrush, Type, Square, Image as ImageIcon, Briefcase, X, ShieldAlert, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { useTheme } from "../ThemeProvider";
+import { useSettingsContext } from "../payroll/SettingsContext";
 
 const FONTS = [
   { value: "System", label: "System Default" },
@@ -105,6 +106,29 @@ export function AdminSettings() {
     logoUrl, setLogoUrl, 
     companyName, setCompanyName 
   } = useTheme();
+
+  const { penaltyTemplates, addPenaltyTemplate, removePenaltyTemplate } = useSettingsContext();
+  const [newTemplateLabel, setNewTemplateLabel] = useState("");
+  const [newTemplateDesc, setNewTemplateDesc] = useState("");
+  const [newTemplateType, setNewTemplateType] = useState<"Penalty" | "Warning">("Penalty");
+  const [newTemplateAmount, setNewTemplateAmount] = useState("");
+
+  const handleAddTemplate = () => {
+    if (!newTemplateLabel.trim()) {
+      toast.error("Label is required");
+      return;
+    }
+    addPenaltyTemplate({
+      label: newTemplateLabel,
+      description: newTemplateDesc,
+      type: newTemplateType,
+      amount: newTemplateAmount
+    });
+    setNewTemplateLabel("");
+    setNewTemplateDesc("");
+    setNewTemplateAmount("");
+    toast.success("Template added");
+  };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -268,6 +292,90 @@ export function AdminSettings() {
         </div>
         
       </div>
+
+      {/* Disciplinary Settings */}
+      <div className="bg-card border border-border/50 rounded-3xl p-6 shadow-sm flex flex-col md:col-span-2 xl:col-span-3">
+        <div className="flex items-center gap-2 mb-4">
+          <ShieldAlert className="w-5 h-5 text-primary" />
+          <h3 className="text-lg font-black">Disciplinary Templates</h3>
+        </div>
+        <p className="text-sm text-muted-foreground mb-6">
+          Manage pre-defined penalty and warning templates for quick selection when adding records.
+        </p>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2 space-y-3 max-h-80 overflow-y-auto pr-2 custom-scrollbar">
+            {penaltyTemplates.filter(t => t.id !== "1").map(t => (
+              <div key={t.id} className="flex items-start justify-between p-4 rounded-xl border border-border/50 bg-background/50 hover:bg-muted/30 transition-colors">
+                <div>
+                  <h4 className="font-bold text-foreground text-sm">{t.label}</h4>
+                  <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{t.description}</p>
+                  <div className="flex items-center gap-2 mt-2">
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md uppercase ${t.type === 'Penalty' ? 'bg-destructive/10 text-destructive' : 'bg-amber-100 text-amber-700'}`}>
+                      {t.type}
+                    </span>
+                    {t.amount && (
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-muted text-foreground/70">
+                        ₹{t.amount}
+                      </span>
+                    )}
+                  </div>
+                </div>
+                <button onClick={() => removePenaltyTemplate(t.id)} className="p-2 hover:bg-destructive/10 text-muted-foreground hover:text-destructive rounded-lg transition-colors">
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
+            ))}
+            {penaltyTemplates.length <= 1 && (
+              <div className="text-center p-8 text-muted-foreground text-sm border border-dashed border-border rounded-xl">
+                No custom templates found.
+              </div>
+            )}
+          </div>
+
+          <div className="bg-muted/30 border border-border rounded-2xl p-5 space-y-4">
+            <h4 className="font-bold text-sm text-foreground">Add New Template</h4>
+            <input 
+              type="text" 
+              placeholder="Template Label" 
+              value={newTemplateLabel}
+              onChange={e => setNewTemplateLabel(e.target.value)}
+              className="w-full px-3 py-2 rounded-xl border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 bg-background"
+            />
+            <select 
+              value={newTemplateType}
+              onChange={e => setNewTemplateType(e.target.value as "Penalty" | "Warning")}
+              className="w-full px-3 py-2 rounded-xl border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 bg-background"
+            >
+              <option value="Penalty">Penalty</option>
+              <option value="Warning">Warning</option>
+            </select>
+            {newTemplateType === "Penalty" && (
+              <input 
+                type="number" 
+                placeholder="Default Amount (Optional)" 
+                value={newTemplateAmount}
+                onChange={e => setNewTemplateAmount(e.target.value)}
+                className="w-full px-3 py-2 rounded-xl border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 bg-background"
+              />
+            )}
+            <textarea 
+              placeholder="Description" 
+              value={newTemplateDesc}
+              onChange={e => setNewTemplateDesc(e.target.value)}
+              rows={3}
+              className="w-full px-3 py-2 rounded-xl border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 resize-none bg-background"
+            />
+            <button 
+              onClick={handleAddTemplate}
+              className="w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground font-bold text-sm py-2 rounded-xl hover:bg-primary/90 transition-colors"
+            >
+              <Plus className="w-4 h-4" /> Add Template
+            </button>
+          </div>
+        </div>
+      </div>
+
     </div>
   );
 }

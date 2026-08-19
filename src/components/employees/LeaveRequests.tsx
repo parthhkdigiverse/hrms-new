@@ -21,6 +21,7 @@ interface LeaveRequest {
   reason: string;
   status: LeaveStatus;
   appliedOn: string;
+  isConditional?: boolean;
 }
 
 const MOCK_REQUESTS: LeaveRequest[] = [
@@ -148,6 +149,7 @@ export function LeaveRequests() {
   const [newStartDate, setNewStartDate] = useState("");
   const [newEndDate, setNewEndDate] = useState("");
   const [newReason, setNewReason] = useState("");
+  const [newIsConditional, setNewIsConditional] = useState(false);
 
   const handleAction = (id: string, action: "Approved" | "Rejected") => {
     setRequests(prev => prev.map(r => r.id === id ? { ...r, status: action } : r));
@@ -180,6 +182,7 @@ export function LeaveRequests() {
       reason: newReason,
       status: "Pending",
       appliedOn: new Date().toISOString().split("T")[0] || "",
+      isConditional: newIsConditional,
     };
 
     setRequests(prev => [newRequest, ...prev]);
@@ -191,6 +194,7 @@ export function LeaveRequests() {
     setNewStartDate("");
     setNewEndDate("");
     setNewReason("");
+    setNewIsConditional(false);
   };
 
   const filteredRequests = useMemo(() => {
@@ -285,6 +289,19 @@ export function LeaveRequests() {
                   />
                 </div>
 
+                <div className="flex items-center gap-2">
+                  <input 
+                    type="checkbox" 
+                    id="conditionalLeave"
+                    checked={newIsConditional}
+                    onChange={e => setNewIsConditional(e.target.checked)}
+                    className="w-4 h-4 text-primary rounded border-border/50 focus:ring-primary/20 cursor-pointer"
+                  />
+                  <label htmlFor="conditionalLeave" className="text-sm font-medium text-foreground/80 cursor-pointer">
+                    Conditional Leave (Will Work From Home)
+                  </label>
+                </div>
+
                 <div className="pt-4 flex justify-end gap-3">
                   <button 
                     type="button" 
@@ -361,6 +378,11 @@ export function LeaveRequests() {
 
                 {/* Details */}
                 <div className="space-y-3 bg-muted/50/50 rounded-xl p-4 border border-border/50">
+                  {request.isConditional && (
+                    <div className="mb-1 inline-flex items-center gap-1.5 px-2.5 py-1 bg-indigo-500/10 text-indigo-700 text-[11px] font-black uppercase rounded-lg border border-indigo-500/20">
+                      <Clock className="w-3.5 h-3.5" /> Working From Home
+                    </div>
+                  )}
                   <div className="flex items-start gap-3">
                     <Calendar className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
                     <div>

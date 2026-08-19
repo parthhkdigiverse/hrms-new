@@ -40,6 +40,9 @@ function hexToHSL(H: string) {
   else if (cmax == g) h = (b - r) / delta + 2;
   else h = (r - g) / delta + 4;
   
+  // Calculate relative luminance for contrast (YIQ formula)
+  const luminance = (r * 255 * 299 + g * 255 * 587 + b * 255 * 114) / 1000;
+  
   h = Math.round(h * 60);
   if (h < 0) h += 360;
   
@@ -48,7 +51,7 @@ function hexToHSL(H: string) {
   s = +(s * 100).toFixed(1);
   l = +(l * 100).toFixed(1);
 
-  return { h, s, l };
+  return { h, s, l, luminance };
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
@@ -93,7 +96,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     root.style.setProperty("--chart-4", `hsl(${(hsl.h + 90) % 360}, ${hsl.s}%, ${hsl.l}%)`);
     root.style.setProperty("--chart-5", `hsl(${(hsl.h + 120) % 360}, ${hsl.s}%, ${hsl.l}%)`);
     
-    const primaryFg = hsl.l > 60 ? "#000000" : "#ffffff";
+    // YIQ formula threshold is typically 128
+    const primaryFg = hsl.luminance > 140 ? "#000000" : "#ffffff";
     root.style.setProperty("--primary-foreground", primaryFg);
     root.style.setProperty("--sidebar-primary-foreground", primaryFg);
     

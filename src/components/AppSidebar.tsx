@@ -24,10 +24,12 @@ import {
 import { useTheme } from "./ThemeProvider";
 
 function Badge({ count }: { count: number }) {
+  if (count <= 0) return null;
   return (
-    <span className="ml-auto shrink-0 rounded-full bg-sidebar-primary px-1.5 py-0.5 text-[10px] font-semibold leading-none text-sidebar-primary-foreground">
-      {count}
-    </span>
+    <span 
+      className="ml-auto shrink-0 rounded-full bg-sidebar-primary w-2 h-2 shadow-[0_0_8px_rgba(0,0,0,0.15)] shadow-sidebar-primary/50" 
+      aria-label={`${count} notifications`} 
+    />
   );
 }
 

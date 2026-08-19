@@ -3,6 +3,7 @@ import { Search, AlertTriangle, MessageSquareWarning, ThumbsUp, ShieldAlert, Plu
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { useSettingsContext } from "../payroll/SettingsContext";
 
 type RecordType = "Penalty" | "Warning";
 type RecordStatus = "Active" | "Resolved" | "Waived";
@@ -57,6 +58,7 @@ const MOCK_RECORDS: DisciplinaryRecord[] = [
 ];
 
 export function Penalties() {
+  const { penaltyTemplates } = useSettingsContext();
   const [records, setRecords] = useState<DisciplinaryRecord[]>(MOCK_RECORDS);
   const [activeTab, setActiveTab] = useState<"All" | RecordType>("All");
   const [searchQuery, setSearchQuery] = useState("");
@@ -68,12 +70,18 @@ export function Penalties() {
   const [newDesc, setNewDesc] = useState("");
   const [newAmount, setNewAmount] = useState("");
   const [newImpact, setNewImpact] = useState(true);
+  const [selectedTemplate, setSelectedTemplate] = useState("Custom (Manual Entry)");
 
   // Update Status State
   const [isUpdateOpen, setIsUpdateOpen] = useState(false);
   const [updateAction, setUpdateAction] = useState<"Waived" | "Resolved">("Resolved");
   const [updateRecordId, setUpdateRecordId] = useState<string | null>(null);
   const [updateReason, setUpdateReason] = useState("");
+
+  // Edit Amount State
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [editRecordId, setEditRecordId] = useState<string | null>(null);
+  const [editAmount, setEditAmount] = useState("");
 
   const filteredRecords = records.filter(rec => {
     const matchesTab = activeTab === "All" || rec.type === activeTab;
@@ -105,6 +113,26 @@ export function Penalties() {
     toast.success(`Record marked as ${updateAction}`);
     setIsUpdateOpen(false);
   };
+
+  const openEditDialog = (record: DisciplinaryRecord) => {
+    setEditRecordId(record.id);
+    setEditAmount(record.amount?.toString() || "0");
+    setIsEditOpen(true);
+  };
+
+  const handleEditAmount = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editRecordId) return;
+
+    setRecords(records.map(rec => rec.id === editRecordId ? {
+      ...rec,
+      amount: parseFloat(editAmount) || 0
+    } : rec));
+
+    toast.success("Penalty amount updated");
+    setIsEditOpen(false);
+  };
+
 
   const handleCreateRecord = (e: React.FormEvent) => {
     e.preventDefault();
@@ -138,10 +166,50 @@ export function Penalties() {
     setNewAmount("");
     setNewType("Penalty");
     setNewImpact(true);
+    setSelectedTemplate("Custom (Manual Entry)");
+  };
+
+  const handleTemplateChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const val = e.target.value;
+    setSelectedTemplate(val);
+    const template = penaltyTemplates.find(p => p.label === val);
+    if (template && val !== "Custom (Manual Entry)") {
+      setNewType(template.type as RecordType);
+      setNewDesc(template.description);
+      setNewAmount(template.amount);
+    }
   };
 
   const activePenaltiesCount = records.filter(r => r.type === "Penalty" && r.status === "Active").length;
   const totalDeductions = records.filter(r => r.type === "Penalty" && r.status === "Active" && r.impactPayroll).reduce((sum, r) => sum + (r.amount || 0), 0);
+
+  // Group by employee for KPIs
+  const employeeStats = records.reduce((acc, rec) => {
+    if (!acc[rec.employee.name]) {
+      acc[rec.employee.name] = { violations: 0, penaltyAmount: 0 };
+    }
+    acc[rec.employee.name]!.violations += 1;
+    if (rec.type === "Penalty" && rec.amount) {
+      acc[rec.employee.name]!.penaltyAmount += rec.amount;
+    }
+    return acc;
+  }, {} as Record<string, { violations: number, penaltyAmount: number }>);
+
+  let maxViolations = 0;
+  let maxViolationsEmp = "None";
+  let maxPenaltyAmount = 0;
+  let maxPenaltyEmp = "None";
+
+  Object.entries(employeeStats).forEach(([empName, stats]) => {
+    if (stats.violations > maxViolations) {
+      maxViolations = stats.violations;
+      maxViolationsEmp = empName;
+    }
+    if (stats.penaltyAmount > maxPenaltyAmount) {
+      maxPenaltyAmount = stats.penaltyAmount;
+      maxPenaltyEmp = empName;
+    }
+  });
 
   return (
     <div className="space-y-8 h-[calc(100vh-8rem)] flex flex-col overflow-hidden pb-4">
@@ -159,7 +227,7 @@ export function Penalties() {
             </p>
           </div>
           
-          <div className="flex gap-4">
+          <div className="flex flex-wrap gap-4">
             <div className="bg-destructive/10 border border-destructive/20 rounded-2xl p-4 flex items-center gap-4 min-w-[160px]">
               <div className="w-10 h-10 bg-background rounded-xl shadow-sm flex items-center justify-center text-destructive shrink-0">
                 <AlertTriangle className="w-5 h-5" />
@@ -177,6 +245,26 @@ export function Penalties() {
               <div>
                 <p className="text-xs font-bold text-primary/70 uppercase tracking-wider mb-0.5">Payroll Impact</p>
                 <p className="text-2xl font-black text-primary leading-none">₹{totalDeductions}</p>
+              </div>
+            </div>
+
+            <div className="bg-amber-500/10 border border-amber-500/20 rounded-2xl p-4 flex items-center gap-4 min-w-[160px] flex-1 sm:flex-none">
+              <div className="w-10 h-10 bg-background rounded-xl shadow-sm flex items-center justify-center text-amber-600 shrink-0">
+                <ShieldAlert className="w-5 h-5" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-xs font-bold text-amber-600/80 uppercase tracking-wider mb-0.5 truncate" title={maxViolationsEmp}>{maxViolationsEmp}</p>
+                <p className="text-lg font-black text-amber-700 leading-none truncate">{maxViolations} Violations</p>
+              </div>
+            </div>
+
+            <div className="bg-rose-500/10 border border-rose-500/20 rounded-2xl p-4 flex items-center gap-4 min-w-[160px] flex-1 sm:flex-none">
+              <div className="w-10 h-10 bg-background rounded-xl shadow-sm flex items-center justify-center text-rose-600 shrink-0">
+                <IndianRupee className="w-5 h-5" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-xs font-bold text-rose-600/80 uppercase tracking-wider mb-0.5 truncate" title={maxPenaltyEmp}>{maxPenaltyEmp}</p>
+                <p className="text-lg font-black text-rose-700 leading-none truncate">₹{maxPenaltyAmount}</p>
               </div>
             </div>
           </div>
@@ -228,6 +316,18 @@ export function Penalties() {
                   <DialogTitle>Add Disciplinary Record</DialogTitle>
                 </DialogHeader>
                 <form onSubmit={handleCreateRecord} className="space-y-4 pt-4">
+                  <div className="space-y-2">
+                    <label className="text-sm font-bold text-foreground/80">Pre-defined Template</label>
+                    <select 
+                      value={selectedTemplate}
+                      onChange={handleTemplateChange}
+                      className="w-full px-3 py-2 bg-muted/30 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 font-medium"
+                    >
+                      {penaltyTemplates.map(t => (
+                        <option key={t.label} value={t.label}>{t.label}</option>
+                      ))}
+                    </select>
+                  </div>
                   <div className="space-y-2">
                     <label className="text-sm font-bold text-foreground/80">Record Type</label>
                     <select 
@@ -344,6 +444,44 @@ export function Penalties() {
                 </form>
               </DialogContent>
             </Dialog>
+
+            <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
+              <DialogContent className="sm:max-w-[400px]">
+                <DialogHeader>
+                  <DialogTitle>Edit Penalty Amount</DialogTitle>
+                </DialogHeader>
+                <form onSubmit={handleEditAmount} className="space-y-4 pt-4">
+                  <div className="space-y-2">
+                    <label className="text-sm font-bold text-foreground/80">
+                      New Amount (₹)
+                    </label>
+                    <input 
+                      type="number"
+                      required
+                      min="0"
+                      value={editAmount}
+                      onChange={e => setEditAmount(e.target.value)}
+                      className="w-full px-3 py-2 bg-background border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    />
+                  </div>
+                  <div className="pt-4 flex justify-end gap-3">
+                    <button 
+                      type="button" 
+                      onClick={() => setIsEditOpen(false)}
+                      className="px-4 py-2 bg-background border border-border text-foreground/80 hover:bg-muted font-bold text-sm rounded-xl transition-colors"
+                    >
+                      Cancel
+                    </button>
+                    <button 
+                      type="submit"
+                      className="px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-sm rounded-xl transition-colors"
+                    >
+                      Update
+                    </button>
+                  </div>
+                </form>
+              </DialogContent>
+            </Dialog>
           </div>
         </div>
 
@@ -414,6 +552,14 @@ export function Penalties() {
                   
                   {record.status === "Active" && (record.type === "Penalty" || record.type === "Warning") && (
                     <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      {record.type === "Penalty" && (
+                        <button 
+                          onClick={() => openEditDialog(record)}
+                          className="px-3 py-1.5 text-xs font-bold text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors"
+                        >
+                          Edit
+                        </button>
+                      )}
                       <button 
                         onClick={() => openUpdateDialog(record.id, "Waived")}
                         className="px-3 py-1.5 text-xs font-bold text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors"
