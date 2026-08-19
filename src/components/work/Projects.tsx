@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
-import { Search, Plus, Filter, MoreHorizontal, LayoutGrid, List, Briefcase, Calendar, Clock, Star, Circle, Trash2, Edit2, Archive, ArrowLeft, Users, IndianRupee, FolderGit2, CheckCircle2, Settings2, TrendingUp, MousePointerClick, Target, BarChart3, ChevronDown } from "lucide-react";
+import { X,  Search, Plus, Filter, MoreHorizontal, LayoutGrid, List, Briefcase, Calendar, Clock, Star, Circle, Trash2, Edit2, Archive, ArrowLeft, Users, IndianRupee, FolderGit2, CheckCircle2, Settings2, TrendingUp, MousePointerClick, Target, BarChart3, ChevronDown  } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { DialogClose,  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter  } from "@/components/ui/dialog";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar as CalendarUI } from "@/components/ui/calendar";
@@ -249,10 +249,15 @@ export function Projects() {
 
   const [isNewClientModalOpen, setIsNewClientModalOpen] = useState(false);
   const [isNewProjectModalOpen, setIsNewProjectModalOpen] = useState(false);
+  const [isEditClientModalOpen, setIsEditClientModalOpen] = useState(false);
+  const [editingClient, setEditingClient] = useState<Client | null>(null);
+  const [showEditClientErrors, setShowEditClientErrors] = useState(false);
   const [isEditProjectModalOpen, setIsEditProjectModalOpen] = useState(false);
   
   const [newClientName, setNewClientName] = useState("");
   const [newClientBudget, setNewClientBudget] = useState("");
+  const [newClientOutstanding, setNewClientOutstanding] = useState("");
+  const [newClientOnboarding, setNewClientOnboarding] = useState(new Date().toISOString().split('T')[0] || "");
   
   const [newProjectName, setNewProjectName] = useState("");
   const [newProjectBudget, setNewProjectBudget] = useState("");
@@ -288,8 +293,8 @@ export function Projects() {
       name: newClientName,
       logo: `https://i.pravatar.cc/150?u=${encodeURIComponent(newClientName)}`,
       totalBudget: newClientBudget || "₹0",
-      outstandingPayment: "₹0",
-      onboardingDate: new Date().toISOString().split('T')[0] || "",
+      outstandingPayment: newClientOutstanding || "₹0",
+      onboardingDate: newClientOnboarding || new Date().toISOString().split('T')[0] || "",
       activeProjects: 0,
       status: "Active",
       contacts: [{ name: "User", avatar: "https://i.pravatar.cc/150?u=user" }]
@@ -297,8 +302,23 @@ export function Projects() {
     setClients([newClient, ...clients]);
     setNewClientName("");
     setNewClientBudget("");
+    setNewClientOutstanding("");
+    setNewClientOnboarding(new Date().toISOString().split('T')[0] || "");
     setShowNewClientErrors(false);
     setIsNewClientModalOpen(false);
+  };
+
+  const handleUpdateClient = () => {
+    setShowEditClientErrors(true);
+    if (!editingClient || !editingClient.name.trim()) {
+      toast.error("Please fill in all required fields");
+      setTimeout(() => setShowEditClientErrors(false), 3000);
+      return;
+    }
+    setClients(clients.map(c => c.id === editingClient.id ? editingClient : c));
+    setShowEditClientErrors(false);
+    setIsEditClientModalOpen(false);
+    setEditingClient(null);
   };
 
   const handleCreateProject = () => {
@@ -1122,13 +1142,21 @@ export function Projects() {
         </div>
         {/* New Project Modal */}
         <Dialog open={isNewProjectModalOpen} onOpenChange={setIsNewProjectModalOpen}>
-          <DialogContent className="sm:max-w-[425px] rounded-3xl p-0 overflow-hidden border-border/50 shadow-2xl">
+          <DialogContent className="sm:max-w-[425px] md:max-w-[500px] p-0 overflow-hidden rounded-[2rem] gap-0 border-border/60 shadow-2xl [&>button]:hidden bg-card">
             <div className="p-6 pb-4">
-              <DialogHeader>
-                <DialogTitle className="text-2xl font-black tracking-tight">New Project</DialogTitle>
-              </DialogHeader>
+              <div className="flex items-center justify-between px-6 md:px-8 py-6 border-b border-border/50 bg-muted/30">
+          <div>
+            <h2 className="text-xl md:text-2xl font-black tracking-tight">New Project</h2>
+            
+          </div>
+          <DialogClose asChild>
+            <button className="p-2 text-muted-foreground hover:text-foreground/80 hover:bg-muted rounded-full transition-colors">
+              <X className="w-5 h-5" />
+            </button>
+          </DialogClose>
+        </div>
             </div>
-            <div className="p-6 pt-0 space-y-4">
+            <div className="p-6 md:p-8 space-y-6 overflow-y-auto max-h-[70vh]">
               <div>
                 <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Project Name <span className="text-red-500">*</span></label>
                 <input 
@@ -1203,7 +1231,7 @@ export function Projects() {
                 </select>
               </div>
             </div>
-            <div className="p-6 pt-4 bg-muted/30 border-t border-border/50 flex justify-end gap-3">
+            <div className="px-6 md:px-8 py-4 md:py-6 bg-muted/30 border-t border-border/50 flex justify-end gap-3 mt-auto shrink-0">
               <button 
                 onClick={() => setIsNewProjectModalOpen(false)}
                 className="px-5 py-2.5 rounded-xl font-bold text-muted-foreground hover:bg-muted transition-colors"
@@ -1220,14 +1248,22 @@ export function Projects() {
             
             {/* Nested Manage Categories Modal */}
             <Dialog open={isManageCategoriesModalOpen} onOpenChange={setIsManageCategoriesModalOpen}>
-              <DialogContent className="sm:max-w-[400px] rounded-3xl p-0 overflow-hidden border-border/50 shadow-2xl z-[100]">
+              <DialogContent className="sm:max-w-[400px] p-0 overflow-hidden rounded-[2rem] gap-0 border-border/60 shadow-2xl [&>button]:hidden bg-card">
                 <div className="p-6 pb-4">
-                  <DialogHeader>
-                    <DialogTitle className="text-2xl font-black tracking-tight">Manage Categories</DialogTitle>
-                  </DialogHeader>
+                  <div className="flex items-center justify-between px-6 md:px-8 py-6 border-b border-border/50 bg-muted/30">
+          <div>
+            <h2 className="text-xl md:text-2xl font-black tracking-tight">Manage Categories</h2>
+            
+          </div>
+          <DialogClose asChild>
+            <button className="p-2 text-muted-foreground hover:text-foreground/80 hover:bg-muted rounded-full transition-colors">
+              <X className="w-5 h-5" />
+            </button>
+          </DialogClose>
+        </div>
                 </div>
                 
-                <div className="p-6 pt-0 space-y-4">
+                <div className="p-6 md:p-8 space-y-6 overflow-y-auto max-h-[70vh]">
                   <div className="flex gap-2">
                     <input 
                       type="text" 
@@ -1262,7 +1298,7 @@ export function Projects() {
                   </div>
                 </div>
                 
-                <div className="p-6 pt-4 bg-muted/30 border-t border-border/50 flex justify-end">
+                <div className="px-6 md:px-8 py-4 md:py-6 bg-muted/30 border-t border-border/50 flex justify-end gap-3 mt-auto shrink-0">
                   <button 
                     onClick={() => setIsManageCategoriesModalOpen(false)}
                     className="px-5 py-2.5 bg-foreground text-background font-bold rounded-xl hover:bg-foreground/90 transition-colors"
@@ -1278,14 +1314,22 @@ export function Projects() {
 
         {/* Edit Project Modal */}
         <Dialog open={isEditProjectModalOpen} onOpenChange={setIsEditProjectModalOpen}>
-          <DialogContent className="sm:max-w-[425px] rounded-3xl p-0 overflow-hidden border-border/50 shadow-2xl">
+          <DialogContent className="sm:max-w-[425px] md:max-w-[500px] p-0 overflow-hidden rounded-[2rem] gap-0 border-border/60 shadow-2xl [&>button]:hidden bg-card">
             <div className="p-6 pb-4">
-              <DialogHeader>
-                <DialogTitle className="text-2xl font-black tracking-tight">Edit Project</DialogTitle>
-              </DialogHeader>
+              <div className="flex items-center justify-between px-6 md:px-8 py-6 border-b border-border/50 bg-muted/30">
+          <div>
+            <h2 className="text-xl md:text-2xl font-black tracking-tight">Edit Project</h2>
+            
+          </div>
+          <DialogClose asChild>
+            <button className="p-2 text-muted-foreground hover:text-foreground/80 hover:bg-muted rounded-full transition-colors">
+              <X className="w-5 h-5" />
+            </button>
+          </DialogClose>
+        </div>
             </div>
             {editingProject && (
-              <div className="p-6 pt-0 space-y-4 max-h-[60vh] overflow-y-auto">
+              <div className="p-6 md:p-8 space-y-6 overflow-y-auto max-h-[70vh]">
                 <div>
                   <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Project Name <span className="text-red-500">*</span></label>
                   <input 
@@ -1380,7 +1424,7 @@ export function Projects() {
                 </div>
               </div>
             )}
-            <div className="p-6 pt-4 bg-muted/30 border-t border-border/50 flex justify-end gap-3">
+            <div className="px-6 md:px-8 py-4 md:py-6 bg-muted/30 border-t border-border/50 flex justify-end gap-3 mt-auto shrink-0">
               <button 
                 onClick={() => { setIsEditProjectModalOpen(false); setEditingProject(null); }}
                 className="px-5 py-2.5 rounded-xl font-bold text-muted-foreground hover:bg-muted transition-colors"
@@ -1397,14 +1441,22 @@ export function Projects() {
             
             {/* Nested Manage Categories Modal for Edit */}
             <Dialog open={isManageCategoriesModalOpen} onOpenChange={setIsManageCategoriesModalOpen}>
-              <DialogContent className="sm:max-w-[400px] rounded-3xl p-0 overflow-hidden border-border/50 shadow-2xl z-[100]">
+              <DialogContent className="sm:max-w-[400px] p-0 overflow-hidden rounded-[2rem] gap-0 border-border/60 shadow-2xl [&>button]:hidden bg-card">
                 <div className="p-6 pb-4">
-                  <DialogHeader>
-                    <DialogTitle className="text-2xl font-black tracking-tight">Manage Categories</DialogTitle>
-                  </DialogHeader>
+                  <div className="flex items-center justify-between px-6 md:px-8 py-6 border-b border-border/50 bg-muted/30">
+          <div>
+            <h2 className="text-xl md:text-2xl font-black tracking-tight">Manage Categories</h2>
+            
+          </div>
+          <DialogClose asChild>
+            <button className="p-2 text-muted-foreground hover:text-foreground/80 hover:bg-muted rounded-full transition-colors">
+              <X className="w-5 h-5" />
+            </button>
+          </DialogClose>
+        </div>
                 </div>
                 
-                <div className="p-6 pt-0 space-y-4">
+                <div className="p-6 md:p-8 space-y-6 overflow-y-auto max-h-[70vh]">
                   <div className="flex gap-2">
                     <input 
                       type="text" 
@@ -1439,7 +1491,7 @@ export function Projects() {
                   </div>
                 </div>
                 
-                <div className="p-6 pt-4 bg-muted/30 border-t border-border/50 flex justify-end">
+                <div className="px-6 md:px-8 py-4 md:py-6 bg-muted/30 border-t border-border/50 flex justify-end gap-3 mt-auto shrink-0">
                   <button 
                     onClick={() => setIsManageCategoriesModalOpen(false)}
                     className="px-5 py-2.5 bg-foreground text-background font-bold rounded-xl hover:bg-foreground/90 transition-colors"
@@ -1621,7 +1673,10 @@ export function Projects() {
                   </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48 rounded-2xl p-2 border-border/60 shadow-xl bg-background/95 backdrop-blur-md">
-                  <DropdownMenuItem className="rounded-xl cursor-pointer py-2.5 focus:bg-primary/10 focus:text-primary font-medium transition-colors">
+                  <DropdownMenuItem 
+                    onClick={(e) => { e.stopPropagation(); setEditingClient(client); setIsEditClientModalOpen(true); }}
+                    className="rounded-xl cursor-pointer py-2.5 focus:bg-primary/10 focus:text-primary font-medium transition-colors"
+                  >
                     <Edit2 className="w-4 h-4 mr-2" /> Edit Client
                   </DropdownMenuItem>
                   <DropdownMenuSeparator className="bg-border/50" />
@@ -1674,13 +1729,21 @@ export function Projects() {
 
       {/* New Client Modal */}
       <Dialog open={isNewClientModalOpen} onOpenChange={setIsNewClientModalOpen}>
-        <DialogContent className="sm:max-w-[425px] rounded-3xl p-0 overflow-hidden border-border/50 shadow-2xl">
+        <DialogContent className="sm:max-w-[425px] md:max-w-[500px] p-0 overflow-hidden rounded-[2rem] gap-0 border-border/60 shadow-2xl [&>button]:hidden bg-card">
           <div className="p-6 pb-4">
-            <DialogHeader>
-              <DialogTitle className="text-2xl font-black tracking-tight">New Client</DialogTitle>
-            </DialogHeader>
+            <div className="flex items-center justify-between px-6 md:px-8 py-6 border-b border-border/50 bg-muted/30">
+          <div>
+            <h2 className="text-xl md:text-2xl font-black tracking-tight">New Client</h2>
+            
           </div>
-          <div className="p-6 pt-0 space-y-4">
+          <DialogClose asChild>
+            <button className="p-2 text-muted-foreground hover:text-foreground/80 hover:bg-muted rounded-full transition-colors">
+              <X className="w-5 h-5" />
+            </button>
+          </DialogClose>
+        </div>
+          </div>
+          <div className="p-6 md:p-8 space-y-6 overflow-y-auto max-h-[70vh]">
             <div>
               <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Client Name <span className="text-red-500">*</span></label>
               <input 
@@ -1701,8 +1764,27 @@ export function Projects() {
                 className="w-full px-4 py-3 bg-muted/50 border border-border/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium"
               />
             </div>
+            <div>
+              <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Outstanding Payment (Optional)</label>
+              <input 
+                type="text" 
+                value={newClientOutstanding}
+                onChange={(e) => setNewClientOutstanding(e.target.value)}
+                placeholder="e.g. ₹50,000"
+                className="w-full px-4 py-3 bg-muted/50 border border-border/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium"
+              />
+            </div>
+            <div>
+              <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Onboarding Date</label>
+              <input 
+                type="date" 
+                value={newClientOnboarding}
+                onChange={(e) => setNewClientOnboarding(e.target.value)}
+                className="w-full px-4 py-3 bg-muted/50 border border-border/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium"
+              />
+            </div>
           </div>
-          <div className="p-6 pt-4 bg-muted/30 border-t border-border/50 flex justify-end gap-3">
+          <div className="px-6 md:px-8 py-4 md:py-6 bg-muted/30 border-t border-border/50 flex justify-end gap-3 mt-auto shrink-0">
             <button 
               onClick={() => setIsNewClientModalOpen(false)}
               className="px-5 py-2.5 rounded-xl font-bold text-muted-foreground hover:bg-muted transition-colors"
@@ -1714,6 +1796,78 @@ export function Projects() {
               className="px-6 py-2.5 bg-primary text-primary-foreground font-bold rounded-xl shadow-md hover:bg-primary/90 transition-all disabled:opacity-50"
             >
               Create Client
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
+      {/* Edit Client Modal */}
+      <Dialog open={isEditClientModalOpen} onOpenChange={setIsEditClientModalOpen}>
+        <DialogContent className="sm:max-w-[425px] md:max-w-[500px] p-0 overflow-hidden rounded-[2rem] gap-0 border-border/60 shadow-2xl [&>button]:hidden bg-card">
+          <div className="p-6 pb-4">
+            <div className="flex items-center justify-between px-6 md:px-8 py-6 border-b border-border/50 bg-muted/30">
+          <div>
+            <h2 className="text-xl md:text-2xl font-black tracking-tight">Edit Client</h2>
+            
+          </div>
+          <DialogClose asChild>
+            <button className="p-2 text-muted-foreground hover:text-foreground/80 hover:bg-muted rounded-full transition-colors">
+              <X className="w-5 h-5" />
+            </button>
+          </DialogClose>
+        </div>
+          </div>
+          {editingClient && (
+            <div className="p-6 md:p-8 space-y-6 overflow-y-auto max-h-[70vh]">
+              <div>
+                <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Client Name <span className="text-red-500">*</span></label>
+                <input 
+                  type="text" 
+                  value={editingClient.name}
+                  onChange={(e) => setEditingClient({...editingClient, name: e.target.value})}
+                  className={"w-full px-4 py-3 bg-muted/50 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium " + (showEditClientErrors && !editingClient.name.trim() ? "border-red-500 ring-1 ring-red-500" : "border-border/50")}
+                />
+              </div>
+              <div>
+                <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Total Budget (Optional)</label>
+                <input 
+                  type="text" 
+                  value={editingClient.totalBudget}
+                  onChange={(e) => setEditingClient({...editingClient, totalBudget: e.target.value})}
+                  className="w-full px-4 py-3 bg-muted/50 border border-border/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Outstanding Payment (Optional)</label>
+                <input 
+                  type="text" 
+                  value={editingClient.outstandingPayment}
+                  onChange={(e) => setEditingClient({...editingClient, outstandingPayment: e.target.value})}
+                  className="w-full px-4 py-3 bg-muted/50 border border-border/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Onboarding Date</label>
+                <input 
+                  type="date" 
+                  value={editingClient.onboardingDate}
+                  onChange={(e) => setEditingClient({...editingClient, onboardingDate: e.target.value})}
+                  className="w-full px-4 py-3 bg-muted/50 border border-border/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium"
+                />
+              </div>
+            </div>
+          )}
+          <div className="px-6 md:px-8 py-4 md:py-6 bg-muted/30 border-t border-border/50 flex justify-end gap-3 mt-auto shrink-0">
+            <button 
+              onClick={() => { setIsEditClientModalOpen(false); setEditingClient(null); }}
+              className="px-5 py-2.5 rounded-xl font-bold text-muted-foreground hover:bg-muted transition-colors"
+            >
+              Cancel
+            </button>
+            <button 
+              onClick={handleUpdateClient}
+              className="px-6 py-2.5 bg-primary text-primary-foreground font-bold rounded-xl shadow-md hover:bg-primary/90 transition-all disabled:opacity-50"
+            >
+              Save Changes
             </button>
           </div>
         </DialogContent>

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Download, ChevronDown, CheckCircle2, TrendingUp, TrendingDown, DollarSign, Target, Calendar, BarChart2, Plus, Edit3, Save, X, Search, Info, Trash2, ArrowRight } from "lucide-react";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { DialogClose,  Dialog, DialogContent  } from "@/components/ui/dialog";
 
 const mockPlanData = {
   "FINANCIAL - REVENUE": [
@@ -147,7 +147,7 @@ export function FinancialPlan() {
 
       {/* --- ADD CATEGORY MODAL --- */}
       <Dialog open={isAddCategoryOpen} onOpenChange={setIsAddCategoryOpen}>
-        <DialogContent className="max-w-sm p-0 overflow-hidden rounded-2xl gap-0 border-border/50 shadow-2xl [&>button]:hidden bg-card">
+        <DialogContent className="max-w-sm p-0 overflow-hidden rounded-[2rem] gap-0 border-border/60 shadow-2xl [&>button]:hidden bg-card">
           <div className="p-4 border-b border-border/50 flex justify-between items-center bg-indigo-500/5">
               <h3 className="font-black text-lg text-foreground flex items-center gap-2">
                 <Plus className="w-5 h-5 text-indigo-600" /> Add Category
@@ -156,7 +156,7 @@ export function FinancialPlan() {
                 <X className="w-4 h-4 text-muted-foreground" />
               </button>
             </div>
-            <div className="p-6 space-y-4">
+            <div className="p-6 md:p-8 space-y-6 overflow-y-auto max-h-[70vh]">
               <div className="space-y-1.5">
                 <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wide">Category Name</label>
                 <input type="text" placeholder="e.g. MARKETING EXPENSES" className="w-full px-3 py-2 bg-background border border-border/50 rounded-lg text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500/20 uppercase" />
@@ -171,7 +171,7 @@ export function FinancialPlan() {
 
       {/* --- ADD/EDIT ROW MODAL --- */}
       <Dialog open={isAddRowOpen || isEditRowOpen} onOpenChange={(open) => { if (!open) { setIsAddRowOpen(false); setIsEditRowOpen(false); } }}>
-        <DialogContent className="max-w-md p-0 overflow-hidden rounded-2xl gap-0 border-border/50 shadow-2xl [&>button]:hidden bg-card">
+        <DialogContent className="max-w-md p-0 overflow-hidden rounded-[2rem] gap-0 border-border/60 shadow-2xl [&>button]:hidden bg-card">
           <div className="p-4 border-b border-border/50 flex justify-between items-center bg-primary/5">
               <h3 className="font-black text-lg text-foreground flex items-center gap-2">
                 {isEditRowOpen ? <Edit3 className="w-5 h-5 text-primary" /> : <Plus className="w-5 h-5 text-primary" />}
@@ -181,7 +181,7 @@ export function FinancialPlan() {
                 <X className="w-4 h-4 text-muted-foreground" />
               </button>
             </div>
-            <div className="p-6 space-y-4">
+            <div className="p-6 md:p-8 space-y-6 overflow-y-auto max-h-[70vh]">
               <div className="space-y-1.5">
                 <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wide">Sub-Category</label>
                 <input type="text" placeholder="e.g. Headcount" className="w-full px-3 py-2 bg-background border border-border/50 rounded-lg text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-primary/20" />

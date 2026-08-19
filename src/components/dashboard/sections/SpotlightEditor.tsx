@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Edit2, Plus, Trash2, X } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { DialogClose,  Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger  } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 
 export interface SpotlightEmployee {
@@ -51,13 +51,21 @@ export function SpotlightEditor({ spotlights, setSpotlights }: SpotlightEditorPr
           Manage Spotlight
         </button>
       </DialogTrigger>
-      <DialogContent className="max-w-md bg-card rounded-3xl p-6 border border-border shadow-2xl">
-        <DialogHeader className="mb-6">
-          <DialogTitle className="text-xl font-black flex items-center gap-2">
+      <DialogContent className="max-w-md p-0 overflow-hidden rounded-[2rem] gap-0 border-border/60 shadow-2xl [&>button]:hidden bg-card">
+        <div className="flex items-center justify-between px-6 md:px-8 py-6 border-b border-border/50 bg-muted/30">
+          <div>
+            <h2 className="text-xl md:text-2xl font-black tracking-tight">
             <Edit2 className="w-5 h-5 text-primary" />
             Manage Spotlight
-          </DialogTitle>
-        </DialogHeader>
+          </h2>
+            
+          </div>
+          <DialogClose asChild>
+            <button className="p-2 text-muted-foreground hover:text-foreground/80 hover:bg-muted rounded-full transition-colors">
+              <X className="w-5 h-5" />
+            </button>
+          </DialogClose>
+        </div>
 
         <div className="space-y-6">
           {/* Current List */}

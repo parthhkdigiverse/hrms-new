@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Search, Filter, CheckCircle2, Clock, Check, X, Star, AlertCircle, MessageSquare, Activity, User, Eye } from "lucide-react";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { DialogClose,  Dialog, DialogContent  } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 
 type VerificationStatus = "Pending" | "Verified";
@@ -323,7 +323,7 @@ export function DailyProgress() {
 
       {/* Verification Modal */}
       <Dialog open={verifyModalOpen} onOpenChange={(open) => !open && setVerifyModalOpen(false)}>
-        <DialogContent className="max-w-3xl p-0 overflow-hidden rounded-2xl gap-0 border-border/50 shadow-xl flex flex-col max-h-[90vh] bg-card">
+        <DialogContent className="max-w-3xl p-0 overflow-hidden rounded-[2rem] gap-0 border-border/60 shadow-2xl [&>button]:hidden bg-card">
           
           {/* Modal Header */}
           <div className="flex items-center justify-between p-6 border-b border-border/50 shrink-0">
@@ -339,7 +339,7 @@ export function DailyProgress() {
             </div>
             
             {/* Modal Body */}
-            <div className="p-6 overflow-y-auto space-y-6">
+            <div className="p-6 md:p-8 space-y-6 overflow-y-auto max-h-[70vh]">
               <div className="grid md:grid-cols-2 gap-6">
                 
                 {/* Tasks List */}
@@ -459,7 +459,7 @@ export function DailyProgress() {
 
       {/* Pending List Modal */}
       <Dialog open={pendingListModalOpen} onOpenChange={setPendingListModalOpen}>
-        <DialogContent className="max-w-md p-0 overflow-hidden rounded-3xl gap-0 border-border/60 shadow-2xl [&>button]:hidden bg-white">
+        <DialogContent className="max-w-md p-0 overflow-hidden rounded-[2rem] gap-0 border-border/60 shadow-2xl [&>button]:hidden bg-card">
           <div className="p-6 border-b border-border/50 bg-muted/10 flex justify-between items-center shrink-0">
             <div>
               <h2 className="text-xl font-black text-foreground flex items-center gap-2">
@@ -476,7 +476,7 @@ export function DailyProgress() {
             </button>
           </div>
           
-          <div className="p-6 overflow-y-auto max-h-[60vh] space-y-3">
+          <div className="p-6 md:p-8 space-y-6 overflow-y-auto max-h-[70vh]">
             {records.filter(r => r.verificationStatus === "Pending").map(record => (
               <div key={record.id} className="p-4 border border-border/50 rounded-xl bg-card flex justify-between items-center hover:border-primary/50 transition-colors">
                 <div className="flex items-center gap-3">

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Download, Plus, Edit3, Trash2, ArrowUpRight, ArrowDownRight, Search, FileText, ChevronRight, Briefcase, Calendar, Info, X, Users, Filter, ChevronDown } from "lucide-react";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { DialogClose,  Dialog, DialogContent  } from "@/components/ui/dialog";
 
 const mockClientData = [
   {
@@ -222,7 +222,7 @@ export function OtherTransactions() {
 
       {/* --- ADD / EDIT TRANSACTION MODAL --- */}
       <Dialog open={isAddTxOpen} onOpenChange={setIsAddTxOpen}>
-        <DialogContent className="max-w-lg p-0 overflow-hidden rounded-2xl gap-0 border-border/50 shadow-2xl [&>button]:hidden bg-card">
+        <DialogContent className="max-w-lg p-0 overflow-hidden rounded-[2rem] gap-0 border-border/60 shadow-2xl [&>button]:hidden bg-card">
           <div className="p-4 border-b border-border/50 flex justify-between items-center bg-primary/5">
               <div>
                 <h3 className="font-black text-lg text-foreground">Add/Edit Client Transaction</h3>
@@ -232,7 +232,7 @@ export function OtherTransactions() {
                 <X className="w-4 h-4 text-muted-foreground" />
               </button>
             </div>
-            <div className="p-6 space-y-4">
+            <div className="p-6 md:p-8 space-y-6 overflow-y-auto max-h-[70vh]">
               <div className="space-y-1.5">
                 <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wide">Category *</label>
                 <input type="text" placeholder="e.g. Software Sales" className="w-full px-3 py-2 bg-background border border-border/50 rounded-lg text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-primary/20" />
@@ -283,7 +283,7 @@ export function OtherTransactions() {
 
       {/* --- MANAGE CLIENT MODAL --- */}
       <Dialog open={isManageClientOpen} onOpenChange={setIsManageClientOpen}>
-        <DialogContent className="max-w-2xl p-0 overflow-hidden rounded-2xl gap-0 border-border/50 shadow-2xl [&>button]:hidden bg-card flex flex-col max-h-[90vh]">
+        <DialogContent className="max-w-2xl p-0 overflow-hidden rounded-[2rem] gap-0 border-border/60 shadow-2xl [&>button]:hidden bg-card">
           <div className="p-4 border-b border-border/50 flex justify-between items-center bg-indigo-500/5 shrink-0">
               <div>
                 <h3 className="font-black text-lg text-foreground">Manage Category: Software Sales</h3>
@@ -294,7 +294,7 @@ export function OtherTransactions() {
               </button>
             </div>
             
-            <div className="p-6 overflow-y-auto space-y-6">
+            <div className="p-6 md:p-8 space-y-6 overflow-y-auto max-h-[70vh]">
               {/* Summary Cards */}
               <div className="grid grid-cols-3 gap-4">
                 <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-4">

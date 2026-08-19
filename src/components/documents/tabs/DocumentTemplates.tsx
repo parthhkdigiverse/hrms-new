@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Plus, Trash2, Edit2, FileType2, X } from "lucide-react";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { DialogClose,  Dialog, DialogContent  } from "@/components/ui/dialog";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
 
 interface DocTemplate {
@@ -86,7 +86,7 @@ export function DocumentTemplates() {
       </div>
 
       <Dialog open={isAddMode} onOpenChange={setIsAddMode}>
-        <DialogContent className="max-w-2xl p-0 overflow-hidden rounded-2xl gap-0 border-border/50 shadow-xl [&>button]:hidden bg-card flex flex-col max-h-[90vh]">
+        <DialogContent className="max-w-2xl p-0 overflow-hidden rounded-[2rem] gap-0 border-border/60 shadow-2xl [&>button]:hidden bg-card">
           <div className="flex items-center justify-between p-6 border-b border-border/50">
               <h2 className="text-xl font-bold">Create Document Template</h2>
               <button 
@@ -97,7 +97,7 @@ export function DocumentTemplates() {
               </button>
             </div>
             
-            <div className="p-6 overflow-y-auto space-y-4">
+            <div className="p-6 md:p-8 space-y-6 overflow-y-auto max-h-[70vh]">
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
                   <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">Template Name</label>

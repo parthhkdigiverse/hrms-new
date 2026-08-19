@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Search, Download, Plus, RefreshCw, Wallet, Building2, Calendar, Filter, ArrowDownLeft, ArrowUpRight, ArrowRight, Edit3, Trash2, X } from "lucide-react";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { DialogClose,  Dialog, DialogContent  } from "@/components/ui/dialog";
 
 const mockCreditTransactions = [
   { id: 'INV-001', date: '15/6/2026', amount: 1234.00, category: 'Sales', description: 'test', service: 'fgh', remarks: '1. Payment is due w...' },
@@ -326,7 +326,7 @@ export function Transactions() {
 
       {/* --- ADD CREDIT MODAL --- */}
       <Dialog open={isAddCreditOpen} onOpenChange={setIsAddCreditOpen}>
-        <DialogContent className="max-w-lg p-0 overflow-hidden rounded-2xl gap-0 border-border/50 shadow-2xl [&>button]:hidden bg-card">
+        <DialogContent className="max-w-lg p-0 overflow-hidden rounded-[2rem] gap-0 border-border/60 shadow-2xl [&>button]:hidden bg-card">
           <div className="p-4 border-b border-border/50 flex justify-between items-center bg-emerald-500/5">
               <div>
                 <h3 className="font-black text-lg text-foreground">Add Credit (Income / Invoice)</h3>
@@ -336,7 +336,7 @@ export function Transactions() {
                 <X className="w-4 h-4" />
               </button>
             </div>
-            <div className="p-6 space-y-4">
+            <div className="p-6 md:p-8 space-y-6 overflow-y-auto max-h-[70vh]">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <label className="text-xs font-bold text-muted-foreground">Invoice Number / Ref</label>
@@ -383,7 +383,7 @@ export function Transactions() {
 
       {/* --- ADD DEBT MODAL --- */}
       <Dialog open={isAddDebtOpen} onOpenChange={setIsAddDebtOpen}>
-        <DialogContent className="max-w-lg p-0 overflow-hidden rounded-2xl gap-0 border-border/50 shadow-2xl [&>button]:hidden bg-card">
+        <DialogContent className="max-w-lg p-0 overflow-hidden rounded-[2rem] gap-0 border-border/60 shadow-2xl [&>button]:hidden bg-card">
           <div className="p-4 border-b border-border/50 flex justify-between items-center bg-rose-500/5">
               <div>
                 <h3 className="font-black text-lg text-foreground">Add Debt (Expense / Bill)</h3>
@@ -393,7 +393,7 @@ export function Transactions() {
                 <X className="w-4 h-4" />
               </button>
             </div>
-            <div className="p-6 space-y-4">
+            <div className="p-6 md:p-8 space-y-6 overflow-y-auto max-h-[70vh]">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <label className="text-xs font-bold text-muted-foreground">Expense No. / Ref</label>

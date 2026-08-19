@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { Search, Plus, Filter, Users, Briefcase, MapPin, Clock, MoreHorizontal, ArrowUpRight, UserPlus } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { X,  Search, Plus, Filter, Users, Briefcase, MapPin, Clock, MoreHorizontal, ArrowUpRight, UserPlus  } from "lucide-react";
+import { DialogClose,  Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger  } from "@/components/ui/dialog";
 import { useDepartments } from "../employees/DepartmentContext";
 import { toast } from "sonner";
 
@@ -160,13 +160,21 @@ export function Hirings() {
                 <Plus className="w-4 h-4" /> Post Job
               </button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px] rounded-2xl">
-              <DialogHeader>
-                <DialogTitle className="text-xl font-black text-foreground">Post New Job</DialogTitle>
-              </DialogHeader>
+            <DialogContent className="sm:max-w-[425px] md:max-w-[500px] p-0 overflow-hidden rounded-[2rem] gap-0 border-border/60 shadow-2xl [&>button]:hidden bg-card">
+              <div className="flex items-center justify-between px-6 md:px-8 py-6 border-b border-border/50 bg-muted/30">
+          <div>
+            <h2 className="text-xl md:text-2xl font-black tracking-tight">Post New Job</h2>
+            
+          </div>
+          <DialogClose asChild>
+            <button className="p-2 text-muted-foreground hover:text-foreground/80 hover:bg-muted rounded-full transition-colors">
+              <X className="w-5 h-5" />
+            </button>
+          </DialogClose>
+        </div>
               <form onSubmit={handlePostJob} className="space-y-4 mt-4">
                 <div className="space-y-2">
-                  <label className="text-sm font-bold text-foreground/80">Job Title</label>
+                  <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Job Title</label>
                   <input 
                     type="text" 
                     required
@@ -177,7 +185,7 @@ export function Hirings() {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <label className="text-sm font-bold text-foreground/80">Department</label>
+                    <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Department</label>
                     <select 
                       value={newDepartment}
                       onChange={e => setNewDepartment(e.target.value)}
@@ -189,7 +197,7 @@ export function Hirings() {
                     </select>
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm font-bold text-foreground/80">Employment Type</label>
+                    <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Employment Type</label>
                     <select 
                       value={newType}
                       onChange={e => setNewType(e.target.value)}
@@ -203,7 +211,7 @@ export function Hirings() {
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-bold text-foreground/80">Location</label>
+                  <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Location</label>
                   <input 
                     type="text" 
                     placeholder="e.g. Remote or San Francisco, CA"
@@ -214,7 +222,7 @@ export function Hirings() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-bold text-foreground/80">Hiring Manager</label>
+                  <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Hiring Manager</label>
                   <input 
                     type="text" 
                     required
@@ -344,10 +352,18 @@ export function Hirings() {
 
       {/* View Details Modal */}
       <Dialog open={!!selectedJob} onOpenChange={(open) => !open && setSelectedJob(null)}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>{selectedJob?.title}</DialogTitle>
-          </DialogHeader>
+        <DialogContent className="max-w-2xl p-0 overflow-hidden rounded-[2rem] gap-0 border-border/60 shadow-2xl [&>button]:hidden bg-card">
+          <div className="flex items-center justify-between px-6 md:px-8 py-6 border-b border-border/50 bg-muted/30">
+          <div>
+            <h2 className="text-xl md:text-2xl font-black tracking-tight">{selectedJob?.title}</h2>
+            
+          </div>
+          <DialogClose asChild>
+            <button className="p-2 text-muted-foreground hover:text-foreground/80 hover:bg-muted rounded-full transition-colors">
+              <X className="w-5 h-5" />
+            </button>
+          </DialogClose>
+        </div>
           {selectedJob && (
             <div className="space-y-6">
               <div className="flex flex-wrap gap-4 pt-2 border-b border-border/50 pb-4">
@@ -396,10 +412,18 @@ export function Hirings() {
 
       {/* Refer a Friend Modal */}
       <Dialog open={!!referJob} onOpenChange={(open) => !open && setReferJob(null)}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Refer someone for {referJob?.title}</DialogTitle>
-          </DialogHeader>
+        <DialogContent className="max-w-md p-0 overflow-hidden rounded-[2rem] gap-0 border-border/60 shadow-2xl [&>button]:hidden bg-card">
+          <div className="flex items-center justify-between px-6 md:px-8 py-6 border-b border-border/50 bg-muted/30">
+          <div>
+            <h2 className="text-xl md:text-2xl font-black tracking-tight">Refer someone for {referJob?.title}</h2>
+            
+          </div>
+          <DialogClose asChild>
+            <button className="p-2 text-muted-foreground hover:text-foreground/80 hover:bg-muted rounded-full transition-colors">
+              <X className="w-5 h-5" />
+            </button>
+          </DialogClose>
+        </div>
           <form 
             onSubmit={(e) => {
               e.preventDefault();
@@ -409,23 +433,23 @@ export function Hirings() {
             className="space-y-4 pt-4"
           >
             <div className="space-y-2">
-              <label className="text-sm font-bold text-foreground/80">Candidate Name</label>
+              <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Candidate Name</label>
               <input type="text" required className="w-full px-3 py-2 bg-white border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-bold text-foreground/80">Candidate Email</label>
+              <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Candidate Email</label>
               <input type="email" required className="w-full px-3 py-2 bg-white border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-bold text-foreground/80">LinkedIn Profile (Optional)</label>
+              <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">LinkedIn Profile (Optional)</label>
               <input type="url" className="w-full px-3 py-2 bg-white border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-bold text-foreground/80">Resume / CV</label>
+              <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Resume / CV</label>
               <input type="file" required className="w-full px-3 py-2 bg-white border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/10" />
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-bold text-foreground/80">Why are they a good fit?</label>
+              <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Why are they a good fit?</label>
               <textarea required rows={3} className="w-full px-3 py-2 bg-white border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
             </div>
             

@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { Check, X, Calendar, Clock, ChevronDown, Filter, CalendarDays, Activity, Plus } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { DialogClose,  Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger  } from "@/components/ui/dialog";
 import { useSettingsContext } from "../payroll/SettingsContext";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -237,82 +237,92 @@ export function LeaveRequests() {
                 <Plus className="w-4 h-4" /> Add Leave
               </button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px] rounded-2xl">
-              <DialogHeader>
-                <DialogTitle className="text-xl font-black text-foreground">Request Leave</DialogTitle>
-              </DialogHeader>
-              <form onSubmit={handleAddLeave} className="space-y-4 mt-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-bold text-foreground/80">Leave Type</label>
-                  <select 
-                    value={newLeaveType}
-                    onChange={e => setNewLeaveType(e.target.value)}
-                    className="w-full px-3 py-2 bg-white border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-                  >
-                    {leaveTypes.map(type => (
-                      <option key={type} value={type}>{type}</option>
-                    ))}
-                  </select>
-                </div>
-                
-                <div className="grid grid-cols-2 gap-4">
+            <DialogContent className="sm:max-w-[425px] md:max-w-[500px] p-0 overflow-hidden rounded-[2rem] gap-0 border-border/60 shadow-2xl [&>button]:hidden bg-card">
+              <div className="flex items-center justify-between px-6 md:px-8 py-6 border-b border-border/50 bg-muted/30">
+          <div>
+            <h2 className="text-xl md:text-2xl font-black tracking-tight">Request Leave</h2>
+            
+          </div>
+          <DialogClose asChild>
+            <button className="p-2 text-muted-foreground hover:text-foreground/80 hover:bg-muted rounded-full transition-colors">
+              <X className="w-5 h-5" />
+            </button>
+          </DialogClose>
+        </div>
+              <form onSubmit={handleAddLeave} className="flex flex-col max-h-[70vh]">
+                <div className="p-6 md:p-8 space-y-6 overflow-y-auto">
                   <div className="space-y-2">
-                    <label className="text-sm font-bold text-foreground/80">Start Date</label>
-                    <input 
-                      type="date" 
+                    <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Leave Type</label>
+                    <select 
+                      value={newLeaveType}
+                      onChange={e => setNewLeaveType(e.target.value)}
+                      className="w-full px-4 py-3 bg-muted/50 border border-border/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium"
+                    >
+                      {leaveTypes.map(type => (
+                        <option key={type} value={type}>{type}</option>
+                      ))}
+                    </select>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Start Date</label>
+                      <input 
+                        type="date" 
+                        required
+                        value={newStartDate}
+                        onChange={e => setNewStartDate(e.target.value)}
+                        className="w-full px-4 py-3 bg-muted/50 border border-border/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">End Date</label>
+                      <input 
+                        type="date" 
+                        required
+                        value={newEndDate}
+                        onChange={e => setNewEndDate(e.target.value)}
+                        className="w-full px-4 py-3 bg-muted/50 border border-border/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Reason</label>
+                    <textarea 
                       required
-                      value={newStartDate}
-                      onChange={e => setNewStartDate(e.target.value)}
-                      className="w-full px-3 py-2 bg-white border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+                      value={newReason}
+                      onChange={e => setNewReason(e.target.value)}
+                      placeholder="Briefly explain your reason..."
+                      className="w-full px-4 py-3 bg-muted/50 border border-border/50 rounded-xl text-sm min-h-[100px] resize-none focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium"
                     />
                   </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-bold text-foreground/80">End Date</label>
+
+                  <div className="flex items-center gap-2 pt-2">
                     <input 
-                      type="date" 
-                      required
-                      value={newEndDate}
-                      onChange={e => setNewEndDate(e.target.value)}
-                      className="w-full px-3 py-2 bg-white border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+                      type="checkbox" 
+                      id="conditionalLeave"
+                      checked={newIsConditional}
+                      onChange={e => setNewIsConditional(e.target.checked)}
+                      className="w-4 h-4 text-primary rounded border-border/50 focus:ring-primary/20 cursor-pointer"
                     />
+                    <label htmlFor="conditionalLeave" className="text-sm font-bold text-muted-foreground cursor-pointer uppercase tracking-widest">
+                      Conditional Leave (WFH)
+                    </label>
                   </div>
                 </div>
 
-                <div className="space-y-2">
-                  <label className="text-sm font-bold text-foreground/80">Reason</label>
-                  <textarea 
-                    required
-                    value={newReason}
-                    onChange={e => setNewReason(e.target.value)}
-                    placeholder="Briefly explain your reason..."
-                    className="w-full px-3 py-2 bg-white border border-border rounded-xl text-sm min-h-[100px] resize-none focus:outline-none focus:ring-2 focus:ring-primary/20"
-                  />
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <input 
-                    type="checkbox" 
-                    id="conditionalLeave"
-                    checked={newIsConditional}
-                    onChange={e => setNewIsConditional(e.target.checked)}
-                    className="w-4 h-4 text-primary rounded border-border/50 focus:ring-primary/20 cursor-pointer"
-                  />
-                  <label htmlFor="conditionalLeave" className="text-sm font-medium text-foreground/80 cursor-pointer">
-                    Conditional Leave (Will Work From Home)
-                  </label>
-                </div>
-
-                <div className="pt-4 flex justify-end gap-3">
+                <div className="px-6 md:px-8 py-4 md:py-6 bg-muted/30 border-t border-border/50 flex justify-end gap-3 mt-auto shrink-0">
                   <button 
                     type="button" 
                     onClick={() => setIsAddOpen(false)}
-                    className="px-4 py-2 bg-white border border-border text-foreground/80 hover:bg-muted/50 font-bold text-sm rounded-xl transition-colors"
+                    className="px-5 py-2.5 rounded-xl font-bold text-muted-foreground hover:bg-muted transition-colors"
                   >
                     Cancel
                   </button>
                   <button 
                     type="submit"
-                    className="px-4 py-2 bg-primary hover:bg-primary text-primary-foreground font-bold text-sm rounded-xl transition-colors"
+                    className="px-6 py-2.5 bg-primary text-primary-foreground font-bold rounded-xl shadow-md hover:bg-primary/90 transition-all"
                   >
                     Submit Request
                   </button>

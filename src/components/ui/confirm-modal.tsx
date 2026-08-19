@@ -1,5 +1,5 @@
 import { X, AlertTriangle } from "lucide-react";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { DialogClose,  Dialog, DialogContent  } from "@/components/ui/dialog";
 
 interface ConfirmModalProps {
   isOpen: boolean;
@@ -24,7 +24,7 @@ export function ConfirmModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-md p-0 overflow-hidden rounded-3xl gap-0 border-border/60 shadow-2xl [&>button]:hidden bg-white">
+      <DialogContent className="max-w-md p-0 overflow-hidden rounded-[2rem] gap-0 border-border/60 shadow-2xl [&>button]:hidden bg-card">
           <div className="flex items-center justify-between px-6 py-5 border-b border-border/50 bg-red-50/50">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-red-100 text-red-600 rounded-xl">
@@ -43,7 +43,7 @@ export function ConfirmModal({
             </button>
           </div>
 
-          <div className="p-6 space-y-4">
+          <div className="p-6 md:p-8 space-y-6 overflow-y-auto max-h-[70vh]">
             <p className="text-foreground/80 text-sm leading-relaxed">
               {description}
             </p>

@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { Search, Plus, Calendar as CalendarIcon, Video, MoreHorizontal, Clock, CheckCircle2, ChevronRight, User } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { X,  Search, Plus, Calendar as CalendarIcon, Video, MoreHorizontal, Clock, CheckCircle2, ChevronRight, User  } from "lucide-react";
+import { DialogClose,  Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger  } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
@@ -221,13 +221,21 @@ export function Interviews() {
                 <Plus className="w-4 h-4" /> Schedule
               </button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px] rounded-2xl">
-              <DialogHeader>
-                <DialogTitle className="text-xl font-black text-foreground">Schedule Interview</DialogTitle>
-              </DialogHeader>
+            <DialogContent className="sm:max-w-[425px] md:max-w-[500px] p-0 overflow-hidden rounded-[2rem] gap-0 border-border/60 shadow-2xl [&>button]:hidden bg-card">
+              <div className="flex items-center justify-between px-6 md:px-8 py-6 border-b border-border/50 bg-muted/30">
+          <div>
+            <h2 className="text-xl md:text-2xl font-black tracking-tight">Schedule Interview</h2>
+            
+          </div>
+          <DialogClose asChild>
+            <button className="p-2 text-muted-foreground hover:text-foreground/80 hover:bg-muted rounded-full transition-colors">
+              <X className="w-5 h-5" />
+            </button>
+          </DialogClose>
+        </div>
               <form onSubmit={handleSchedule} className="space-y-4 mt-4">
                 <div className="space-y-2">
-                  <label className="text-sm font-bold text-foreground/80">Candidate Name</label>
+                  <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Candidate Name</label>
                   <input 
                     type="text" 
                     required
@@ -237,7 +245,7 @@ export function Interviews() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-bold text-foreground/80">Role / Position</label>
+                  <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Role / Position</label>
                   <input 
                     type="text" 
                     required
@@ -247,7 +255,7 @@ export function Interviews() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-bold text-foreground/80">Interview Stage</label>
+                  <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Interview Stage</label>
                   <select 
                     value={newStage}
                     onChange={e => setNewStage(e.target.value as InterviewStage)}
@@ -258,7 +266,7 @@ export function Interviews() {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <label className="text-sm font-bold text-foreground/80">Date</label>
+                    <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Date</label>
                     <input 
                       type="text"
                       placeholder="e.g. Aug 15"
@@ -269,7 +277,7 @@ export function Interviews() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm font-bold text-foreground/80">Time</label>
+                    <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Time</label>
                     <input 
                       type="text" 
                       placeholder="e.g. 2:00 PM"
@@ -281,7 +289,7 @@ export function Interviews() {
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-bold text-foreground/80">Interviewer Name</label>
+                  <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Interviewer Name</label>
                   <input 
                     type="text" 
                     required

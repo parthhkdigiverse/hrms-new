@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { User, Briefcase, FileText, Check, ChevronRight, Upload, X, MapPin, Phone, Mail, Building2, CreditCard, ShieldAlert } from "lucide-react";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { DialogClose,  Dialog, DialogContent  } from "@/components/ui/dialog";
 import { Employee, EmployeeStatus } from "./employee-data";
 import { useDepartments } from "./DepartmentContext";
 import { toast } from "sonner";

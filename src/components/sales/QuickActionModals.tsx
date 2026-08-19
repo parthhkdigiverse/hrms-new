@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { DialogClose,  Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter  } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { UploadCloud, CheckCircle2 } from "lucide-react";
+import { X,  UploadCloud, CheckCircle2  } from "lucide-react";
 import { toast } from "sonner";
 
 export function QuickActionModals({ activeAction, onClose }: { activeAction: string | null; onClose: () => void }) {
@@ -39,10 +39,11 @@ export function QuickActionModals({ activeAction, onClose }: { activeAction: str
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>{activeAction}</DialogTitle>
-          <DialogDescription>
+      <DialogContent className="sm:max-w-[425px] md:max-w-[500px] p-0 overflow-hidden rounded-[2rem] gap-0 border-border/60 shadow-2xl [&>button]:hidden bg-card">
+        <div className="flex items-center justify-between px-6 md:px-8 py-6 border-b border-border/50 bg-muted/30">
+          <div>
+            <h2 className="text-xl md:text-2xl font-black tracking-tight">{activeAction}</h2>
+            <p className="text-sm text-muted-foreground mt-1">
             {activeAction === "Add Lead" && "Enter the details of the new prospective client."}
             {activeAction === "Add Meeting" && "Schedule a new meeting with a lead or client."}
             {activeAction === "Schedule Follow-up" && "Set a reminder to follow up on an ongoing deal."}
@@ -52,8 +53,14 @@ export function QuickActionModals({ activeAction, onClose }: { activeAction: str
             {activeAction === "Create Quotation" && "Generate a quick quotation estimate."}
             {activeAction === "Convert Lead" && "Mark a lead as successfully won and convert to client."}
             {(activeAction === "Bulk Upload Leads" || activeAction === "Import CSV") && "Upload a spreadsheet to import multiple records at once."}
-          </DialogDescription>
-        </DialogHeader>
+          </p>
+          </div>
+          <DialogClose asChild>
+            <button className="p-2 text-muted-foreground hover:text-foreground/80 hover:bg-muted rounded-full transition-colors">
+              <X className="w-5 h-5" />
+            </button>
+          </DialogClose>
+        </div>
 
         <form onSubmit={handleSubmit} className="grid gap-4 py-4">
           {/* Add Lead Form */}
@@ -259,12 +266,12 @@ export function QuickActionModals({ activeAction, onClose }: { activeAction: str
             </div>
           )}
 
-          <DialogFooter className="mt-4">
+          <div className="px-6 md:px-8 py-4 md:py-6 bg-muted/30 border-t border-border/50 flex justify-end gap-3 mt-auto shrink-0">
             <Button type="button" variant="outline" onClick={handleClose}>Cancel</Button>
             <Button type="submit" className="bg-emerald-600 hover:bg-emerald-700" disabled={isSubmitting}>
               {isSubmitting ? "Processing..." : activeAction.includes("Upload") || activeAction.includes("Import") ? "Upload Data" : "Save Changes"}
             </Button>
-          </DialogFooter>
+          </div>
         </form>
       </DialogContent>
     </Dialog>

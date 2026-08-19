@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import { cn } from "@/lib/utils";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { DialogClose,  Dialog, DialogContent  } from "@/components/ui/dialog";
 import { 
   Building2, Users, MapPin, DollarSign, Calendar, Target,
   Briefcase, TrendingUp, CheckCircle2, ShieldAlert, BadgeCent,
@@ -694,7 +694,7 @@ export function SalesSettings() {
 
       {/* Delete Confirmation Modal */}
       <Dialog open={deleteConfirm.isOpen} onOpenChange={(open) => !open && setDeleteConfirm({ isOpen: false, type: null, index: -1, name: "" })}>
-        <DialogContent className="max-w-sm p-6 overflow-hidden rounded-3xl gap-0 border-border/60 shadow-xl [&>button]:hidden bg-white">
+        <DialogContent className="max-w-sm p-0 overflow-hidden rounded-[2rem] gap-0 border-border/60 shadow-2xl [&>button]:hidden bg-card">
           <h3 className="text-xl font-black tracking-tight mb-2">Delete {deleteConfirm.type === 'category' ? 'Category' : deleteConfirm.type === 'source' ? 'Source' : 'Stage'}</h3>
           <p className="text-sm text-muted-foreground mb-6">
             Are you sure you want to delete <span className="font-bold text-foreground">"{deleteConfirm.name}"</span>? This action cannot be undone.
@@ -718,7 +718,7 @@ export function SalesSettings() {
 
       {/* Edit Permissions Modal */}
       <Dialog open={editRoleIdx !== null} onOpenChange={(open) => !open && setEditRoleIdx(null)}>
-        <DialogContent className="max-w-lg p-6 overflow-hidden rounded-3xl gap-0 border-border/60 shadow-xl max-h-[90vh] flex flex-col [&>button]:hidden bg-white">
+        <DialogContent className="max-w-lg p-0 overflow-hidden rounded-[2rem] gap-0 border-border/60 shadow-2xl [&>button]:hidden bg-card">
           <h3 className="text-xl font-black tracking-tight mb-2">Edit {editRoleIdx !== null ? permissions[editRoleIdx]?.role : "Role"} Permissions</h3>
           <p className="text-sm text-muted-foreground mb-6">
             Select the capabilities this role should have access to.

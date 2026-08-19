@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Search, Plus, Filter, FileText, CheckCircle2, Clock, X, Download, Eye, Upload, Printer, Mail, FilePlus, Send } from "lucide-react";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { DialogClose,  Dialog, DialogContent  } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 
 type RequestStatus = "Pending" | "Approved" | "Sent" | "Rejected";
@@ -89,7 +89,7 @@ export function OfficialLetters({ onNavigate }: { onNavigate?: ((path: string) =
       </div>
 
       <Dialog open={isAddMode} onOpenChange={setIsAddMode}>
-        <DialogContent className="max-w-lg p-0 overflow-hidden rounded-2xl gap-0 border-border/50 shadow-xl [&>button]:hidden bg-card flex flex-col">
+        <DialogContent className="max-w-lg p-0 overflow-hidden rounded-[2rem] gap-0 border-border/60 shadow-2xl [&>button]:hidden bg-card">
           <div className="flex items-center justify-between p-6 border-b border-border/50">
               <h2 className="text-xl font-bold">New Letter Request</h2>
               <button 
@@ -100,7 +100,7 @@ export function OfficialLetters({ onNavigate }: { onNavigate?: ((path: string) =
               </button>
             </div>
             
-            <div className="p-6 space-y-4">
+            <div className="p-6 md:p-8 space-y-6 overflow-y-auto max-h-[70vh]">
               <div>
                 <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">Employee Name</label>
                 <input

@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { Search, AlertTriangle, MessageSquareWarning, ThumbsUp, ShieldAlert, Plus, IndianRupee, CheckCircle2, XCircle, Filter } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { X,  Search, AlertTriangle, MessageSquareWarning, ThumbsUp, ShieldAlert, Plus, IndianRupee, CheckCircle2, XCircle, Filter  } from "lucide-react";
+import { DialogClose,  Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger  } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { useSettingsContext } from "../payroll/SettingsContext";
@@ -311,13 +311,21 @@ export function Penalties() {
                   <span className="hidden sm:inline">Add Record</span>
                 </button>
               </DialogTrigger>
-              <DialogContent className="sm:max-w-[500px]">
-                <DialogHeader>
-                  <DialogTitle>Add Disciplinary Record</DialogTitle>
-                </DialogHeader>
+              <DialogContent className="sm:max-w-[500px] p-0 overflow-hidden rounded-[2rem] gap-0 border-border/60 shadow-2xl [&>button]:hidden bg-card">
+                <div className="flex items-center justify-between px-6 md:px-8 py-6 border-b border-border/50 bg-muted/30">
+          <div>
+            <h2 className="text-xl md:text-2xl font-black tracking-tight">Add Disciplinary Record</h2>
+            
+          </div>
+          <DialogClose asChild>
+            <button className="p-2 text-muted-foreground hover:text-foreground/80 hover:bg-muted rounded-full transition-colors">
+              <X className="w-5 h-5" />
+            </button>
+          </DialogClose>
+        </div>
                 <form onSubmit={handleCreateRecord} className="space-y-4 pt-4">
                   <div className="space-y-2">
-                    <label className="text-sm font-bold text-foreground/80">Pre-defined Template</label>
+                    <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Pre-defined Template</label>
                     <select 
                       value={selectedTemplate}
                       onChange={handleTemplateChange}
@@ -329,7 +337,7 @@ export function Penalties() {
                     </select>
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm font-bold text-foreground/80">Record Type</label>
+                    <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Record Type</label>
                     <select 
                       value={newType}
                       onChange={e => setNewType(e.target.value as RecordType)}
@@ -340,7 +348,7 @@ export function Penalties() {
                     </select>
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm font-bold text-foreground/80">Employee Name</label>
+                    <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Employee Name</label>
                     <input 
                       type="text" 
                       required
@@ -354,7 +362,7 @@ export function Penalties() {
                   {newType === "Penalty" && (
                     <div className="flex gap-4">
                       <div className="space-y-2 flex-1">
-                        <label className="text-sm font-bold text-foreground/80">Deduction Amount (₹)</label>
+                        <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Deduction Amount (₹)</label>
                         <input 
                           type="number" 
                           placeholder="e.g. 50"
@@ -378,7 +386,7 @@ export function Penalties() {
                   )}
 
                   <div className="space-y-2">
-                    <label className="text-sm font-bold text-foreground/80">Description / Reason</label>
+                    <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Description / Reason</label>
                     <textarea 
                       required
                       rows={3}
@@ -408,13 +416,21 @@ export function Penalties() {
             </Dialog>
 
             <Dialog open={isUpdateOpen} onOpenChange={setIsUpdateOpen}>
-              <DialogContent className="sm:max-w-[400px]">
-                <DialogHeader>
-                  <DialogTitle>{updateAction === "Waived" ? "Waive Penalty" : "Resolve Issue"}</DialogTitle>
-                </DialogHeader>
+              <DialogContent className="sm:max-w-[400px] p-0 overflow-hidden rounded-[2rem] gap-0 border-border/60 shadow-2xl [&>button]:hidden bg-card">
+                <div className="flex items-center justify-between px-6 md:px-8 py-6 border-b border-border/50 bg-muted/30">
+          <div>
+            <h2 className="text-xl md:text-2xl font-black tracking-tight">{updateAction === "Waived" ? "Waive Penalty" : "Resolve Issue"}</h2>
+            
+          </div>
+          <DialogClose asChild>
+            <button className="p-2 text-muted-foreground hover:text-foreground/80 hover:bg-muted rounded-full transition-colors">
+              <X className="w-5 h-5" />
+            </button>
+          </DialogClose>
+        </div>
                 <form onSubmit={handleConfirmUpdate} className="space-y-4 pt-4">
                   <div className="space-y-2">
-                    <label className="text-sm font-bold text-foreground/80">
+                    <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">
                       Reason for {updateAction === "Waived" ? "Waiving" : "Resolving"}
                     </label>
                     <textarea 
@@ -446,13 +462,21 @@ export function Penalties() {
             </Dialog>
 
             <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
-              <DialogContent className="sm:max-w-[400px]">
-                <DialogHeader>
-                  <DialogTitle>Edit Penalty Amount</DialogTitle>
-                </DialogHeader>
+              <DialogContent className="sm:max-w-[400px] p-0 overflow-hidden rounded-[2rem] gap-0 border-border/60 shadow-2xl [&>button]:hidden bg-card">
+                <div className="flex items-center justify-between px-6 md:px-8 py-6 border-b border-border/50 bg-muted/30">
+          <div>
+            <h2 className="text-xl md:text-2xl font-black tracking-tight">Edit Penalty Amount</h2>
+            
+          </div>
+          <DialogClose asChild>
+            <button className="p-2 text-muted-foreground hover:text-foreground/80 hover:bg-muted rounded-full transition-colors">
+              <X className="w-5 h-5" />
+            </button>
+          </DialogClose>
+        </div>
                 <form onSubmit={handleEditAmount} className="space-y-4 pt-4">
                   <div className="space-y-2">
-                    <label className="text-sm font-bold text-foreground/80">
+                    <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">
                       New Amount (₹)
                     </label>
                     <input 

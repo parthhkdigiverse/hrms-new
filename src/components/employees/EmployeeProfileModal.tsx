@@ -1,6 +1,6 @@
 import { X, Calendar, MapPin, Phone, Mail, Briefcase, Award, TrendingUp, Clock, CheckCircle2 } from "lucide-react";
 import { Employee } from "./employee-data";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { DialogClose,  Dialog, DialogContent  } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 
 interface EmployeeProfileModalProps {
@@ -38,7 +38,7 @@ export function EmployeeProfileModal({ employee, onClose }: EmployeeProfileModal
 
   return (
     <Dialog open={!!employee} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-3xl p-0 overflow-hidden rounded-3xl gap-0 border-border/60 shadow-2xl [&>button]:hidden bg-white">
+      <DialogContent className="max-w-3xl p-0 overflow-hidden rounded-[2rem] gap-0 border-border/60 shadow-2xl [&>button]:hidden bg-card">
         {/* Header Background */}
         <div className="h-32 shrink-0 bg-gradient-to-r from-emerald-500 to-teal-600 relative">
           <button 

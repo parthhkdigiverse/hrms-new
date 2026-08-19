@@ -1,14 +1,14 @@
 import { useState } from "react";
-import { 
+import {  
   Building2, Users, IndianRupee, Target, Briefcase, Handshake, 
   MapPin, AlertTriangle, ArrowRight, ArrowUpRight, CheckCircle2, 
   Clock, ArrowDownRight, Activity, Search, Filter, Plus, FileText, 
   MoreVertical, Check, X
-} from "lucide-react";
+ } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
 import { toast } from "sonner";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
+import { DialogClose,  Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter  } from "@/components/ui/dialog";
 
 // --- Sub-components ---
 
@@ -118,15 +118,22 @@ function B2BPartners() {
               <Plus className="w-4 h-4" /> Add Partner
             </button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[500px] p-0 border-none bg-card rounded-2xl shadow-2xl overflow-hidden">
-            <DialogHeader className="px-6 pt-6 pb-4 border-b border-border/40 bg-muted/20">
-              <DialogTitle className="text-2xl font-black">Add Partner</DialogTitle>
-              <p className="text-sm text-muted-foreground mt-1">This prototype stores records in memory only.</p>
-            </DialogHeader>
+          <DialogContent className="sm:max-w-[500px] p-0 overflow-hidden rounded-[2rem] gap-0 border-border/60 shadow-2xl [&>button]:hidden bg-card">
+            <div className="flex items-center justify-between px-6 md:px-8 py-6 border-b border-border/50 bg-muted/30">
+          <div>
+            <h2 className="text-xl md:text-2xl font-black tracking-tight">Add Partner</h2>
+            <p className="text-sm text-muted-foreground mt-1">This prototype stores records in memory only.</p>
+          </div>
+          <DialogClose asChild>
+            <button className="p-2 text-muted-foreground hover:text-foreground/80 hover:bg-muted rounded-full transition-colors">
+              <X className="w-5 h-5" />
+            </button>
+          </DialogClose>
+        </div>
 
-            <div className="p-6 space-y-5">
+            <div className="p-6 md:p-8 space-y-6 overflow-y-auto max-h-[70vh]">
               <div className="space-y-1.5">
-                <label className="text-sm font-bold text-foreground">Name <span className="text-rose-500">*</span></label>
+                <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Name <span className="text-rose-500">*</span></label>
                 <div className="relative">
                   <input 
                     type="text" 
@@ -140,7 +147,7 @@ function B2BPartners() {
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-sm font-bold text-foreground">Contact person <span className="text-rose-500">*</span></label>
+                <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Contact person <span className="text-rose-500">*</span></label>
                 <input 
                   type="text" 
                   placeholder="e.g. Nirav Shah" 
@@ -149,7 +156,7 @@ function B2BPartners() {
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-sm font-bold text-foreground">Phone</label>
+                <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Phone</label>
                 <input 
                   type="text" 
                   placeholder="+91 98250 41200" 
@@ -159,7 +166,7 @@ function B2BPartners() {
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-sm font-bold text-foreground">City</label>
+                <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">City</label>
                 <input 
                   type="text" 
                   placeholder="e.g. Surat, Gujarat" 
@@ -168,7 +175,7 @@ function B2BPartners() {
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-sm font-bold text-foreground">Notes</label>
+                <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Notes</label>
                 <textarea 
                   placeholder="Add context for this record..." 
                   className="w-full bg-background border border-border/50 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all resize-none h-24"
@@ -176,7 +183,7 @@ function B2BPartners() {
               </div>
             </div>
 
-            <DialogFooter className="px-6 py-4 border-t border-border/40 bg-muted/20 flex gap-2 justify-end sm:justify-end">
+            <div className="px-6 md:px-8 py-4 md:py-6 bg-muted/30 border-t border-border/50 flex justify-end gap-3 mt-auto shrink-0">
               <button 
                 onClick={() => document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }))}
                 className="px-6 py-2.5 rounded-xl font-bold text-sm bg-background border border-border hover:bg-muted transition-colors shadow-sm"
@@ -192,7 +199,7 @@ function B2BPartners() {
               >
                 Save
               </button>
-            </DialogFooter>
+            </div>
           </DialogContent>
         </Dialog>
       </div>

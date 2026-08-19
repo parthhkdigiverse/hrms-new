@@ -1,5 +1,5 @@
 import { X, AlertTriangle } from "lucide-react";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { DialogClose,  Dialog, DialogContent  } from "@/components/ui/dialog";
 import { OrgNodeData } from "./org-data";
 
 interface DeleteConfirmModalProps {
@@ -16,7 +16,7 @@ export function DeleteConfirmModal({ isOpen, onClose, onConfirm, node }: DeleteC
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-md p-0 overflow-hidden rounded-3xl gap-0 border-border/60 shadow-2xl [&>button]:hidden bg-white">
+      <DialogContent className="max-w-md p-0 overflow-hidden rounded-[2rem] gap-0 border-border/60 shadow-2xl [&>button]:hidden bg-card">
           <div className="flex items-center justify-between px-6 py-5 border-b border-border/50 bg-red-50/50">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-red-100 text-red-600 rounded-xl">
@@ -35,7 +35,7 @@ export function DeleteConfirmModal({ isOpen, onClose, onConfirm, node }: DeleteC
             </button>
           </div>
 
-          <div className="p-6 space-y-4">
+          <div className="p-6 md:p-8 space-y-6 overflow-y-auto max-h-[70vh]">
             {hasChildren ? (
               <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl text-amber-800 text-sm font-medium">
                 <span className="font-bold block mb-1">Warning: Direct Reports Found</span>

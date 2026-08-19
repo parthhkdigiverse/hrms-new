@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import { Calendar as CalendarIcon, Clock, Users, Tv, Presentation, ShieldAlert, Armchair, Plus, Settings2, Trash2 } from "lucide-react";
+import { X,  Calendar as CalendarIcon, Clock, Users, Tv, Presentation, ShieldAlert, Armchair, Plus, Settings2, Trash2  } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { DialogClose,  Dialog, DialogContent, DialogHeader, DialogTitle  } from "@/components/ui/dialog";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
 
 export interface Resource {
@@ -234,14 +234,22 @@ export function ResourceManagement() {
 
       {/* Add Resource Modal */}
       <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
-        <DialogContent className="sm:max-w-[425px] rounded-3xl p-0 overflow-hidden border-border/50 shadow-2xl">
+        <DialogContent className="sm:max-w-[425px] md:max-w-[500px] p-0 overflow-hidden rounded-[2rem] gap-0 border-border/60 shadow-2xl [&>button]:hidden bg-card">
           <div className="p-6 pb-4">
-            <DialogHeader>
-              <DialogTitle className="text-2xl font-black tracking-tight">Add Resource</DialogTitle>
-            </DialogHeader>
+            <div className="flex items-center justify-between px-6 md:px-8 py-6 border-b border-border/50 bg-muted/30">
+          <div>
+            <h2 className="text-xl md:text-2xl font-black tracking-tight">Add Resource</h2>
+            
+          </div>
+          <DialogClose asChild>
+            <button className="p-2 text-muted-foreground hover:text-foreground/80 hover:bg-muted rounded-full transition-colors">
+              <X className="w-5 h-5" />
+            </button>
+          </DialogClose>
+        </div>
           </div>
           
-          <div className="p-6 pt-0 space-y-4">
+          <div className="p-6 md:p-8 space-y-6 overflow-y-auto max-h-[70vh]">
             <div>
               <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Resource Name</label>
               <input 
@@ -299,7 +307,7 @@ export function ResourceManagement() {
             </div>
           </div>
           
-          <div className="p-6 pt-4 bg-muted/30 border-t border-border/50 flex justify-end gap-3">
+          <div className="px-6 md:px-8 py-4 md:py-6 bg-muted/30 border-t border-border/50 flex justify-end gap-3 mt-auto shrink-0">
             <button 
               onClick={() => setIsAddModalOpen(false)}
               className="px-5 py-2.5 rounded-xl font-bold text-muted-foreground hover:bg-muted transition-colors"
@@ -319,14 +327,22 @@ export function ResourceManagement() {
 
       {/* Manage Types Modal */}
       <Dialog open={isManageTypesModalOpen} onOpenChange={setIsManageTypesModalOpen}>
-        <DialogContent className="sm:max-w-[400px] rounded-3xl p-0 overflow-hidden border-border/50 shadow-2xl">
+        <DialogContent className="sm:max-w-[400px] p-0 overflow-hidden rounded-[2rem] gap-0 border-border/60 shadow-2xl [&>button]:hidden bg-card">
           <div className="p-6 pb-4">
-            <DialogHeader>
-              <DialogTitle className="text-2xl font-black tracking-tight">Manage Resource Types</DialogTitle>
-            </DialogHeader>
+            <div className="flex items-center justify-between px-6 md:px-8 py-6 border-b border-border/50 bg-muted/30">
+          <div>
+            <h2 className="text-xl md:text-2xl font-black tracking-tight">Manage Resource Types</h2>
+            
+          </div>
+          <DialogClose asChild>
+            <button className="p-2 text-muted-foreground hover:text-foreground/80 hover:bg-muted rounded-full transition-colors">
+              <X className="w-5 h-5" />
+            </button>
+          </DialogClose>
+        </div>
           </div>
           
-          <div className="p-6 pt-0 space-y-4">
+          <div className="p-6 md:p-8 space-y-6 overflow-y-auto max-h-[70vh]">
             <div className="flex gap-2">
               <input 
                 type="text" 
@@ -365,7 +381,7 @@ export function ResourceManagement() {
             </div>
           </div>
           
-          <div className="p-6 pt-4 bg-muted/30 border-t border-border/50 flex justify-end">
+          <div className="px-6 md:px-8 py-4 md:py-6 bg-muted/30 border-t border-border/50 flex justify-end gap-3 mt-auto shrink-0">
             <button 
               onClick={() => setIsManageTypesModalOpen(false)}
               className="px-5 py-2.5 bg-foreground text-background font-bold rounded-xl hover:bg-foreground/90 transition-colors"

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { Clock, Coffee, LogIn, LogOut, CheckCircle2, Pencil } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { X,  Clock, Coffee, LogIn, LogOut, CheckCircle2, Pencil  } from "lucide-react";
+import { DialogClose,  Dialog, DialogContent, DialogHeader, DialogTitle  } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 
 const CATEGORIES = ["Today's Work", "Upcoming Work", "Research", "Activity", "Meeting"];
@@ -228,12 +228,19 @@ export function TimeTrackerWidget() {
       </div>
 
       <Dialog open={isPunchInModalOpen} onOpenChange={setIsPunchInModalOpen}>
-        <DialogContent className="sm:max-w-[650px] p-0 overflow-hidden bg-background border-border shadow-xl">
+        <DialogContent className="sm:max-w-[650px] p-0 overflow-hidden rounded-[2rem] gap-0 border-border/60 shadow-2xl [&>button]:hidden bg-card">
           <div className="p-6 pb-4 bg-card">
-            <DialogHeader>
-              <DialogTitle className="text-2xl font-black text-foreground tracking-tight">Update Activity</DialogTitle>
-              <p className="text-sm text-muted-foreground mt-1.5 font-medium">What will you be working on right now?</p>
-            </DialogHeader>
+            <div className="flex items-center justify-between px-6 md:px-8 py-6 border-b border-border/50 bg-muted/30">
+          <div>
+            <h2 className="text-xl md:text-2xl font-black tracking-tight">Update Activity</h2>
+            <p className="text-sm text-muted-foreground mt-1">What will you be working on right now?</p>
+          </div>
+          <DialogClose asChild>
+            <button className="p-2 text-muted-foreground hover:text-foreground/80 hover:bg-muted rounded-full transition-colors">
+              <X className="w-5 h-5" />
+            </button>
+          </DialogClose>
+        </div>
           </div>
 
           {/* Categories */}

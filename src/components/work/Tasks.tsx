@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { Search, Plus, Filter, LayoutGrid, List as ListIcon, MoreHorizontal, Calendar, Clock, CheckCircle2, MessageSquare, Paperclip } from "lucide-react";
+import { X,  Search, Plus, Filter, LayoutGrid, List as ListIcon, MoreHorizontal, Calendar, Clock, CheckCircle2, MessageSquare, Paperclip  } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { DialogClose,  Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger  } from "@/components/ui/dialog";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { toast } from "sonner";
 import { format } from "date-fns";
@@ -188,13 +188,21 @@ export function Tasks() {
                 <span className="hidden sm:inline">New Task</span>
               </button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
-              <DialogHeader>
-                <DialogTitle>{editingTaskId ? "Edit Task" : "Create New Task"}</DialogTitle>
-              </DialogHeader>
+            <DialogContent className="sm:max-w-[425px] md:max-w-[500px] p-0 overflow-hidden rounded-[2rem] gap-0 border-border/60 shadow-2xl [&>button]:hidden bg-card">
+              <div className="flex items-center justify-between px-6 md:px-8 py-6 border-b border-border/50 bg-muted/30">
+          <div>
+            <h2 className="text-xl md:text-2xl font-black tracking-tight">{editingTaskId ? "Edit Task" : "Create New Task"}</h2>
+            
+          </div>
+          <DialogClose asChild>
+            <button className="p-2 text-muted-foreground hover:text-foreground/80 hover:bg-muted rounded-full transition-colors">
+              <X className="w-5 h-5" />
+            </button>
+          </DialogClose>
+        </div>
               <form onSubmit={handleCreateTask} className="space-y-4 pt-4">
                 <div className="space-y-2">
-                  <label className="text-sm font-bold text-foreground/80">Task Title</label>
+                  <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Task Title</label>
                   <input 
                     type="text" 
                     required
@@ -205,7 +213,7 @@ export function Tasks() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-bold text-foreground/80">Description</label>
+                  <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Description</label>
                   <textarea 
                     rows={3}
                     placeholder="Task details..."
@@ -216,7 +224,7 @@ export function Tasks() {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <label className="text-sm font-bold text-foreground/80">Priority</label>
+                    <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Priority</label>
                     <select
                       value={newTaskPriority}
                       onChange={e => setNewTaskPriority(e.target.value as Priority)}
@@ -228,7 +236,7 @@ export function Tasks() {
                     </select>
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm font-bold text-foreground/80">Due Date</label>
+                    <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Due Date</label>
                     <input 
                       type="date" 
                       value={newTaskDueDate}

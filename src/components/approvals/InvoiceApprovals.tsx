@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Search, Filter, CheckCircle2, Clock, Check, X, FileText, Download, Building2 } from "lucide-react";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { DialogClose,  Dialog, DialogContent  } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 
 type ApprovalStatus = "Pending" | "Approved" | "Rejected";
@@ -187,7 +187,7 @@ export function InvoiceApprovals() {
 
       {/* Review Modal */}
       <Dialog open={reviewModalOpen} onOpenChange={(open) => !open && setReviewModalOpen(false)}>
-        <DialogContent className="max-w-lg p-0 overflow-hidden rounded-2xl gap-0 border-border/50 shadow-xl [&>button]:hidden bg-card flex flex-col max-h-[90vh]">
+        <DialogContent className="max-w-lg p-0 overflow-hidden rounded-[2rem] gap-0 border-border/60 shadow-2xl [&>button]:hidden bg-card">
           <div className="flex items-center justify-between p-6 border-b border-border/50">
             <div>
               <h2 className="text-xl font-bold">Review {selectedInvoice?.invoiceNumber}</h2>
@@ -201,7 +201,7 @@ export function InvoiceApprovals() {
               </button>
             </div>
             
-            <div className="p-6 overflow-y-auto space-y-6">
+            <div className="p-6 md:p-8 space-y-6 overflow-y-auto max-h-[70vh]">
               <div className="flex justify-between items-center bg-muted/30 p-4 rounded-xl border border-border/50">
                 <div>
                   <div className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1">Invoice Amount</div>
