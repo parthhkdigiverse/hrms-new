@@ -17,6 +17,7 @@ interface DailyRecord {
   role: string;
   department: string;
   submittedAt: string;
+  date: string;
   tasksDone: DailyTask[];
   tasksPending: DailyTask[];
   verificationStatus: VerificationStatus;
@@ -32,6 +33,7 @@ const MOCK_RECORDS: DailyRecord[] = [
     role: "Frontend Developer",
     department: "Engineering",
     submittedAt: "05:30 PM",
+    date: new Date().toISOString().slice(0, 10),
     verificationStatus: "Pending",
     tasksDone: [
       { id: "t1", description: "Implement Document Generator UI", status: "done" },
@@ -47,6 +49,7 @@ const MOCK_RECORDS: DailyRecord[] = [
     role: "Product Manager",
     department: "Product",
     submittedAt: "06:15 PM",
+    date: new Date().toISOString().slice(0, 10),
     verificationStatus: "Verified",
     rating: 4,
     verifiedBy: "Alex Boss",
@@ -64,6 +67,7 @@ const MOCK_RECORDS: DailyRecord[] = [
     role: "Backend Engineer",
     department: "Engineering",
     submittedAt: "04:45 PM",
+    date: new Date(Date.now() - 86400000).toISOString().slice(0, 10), // Yesterday
     verificationStatus: "Pending",
     tasksDone: [
       { id: "t7", description: "Optimize database queries for user search", status: "done" }
@@ -77,11 +81,14 @@ const MOCK_RECORDS: DailyRecord[] = [
 
 export function DailyProgress() {
   const [search, setSearch] = useState("");
+  const [startDate, setStartDate] = useState(new Date(Date.now() - 7 * 86400000).toISOString().slice(0, 10));
+  const [endDate, setEndDate] = useState(new Date().toISOString().slice(0, 10));
   const [statusFilter, setStatusFilter] = useState<VerificationStatus | "All">("All");
   const [records, setRecords] = useState<DailyRecord[]>(MOCK_RECORDS);
 
   // Modal State
   const [verifyModalOpen, setVerifyModalOpen] = useState(false);
+  const [pendingListModalOpen, setPendingListModalOpen] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState<DailyRecord | null>(null);
   const [currentRating, setCurrentRating] = useState<number>(0);
   const [currentRemarks, setCurrentRemarks] = useState("");
@@ -89,7 +96,8 @@ export function DailyProgress() {
   const filteredRecords = records.filter(rec => {
     const matchesSearch = rec.employeeName.toLowerCase().includes(search.toLowerCase());
     const matchesStatus = statusFilter === "All" || rec.verificationStatus === statusFilter;
-    return matchesSearch && matchesStatus;
+    const matchesDate = rec.date >= startDate && rec.date <= endDate;
+    return matchesSearch && matchesStatus && matchesDate;
   });
 
   const handleOpenVerify = (record: DailyRecord) => {
@@ -144,15 +152,21 @@ export function DailyProgress() {
       {/* Stats Bar */}
       <div className="grid gap-4 sm:grid-cols-3">
         <div className="bg-card border border-border/50 rounded-2xl p-6 shadow-sm">
-          <div className="text-muted-foreground font-bold text-xs uppercase tracking-wider mb-1">Total Reports Today</div>
+          <div className="text-muted-foreground font-bold text-xs uppercase tracking-wider mb-1">Total Reports (All Time)</div>
           <div className="text-4xl font-black">{records.length}</div>
         </div>
-        <div className="bg-amber-500/5 border border-amber-500/20 rounded-2xl p-6 shadow-sm">
-          <div className="text-amber-600 font-bold text-xs uppercase tracking-wider mb-1">Pending Verification</div>
+        <div 
+          className="bg-amber-500/5 border border-amber-500/20 rounded-2xl p-6 shadow-sm cursor-pointer hover:bg-amber-500/10 transition-colors group"
+          onClick={() => setPendingListModalOpen(true)}
+        >
+          <div className="text-amber-600 font-bold text-xs uppercase tracking-wider mb-1 flex items-center justify-between">
+            Pending Verification
+            <span className="opacity-0 group-hover:opacity-100 transition-opacity text-[10px] bg-amber-500/20 px-2 py-0.5 rounded-md">View All</span>
+          </div>
           <div className="text-4xl font-black text-amber-700">{pendingCount}</div>
         </div>
         <div className="bg-emerald-500/5 border border-emerald-500/20 rounded-2xl p-6 shadow-sm">
-          <div className="text-emerald-600 font-bold text-xs uppercase tracking-wider mb-1">Avg Today's Rating</div>
+          <div className="text-emerald-600 font-bold text-xs uppercase tracking-wider mb-1">Avg Rating (All Time)</div>
           <div className="text-4xl font-black text-emerald-700 flex items-end gap-2">
             {avgRating} <Star className="w-6 h-6 text-emerald-500 mb-1 fill-emerald-500" />
           </div>
@@ -172,6 +186,21 @@ export function DailyProgress() {
           />
         </div>
         <div className="flex items-center gap-2 w-full sm:w-auto">
+          <div className="flex items-center gap-2 w-full sm:w-auto bg-background border border-border/50 rounded-xl px-2 focus-within:ring-2 focus-within:ring-primary/20 transition-all">
+            <input 
+              type="date"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              className="w-full sm:w-auto px-2 py-2.5 bg-transparent focus:outline-none text-sm font-bold appearance-none cursor-pointer"
+            />
+            <span className="text-muted-foreground text-sm font-bold">to</span>
+            <input 
+              type="date"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+              className="w-full sm:w-auto px-2 py-2.5 bg-transparent focus:outline-none text-sm font-bold appearance-none cursor-pointer"
+            />
+          </div>
           <div className="relative w-full sm:w-auto">
             <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <select
@@ -215,7 +244,7 @@ export function DailyProgress() {
               </div>
               <div className="flex items-center gap-2 text-xs font-bold text-muted-foreground">
                 <Clock className="w-3.5 h-3.5" />
-                Submitted at {record.submittedAt}
+                {record.date} • Submitted at {record.submittedAt}
               </div>
             </div>
 
@@ -425,6 +454,57 @@ export function DailyProgress() {
               </button>
             </div>
             
+        </DialogContent>
+      </Dialog>
+
+      {/* Pending List Modal */}
+      <Dialog open={pendingListModalOpen} onOpenChange={setPendingListModalOpen}>
+        <DialogContent className="max-w-md p-0 overflow-hidden rounded-3xl gap-0 border-border/60 shadow-2xl [&>button]:hidden bg-white">
+          <div className="p-6 border-b border-border/50 bg-muted/10 flex justify-between items-center shrink-0">
+            <div>
+              <h2 className="text-xl font-black text-foreground flex items-center gap-2">
+                <AlertCircle className="w-5 h-5 text-amber-500" />
+                Pending Verifications
+              </h2>
+              <p className="text-sm text-muted-foreground mt-1">All reports waiting for manager review.</p>
+            </div>
+            <button 
+              onClick={() => setPendingListModalOpen(false)}
+              className="p-2 text-muted-foreground hover:bg-muted rounded-full transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+          
+          <div className="p-6 overflow-y-auto max-h-[60vh] space-y-3">
+            {records.filter(r => r.verificationStatus === "Pending").map(record => (
+              <div key={record.id} className="p-4 border border-border/50 rounded-xl bg-card flex justify-between items-center hover:border-primary/50 transition-colors">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0 font-bold">
+                    {record.employeeName.charAt(0)}
+                  </div>
+                  <div>
+                    <div className="font-bold text-foreground text-sm">{record.employeeName}</div>
+                    <div className="text-xs text-muted-foreground">{record.date} • {record.submittedAt}</div>
+                  </div>
+                </div>
+                <button 
+                  onClick={() => {
+                    setPendingListModalOpen(false);
+                    handleOpenVerify(record);
+                  }}
+                  className="text-xs font-bold bg-primary/10 text-primary px-3 py-1.5 rounded-lg hover:bg-primary/20 transition-colors"
+                >
+                  Review
+                </button>
+              </div>
+            ))}
+            {records.filter(r => r.verificationStatus === "Pending").length === 0 && (
+              <div className="text-center p-8 text-muted-foreground bg-muted/20 rounded-xl">
+                No pending verifications! 🎉
+              </div>
+            )}
+          </div>
         </DialogContent>
       </Dialog>
 
