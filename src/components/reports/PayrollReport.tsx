@@ -1,4 +1,4 @@
-import { IndianRupee, TrendingUp, TrendingDown, Landmark, Building2, Wallet, ChevronDown } from "lucide-react";
+import { IndianRupee, TrendingUp, TrendingDown, Landmark, Building2, Wallet } from "lucide-react";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Legend, Cell, ComposedChart, Line } from 'recharts';
 
 const payrollTrend = [
@@ -35,14 +35,11 @@ export function PayrollReport() {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <div className="relative">
-            <select className="px-4 py-2.5 pr-8 bg-card border border-border/50 text-foreground font-bold rounded-xl hover:bg-muted/50 transition-colors shadow-sm outline-none appearance-none">
-              <option>Last 6 Months</option>
-              <option>This Year</option>
-              <option>Last Year</option>
-            </select>
-            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
-          </div>
+          <select className="px-4 py-2.5 bg-card border border-border/50 text-foreground font-bold rounded-xl hover:bg-muted/50 transition-colors shadow-sm outline-none">
+            <option>Last 6 Months</option>
+            <option>This Year</option>
+            <option>Last Year</option>
+          </select>
         </div>
       </div>
 
@@ -146,8 +143,9 @@ export function PayrollReport() {
                   cursor={{ fill: 'var(--muted)', opacity: 0.5 }}
                   content={({ active, payload }) => {
                     if (active && payload && payload.length) {
-                      const data = payload[0].payload;
-                      const color = payload[0].color || payload[0].fill;
+                      const data = payload[0]?.payload;
+                      const color = payload[0]?.color || payload[0]?.fill;
+                      if (!data) return null;
                       return (
                         <div className="bg-card border border-border p-3 rounded-xl shadow-sm" style={{ color }}>
                           <p className="font-bold text-sm mb-1">{data.name}</p>
