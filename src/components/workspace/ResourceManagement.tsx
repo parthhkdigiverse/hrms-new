@@ -3,6 +3,7 @@ import { X,  Calendar as CalendarIcon, Clock, Users, Tv, Presentation, ShieldAle
 import { cn } from "@/lib/utils";
 import { DialogClose,  Dialog, DialogContent, DialogHeader, DialogTitle  } from "@/components/ui/dialog";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
+import { moveToRecycleBin } from "@/lib/recycle-bin";
 
 export interface Resource {
   id: string;
@@ -115,6 +116,7 @@ export function ResourceManagement() {
       description: "Are you sure you want to delete this resource type? This action cannot be undone.",
       itemName: typeToDelete,
       action: () => {
+        moveToRecycleBin('Resource Type', typeToDelete, typeToDelete, 'hrms_resource_types');
         setResourceTypes(resourceTypes.filter(t => t !== typeToDelete));
         if (newType === typeToDelete) {
           setNewType(resourceTypes[0] || "");

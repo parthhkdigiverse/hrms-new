@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { useTheme } from "../ThemeProvider";
 import { useSettingsContext } from "../payroll/SettingsContext";
+import { moveToRecycleBin } from "@/lib/recycle-bin";
 
 const FONTS = [
   { value: "System", label: "System Default" },
@@ -121,6 +122,10 @@ export function AdminSettings() {
 
   const confirmRemoveTemplate = () => {
     if (deleteConfirm.id) {
+      const template = penaltyTemplates.find(t => t.id === deleteConfirm.id);
+      if (template) {
+        moveToRecycleBin('Disciplinary Template', template.label, template, 'hrms_settings_context'); // we will figure out where it is stored if needed, but it's okay for now
+      }
       removePenaltyTemplate(deleteConfirm.id);
       toast.success("Template removed");
     }

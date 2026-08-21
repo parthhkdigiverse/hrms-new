@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { leads as initialLeads, pipelineStages, type Lead } from "./sales-data";
 
 type SalesContextType = {
@@ -11,10 +11,24 @@ type SalesContextType = {
 const SalesContext = createContext<SalesContextType | undefined>(undefined);
 
 export function SalesProvider({ children }: { children: ReactNode }) {
-  const [leads, setLeads] = useState<Lead[]>(initialLeads);
-  const [stages, setStages] = useState<string[]>(
-    pipelineStages.map((s) => s.stage)
-  );
+  const [leads, setLeads] = useState<Lead[]>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('hrms_sales_leads');
+      return saved ? JSON.parse(saved) : initialLeads;
+    }
+    return initialLeads;
+  });
+  
+  const [stages, setStages] = useState<string[]>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('hrms_sales_stages');
+      return saved ? JSON.parse(saved) : pipelineStages.map((s) => s.stage);
+    }
+    return pipelineStages.map((s) => s.stage);
+  });
+
+  useEffect(() => { if (typeof window !== 'undefined') localStorage.setItem('hrms_sales_leads', JSON.stringify(leads)); }, [leads]);
+  useEffect(() => { if (typeof window !== 'undefined') localStorage.setItem('hrms_sales_stages', JSON.stringify(stages)); }, [stages]);
 
   return (
     <SalesContext.Provider value={{ leads, setLeads, stages, setStages }}>

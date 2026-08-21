@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Download, Plus, Edit3, Trash2, ArrowUpRight, ArrowDownRight, Search, FileText, ChevronRight, Briefcase, Calendar, Info, X, Users, Filter, ChevronDown } from "lucide-react";
 import { DialogClose,  Dialog, DialogContent  } from "@/components/ui/dialog";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
+import { moveToRecycleBin } from "@/lib/recycle-bin";
 
 const mockClientData = [
   {
@@ -26,7 +27,13 @@ const mockClientData = [
 ];
 
 export function OtherTransactions() {
-  const [clientData, setClientData] = useState(mockClientData);
+  const [clientData, setClientData] = useState(() => {
+    const saved = localStorage.getItem('hrms_other_transactions');
+    return saved ? JSON.parse(saved) : mockClientData;
+  });
+  
+  useEffect(() => { localStorage.setItem('hrms_other_transactions', JSON.stringify(clientData)); }, [clientData]);
+
   const [deleteConfirm, setDeleteConfirm] = useState<{isOpen: boolean, clientId: string, txId: string, desc: string}>({isOpen: false, clientId: "", txId: "", desc: ""});
   const [searchQuery, setSearchQuery] = useState("");
   const [expandedClients, setExpandedClients] = useState<string[]>(["Acme Corp"]);
@@ -47,6 +54,14 @@ export function OtherTransactions() {
     if (deleteConfirm.txId) {
       setClientData(prev => prev.map(client => {
         if (client.clientName === deleteConfirm.clientId) {
+          const txToDelete = client.transactions.find(t => t.id === deleteConfirm.txId);
+          if (txToDelete) {
+            moveToRecycleBin('Other Transaction', `TX ${txToDelete.id}`, txToDelete, 'hrms_other_transactions', {
+              parentId: client.clientName,
+              parentKey: 'clientName',
+              nestedArrayKey: 'transactions'
+            });
+          }
           return {
             ...client,
             transactions: client.transactions.filter(t => t.id !== deleteConfirm.txId)

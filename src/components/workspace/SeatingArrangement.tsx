@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
-import { X,  Search, MousePointerClick, UserMinus, UserPlus  } from "lucide-react";
+import { X,  Search, MousePointerClick, UserMinus, UserPlus, ChevronDown  } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { DialogClose,  Dialog, DialogContent, DialogHeader, DialogTitle  } from "@/components/ui/dialog";
+import { DialogClose,  Dialog, DialogContent } from "@/components/ui/dialog";
+import { EMPLOYEES } from "@/components/employees/employee-data";
 
 // Mock Data
 const ZONES = [
@@ -226,17 +227,23 @@ export function SeatingArrangement() {
                 <div className="bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 rounded-xl p-4 text-sm font-medium mb-4">
                   This desk is currently available. Assign it to a new employee.
                 </div>
-                <div>
-                  <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Employee Name</label>
-                  <input 
-                    type="text" 
-                    value={newAssigneeName}
-                    onChange={(e) => setNewAssigneeName(e.target.value)}
-                    placeholder="e.g. John Doe"
-                    className="w-full px-4 py-3 bg-muted/50 border border-border/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium"
-                    autoFocus
-                  />
-                </div>
+                <div className="space-y-2">
+                    <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Employee Name</label>
+                    <div className="relative">
+                      <select 
+                        required
+                        value={newAssigneeName}
+                        onChange={e => setNewAssigneeName(e.target.value)}
+                        className="w-full px-3 py-2 bg-background border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 appearance-none pr-8"
+                      >
+                        <option value="" disabled>Select Employee</option>
+                        {EMPLOYEES.map(emp => (
+                          <option key={emp.id} value={emp.name}>{emp.name}</option>
+                        ))}
+                      </select>
+                      <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+                    </div>
+                  </div>
                 <div>
                   <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Role / Title</label>
                   <input 

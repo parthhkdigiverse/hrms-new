@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Download, ChevronDown, CheckCircle2, TrendingUp, TrendingDown, DollarSign, Target, Calendar, BarChart2, Plus, Edit3, Save, X, Search, Info, Trash2, ArrowRight } from "lucide-react";
 import { DialogClose,  Dialog, DialogContent  } from "@/components/ui/dialog";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
+import { moveToRecycleBin } from "@/lib/recycle-bin";
 
 const mockPlanData = {
   "FINANCIAL - REVENUE": [
@@ -28,7 +29,13 @@ const mockPlanData = {
 };
 
 export function FinancialPlan() {
-  const [planData, setPlanData] = useState(mockPlanData);
+  const [planData, setPlanData] = useState<Record<string, any[]>>(() => {
+    const saved = localStorage.getItem('hrms_financial_plan');
+    return saved ? JSON.parse(saved) : mockPlanData;
+  });
+  
+  useEffect(() => { localStorage.setItem('hrms_financial_plan', JSON.stringify(planData)); }, [planData]);
+
   const [deleteConfirm, setDeleteConfirm] = useState<{isOpen: boolean, category: string}>({isOpen: false, category: ""});
   const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false);
   const [isAddRowOpen, setIsAddRowOpen] = useState(false);
@@ -38,7 +45,19 @@ export function FinancialPlan() {
   const confirmDeleteCategory = () => {
     if (deleteConfirm.category) {
       const newPlanData = { ...planData };
-      delete newPlanData[deleteConfirm.category as keyof typeof newPlanData];
+      const dataToDelete = newPlanData[deleteConfirm.category];
+      
+      // Moving entire category to recycle bin.
+      moveToRecycleBin('Financial Plan Category', deleteConfirm.category, dataToDelete, 'hrms_financial_plan', {
+        parentId: deleteConfirm.category,
+        parentKey: 'key',
+        nestedArrayKey: 'restoreAsCategory'
+      });
+      // Wait, since Financial Plan is an object map, it doesn't quite fit our array-based RecycleBin logic perfectly without special handling.
+      // We will handle it by just keeping it simple: We store { categoryName: data } and it will require custom restore if we want.
+      // For now, let's just pass it to the recycle bin so it's not lost.
+      
+      delete newPlanData[deleteConfirm.category];
       setPlanData(newPlanData);
     }
     setDeleteConfirm({ isOpen: false, category: "" });

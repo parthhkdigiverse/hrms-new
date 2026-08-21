@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Plus, Trash2, Edit2, FileType2, X } from "lucide-react";
 import { DialogClose,  Dialog, DialogContent  } from "@/components/ui/dialog";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
+import { moveToRecycleBin } from "@/lib/recycle-bin";
 
 interface DocTemplate {
   id: string;
@@ -48,6 +49,10 @@ export function DocumentTemplates() {
 
   const executeDelete = () => {
     if (confirmModal.idToDelete) {
+      const template = templates.find(t => t.id === confirmModal.idToDelete);
+      if (template) {
+        moveToRecycleBin('Document Template', template.name, template, 'documentTemplates');
+      }
       setTemplates(templates.filter(t => t.id !== confirmModal.idToDelete));
     }
     setConfirmModal({ isOpen: false });

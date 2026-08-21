@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Shield, ShieldAlert, CheckCircle, Monitor, Send, ShieldCheck, AlertTriangle, Search, Plus, Trash2, RefreshCw } from "lucide-react";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
+import { moveToRecycleBin } from "@/lib/recycle-bin";
 
 const mockPcs = [
   { id: 1, hostname: 'DESKTOP-DEV-01', user: 'Sarah Jenkins', ip: '192.168.1.105', os: 'Windows 11', restricted: true },
@@ -18,8 +19,20 @@ export function Restrictions() {
   const [activeTab, setActiveTab] = useState<"pcs" | "broadcast" | "alerts">("pcs");
   const [searchQuery, setSearchQuery] = useState("");
   const [editingPc, setEditingPc] = useState<any>(null);
-  const [blockApps, setBlockApps] = useState(["spotify.exe"]);
-  const [blockUrls, setBlockUrls] = useState(["facebook.com", "instagram.com"]);
+  
+  const [blockApps, setBlockApps] = useState<string[]>(() => {
+    const saved = localStorage.getItem('hrms_block_apps');
+    return saved ? JSON.parse(saved) : ["spotify.exe"];
+  });
+  
+  const [blockUrls, setBlockUrls] = useState<string[]>(() => {
+    const saved = localStorage.getItem('hrms_block_urls');
+    return saved ? JSON.parse(saved) : ["facebook.com", "instagram.com"];
+  });
+
+  useEffect(() => { localStorage.setItem('hrms_block_apps', JSON.stringify(blockApps)); }, [blockApps]);
+  useEffect(() => { localStorage.setItem('hrms_block_urls', JSON.stringify(blockUrls)); }, [blockUrls]);
+
   const [blockChrome, setBlockChrome] = useState(false);
   const [blockYoutube, setBlockYoutube] = useState(true);
 
@@ -28,8 +41,12 @@ export function Restrictions() {
   const confirmDelete = () => {
     if (deleteConfirm.idx !== null && deleteConfirm.type) {
       if (deleteConfirm.type === 'app') {
+        const item = blockApps[deleteConfirm.idx];
+        moveToRecycleBin('Restricted App', item, item, 'hrms_block_apps');
         setBlockApps(blockApps.filter((_, i) => i !== deleteConfirm.idx));
       } else {
+        const item = blockUrls[deleteConfirm.idx];
+        moveToRecycleBin('Restricted URL', item, item, 'hrms_block_urls');
         setBlockUrls(blockUrls.filter((_, i) => i !== deleteConfirm.idx));
       }
     }

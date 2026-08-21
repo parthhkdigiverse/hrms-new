@@ -1,6 +1,8 @@
 import { useState } from "react";
-import { X,  Search, AlertTriangle, MessageSquareWarning, ThumbsUp, ShieldAlert, Plus, IndianRupee, CheckCircle2, XCircle, Filter  } from "lucide-react";
-import { DialogClose,  Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger  } from "@/components/ui/dialog";
+import { X, Search, AlertTriangle, MessageSquareWarning, ThumbsUp, ShieldAlert, Plus, IndianRupee, CheckCircle2, XCircle, Filter, FileText, ChevronDown } from "lucide-react";
+import { DialogClose, Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { ConfirmModal } from "@/components/ui/confirm-modal";
+import { EMPLOYEES } from "@/components/employees/employee-data";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { useSettingsContext } from "../payroll/SettingsContext";
@@ -350,14 +352,20 @@ export function Penalties() {
                   </div>
                   <div className="space-y-2">
                     <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Employee Name</label>
-                    <input 
-                      type="text" 
-                      required
-                      placeholder="e.g. John Doe"
-                      value={newEmpName}
-                      onChange={e => setNewEmpName(e.target.value)}
-                      className="w-full px-3 py-2 bg-background border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-                    />
+                    <div className="relative">
+                      <select 
+                        required
+                        value={newEmpName}
+                        onChange={e => setNewEmpName(e.target.value)}
+                        className="w-full px-3 py-2 bg-background border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 appearance-none pr-8"
+                      >
+                        <option value="" disabled>Select Employee</option>
+                        {EMPLOYEES.map(emp => (
+                          <option key={emp.id} value={emp.name}>{emp.name}</option>
+                        ))}
+                      </select>
+                      <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+                    </div>
                   </div>
                   
                   {newType === "Penalty" && (

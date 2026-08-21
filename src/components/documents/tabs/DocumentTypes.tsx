@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Plus, Trash2, Settings2 } from "lucide-react";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
+import { moveToRecycleBin } from "@/lib/recycle-bin";
 
 interface DocType {
   id: string;
@@ -61,6 +62,10 @@ export function DocumentTypes() {
 
   const executeDelete = () => {
     if (confirmModal.idToDelete) {
+      const type = types.find(t => t.id === confirmModal.idToDelete);
+      if (type) {
+        moveToRecycleBin('Document Type', type.name, type, 'documentTypes');
+      }
       setTypes(types.filter(t => t.id !== confirmModal.idToDelete));
     }
     setConfirmModal({ isOpen: false });

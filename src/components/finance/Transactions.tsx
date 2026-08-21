@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Search, Download, Plus, RefreshCw, Wallet, Building2, Calendar, Filter, ArrowDownLeft, ArrowUpRight, ArrowRight, Edit3, Trash2, X } from "lucide-react";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { DialogClose,  Dialog, DialogContent  } from "@/components/ui/dialog";
+import { moveToRecycleBin } from "@/lib/recycle-bin";
 
 const MOCK_CREDIT_TRANSACTIONS = [
   { id: 'INV-001', date: '15/6/2026', amount: 1234.00, category: 'Sales', description: 'test', service: 'fgh', remarks: '1. Payment is due w...' },
@@ -12,8 +13,19 @@ const MOCK_DEBIT_TRANSACTIONS = [
 ];
 
 export function Transactions() {
-  const [creditTransactions, setCreditTransactions] = useState(MOCK_CREDIT_TRANSACTIONS);
-  const [debitTransactions, setDebitTransactions] = useState(MOCK_DEBIT_TRANSACTIONS);
+  const [creditTransactions, setCreditTransactions] = useState(() => {
+    const saved = localStorage.getItem('hrms_credit_transactions');
+    return saved ? JSON.parse(saved) : MOCK_CREDIT_TRANSACTIONS;
+  });
+  
+  const [debitTransactions, setDebitTransactions] = useState(() => {
+    const saved = localStorage.getItem('hrms_debit_transactions');
+    return saved ? JSON.parse(saved) : MOCK_DEBIT_TRANSACTIONS;
+  });
+
+  useEffect(() => { localStorage.setItem('hrms_credit_transactions', JSON.stringify(creditTransactions)); }, [creditTransactions]);
+  useEffect(() => { localStorage.setItem('hrms_debit_transactions', JSON.stringify(debitTransactions)); }, [debitTransactions]);
+
   const [deleteConfirm, setDeleteConfirm] = useState<{isOpen: boolean, id: string | null, type: 'credit' | 'debit'}>({isOpen: false, id: null, type: 'credit'});
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -25,9 +37,13 @@ export function Transactions() {
   const confirmDelete = () => {
     if (deleteConfirm.id) {
       if (deleteConfirm.type === 'credit') {
-        setCreditTransactions(creditTransactions.filter(t => t.id !== deleteConfirm.id));
+        const item = creditTransactions.find((t: any) => t.id === deleteConfirm.id);
+        if (item) moveToRecycleBin('Credit Transaction', `Invoice ${item.id}`, item, 'hrms_credit_transactions');
+        setCreditTransactions(creditTransactions.filter((t: any) => t.id !== deleteConfirm.id));
       } else {
-        setDebitTransactions(debitTransactions.filter(t => t.id !== deleteConfirm.id));
+        const item = debitTransactions.find((t: any) => t.id === deleteConfirm.id);
+        if (item) moveToRecycleBin('Debit Transaction', `Expense ${item.id}`, item, 'hrms_debit_transactions');
+        setDebitTransactions(debitTransactions.filter((t: any) => t.id !== deleteConfirm.id));
       }
     }
     setDeleteConfirm({ isOpen: false, id: null, type: 'credit' });

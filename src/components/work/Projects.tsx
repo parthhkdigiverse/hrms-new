@@ -9,6 +9,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Calendar as CalendarUI } from "@/components/ui/calendar";
 import { format, subDays, startOfYear, differenceInDays } from "date-fns";
 import { DateRange } from "react-day-picker";
+import { moveToRecycleBin } from "@/lib/recycle-bin";
 
 type ProjectStatus = "In Progress" | "In Review" | "Completed" | "On Hold";
 type ClientStatus = "Active" | "Archived";
@@ -404,6 +405,7 @@ export function Projects() {
       description: "Are you sure you want to delete this category? This action cannot be undone.",
       itemName: categoryToDelete,
       action: () => {
+        moveToRecycleBin('Project Category', categoryToDelete, categoryToDelete, 'hrms_categories');
         const newCategories = categories.filter(c => c !== categoryToDelete);
         setCategories(newCategories);
         if (newProjectCategory === categoryToDelete) {
@@ -420,6 +422,7 @@ export function Projects() {
       description: "Are you sure you want to delete this project? All associated data will be permanently removed.",
       itemName: project.name,
       action: () => {
+        moveToRecycleBin('Project', project.name, project, 'hrms_projects');
         setProjects(projects.filter(p => p.id !== project.id));
         setClients(clients.map(c => 
           c.id === project.clientId ? { ...c, activeProjects: Math.max(0, c.activeProjects - 1) } : c
@@ -438,6 +441,7 @@ export function Projects() {
       description: "Are you sure you want to delete this client? All associated projects will also be permanently deleted.",
       itemName: client.name,
       action: () => {
+        moveToRecycleBin('Client', client.name, client, 'hrms_clients');
         setClients(clients.filter(c => c.id !== client.id));
         setProjects(projects.filter(p => p.clientId !== client.id));
         if (selectedClientId === client.id) {

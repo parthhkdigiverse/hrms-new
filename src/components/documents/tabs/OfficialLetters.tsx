@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { Search, Plus, Filter, FileText, CheckCircle2, Clock, X, Download, Eye, Upload, Printer, Mail, FilePlus, Send } from "lucide-react";
+import { Search, Plus, Filter, FileText, CheckCircle2, Clock, X, Download, Eye, Upload, Printer, Mail, FilePlus, Send, ChevronDown } from "lucide-react";
 import { DialogClose,  Dialog, DialogContent  } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
+import { EMPLOYEES } from "@/components/employees/employee-data";
 
 type RequestStatus = "Pending" | "Approved" | "Sent" | "Rejected";
 
@@ -103,13 +104,19 @@ export function OfficialLetters({ onNavigate }: { onNavigate?: ((path: string) =
             <div className="p-6 md:p-8 space-y-6 overflow-y-auto max-h-[70vh]">
               <div>
                 <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">Employee Name</label>
-                <input
-                  type="text"
-                  value={newEmployeeName}
-                  onChange={(e) => setNewEmployeeName(e.target.value)}
-                  placeholder="e.g. John Doe"
-                  className="w-full px-4 py-2.5 bg-background border border-border/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all text-sm font-medium"
-                />
+                <div className="relative">
+                  <select
+                    value={newEmployeeName}
+                    onChange={(e) => setNewEmployeeName(e.target.value)}
+                    className="w-full px-4 py-2.5 rounded-xl border border-border/50 bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all text-sm font-medium appearance-none pr-8"
+                  >
+                    <option value="" disabled>Select Employee</option>
+                    {EMPLOYEES.map(emp => (
+                      <option key={emp.id} value={emp.name}>{emp.name}</option>
+                    ))}
+                  </select>
+                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+                </div>
               </div>
               
               <div>

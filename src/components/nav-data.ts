@@ -42,6 +42,7 @@ import {
   CheckSquare,
   BarChart2,
   Bell,
+  Trash2,
   type LucideIcon,
 } from "lucide-react";
 
@@ -229,6 +230,7 @@ export const navItems: NavItem[] = [
   { title: "Settings", url: "/settings", icon: Settings, section: "Admin" },
   { title: "Restrictions", url: "/restrictions", icon: Shield, section: "Admin" },
   { title: "Activity Logs", url: "/activity-logs", icon: ScrollText, section: "Admin" },
+  { title: "Recycle Bin", url: "/recycle-bin", icon: Trash2, section: "Admin" },
 ];
 
 export const sectionOrder = [

@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { X, User, Briefcase, Building2, ShieldAlert } from "lucide-react";
+import { X, User, Briefcase, Building2, ShieldAlert, ChevronDown } from "lucide-react";
 import { DialogClose,  Dialog, DialogContent  } from "@/components/ui/dialog";
 import { OrgNodeData } from "./org-data";
+import { EMPLOYEES } from "@/components/employees/employee-data";
 import { toast } from "sonner";
 import { useDepartments } from "./DepartmentContext";
 
@@ -66,14 +67,20 @@ export function AddOrgNodeModal({ isOpen, onClose, onSubmit, parentName }: AddOr
             <div className="p-6 md:p-8 space-y-6 overflow-y-auto">
             <div className="space-y-2">
               <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Full Name</label>
-              <input 
-                type="text" 
-                required
-                value={formData.name}
-                onChange={(e) => setFormData({...formData, name: e.target.value})}
-                className="w-full px-4 py-3 bg-muted/50 border border-border/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium"
-                placeholder="e.g. John Doe"
-              />
+              <div className="relative">
+                <select 
+                  required
+                  value={formData.name}
+                  onChange={(e) => setFormData({...formData, name: e.target.value})}
+                  className="w-full px-4 py-3 bg-muted/50 border border-border/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium appearance-none pr-8"
+                >
+                  <option value="" disabled>Select Employee</option>
+                  {EMPLOYEES.map(emp => (
+                    <option key={emp.id} value={emp.name}>{emp.name}</option>
+                  ))}
+                </select>
+                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+              </div>
             </div>
 
             <div className="space-y-2">

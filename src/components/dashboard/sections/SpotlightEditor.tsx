@@ -3,6 +3,7 @@ import { Edit2, Plus, Trash2, X, ChevronDown, PartyPopper, Sparkles, Star, Refre
 import { DialogClose,  Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger  } from "@/components/ui/dialog";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { cn } from "@/lib/utils";
+import { moveToRecycleBin } from "@/lib/recycle-bin";
 import { EMPLOYEES } from "@/components/employees/employee-data";
 import { SparklesCelebration } from "../../common/SparklesCelebration";
 import { BADGE_PRESETS, CELEBRATION_PRESETS } from "./spotlight-constants";
@@ -84,6 +85,8 @@ export function SpotlightEditor({ spotlights, setSpotlights }: SpotlightEditorPr
   const confirmDelete = () => {
     if (deleteConfirm.index !== null) {
       const updated = [...spotlights];
+      const itemToDelete = updated[deleteConfirm.index];
+      moveToRecycleBin('Spotlight Employee', itemToDelete.name, itemToDelete, 'dashboard-spotlights');
       updated.splice(deleteConfirm.index, 1);
       setSpotlights(updated);
       if (editIndex === deleteConfirm.index) {

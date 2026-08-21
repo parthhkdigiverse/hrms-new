@@ -1,4 +1,4 @@
-import { IndianRupee, TrendingUp, TrendingDown, Landmark, Building2, Wallet } from "lucide-react";
+import { IndianRupee, TrendingUp, TrendingDown, Landmark, Building2, Wallet, ChevronDown } from "lucide-react";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Legend, Cell, ComposedChart, Line } from 'recharts';
 
 const payrollTrend = [
@@ -35,11 +35,14 @@ export function PayrollReport() {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <select className="px-4 py-2.5 bg-card border border-border/50 text-foreground font-bold rounded-xl hover:bg-muted/50 transition-colors shadow-sm outline-none">
-            <option>Last 6 Months</option>
-            <option>This Year</option>
-            <option>Last Year</option>
-          </select>
+          <div className="relative">
+            <select className="px-4 py-2.5 pr-8 bg-card border border-border/50 text-foreground font-bold rounded-xl hover:bg-muted/50 transition-colors shadow-sm outline-none appearance-none">
+              <option>Last 6 Months</option>
+              <option>This Year</option>
+              <option>Last Year</option>
+            </select>
+            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+          </div>
         </div>
       </div>
 
@@ -138,11 +141,22 @@ export function PayrollReport() {
               <BarChart data={departmentCost} layout="vertical" margin={{ top: 0, right: 20, left: 10, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" opacity={0.5} />
                 <XAxis type="number" hide />
-                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: "var(--muted-foreground)" }} type="category" />
+                <YAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: "var(--muted-foreground)" }} type="category" width={100} />
                 <Tooltip 
-                  cursor={{ fill: 'hsl(var(--muted)/0.5)' }}
-                  contentStyle={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', borderRadius: '12px', color: 'var(--foreground)' }}
-                  formatter={(value: number) => [`₹ ${value.toLocaleString()}`, 'Cost']}
+                  cursor={{ fill: 'var(--muted)', opacity: 0.5 }}
+                  content={({ active, payload }) => {
+                    if (active && payload && payload.length) {
+                      const data = payload[0].payload;
+                      const color = payload[0].color || payload[0].fill;
+                      return (
+                        <div className="bg-card border border-border p-3 rounded-xl shadow-sm" style={{ color }}>
+                          <p className="font-bold text-sm mb-1">{data.name}</p>
+                          <p className="font-medium text-sm">Cost: ₹ {data.value.toLocaleString()}</p>
+                        </div>
+                      );
+                    }
+                    return null;
+                  }}
                 />
                 <Bar dataKey="value" radius={[0, 6, 6, 0]} barSize={24}>
                   {departmentCost.map((entry, index) => (

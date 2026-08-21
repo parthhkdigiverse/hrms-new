@@ -12,6 +12,7 @@ import {
 import { toast } from "sonner";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { useSales } from "./SalesContext";
+import { moveToRecycleBin } from "@/lib/recycle-bin";
 
 const TABS = ["Pipeline Stages", "Lead Categories", "Lead Sources", "Assignment", "Notifications", "Permissions", "Audit Log"] as const;
 type Tab = typeof TABS[number];
@@ -129,10 +130,26 @@ function ToggleSwitch({ active }: { active: boolean }) {
 export function SalesSettings() {
   const { stages, setStages } = useSales();
   const [activeTab, setActiveTab] = useState<Tab>("Lead Categories");
-  const [categories, setCategories] = useState(INITIAL_LEAD_CATEGORIES);
-  const [sources, setSources] = useState(INITIAL_LEAD_SOURCES);
-  const [permissions, setPermissions] = useState(INITIAL_PERMISSIONS);
   
+  const [categories, setCategories] = useState(() => {
+    const saved = localStorage.getItem('hrms_sales_categories');
+    return saved ? JSON.parse(saved) : INITIAL_LEAD_CATEGORIES;
+  });
+  
+  const [sources, setSources] = useState(() => {
+    const saved = localStorage.getItem('hrms_sales_sources');
+    return saved ? JSON.parse(saved) : INITIAL_LEAD_SOURCES;
+  });
+  
+  const [permissions, setPermissions] = useState(() => {
+    const saved = localStorage.getItem('hrms_sales_permissions');
+    return saved ? JSON.parse(saved) : INITIAL_PERMISSIONS;
+  });
+
+  useEffect(() => { localStorage.setItem('hrms_sales_categories', JSON.stringify(categories)); }, [categories]);
+  useEffect(() => { localStorage.setItem('hrms_sales_sources', JSON.stringify(sources)); }, [sources]);
+  useEffect(() => { localStorage.setItem('hrms_sales_permissions', JSON.stringify(permissions)); }, [permissions]);
+
   const [newCategoryName, setNewCategoryName] = useState("");
   const [newSourceName, setNewSourceName] = useState("");
   const [newStageName, setNewStageName] = useState("");
@@ -243,12 +260,18 @@ export function SalesSettings() {
 
   const executeDelete = () => {
     if (deleteConfirm.type === "category") {
+      const item = categories[deleteConfirm.index];
+      moveToRecycleBin('Lead Category', item.name, item, 'hrms_sales_categories');
       setCategories(categories.filter((_, i) => i !== deleteConfirm.index));
       toast.success(`${deleteConfirm.name} deleted successfully`);
     } else if (deleteConfirm.type === "source") {
+      const item = sources[deleteConfirm.index];
+      moveToRecycleBin('Lead Source', item, item, 'hrms_sales_sources');
       setSources(sources.filter((_, i) => i !== deleteConfirm.index));
       toast.success(`Lead source deleted`);
     } else if (deleteConfirm.type === "stage") {
+      const item = stages[deleteConfirm.index];
+      moveToRecycleBin('Pipeline Stage', item, item, 'hrms_sales_stages');
       setStages(stages.filter((_, i) => i !== deleteConfirm.index));
       toast.success(`Pipeline stage deleted`);
     }
