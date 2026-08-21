@@ -367,7 +367,7 @@ export function Hirings() {
           </DialogClose>
         </div>
           {selectedJob && (
-            <div className="space-y-6">
+            <div className="space-y-6 px-6 md:px-8 py-6">
               <div className="flex flex-wrap gap-4 pt-2 border-b border-border/50 pb-4">
                 <div className="bg-muted/50 px-3 py-1.5 rounded-lg flex items-center gap-2">
                   <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Department</span>
@@ -432,7 +432,7 @@ export function Hirings() {
               toast.success("Referral submitted successfully! Thank you.");
               setReferJob(null);
             }} 
-            className="space-y-4 pt-4"
+            className="space-y-4 px-6 md:px-8 py-6"
           >
             <div className="space-y-2">
               <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Candidate Name</label>
