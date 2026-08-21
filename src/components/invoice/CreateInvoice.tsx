@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
 import { Plus, Trash2, FileText, Send, Save, ArrowLeft, Building2, Calendar, IndianRupee } from "lucide-react";
+import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { cn } from "@/lib/utils";
 
 interface LineItem {
@@ -17,6 +18,7 @@ export function CreateInvoice({ onBack, isProforma = false }: { onBack?: (() => 
   const [items, setItems] = useState<LineItem[]>([
     { id: "item1", description: "", quantity: 1, rate: 0 }
   ]);
+  const [deleteConfirm, setDeleteConfirm] = useState<{isOpen: boolean, id: string | null}>({isOpen: false, id: null});
 
   const taxRate = 0.18; // 18% GST mock
 
@@ -26,7 +28,14 @@ export function CreateInvoice({ onBack, isProforma = false }: { onBack?: (() => 
 
   const handleRemoveItem = (id: string) => {
     if (items.length === 1) return; // keep at least one
-    setItems(items.filter(i => i.id !== id));
+    setDeleteConfirm({ isOpen: true, id });
+  };
+
+  const confirmRemoveItem = () => {
+    if (deleteConfirm.id) {
+      setItems(items.filter(i => i.id !== deleteConfirm.id));
+    }
+    setDeleteConfirm({ isOpen: false, id: null });
   };
 
   const updateItem = (id: string, field: keyof LineItem, value: any) => {
@@ -257,8 +266,15 @@ export function CreateInvoice({ onBack, isProforma = false }: { onBack?: (() => 
             className="w-full px-4 py-3 bg-background border border-border/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all text-sm font-medium resize-none h-20"
           />
         </div>
-
       </div>
+
+      <ConfirmModal 
+        isOpen={deleteConfirm.isOpen}
+        onClose={() => setDeleteConfirm({ isOpen: false, id: null })}
+        onConfirm={confirmRemoveItem}
+        title="Remove Line Item"
+        description="Are you sure you want to remove this line item from the invoice?"
+      />
     </div>
   );
 }

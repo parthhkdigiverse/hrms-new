@@ -1,12 +1,18 @@
 import React, { useState } from "react";
-import { Edit2, Plus, Trash2, X } from "lucide-react";
+import { Edit2, Plus, Trash2, X, ChevronDown, PartyPopper, Sparkles, Star, RefreshCw } from "lucide-react";
 import { DialogClose,  Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger  } from "@/components/ui/dialog";
+import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { cn } from "@/lib/utils";
+import { EMPLOYEES } from "@/components/employees/employee-data";
+import { SparklesCelebration } from "../../common/SparklesCelebration";
+import { BADGE_PRESETS, CELEBRATION_PRESETS } from "./spotlight-constants";
 
 export interface SpotlightEmployee {
   name: string;
   role: string;
   image?: string;
+  ringStyle?: "none" | "white" | "gold" | "primary";
+  popperStyle?: "none" | "poppers" | "sparkles" | "stars";
 }
 
 interface SpotlightEditorProps {
@@ -21,6 +27,12 @@ export function SpotlightEditor({ spotlights, setSpotlights }: SpotlightEditorPr
   const [newName, setNewName] = useState("");
   const [newRole, setNewRole] = useState("");
   const [newImage, setNewImage] = useState("");
+  const [newRingStyle, setNewRingStyle] = useState<"none" | "white" | "gold" | "primary">("none");
+  const [newPopperStyle, setNewPopperStyle] = useState<"none" | "poppers" | "sparkles" | "stars">("none");
+  const [replayCount, setReplayCount] = useState(0);
+  const [editIndex, setEditIndex] = useState<number | null>(null);
+  
+  const [deleteConfirm, setDeleteConfirm] = useState<{isOpen: boolean, index: number | null, name: string}>({isOpen: false, index: null, name: ""});
 
   const handleAdd = () => {
     if (!newName || !newRole) return;
@@ -30,17 +42,57 @@ export function SpotlightEditor({ spotlights, setSpotlights }: SpotlightEditorPr
       role: newRole,
     };
     if (newImage) newSpotlight.image = newImage;
+    if (newRingStyle !== "none") newSpotlight.ringStyle = newRingStyle;
+    if (newPopperStyle !== "none") newSpotlight.popperStyle = newPopperStyle;
     
-    setSpotlights([...spotlights, newSpotlight]);
+    if (editIndex !== null) {
+      const updated = [...spotlights];
+      updated[editIndex] = newSpotlight;
+      setSpotlights(updated);
+      setEditIndex(null);
+    } else {
+      setSpotlights([...spotlights, newSpotlight]);
+    }
+    
     setNewName("");
     setNewRole("");
     setNewImage("");
+    setNewRingStyle("none");
+    setNewPopperStyle("none");
   };
 
-  const handleRemove = (index: number) => {
-    const updated = [...spotlights];
-    updated.splice(index, 1);
-    setSpotlights(updated);
+  const handleEdit = (index: number) => {
+    const emp = spotlights[index];
+    setNewName(emp.name);
+    setNewRole(emp.role);
+    setNewImage(emp.image || "");
+    setNewRingStyle(emp.ringStyle || "none");
+    setNewPopperStyle(emp.popperStyle || "none");
+    setEditIndex(index);
+    setReplayCount(c => c + 1); // trigger preview replay for the loaded celebration
+  };
+
+  const handleCancelEdit = () => {
+    setEditIndex(null);
+    setNewName("");
+    setNewRole("");
+    setNewImage("");
+    setNewRingStyle("none");
+    setNewPopperStyle("none");
+  };
+
+  const confirmDelete = () => {
+    if (deleteConfirm.index !== null) {
+      const updated = [...spotlights];
+      updated.splice(deleteConfirm.index, 1);
+      setSpotlights(updated);
+      if (editIndex === deleteConfirm.index) {
+        handleCancelEdit();
+      } else if (editIndex !== null && deleteConfirm.index < editIndex) {
+        setEditIndex(editIndex - 1);
+      }
+    }
+    setDeleteConfirm({ isOpen: false, index: null, name: "" });
   };
 
   return (
@@ -52,13 +104,12 @@ export function SpotlightEditor({ spotlights, setSpotlights }: SpotlightEditorPr
         </button>
       </DialogTrigger>
       <DialogContent className="max-w-md p-0 overflow-hidden rounded-[2rem] gap-0 border-border/60 shadow-2xl [&>button]:hidden bg-card">
-        <div className="flex items-center justify-between px-6 md:px-8 py-6 border-b border-border/50 bg-muted/30">
+        <div className="flex items-center justify-between px-6 md:px-8 py-6 border-b border-border/50 bg-muted/30 sticky top-0 z-50">
           <div>
-            <h2 className="text-xl md:text-2xl font-black tracking-tight">
-            <Edit2 className="w-5 h-5 text-primary" />
-            Manage Spotlight
-          </h2>
-            
+            <h2 className="text-xl md:text-2xl font-black tracking-tight flex items-center gap-2">
+              <Edit2 className="w-5 h-5 text-primary" />
+              Manage Spotlight
+            </h2>
           </div>
           <DialogClose asChild>
             <button className="p-2 text-muted-foreground hover:text-foreground/80 hover:bg-muted rounded-full transition-colors">
@@ -67,11 +118,11 @@ export function SpotlightEditor({ spotlights, setSpotlights }: SpotlightEditorPr
           </DialogClose>
         </div>
 
-        <div className="space-y-6">
+        <div className="p-6 md:p-8 pt-6 space-y-8 overflow-y-auto max-h-[calc(90vh-100px)] custom-scrollbar">
           {/* Current List */}
           <div>
             <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-3">Current Rotation</h4>
-            <div className="space-y-2 max-h-[200px] overflow-y-auto pr-2 custom-scrollbar">
+            <div className="space-y-3 max-h-[200px] overflow-y-auto pr-2 custom-scrollbar">
               {spotlights.length === 0 ? (
                 <div className="text-sm text-muted-foreground italic p-4 text-center border border-dashed rounded-xl">No employees in spotlight</div>
               ) : (
@@ -90,12 +141,22 @@ export function SpotlightEditor({ spotlights, setSpotlights }: SpotlightEditorPr
                         <p className="text-[11px] text-muted-foreground">{emp.role}</p>
                       </div>
                     </div>
-                    <button 
-                      onClick={() => handleRemove(i)}
-                      className="p-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-colors"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+                    <div className="flex items-center gap-1">
+                      <button 
+                        onClick={() => handleEdit(i)}
+                        className="p-2 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg transition-colors"
+                        title="Edit employee"
+                      >
+                        <Edit2 className="w-4 h-4" />
+                      </button>
+                      <button 
+                        onClick={() => setDeleteConfirm({ isOpen: true, index: i, name: emp.name })}
+                        className="p-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-colors"
+                        title="Remove employee"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
                   </div>
                 ))
               )}
@@ -104,17 +165,33 @@ export function SpotlightEditor({ spotlights, setSpotlights }: SpotlightEditorPr
 
           <div className="h-[1px] bg-border w-full" />
 
-          {/* Add New */}
+          {/* Add / Edit Form */}
           <div>
-            <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-3">Add to Spotlight</h4>
-            <div className="space-y-3">
-              <input 
-                type="text" 
-                placeholder="Employee Name" 
-                value={newName}
-                onChange={(e) => setNewName(e.target.value)}
-                className="w-full px-4 py-2.5 rounded-xl border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
-              />
+            <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-4">
+              {editIndex !== null ? "Edit Spotlight" : "Add to Spotlight"}
+            </h4>
+            <div className="space-y-4">
+              <div className="relative">
+                <select
+                  value={newName}
+                  onChange={(e) => {
+                    const selectedName = e.target.value;
+                    setNewName(selectedName);
+                    const emp = EMPLOYEES.find(emp => emp.name === selectedName);
+                    if (emp) {
+                      setNewRole(emp.role);
+                      if (emp.avatar) setNewImage(emp.avatar);
+                    }
+                  }}
+                  className="w-full px-4 py-2.5 rounded-xl border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 appearance-none pr-10"
+                >
+                  <option value="" disabled>Select Employee</option>
+                  {EMPLOYEES.map((emp) => (
+                    <option key={emp.id} value={emp.name}>{emp.name}</option>
+                  ))}
+                </select>
+                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+              </div>
               <input 
                 type="text" 
                 placeholder="Role / Tagline (e.g., Top Closer)" 
@@ -122,8 +199,8 @@ export function SpotlightEditor({ spotlights, setSpotlights }: SpotlightEditorPr
                 onChange={(e) => setNewRole(e.target.value)}
                 className="w-full px-4 py-2.5 rounded-xl border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
               />
-              <div>
-                <label className="block text-xs font-semibold text-muted-foreground mb-1.5">Upload Background Image</label>
+              <div className="pt-1">
+                <label className="block text-xs font-semibold text-muted-foreground mb-2">Upload Background Image</label>
                 <div className="relative">
                   <input 
                     type="file" 
@@ -156,17 +233,123 @@ export function SpotlightEditor({ spotlights, setSpotlights }: SpotlightEditorPr
                   </div>
                 )}
               </div>
-              <button 
-                onClick={handleAdd}
-                disabled={!newName || !newRole}
-                className="w-full mt-2 bg-primary text-primary-foreground py-2.5 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <Plus className="w-4 h-4" /> Add Employee
-              </button>
+              
+              <div className="grid grid-cols-2 gap-4 pt-2">
+                <div>
+                  <label className="block text-xs font-semibold text-muted-foreground mb-1.5">Avatar Ring</label>
+                  <div className="relative">
+                    <select
+                      value={newRingStyle}
+                      onChange={(e) => setNewRingStyle(e.target.value as any)}
+                      className="w-full px-3 py-2 rounded-xl border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 appearance-none pr-8"
+                    >
+                      {Object.entries(BADGE_PRESETS).map(([key, preset]) => (
+                        <option key={key} value={key}>{preset.label}</option>
+                      ))}
+                    </select>
+                    <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-muted-foreground mb-1.5">Celebrations</label>
+                  <div className="relative">
+                    <select
+                      value={newPopperStyle}
+                      onChange={(e) => setNewPopperStyle(e.target.value as any)}
+                      className="w-full px-3 py-2 rounded-xl border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 appearance-none pr-8"
+                    >
+                      {Object.entries(CELEBRATION_PRESETS).map(([key, preset]) => (
+                        <option key={key} value={key}>{preset.label}</option>
+                      ))}
+                    </select>
+                    <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+                  </div>
+                </div>
+              </div>
+
+              {/* Live Preview */}
+              <div className="mt-4 p-6 rounded-2xl border border-border bg-muted/20 flex flex-col items-center justify-center relative overflow-hidden">
+                {newPopperStyle !== "none" && (
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[800px] pointer-events-none transform scale-[0.35] z-50">
+                    <SparklesCelebration key={`${newPopperStyle}-${replayCount}`} trigger={true} effectStyle={newPopperStyle} />
+                  </div>
+                )}
+                <div className="absolute top-2 left-3 text-[10px] font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-2 z-30">
+                  Preview
+                  {newPopperStyle !== "none" && (
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setReplayCount(c => c + 1);
+                      }}
+                      className="p-1 hover:bg-black/5 dark:hover:bg-white/10 rounded-full transition-colors text-primary"
+                      title="Replay Animation"
+                    >
+                      <RefreshCw className="w-3 h-3" />
+                    </button>
+                  )}
+                </div>
+                
+                <div className="relative mt-2">
+
+                  <div className="w-16 h-16 rounded-full relative z-10 shadow-lg flex items-center justify-center">
+                    {newRingStyle && newRingStyle !== "none" && (
+                      <div className={cn("absolute -inset-[5px] rounded-full shadow-sm -z-10", BADGE_PRESETS[newRingStyle]?.class)}></div>
+                    )}
+                    <div className="w-full h-full rounded-full bg-background flex items-center justify-center relative z-10 overflow-hidden border-2 border-background">
+                      {newImage ? (
+                        <img src={newImage} alt="Preview" className="w-full h-full object-cover" />
+                      ) : (
+                        <span className="text-xl font-bold text-muted-foreground">{newName ? newName.charAt(0) : "?"}</span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="mt-4 text-center">
+                  <p className="text-sm font-black text-foreground">{newName || "Employee Name"}</p>
+                  <p className="text-[11px] text-muted-foreground">{newRole || "Role / Tagline"}</p>
+                </div>
+              </div>
+
+              <div className="flex gap-3 pt-2">
+                {editIndex !== null && (
+                  <button 
+                    onClick={handleCancelEdit}
+                    className="flex-1 py-3 px-4 bg-muted hover:bg-muted/80 text-foreground font-bold rounded-xl transition-all border border-border"
+                  >
+                    Cancel
+                  </button>
+                )}
+                <button 
+                  onClick={handleAdd}
+                  disabled={!newName || !newRole}
+                  className="flex-1 py-3 px-4 bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-xl transition-all shadow-[0_0_20px_rgba(var(--primary),0.3)] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  {editIndex !== null ? (
+                    <>
+                      <Edit2 className="w-4 h-4" /> Save Changes
+                    </>
+                  ) : (
+                    <>
+                      <Plus className="w-4 h-4" /> Add Employee
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
           </div>
         </div>
       </DialogContent>
+      
+      <ConfirmModal 
+        isOpen={deleteConfirm.isOpen}
+        onClose={() => setDeleteConfirm({ isOpen: false, index: null, name: "" })}
+        onConfirm={confirmDelete}
+        title="Remove Spotlight Employee"
+        description={`Are you sure you want to remove "${deleteConfirm.name}" from the spotlight?`}
+        itemName={deleteConfirm.name}
+      />
     </Dialog>
   );
 }

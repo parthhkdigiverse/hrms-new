@@ -5,6 +5,7 @@ import { useDepartments } from "./DepartmentContext";
 import { EmployeeProfileModal } from "./EmployeeProfileModal";
 import { EmployeeFormModal } from "./EmployeeFormModal";
 import { toast } from "sonner";
+import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { cn } from "@/lib/utils";
 import { useEmployeesContext } from "./EmployeeContext";
 
@@ -18,6 +19,7 @@ export function EmployeeList() {
   // Form modal state
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
+  const [deleteConfirm, setDeleteConfirm] = useState<{isOpen: boolean, id: string | null, name: string}>({isOpen: false, id: null, name: ""});
 
   const { departments } = useDepartments();
 
@@ -56,10 +58,15 @@ export function EmployeeList() {
   };
 
   const handleDeleteEmployee = (id: string, name: string) => {
-    if (window.confirm(`Are you sure you want to completely delete ${name} from the company records?`)) {
-      deleteEmployee(id);
-      toast.success(`${name} has been deleted.`);
+    setDeleteConfirm({ isOpen: true, id, name });
+  };
+
+  const confirmDelete = () => {
+    if (deleteConfirm.id) {
+      deleteEmployee(deleteConfirm.id);
+      toast.success(`${deleteConfirm.name} removed from company records.`);
     }
+    setDeleteConfirm({ isOpen: false, id: null, name: "" });
   };
 
   const openAddForm = () => {
@@ -293,6 +300,15 @@ export function EmployeeList() {
         onClose={() => setIsFormOpen(false)}
         onSubmit={handleFormSubmit}
         initialData={editingEmployee}
+      />
+
+      <ConfirmModal 
+        isOpen={deleteConfirm.isOpen}
+        onClose={() => setDeleteConfirm({ isOpen: false, id: null, name: "" })}
+        onConfirm={confirmDelete}
+        title="Remove Employee"
+        description={`Are you sure you want to completely delete ${deleteConfirm.name} from the company records? This action cannot be undone.`}
+        itemName={deleteConfirm.name}
       />
     </div>
   );

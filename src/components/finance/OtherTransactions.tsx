@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Download, Plus, Edit3, Trash2, ArrowUpRight, ArrowDownRight, Search, FileText, ChevronRight, Briefcase, Calendar, Info, X, Users, Filter, ChevronDown } from "lucide-react";
 import { DialogClose,  Dialog, DialogContent  } from "@/components/ui/dialog";
+import { ConfirmModal } from "@/components/ui/confirm-modal";
 
 const mockClientData = [
   {
@@ -25,6 +26,8 @@ const mockClientData = [
 ];
 
 export function OtherTransactions() {
+  const [clientData, setClientData] = useState(mockClientData);
+  const [deleteConfirm, setDeleteConfirm] = useState<{isOpen: boolean, clientId: string, txId: string, desc: string}>({isOpen: false, clientId: "", txId: "", desc: ""});
   const [searchQuery, setSearchQuery] = useState("");
   const [expandedClients, setExpandedClients] = useState<string[]>(["Acme Corp"]);
 
@@ -38,6 +41,21 @@ export function OtherTransactions() {
         ? prev.filter(c => c !== clientName)
         : [...prev, clientName]
     );
+  };
+
+  const confirmDelete = () => {
+    if (deleteConfirm.txId) {
+      setClientData(prev => prev.map(client => {
+        if (client.clientName === deleteConfirm.clientId) {
+          return {
+            ...client,
+            transactions: client.transactions.filter(t => t.id !== deleteConfirm.txId)
+          };
+        }
+        return client;
+      }));
+    }
+    setDeleteConfirm({ isOpen: false, clientId: "", txId: "", desc: "" });
   };
 
   return (
@@ -115,8 +133,8 @@ export function OtherTransactions() {
                 <th className="p-4 pr-6 text-center">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-border/50 text-sm">
-              {mockClientData.map((client) => {
+            <tbody className="divide-y divide-border/50">
+              {clientData.filter(c => c.clientName.toLowerCase().includes(searchQuery.toLowerCase())).map((client, idx) => {
                 const isExpanded = expandedClients.includes(client.clientName);
                 
                 return (
@@ -201,7 +219,9 @@ export function OtherTransactions() {
                                     <td className="p-3 pr-4 text-center">
                                       <div className="flex items-center justify-center gap-2">
                                         <button onClick={() => setIsAddTxOpen(true)} className="text-muted-foreground hover:text-foreground transition-colors"><Edit3 className="w-3.5 h-3.5" /></button>
-                                        <button className="text-rose-500 hover:text-rose-600 transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
+                                        <button 
+                                          onClick={() => setDeleteConfirm({ isOpen: true, clientId: client.clientName, txId: tx.id, desc: tx.desc })}
+                                          className="text-rose-500 hover:text-rose-600 transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
                                       </div>
                                     </td>
                                   </tr>
@@ -358,6 +378,14 @@ export function OtherTransactions() {
         </DialogContent>
       </Dialog>
 
+      <ConfirmModal 
+        isOpen={deleteConfirm.isOpen}
+        onClose={() => setDeleteConfirm({ isOpen: false, clientId: "", txId: "", desc: "" })}
+        onConfirm={confirmDelete}
+        title="Delete Transaction"
+        description={`Are you sure you want to completely delete transaction "${deleteConfirm.desc}"?`}
+        itemName={deleteConfirm.desc}
+      />
     </div>
   );
 }

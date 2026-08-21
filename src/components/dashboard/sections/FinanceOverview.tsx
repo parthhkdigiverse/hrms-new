@@ -55,7 +55,7 @@ export function FinanceOverview() {
                 <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: 'var(--muted-foreground)' }} />
                 <Tooltip 
                   contentStyle={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', borderRadius: '12px', color: 'var(--foreground)', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                  itemStyle={{ color: 'var(--primary)', fontWeight: 'bold' }}
+                  itemStyle={{ fontWeight: 'bold' }}
                 />
                 <Area type="monotone" dataKey="revenue" stroke="var(--chart-1)" strokeWidth={2} fillOpacity={1} fill="url(#colorRev)" />
                 <Area type="monotone" dataKey="expense" stroke="var(--destructive)" strokeWidth={2} fillOpacity={1} fill="url(#colorExp)" />
@@ -84,7 +84,7 @@ export function FinanceOverview() {
                 <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: 'var(--muted-foreground)' }} />
                 <Tooltip 
                   contentStyle={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', borderRadius: '12px', color: 'var(--foreground)', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                  itemStyle={{ color: 'var(--primary)', fontWeight: 'bold' }}
+                  itemStyle={{ fontWeight: 'bold' }}
                 />
                 <Area type="monotone" dataKey="profit" stroke="var(--chart-1)" strokeWidth={2} fillOpacity={1} fill="url(#colorProfit)" />
               </AreaChart>

@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
-import { Sparkles, Trophy } from "lucide-react";
+import { Sparkles, Trophy, PartyPopper, Star } from "lucide-react";
 import { TOP_PERFORMERS, NEEDS_ATTENTION, LATE_LEADERBOARD, SPOTLIGHT_EMPLOYEES } from "../dashboard-data";
 import { cn } from "@/lib/utils";
 import { CollapsibleSection } from "./CollapsibleSection";
 import { SpotlightEditor, SpotlightEmployee } from "./SpotlightEditor";
+import { BADGE_PRESETS } from "./spotlight-constants";
+import { SparklesCelebration } from "../../common/SparklesCelebration";
 
 export function EmployeePerformance() {
   const [currentSpotlight, setCurrentSpotlight] = useState(0);
@@ -94,11 +96,29 @@ export function EmployeePerformance() {
                 ))}
               </div>
             </h3>
-            <div className="min-h-[80px]">
-              <p className={cn("text-3xl font-black mb-1 animate-in fade-in slide-in-from-right-4 duration-500", (spotlight && 'image' in spotlight && spotlight.image) ? "text-white" : "text-primary-foreground")} key={spotlight?.name}>
+            <div className="min-h-[80px] relative">
+              {spotlight && 'popperStyle' in spotlight && spotlight.popperStyle !== "none" && spotlight.popperStyle && (
+                <div className="fixed inset-0 z-[100] pointer-events-none">
+                  <SparklesCelebration key={spotlight.name} trigger={true} effectStyle={spotlight.popperStyle} />
+                </div>
+              )}
+              {spotlight && 'image' in spotlight && spotlight.image && (
+                <div 
+                  key={`avatar-${spotlight.name}`}
+                  className="w-12 h-12 mb-4 rounded-full relative animate-in fade-in zoom-in duration-500 shadow-xl"
+                >
+                  {spotlight.ringStyle && spotlight.ringStyle !== "none" && (
+                    <div className={cn("absolute -inset-[5px] rounded-full shadow-sm -z-10", BADGE_PRESETS[spotlight.ringStyle]?.class)}></div>
+                  )}
+                  <div className="w-full h-full rounded-full bg-primary flex items-center justify-center relative z-10 overflow-hidden border-2 border-white/20">
+                    <img src={spotlight.image} alt={spotlight.name} className="w-full h-full object-cover" />
+                  </div>
+                </div>
+              )}
+              <p className={cn("text-3xl font-black mb-1 animate-in fade-in slide-in-from-right-4 duration-500", (spotlight && 'image' in spotlight && spotlight.image) ? "text-white" : "text-primary-foreground")} key={`name-${spotlight?.name}`}>
                 {spotlight?.name}
               </p>
-              <p className={cn("text-sm animate-in fade-in slide-in-from-right-4 duration-500 delay-75", (spotlight && 'image' in spotlight && spotlight.image) ? "text-white/80" : "text-primary-foreground/80")} key={spotlight?.role}>
+              <p className={cn("text-sm animate-in fade-in slide-in-from-right-4 duration-500 delay-75", (spotlight && 'image' in spotlight && spotlight.image) ? "text-white/80" : "text-primary-foreground/80")} key={`role-${spotlight?.role}`}>
                 {spotlight?.role}
               </p>
             </div>

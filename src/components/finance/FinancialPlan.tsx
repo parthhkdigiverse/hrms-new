@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Download, ChevronDown, CheckCircle2, TrendingUp, TrendingDown, DollarSign, Target, Calendar, BarChart2, Plus, Edit3, Save, X, Search, Info, Trash2, ArrowRight } from "lucide-react";
 import { DialogClose,  Dialog, DialogContent  } from "@/components/ui/dialog";
+import { ConfirmModal } from "@/components/ui/confirm-modal";
 
 const mockPlanData = {
   "FINANCIAL - REVENUE": [
@@ -27,10 +28,21 @@ const mockPlanData = {
 };
 
 export function FinancialPlan() {
+  const [planData, setPlanData] = useState(mockPlanData);
+  const [deleteConfirm, setDeleteConfirm] = useState<{isOpen: boolean, category: string}>({isOpen: false, category: ""});
   const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false);
   const [isAddRowOpen, setIsAddRowOpen] = useState(false);
   const [isEditRowOpen, setIsEditRowOpen] = useState(false);
-  const [activeCategory, setActiveCategory] = useState("");
+  const [activeCategory, setActiveCategory] = useState<string>("");
+
+  const confirmDeleteCategory = () => {
+    if (deleteConfirm.category) {
+      const newPlanData = { ...planData };
+      delete newPlanData[deleteConfirm.category as keyof typeof newPlanData];
+      setPlanData(newPlanData);
+    }
+    setDeleteConfirm({ isOpen: false, category: "" });
+  };
 
   return (
     <div className="w-full space-y-6 animate-in fade-in duration-500 pb-12 relative">
@@ -80,14 +92,16 @@ export function FinancialPlan() {
               </tr>
             </thead>
             <tbody className="divide-y divide-border/50">
-              {Object.entries(mockPlanData).map(([categoryName, rows]) => (
+              {Object.entries(planData).map(([categoryName, rows]) => (
                 <div key={categoryName} className="contents">
                   {/* Category Header Row */}
                   <tr className="bg-muted/50 font-extrabold text-foreground group border-y border-border/50">
                     <td colSpan={6} className="px-4 py-3 uppercase tracking-wide text-xs">
                       <div className="flex items-center justify-between">
                         <span>{categoryName}</span>
-                        <button className="text-rose-500 hover:text-rose-600 text-xs font-bold flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded-md hover:bg-rose-500/10 border-none outline-none">
+                        <button 
+                          onClick={() => setDeleteConfirm({ isOpen: true, category: categoryName })}
+                          className="text-rose-500 hover:text-rose-600 text-xs font-bold flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded-md hover:bg-rose-500/10 border-none outline-none">
                           <Trash2 className="w-3.5 h-3.5" /> Remove Category
                         </button>
                       </div>
@@ -212,6 +226,14 @@ export function FinancialPlan() {
         </DialogContent>
       </Dialog>
 
+      <ConfirmModal 
+        isOpen={deleteConfirm.isOpen}
+        onClose={() => setDeleteConfirm({ isOpen: false, category: "" })}
+        onConfirm={confirmDeleteCategory}
+        title="Remove Category"
+        description={`Are you sure you want to remove the category "${deleteConfirm.category}"? This will delete all rows within it.`}
+        itemName={deleteConfirm.category}
+      />
     </div>
   );
 }

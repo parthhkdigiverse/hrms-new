@@ -67,10 +67,10 @@ export function ActivityAndAI() {
               const Icon = IconMap[activity.icon];
               return (
                 <div key={i} className="flex gap-3">
-                  <div className={cn("mt-0.5 p-1.5 rounded-full bg-opacity-10 shrink-0", 
-                    activity.color === 'emerald' ? 'bg-emerald-500 text-emerald-600' :
-                    activity.color === 'indigo' ? 'bg-primary text-primary' :
-                    activity.color === 'amber' ? 'bg-amber-500 text-amber-600' : 'bg-blue-500 text-blue-600'
+                  <div className={cn("mt-0.5 p-1.5 rounded-full shrink-0 text-white", 
+                    activity.color === 'emerald' ? 'bg-emerald-500' :
+                    activity.color === 'indigo' ? 'bg-primary' :
+                    activity.color === 'amber' ? 'bg-amber-500' : 'bg-blue-500'
                   )}>
                     {Icon && <Icon className="h-3 w-3" />}
                   </div>

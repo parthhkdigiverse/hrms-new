@@ -1,22 +1,37 @@
 import { useState } from "react";
 import { Search, Download, Plus, RefreshCw, Wallet, Building2, Calendar, Filter, ArrowDownLeft, ArrowUpRight, ArrowRight, Edit3, Trash2, X } from "lucide-react";
+import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { DialogClose,  Dialog, DialogContent  } from "@/components/ui/dialog";
 
-const mockCreditTransactions = [
+const MOCK_CREDIT_TRANSACTIONS = [
   { id: 'INV-001', date: '15/6/2026', amount: 1234.00, category: 'Sales', description: 'test', service: 'fgh', remarks: '1. Payment is due w...' },
 ];
 
-const mockDebitTransactions = [
+const MOCK_DEBIT_TRANSACTIONS = [
   { id: '2607006', date: '14/7/2026', amount: 6543.00, category: 'General', things: 'Expense', narrative: '-' },
 ];
 
 export function Transactions() {
+  const [creditTransactions, setCreditTransactions] = useState(MOCK_CREDIT_TRANSACTIONS);
+  const [debitTransactions, setDebitTransactions] = useState(MOCK_DEBIT_TRANSACTIONS);
+  const [deleteConfirm, setDeleteConfirm] = useState<{isOpen: boolean, id: string | null, type: 'credit' | 'debit'}>({isOpen: false, id: null, type: 'credit'});
+
   const [searchQuery, setSearchQuery] = useState("");
   const [activeAccountTab, setActiveAccountTab] = useState<"bank" | "cash">("cash");
 
-  // Modal States
   const [isAddCreditOpen, setIsAddCreditOpen] = useState(false);
   const [isAddDebtOpen, setIsAddDebtOpen] = useState(false);
+
+  const confirmDelete = () => {
+    if (deleteConfirm.id) {
+      if (deleteConfirm.type === 'credit') {
+        setCreditTransactions(creditTransactions.filter(t => t.id !== deleteConfirm.id));
+      } else {
+        setDebitTransactions(debitTransactions.filter(t => t.id !== deleteConfirm.id));
+      }
+    }
+    setDeleteConfirm({ isOpen: false, id: null, type: 'credit' });
+  };
 
   return (
     <div className="w-full space-y-6 animate-in fade-in duration-500 pb-12 relative">
@@ -233,7 +248,7 @@ export function Transactions() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/50">
-                {mockCreditTransactions.map((trx, idx) => (
+                {creditTransactions.map((trx, idx) => (
                   <tr key={idx} className="hover:bg-muted/30 transition-colors">
                     <td className="p-3 pl-4 text-xs font-bold text-muted-foreground">{trx.date}</td>
                     <td className="p-3 text-sm font-black text-emerald-600">
@@ -246,7 +261,9 @@ export function Transactions() {
                     <td className="p-3 pr-4 text-center">
                       <div className="flex items-center justify-center gap-2">
                         <button className="text-muted-foreground hover:text-foreground transition-colors"><Edit3 className="w-3.5 h-3.5" /></button>
-                        <button className="text-rose-500 hover:text-rose-600 transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
+                        <button 
+                          onClick={() => setDeleteConfirm({ isOpen: true, id: trx.id, type: 'credit' })}
+                          className="text-rose-500 hover:text-rose-600 transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
                       </div>
                     </td>
                   </tr>
@@ -293,7 +310,7 @@ export function Transactions() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/50">
-                {mockDebitTransactions.map((trx, idx) => (
+                {debitTransactions.map((trx, idx) => (
                   <tr key={idx} className="hover:bg-muted/30 transition-colors">
                     <td className="p-3 pl-4">
                       <span className="text-xs font-black text-foreground bg-muted/50 px-2 py-0.5 rounded-md border border-border/50">{trx.id}</span>
@@ -308,7 +325,9 @@ export function Transactions() {
                     <td className="p-3 pr-4 text-center">
                       <div className="flex items-center justify-center gap-2">
                         <button className="text-muted-foreground hover:text-foreground transition-colors"><Edit3 className="w-3.5 h-3.5" /></button>
-                        <button className="text-rose-500 hover:text-rose-600 transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
+                        <button 
+                          onClick={() => setDeleteConfirm({ isOpen: true, id: trx.id, type: 'debit' })}
+                          className="text-rose-500 hover:text-rose-600 transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
                       </div>
                     </td>
                   </tr>
@@ -431,9 +450,16 @@ export function Transactions() {
               <button onClick={() => setIsAddDebtOpen(false)} className="px-4 py-2 font-bold text-sm bg-background border border-border/50 rounded-lg hover:bg-muted transition-colors">Cancel</button>
               <button onClick={() => setIsAddDebtOpen(false)} className="px-4 py-2 font-bold text-sm bg-rose-600 text-white rounded-lg hover:bg-rose-700 transition-colors">Save Expense</button>
             </div>
-        </DialogContent>
-      </Dialog>
+          </DialogContent>
+        </Dialog>
 
+        <ConfirmModal 
+          isOpen={deleteConfirm.isOpen}
+          onClose={() => setDeleteConfirm({ isOpen: false, id: null, type: 'credit' })}
+          onConfirm={confirmDelete}
+          title="Delete Transaction"
+          description={`Are you sure you want to completely delete this ${deleteConfirm.type === 'credit' ? 'credit (invoice)' : 'debt (expense)'} transaction?`}
+        />
     </div>
   );
 }

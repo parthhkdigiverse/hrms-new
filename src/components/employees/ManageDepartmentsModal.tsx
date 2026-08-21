@@ -3,6 +3,7 @@ import { X, Plus, Trash2 } from "lucide-react";
 import { DialogClose,  Dialog, DialogContent  } from "@/components/ui/dialog";
 import { useDepartments } from "./DepartmentContext";
 import { toast } from "sonner";
+import { ConfirmModal } from "@/components/ui/confirm-modal";
 
 interface ManageDepartmentsModalProps {
   isOpen: boolean;
@@ -12,6 +13,7 @@ interface ManageDepartmentsModalProps {
 export function ManageDepartmentsModal({ isOpen, onClose }: ManageDepartmentsModalProps) {
   const { departments, addDepartment, removeDepartment } = useDepartments();
   const [newDept, setNewDept] = useState("");
+  const [deleteConfirm, setDeleteConfirm] = useState<{isOpen: boolean, dept: string | null}>({isOpen: false, dept: null});
 
   if (!isOpen) return null;
 
@@ -27,9 +29,12 @@ export function ManageDepartmentsModal({ isOpen, onClose }: ManageDepartmentsMod
     toast.success("Department added");
   };
 
-  const handleRemove = (dept: string) => {
-    removeDepartment(dept);
-    toast.success("Department removed");
+  const handleRemove = () => {
+    if (deleteConfirm.dept) {
+      removeDepartment(deleteConfirm.dept);
+      toast.success("Department removed");
+    }
+    setDeleteConfirm({ isOpen: false, dept: null });
   };
 
   return (
@@ -75,7 +80,7 @@ export function ManageDepartmentsModal({ isOpen, onClose }: ManageDepartmentsMod
                   <div key={dept} className="flex items-center justify-between p-3 bg-white border border-border rounded-xl">
                     <span className="text-sm font-bold text-foreground/80">{dept}</span>
                     <button 
-                      onClick={() => handleRemove(dept)}
+                      onClick={() => setDeleteConfirm({ isOpen: true, dept })}
                       className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
                       title="Remove department"
                     >
@@ -87,6 +92,14 @@ export function ManageDepartmentsModal({ isOpen, onClose }: ManageDepartmentsMod
             </div>
           </div>
       </DialogContent>
+      <ConfirmModal 
+        isOpen={deleteConfirm.isOpen}
+        onClose={() => setDeleteConfirm({ isOpen: false, dept: null })}
+        onConfirm={handleRemove}
+        title="Delete Department"
+        description={`Are you sure you want to delete the department "${deleteConfirm.dept}"? This action cannot be undone.`}
+        itemName={deleteConfirm.dept || undefined}
+      />
     </Dialog>
   );
 }

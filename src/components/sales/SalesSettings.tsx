@@ -10,6 +10,7 @@ import {
   Scissors, Dumbbell, HardHat, Shapes
 } from "lucide-react";
 import { toast } from "sonner";
+import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { useSales } from "./SalesContext";
 
 const TABS = ["Pipeline Stages", "Lead Categories", "Lead Sources", "Assignment", "Notifications", "Permissions", "Audit Log"] as const;
@@ -693,28 +694,14 @@ export function SalesSettings() {
       </div>
 
       {/* Delete Confirmation Modal */}
-      <Dialog open={deleteConfirm.isOpen} onOpenChange={(open) => !open && setDeleteConfirm({ isOpen: false, type: null, index: -1, name: "" })}>
-        <DialogContent className="max-w-sm p-0 overflow-hidden rounded-[2rem] gap-0 border-border/60 shadow-2xl [&>button]:hidden bg-card">
-          <h3 className="text-xl font-black tracking-tight mb-2">Delete {deleteConfirm.type === 'category' ? 'Category' : deleteConfirm.type === 'source' ? 'Source' : 'Stage'}</h3>
-          <p className="text-sm text-muted-foreground mb-6">
-            Are you sure you want to delete <span className="font-bold text-foreground">"{deleteConfirm.name}"</span>? This action cannot be undone.
-          </p>
-          <div className="flex gap-3">
-            <button 
-              onClick={() => setDeleteConfirm({ isOpen: false, type: null, index: -1, name: "" })}
-              className="flex-1 rounded-xl border border-border py-2.5 text-sm font-semibold hover:bg-accent transition-colors"
-            >
-              Cancel
-            </button>
-            <button 
-              onClick={executeDelete}
-              className="flex-1 rounded-xl bg-rose-600 py-2.5 text-sm font-semibold text-white hover:bg-rose-700 transition-colors"
-            >
-              Delete
-            </button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <ConfirmModal 
+        isOpen={deleteConfirm.isOpen}
+        onClose={() => setDeleteConfirm({ isOpen: false, type: null, index: -1, name: "" })}
+        onConfirm={executeDelete}
+        title={`Delete ${deleteConfirm.type === 'category' ? 'Category' : deleteConfirm.type === 'source' ? 'Source' : 'Stage'}`}
+        description={`Are you sure you want to delete "${deleteConfirm.name}"? This action cannot be undone.`}
+        itemName={deleteConfirm.name}
+      />
 
       {/* Edit Permissions Modal */}
       <Dialog open={editRoleIdx !== null} onOpenChange={(open) => !open && setEditRoleIdx(null)}>

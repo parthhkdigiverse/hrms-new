@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Search, Filter, Plus, FileText, Download, MoreVertical, Trash2, Edit2, ReceiptText, ArrowUpRight } from "lucide-react";
+import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { cn } from "@/lib/utils";
 
 type InvoiceStatus = "Draft" | "Pending" | "Paid" | "Overdue";
@@ -22,10 +23,12 @@ const MOCK_INVOICES: Invoice[] = [
 ];
 
 export function AllInvoices() {
+  const [invoices, setInvoices] = useState<Invoice[]>(MOCK_INVOICES);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<InvoiceStatus | "All">("All");
+  const [deleteConfirm, setDeleteConfirm] = useState<{isOpen: boolean, id: string | null, name: string}>({isOpen: false, id: null, name: ""});
 
-  const filteredInvoices = MOCK_INVOICES.filter(inv => {
+  const filteredInvoices = invoices.filter(inv => {
     const matchesSearch = inv.clientName.toLowerCase().includes(search.toLowerCase()) || inv.invoiceNumber.toLowerCase().includes(search.toLowerCase());
     const matchesStatus = statusFilter === "All" || inv.status === statusFilter;
     return matchesSearch && matchesStatus;
@@ -40,7 +43,14 @@ export function AllInvoices() {
     }
   };
 
-  const totalAmount = MOCK_INVOICES.reduce((acc, curr) => {
+  const confirmDelete = () => {
+    if (deleteConfirm.id) {
+      setInvoices(invoices.filter(inv => inv.id !== deleteConfirm.id));
+    }
+    setDeleteConfirm({ isOpen: false, id: null, name: "" });
+  };
+
+  const totalAmount = invoices.reduce((acc, curr) => {
     const val = parseInt(curr.amount.replace(/[^0-9]/g, ''));
     return acc + val;
   }, 0);
@@ -167,7 +177,9 @@ export function AllInvoices() {
                       <button className="p-2 text-muted-foreground hover:text-emerald-600 hover:bg-emerald-500/10 rounded-lg transition-colors" title="Download PDF">
                         <Download className="w-4 h-4" />
                       </button>
-                      <button className="p-2 text-muted-foreground hover:text-rose-600 hover:bg-rose-500/10 rounded-lg transition-colors" title="Delete">
+                      <button 
+                        onClick={() => setDeleteConfirm({ isOpen: true, id: inv.id, name: inv.invoiceNumber })}
+                        className="p-2 text-muted-foreground hover:text-rose-600 hover:bg-rose-500/10 rounded-lg transition-colors" title="Delete">
                         <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
@@ -190,6 +202,14 @@ export function AllInvoices() {
         </div>
       </div>
 
+      <ConfirmModal 
+        isOpen={deleteConfirm.isOpen}
+        onClose={() => setDeleteConfirm({ isOpen: false, id: null, name: "" })}
+        onConfirm={confirmDelete}
+        title="Delete Invoice"
+        description={`Are you sure you want to completely delete invoice ${deleteConfirm.name}?`}
+        itemName={deleteConfirm.name}
+      />
     </div>
   );
 }

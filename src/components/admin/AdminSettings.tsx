@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Settings, Save, Palette, Paintbrush, Type, Square, Image as ImageIcon, Briefcase, X, ShieldAlert, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { useTheme } from "../ThemeProvider";
 import { useSettingsContext } from "../payroll/SettingsContext";
 
@@ -116,6 +117,15 @@ export function AdminSettings() {
   const [newTemplateDesc, setNewTemplateDesc] = useState("");
   const [newTemplateType, setNewTemplateType] = useState<"Penalty" | "Warning">("Penalty");
   const [newTemplateAmount, setNewTemplateAmount] = useState("");
+  const [deleteConfirm, setDeleteConfirm] = useState<{isOpen: boolean, id: string | null, label: string}>({isOpen: false, id: null, label: ""});
+
+  const confirmRemoveTemplate = () => {
+    if (deleteConfirm.id) {
+      removePenaltyTemplate(deleteConfirm.id);
+      toast.success("Template removed");
+    }
+    setDeleteConfirm({ isOpen: false, id: null, label: "" });
+  };
 
   const handleAddTemplate = () => {
     if (!newTemplateLabel.trim()) {
@@ -386,7 +396,9 @@ export function AdminSettings() {
                     )}
                   </div>
                 </div>
-                <button onClick={() => removePenaltyTemplate(t.id)} className="p-2 hover:bg-destructive/10 text-muted-foreground hover:text-destructive rounded-lg transition-colors">
+                <button 
+                  onClick={() => setDeleteConfirm({ isOpen: true, id: t.id, label: t.label })} 
+                  className="p-2 hover:bg-destructive/10 text-muted-foreground hover:text-destructive rounded-lg transition-colors">
                   <Trash2 className="w-4 h-4" />
                 </button>
               </div>
@@ -441,6 +453,14 @@ export function AdminSettings() {
         </div>
       </div>
 
+      <ConfirmModal 
+        isOpen={deleteConfirm.isOpen}
+        onClose={() => setDeleteConfirm({ isOpen: false, id: null, label: "" })}
+        onConfirm={confirmRemoveTemplate}
+        title="Remove Template"
+        description={`Are you sure you want to completely remove the template "${deleteConfirm.label}"?`}
+        itemName={deleteConfirm.label}
+      />
     </div>
   );
 }

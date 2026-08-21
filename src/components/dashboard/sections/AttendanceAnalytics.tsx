@@ -65,7 +65,7 @@ export function AttendanceAnalytics() {
                 <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: 'var(--muted-foreground)' }} ticks={[0, 40, 80, 120, 160]} domain={[0, 160]} />
                 <Tooltip 
                   contentStyle={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', borderRadius: '12px', color: 'var(--foreground)', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                  itemStyle={{ color: 'var(--primary)', fontWeight: 'bold' }}
+                  itemStyle={{ fontWeight: 'bold' }}
                   cursor={{ fill: 'var(--muted)', opacity: 0.2 }}
                 />
                 <Legend 

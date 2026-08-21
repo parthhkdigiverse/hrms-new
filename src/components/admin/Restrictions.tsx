@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Shield, ShieldAlert, CheckCircle, Monitor, Send, ShieldCheck, AlertTriangle, Search, Plus, Trash2, RefreshCw } from "lucide-react";
+import { ConfirmModal } from "@/components/ui/confirm-modal";
 
 const mockPcs = [
   { id: 1, hostname: 'DESKTOP-DEV-01', user: 'Sarah Jenkins', ip: '192.168.1.105', os: 'Windows 11', restricted: true },
@@ -21,6 +22,19 @@ export function Restrictions() {
   const [blockUrls, setBlockUrls] = useState(["facebook.com", "instagram.com"]);
   const [blockChrome, setBlockChrome] = useState(false);
   const [blockYoutube, setBlockYoutube] = useState(true);
+
+  const [deleteConfirm, setDeleteConfirm] = useState<{isOpen: boolean, idx: number | null, type: 'app' | 'url' | null, name: string}>({isOpen: false, idx: null, type: null, name: ""});
+
+  const confirmDelete = () => {
+    if (deleteConfirm.idx !== null && deleteConfirm.type) {
+      if (deleteConfirm.type === 'app') {
+        setBlockApps(blockApps.filter((_, i) => i !== deleteConfirm.idx));
+      } else {
+        setBlockUrls(blockUrls.filter((_, i) => i !== deleteConfirm.idx));
+      }
+    }
+    setDeleteConfirm({ isOpen: false, idx: null, type: null, name: "" });
+  };
 
   return (
     <div className="w-full space-y-8 animate-in fade-in duration-500">
@@ -192,7 +206,7 @@ export function Restrictions() {
                         className="flex-1 px-3 py-2 bg-background border border-border/50 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/20"
                       />
                       <button 
-                        onClick={() => setBlockApps(blockApps.filter((_, i) => i !== idx))}
+                        onClick={() => setDeleteConfirm({ isOpen: true, idx, type: 'app', name: app || 'Empty Rule' })}
                         className="p-2 border border-border/50 rounded-lg hover:bg-red-500/10 hover:text-red-500 hover:border-red-500/20 transition-colors"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -225,7 +239,7 @@ export function Restrictions() {
                         className="flex-1 px-3 py-2 bg-background border border-border/50 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/20"
                       />
                       <button 
-                        onClick={() => setBlockUrls(blockUrls.filter((_, i) => i !== idx))}
+                        onClick={() => setDeleteConfirm({ isOpen: true, idx, type: 'url', name: url || 'Empty Rule' })}
                         className="p-2 border border-border/50 rounded-lg hover:bg-red-500/10 hover:text-red-500 hover:border-red-500/20 transition-colors"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -332,6 +346,14 @@ export function Restrictions() {
         </div>
       )}
 
+      <ConfirmModal 
+        isOpen={deleteConfirm.isOpen}
+        onClose={() => setDeleteConfirm({ isOpen: false, idx: null, type: null, name: "" })}
+        onConfirm={confirmDelete}
+        title={`Remove Blocked ${deleteConfirm.type === 'app' ? 'App' : 'Domain'}`}
+        description={`Are you sure you want to remove "${deleteConfirm.name}" from the blocklist?`}
+        itemName={deleteConfirm.name}
+      />
     </div>
   );
 }
