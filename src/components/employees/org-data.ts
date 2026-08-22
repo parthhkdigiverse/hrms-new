@@ -4,7 +4,7 @@ export interface OrgNodeData {
   role: string;
   department: string;
   avatar: string;
-  status: 'Active' | 'On Leave' | 'Remote';
+  status: 'Active' | 'On Leave' | 'Remote' | 'Inactive';
   children?: OrgNodeData[];
 }
 

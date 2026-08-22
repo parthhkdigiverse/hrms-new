@@ -55,6 +55,15 @@ export function Gallery() {
         </div>
         <div className="flex items-center gap-3">
           <button 
+            onClick={() => {
+              const fileInput = document.createElement("input");
+              fileInput.type = "file";
+              fileInput.accept = "image/*,video/*";
+              fileInput.onchange = () => {
+                alert("Media uploaded successfully (Mock Mode).");
+              };
+              fileInput.click();
+            }}
             className="px-5 py-2.5 bg-primary text-primary-foreground font-bold text-sm rounded-xl hover:bg-primary/90 transition-all shadow-sm"
           >
             Upload Media

@@ -65,6 +65,7 @@ export function SpotlightEditor({ spotlights, setSpotlights }: SpotlightEditorPr
 
   const handleEdit = (index: number) => {
     const emp = spotlights[index];
+    if (!emp) return;
     setNewName(emp.name);
     setNewRole(emp.role);
     setNewImage(emp.image || "");
@@ -87,6 +88,7 @@ export function SpotlightEditor({ spotlights, setSpotlights }: SpotlightEditorPr
     if (deleteConfirm.index !== null) {
       const updated = [...spotlights];
       const itemToDelete = updated[deleteConfirm.index];
+      if (!itemToDelete) return;
       moveToRecycleBin('Spotlight Employee', itemToDelete.name, itemToDelete, 'dashboard-spotlights');
       updated.splice(deleteConfirm.index, 1);
       setSpotlights(updated);

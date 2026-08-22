@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { DialogClose,  Dialog, DialogContent  } from "@/components/ui/dialog";
 import { 
@@ -261,18 +261,24 @@ export function SalesSettings() {
   const executeDelete = () => {
     if (deleteConfirm.type === "category") {
       const item = categories[deleteConfirm.index];
-      moveToRecycleBin('Lead Category', item.name, item, 'hrms_sales_categories');
-      setCategories(categories.filter((_, i) => i !== deleteConfirm.index));
+      if (item) {
+        moveToRecycleBin('Lead Category', item.name, item, 'hrms_sales_categories');
+      }
+      setCategories(categories.filter((_: any, i: number) => i !== deleteConfirm.index));
       toast.success(`${deleteConfirm.name} deleted successfully`);
     } else if (deleteConfirm.type === "source") {
       const item = sources[deleteConfirm.index];
-      moveToRecycleBin('Lead Source', item, item, 'hrms_sales_sources');
-      setSources(sources.filter((_, i) => i !== deleteConfirm.index));
+      if (item) {
+        moveToRecycleBin('Lead Source', item, item, 'hrms_sales_sources');
+      }
+      setSources(sources.filter((_: any, i: number) => i !== deleteConfirm.index));
       toast.success(`Lead source deleted`);
     } else if (deleteConfirm.type === "stage") {
       const item = stages[deleteConfirm.index];
-      moveToRecycleBin('Pipeline Stage', item, item, 'hrms_sales_stages');
-      setStages(stages.filter((_, i) => i !== deleteConfirm.index));
+      if (item) {
+        moveToRecycleBin('Pipeline Stage', item, item, 'hrms_sales_stages');
+      }
+      setStages(stages.filter((_: any, i: number) => i !== deleteConfirm.index));
       toast.success(`Pipeline stage deleted`);
     }
     setDeleteConfirm({ isOpen: false, type: null, index: -1, name: "" });
@@ -485,7 +491,7 @@ export function SalesSettings() {
             </div>
 
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {categories.map((cat, i) => (
+              {categories.map((cat: any, i: number) => (
                 <div key={i} className="flex items-center justify-between rounded-2xl border border-border bg-white p-4 transition-shadow hover:shadow-sm">
                   {editingCategoryIdx === i ? (
                     <div className="flex flex-col gap-2 w-full relative">
@@ -581,7 +587,7 @@ export function SalesSettings() {
             </div>
 
             <div className="flex flex-wrap gap-3">
-              {sources.map((source, i) => (
+              {sources.map((source: any, i: number) => (
                 <div key={i} className="flex items-center gap-2 rounded-full border border-border bg-white px-4 py-2 text-sm font-medium transition-colors hover:bg-muted/50">
                   {editingSourceIdx === i ? (
                     <div className="flex items-center gap-2">
@@ -669,7 +675,7 @@ export function SalesSettings() {
             </p>
             
             <div className="grid gap-4 md:grid-cols-2">
-              {permissions.map((perm, i) => (
+              {permissions.map((perm: any, i: number) => (
                 <div key={i} className="rounded-2xl border border-border bg-white p-5">
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="font-bold">{perm.role}</h3>
@@ -681,7 +687,7 @@ export function SalesSettings() {
                     </button>
                   </div>
                   <div className="flex flex-wrap gap-2">
-                    {perm.perms.map((p, j) => (
+                    {perm.perms.map((p: any, j: number) => (
                       <span key={j} className="rounded-full bg-muted/70 px-3 py-1.5 text-xs font-medium">
                         {p}
                       </span>

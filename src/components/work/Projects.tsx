@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { X,  Search, Plus, Filter, MoreHorizontal, LayoutGrid, List, Briefcase, Calendar, Clock, Star, Circle, Trash2, Edit2, Archive, ArrowLeft, Users, IndianRupee, FolderGit2, CheckCircle2, Settings2, TrendingUp, MousePointerClick, Target, BarChart3, ChevronDown, User, Building2, CreditCard, FileText, ChevronRight  } from "lucide-react";
+import { X,  Search, Plus, Filter, MoreHorizontal, LayoutGrid, List, Briefcase, Calendar, Clock, Star, Circle, Trash2, Edit2, Archive, ArchiveRestore, ArrowLeft, Users, IndianRupee, FolderGit2, CheckCircle2, Settings2, TrendingUp, MousePointerClick, Target, BarChart3, ChevronDown, User, Building2, CreditCard, FileText, ChevronRight  } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -425,23 +425,24 @@ export function Projects() {
       id: `p${Date.now()}`,
       clientId: selectedClientId,
       name: newProjectName,
-      description: newProjectDescription,
       category: newProjectCategory,
       status: "In Progress",
-      priority: newProjectPriority,
       progress: 0,
       startDate: newProjectStartDate ?? (new Date().toISOString().split('T')[0] as string),
       endDate: newProjectEndDate ?? (new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] as string),
-      teamDeadline: newProjectTeamDeadline || undefined,
       budget: newProjectBudget || "₹0",
-      services: newProjectServices || undefined,
-      post: newProjectPost ? parseInt(newProjectPost) : undefined,
-      reel: newProjectReel ? parseInt(newProjectReel) : undefined,
-      festivalPost: newProjectFestivalPost,
-      amountReceived: newProjectAmountReceived || undefined,
-      nextPaymentDate: newProjectNextPaymentDate || undefined,
       team: [{ name: "User", avatar: "https://i.pravatar.cc/150?u=user" }]
     };
+
+    if (newProjectDescription) newProject.description = newProjectDescription;
+    if (newProjectPriority) newProject.priority = newProjectPriority;
+    if (newProjectTeamDeadline) newProject.teamDeadline = newProjectTeamDeadline;
+    if (newProjectServices) newProject.services = newProjectServices;
+    if (newProjectPost) newProject.post = parseInt(newProjectPost);
+    if (newProjectReel) newProject.reel = parseInt(newProjectReel);
+    if (newProjectFestivalPost) newProject.festivalPost = newProjectFestivalPost;
+    if (newProjectAmountReceived) newProject.amountReceived = newProjectAmountReceived;
+    if (newProjectNextPaymentDate) newProject.nextPaymentDate = newProjectNextPaymentDate;
     
     setClients(clients.map(c => 
       c.id === selectedClientId ? { ...c, activeProjects: c.activeProjects + 1 } : c
@@ -555,6 +556,18 @@ export function Projects() {
         toast.success(`Client "${client.name}" deleted.`);
       }
     });
+  };
+
+
+  const archiveClient = (client: Client) => {
+    setClients(prev => prev.map(c => c.id === client.id ? { ...c, status: 'Archived' as ClientStatus } : c));
+    if (selectedClientId === client.id) setSelectedClientId(null);
+    toast.success(`Client "${client.name}" archived successfully.`);
+  };
+
+  const unarchiveClient = (client: Client) => {
+    setClients(prev => prev.map(c => c.id === client.id ? { ...c, status: 'Active' as ClientStatus } : c));
+    toast.success(`Client "${client.name}" restored to Active.`);
   };
 
   const getStatusColor = (status: ProjectStatus) => {
@@ -1231,11 +1244,6 @@ export function Projects() {
                         <Edit2 className="w-4 h-4 mr-2" /> Edit Project
                       </DropdownMenuItem>
                       <DropdownMenuSeparator className="bg-border/50" />
-                      <DropdownMenuItem 
-                        className="rounded-xl cursor-pointer py-2.5 focus:bg-amber-500/10 focus:text-amber-600 font-medium text-amber-600 transition-colors"
-                      >
-                        <Archive className="w-4 h-4 mr-2" /> Archive
-                      </DropdownMenuItem>
                       <DropdownMenuItem 
                         onSelect={() => {
                           setTimeout(() => {
@@ -1970,11 +1978,29 @@ export function Projects() {
                     <Edit2 className="w-4 h-4 mr-2" /> Edit Client
                   </DropdownMenuItem>
                   <DropdownMenuSeparator className="bg-border/50" />
-                  <DropdownMenuItem 
-                    className="rounded-xl cursor-pointer py-2.5 focus:bg-amber-500/10 focus:text-amber-600 font-medium text-amber-600 transition-colors"
-                  >
-                    <Archive className="w-4 h-4 mr-2" /> Archive Client
-                  </DropdownMenuItem>
+                  {client.status === 'Archived' ? (
+                    <DropdownMenuItem 
+                      onSelect={() => {
+                        setTimeout(() => {
+                          unarchiveClient(client);
+                        }, 100);
+                      }}
+                      className="rounded-xl cursor-pointer py-2.5 focus:bg-emerald-500/10 focus:text-emerald-600 font-medium text-emerald-600 transition-colors"
+                    >
+                      <ArchiveRestore className="w-4 h-4 mr-2" /> Unarchive Client
+                    </DropdownMenuItem>
+                  ) : (
+                    <DropdownMenuItem 
+                      onSelect={() => {
+                        setTimeout(() => {
+                          archiveClient(client);
+                        }, 100);
+                      }}
+                      className="rounded-xl cursor-pointer py-2.5 focus:bg-amber-500/10 focus:text-amber-600 font-medium text-amber-600 transition-colors"
+                    >
+                      <Archive className="w-4 h-4 mr-2" /> Archive Client
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuItem 
                     onSelect={() => {
                       setTimeout(() => {

@@ -154,7 +154,12 @@ export function LeaveRequests() {
   const [newIsConditional, setNewIsConditional] = useState(false);
 
   const handleAction = (id: string, action: "Approved" | "Rejected" | "Pending", isConditional?: boolean) => {
-    setRequests(prev => prev.map(r => r.id === id ? { ...r, status: action, isConditional: isConditional ?? r.isConditional } : r));
+    setRequests(prev => prev.map(r => {
+      if (r.id !== id) return r;
+      const updated = { ...r, status: action };
+      if (isConditional !== undefined) updated.isConditional = isConditional;
+      return updated;
+    }));
     if (action === "Pending") {
       toast.success(`Leave request reverted to pending for review`);
     } else {

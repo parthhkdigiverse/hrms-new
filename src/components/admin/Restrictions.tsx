@@ -42,12 +42,16 @@ export function Restrictions() {
     if (deleteConfirm.idx !== null && deleteConfirm.type) {
       if (deleteConfirm.type === 'app') {
         const item = blockApps[deleteConfirm.idx];
-        moveToRecycleBin('Restricted App', item, item, 'hrms_block_apps');
-        setBlockApps(blockApps.filter((_, i) => i !== deleteConfirm.idx));
+        if (item) {
+          moveToRecycleBin('Restricted App', item, item, 'hrms_block_apps');
+          setBlockApps(blockApps.filter((_, i) => i !== deleteConfirm.idx));
+        }
       } else {
         const item = blockUrls[deleteConfirm.idx];
-        moveToRecycleBin('Restricted URL', item, item, 'hrms_block_urls');
-        setBlockUrls(blockUrls.filter((_, i) => i !== deleteConfirm.idx));
+        if (item) {
+          moveToRecycleBin('Restricted URL', item, item, 'hrms_block_urls');
+          setBlockUrls(blockUrls.filter((_, i) => i !== deleteConfirm.idx));
+        }
       }
     }
     setDeleteConfirm({ isOpen: false, idx: null, type: null, name: "" });

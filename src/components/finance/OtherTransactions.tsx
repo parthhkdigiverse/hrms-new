@@ -59,9 +59,9 @@ export function OtherTransactions() {
 
   const confirmDelete = () => {
     if (deleteConfirm.txId) {
-      setClientData(prev => prev.map(client => {
+      setClientData((prev: any[]) => prev.map((client: any) => {
         if (client.clientName === deleteConfirm.clientId) {
-          const txToDelete = client.transactions.find(t => t.id === deleteConfirm.txId);
+          const txToDelete = client.transactions.find((t: any) => t.id === deleteConfirm.txId);
           if (txToDelete) {
             moveToRecycleBin('Other Transaction', `TX ${txToDelete.id}`, txToDelete, 'hrms_other_transactions', {
               parentId: client.clientName,
@@ -71,7 +71,7 @@ export function OtherTransactions() {
           }
           return {
             ...client,
-            transactions: client.transactions.filter(t => t.id !== deleteConfirm.txId)
+            transactions: client.transactions.filter((t: any) => t.id !== deleteConfirm.txId)
           };
         }
         return client;
@@ -156,7 +156,7 @@ export function OtherTransactions() {
               </tr>
             </thead>
             <tbody className="divide-y divide-border/50">
-              {clientData.filter(c => c.clientName.toLowerCase().includes(searchQuery.toLowerCase())).map((client, idx) => {
+              {clientData.filter((c: any) => c.clientName.toLowerCase().includes(searchQuery.toLowerCase())).map((client: any, idx: number) => {
                 const isExpanded = expandedClients.includes(client.clientName);
                 
                 return (
@@ -215,7 +215,7 @@ export function OtherTransactions() {
                                 </tr>
                               </thead>
                               <tbody className="divide-y divide-border/50 text-xs">
-                                {client.transactions.map((tx) => (
+                                {client.transactions.map((tx: any) => (
                                   <tr key={tx.id} className="hover:bg-muted/30 transition-colors">
                                     <td className="p-3 pl-4 font-medium flex items-center gap-1.5 text-muted-foreground">
                                       <Calendar className="w-3.5 h-3.5" />
@@ -240,7 +240,29 @@ export function OtherTransactions() {
                                     <td className="p-3 font-medium text-muted-foreground">{tx.remarks}</td>
                                     <td className="p-3 pr-4 text-center">
                                       <div className="flex items-center justify-center gap-2">
-                                        <button onClick={() => setIsAddTxOpen(true)} className="text-muted-foreground hover:text-foreground transition-colors"><Edit3 className="w-3.5 h-3.5" /></button>
+                                        <button 
+                                          onClick={() => {
+                                            setAddTxType(tx.type === "inflow" ? "Inflow (Received)" : "Outflow (Paid)");
+                                            setAddTxMethod(tx.method);
+                                            setIsAddTxOpen(true);
+                                            // Pre-fill inputs after modal dialog updates
+                                            setTimeout(() => {
+                                              const categoryInput = document.querySelector('input[placeholder="e.g. Software Sales"]') as HTMLInputElement;
+                                              const dateInput = document.querySelector('input[type="date"]') as HTMLInputElement;
+                                              const amountInput = document.querySelector('input[placeholder="0.00"]') as HTMLInputElement;
+                                              const descInput = document.querySelector('input[placeholder="Short description"]') as HTMLInputElement;
+                                              const remarksInput = document.querySelector('textarea[placeholder="Any additional notes"]') as HTMLInputElement;
+                                              if (categoryInput) categoryInput.value = client.clientName;
+                                              if (dateInput) dateInput.value = tx.date;
+                                              if (amountInput) amountInput.value = tx.amount.toString();
+                                              if (descInput) descInput.value = tx.desc;
+                                              if (remarksInput) remarksInput.value = tx.remarks;
+                                            }, 50);
+                                          }} 
+                                          className="text-muted-foreground hover:text-foreground transition-colors"
+                                        >
+                                          <Edit3 className="w-3.5 h-3.5" />
+                                        </button>
                                         <button 
                                           onClick={() => setDeleteConfirm({ isOpen: true, clientId: client.clientName, txId: tx.id, desc: tx.desc })}
                                           className="text-rose-500 hover:text-rose-600 transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>

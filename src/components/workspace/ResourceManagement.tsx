@@ -146,6 +146,14 @@ export function ResourceManagement() {
             <Plus className="w-4 h-4" /> Add Resource
           </button>
           <button 
+            onClick={() => {
+              const resAvailable = resources.find(r => r.status === "Available");
+              if (resAvailable) {
+                alert(`Quick booking initiated for resource: ${resAvailable.name}`);
+              } else {
+                alert("No available resource for quick booking!");
+              }
+            }}
             className="px-5 py-2.5 bg-primary text-primary-foreground font-bold text-sm rounded-xl hover:bg-primary/90 transition-all shadow-sm"
           >
             + New Booking

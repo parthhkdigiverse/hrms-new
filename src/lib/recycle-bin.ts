@@ -44,19 +44,22 @@ export function moveToRecycleBin(
 ) {
   const items = getRecycleBinItems();
   
+  const restoreDataObj: RecycleBinItem['restoreData'] = {
+    storageKey,
+    data,
+    isNested: !!nestedConfig
+  };
+
+  if (nestedConfig?.parentId) restoreDataObj.parentId = nestedConfig.parentId;
+  if (nestedConfig?.parentKey) restoreDataObj.parentKey = nestedConfig.parentKey;
+  if (nestedConfig?.nestedArrayKey) restoreDataObj.nestedArrayKey = nestedConfig.nestedArrayKey;
+
   const newItem: RecycleBinItem = {
     id: `rb_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
     module: moduleName,
     itemName,
     deletedAt: Date.now(),
-    restoreData: {
-      storageKey,
-      data,
-      isNested: !!nestedConfig,
-      parentId: nestedConfig?.parentId,
-      parentKey: nestedConfig?.parentKey,
-      nestedArrayKey: nestedConfig?.nestedArrayKey,
-    }
+    restoreData: restoreDataObj
   };
 
   items.unshift(newItem);
@@ -70,6 +73,7 @@ export function restoreItem(binId: string): boolean {
   if (index === -1) return false;
   
   const itemToRestore = items[index];
+  if (!itemToRestore) return false;
   const { restoreData } = itemToRestore;
   
   try {
