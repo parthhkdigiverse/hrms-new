@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Search, Filter, LayoutGrid, List, MoreVertical, Phone, Mail, Plus, MapPin, Edit2, Trash2, Key, UserMinus, UserCheck, Shield, FileText, LogOut, Clock } from "lucide-react";
+import { Search, Filter, LayoutGrid, List, MoreVertical, Phone, Mail, Plus, MapPin, Edit2, Trash2, Key, UserMinus, UserCheck, Shield, FileText, LogOut, Clock, Columns, Eye } from "lucide-react";
 import { EMPLOYEES, Employee } from "./employee-data";
 import { useDepartments } from "./DepartmentContext";
 import { EmployeeProfileModal } from "./EmployeeProfileModal";
@@ -8,6 +8,53 @@ import { toast } from "sonner";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { cn } from "@/lib/utils";
 import { useEmployeesContext } from "./EmployeeContext";
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuCheckboxItem, DropdownMenuLabel, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
+
+
+const COLUMN_OPTIONS = [
+  { key: "employee", label: "Employee", default: true },
+  { key: "department", label: "Department", default: true },
+  { key: "status", label: "Status", default: true },
+  { key: "contact", label: "Contact", default: true },
+  { key: "joined", label: "Joined", default: true },
+  { key: "firstName", label: "First Name", default: false },
+  { key: "middleName", label: "Middle Name", default: false },
+  { key: "lastName", label: "Last Name", default: false },
+  { key: "email", label: "Email Address", default: false },
+  { key: "phone", label: "Phone Number", default: false },
+  { key: "password", label: "Password", default: false },
+  { key: "dob", label: "Date of Birth", default: false },
+  { key: "salary", label: "Salary", default: false },
+  { key: "gender", label: "Gender", default: false },
+  { key: "role", label: "Role", default: false },
+  { key: "upiId", label: "UPI ID", default: false },
+  { key: "accountNumber", label: "Account Number", default: false },
+  { key: "ifscCode", label: "IFSC Code", default: false },
+  { key: "bankName", label: "Bank Name", default: false },
+  { key: "accountHolderName", label: "Account Holder Name", default: false },
+  { key: "parentName", label: "Parent/Guardian Name", default: false },
+  { key: "parentNumber", label: "Parent/Guardian Number", default: false },
+  { key: "relation", label: "Relation", default: false },
+  { key: "employeeId", label: "Employee ID", default: false },
+  { key: "aadharCard", label: "Aadhar Card", default: false },
+  { key: "panCard", label: "PAN Card", default: false },
+  { key: "designation", label: "Designation", default: false },
+  { key: "workMode", label: "Work Mode", default: false },
+  { key: "startTime", label: "Start Time", default: false },
+  { key: "endTime", label: "End Time", default: false },
+  { key: "position", label: "Position", default: false },
+  { key: "hasBond", label: "Has Bond", default: false },
+  { key: "bondStartDate", label: "Bond Start Date", default: false },
+  { key: "bondEndDate", label: "Bond End Date", default: false },
+  { key: "hasNoticePeriod", label: "Has Notice Period", default: false },
+  { key: "noticePeriodDays", label: "Notice Period Days", default: false },
+  { key: "noticePeriodStartDate", label: "Notice Period Start Date", default: false },
+  { key: "hasResignation", label: "Has Resignation", default: false },
+  { key: "resignationDate", label: "Resignation Date", default: false },
+  { key: "hasEmployment", label: "Has Employment Agreement", default: false },
+  { key: "employmentStartDate", label: "Employment Start Date", default: false },
+  { key: "actions", label: "Actions", default: true }
+];
 
 export function EmployeeList() {
   const { employees, addEmployee, updateEmployee, deleteEmployee } = useEmployeesContext();
@@ -15,6 +62,104 @@ export function EmployeeList() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedDept, setSelectedDept] = useState<string | null>(null);
   const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
+  const [visibleColumns, setVisibleColumns] = useState<Record<string, boolean>>(() => {
+    const initial: Record<string, boolean> = {};
+    COLUMN_OPTIONS.forEach(col => {
+      initial[col.key] = col.default;
+    });
+    return initial;
+  });
+
+
+  const renderCell = (emp: Employee, colKey: string) => {
+    switch (colKey) {
+      case "employee":
+        return (
+          <div className="flex items-center gap-3">
+            <img src={emp.avatar} alt={emp.name} className="w-10 h-10 rounded-full object-cover" />
+            <div>
+              <p className="text-[14px] font-bold text-foreground">{emp.name}</p>
+              <p className="text-[12px] text-muted-foreground">{emp.role}</p>
+            </div>
+          </div>
+        );
+      case "department":
+        return (
+          <span className="px-3 py-1 bg-muted text-foreground/80 text-[10px] font-bold rounded-lg">
+            {emp.department}
+          </span>
+        );
+      case "status":
+        return (
+          <div className="flex items-center gap-2">
+            <span className={cn("w-2 h-2 rounded-full", getStatusColor(emp.status))} />
+            <span className="text-[13px] font-medium text-foreground/80">{emp.status}</span>
+          </div>
+        );
+      case "contact":
+        return (
+          <div className="flex flex-col gap-1 text-[12px] text-muted-foreground">
+            <span className="flex items-center gap-1"><Mail className="w-3 h-3" /> {emp.email}</span>
+            <span className="flex items-center gap-1"><Phone className="w-3 h-3" /> {emp.phone}</span>
+          </div>
+        );
+      case "joined":
+        return <span className="text-[13px] font-medium text-foreground/80">{emp.joinDate}</span>;
+      case "actions":
+        return (
+          <div className="relative flex justify-end items-center h-8 w-full min-w-[140px]">
+            <div className="absolute right-0 flex items-center justify-center w-8 h-8 text-muted-foreground/40 group-hover:opacity-0 transition-opacity duration-300">
+              <MoreVertical className="w-4 h-4" />
+            </div>
+            <div className="flex gap-1 opacity-0 translate-x-4 group-hover:translate-x-0 group-hover:opacity-100 transition-all duration-300 bg-white shadow-sm border border-border/50 rounded-lg p-1 relative z-10">
+              <button 
+                onClick={() => setSelectedEmployee(emp)}
+                className="p-1.5 text-muted-foreground hover:bg-[#00A56C]/10 hover:text-[#00A56C] rounded-md transition-all active:scale-95"
+                title="View Profile"
+              >
+                <Eye className="w-3.5 h-3.5" />
+              </button>
+              <button 
+                onClick={() => openEditForm(emp)}
+                className="p-1.5 text-muted-foreground hover:bg-blue-50 hover:text-blue-600 rounded-md transition-all active:scale-95"
+                title="Edit Employee"
+              >
+                <Edit2 className="w-3.5 h-3.5" />
+              </button>
+              <button
+                onClick={() => toast.success("Permissions management coming soon!")}
+                className="p-1.5 text-muted-foreground hover:bg-indigo-50 hover:text-indigo-600 rounded-md transition-all active:scale-95"
+                title="Manage Permissions"
+              >
+                <Shield className="w-3.5 h-3.5" />
+              </button>
+              <button
+                onClick={() => {
+                  const newStatus = emp.status === 'Inactive' ? 'Active' : 'Inactive';
+                  updateEmployee(emp.id, { status: newStatus as any });
+                  toast.success(`${emp.name} is now ${newStatus}`);
+                }}
+                className={cn(
+                  "p-1.5 rounded-md transition-all active:scale-95",
+                  emp.status === 'Inactive' ? "text-amber-500 hover:bg-amber-50" : "text-muted-foreground hover:text-amber-600 hover:bg-amber-50"
+                )}
+                title={emp.status === 'Inactive' ? "Reactivate Employee" : "Deactivate Employee"}
+              >
+                {emp.status === 'Inactive' ? <UserCheck className="w-3.5 h-3.5" /> : <UserMinus className="w-3.5 h-3.5" />}
+              </button>
+            </div>
+          </div>
+        );
+      case "hasBond":
+      case "hasNoticePeriod":
+      case "hasResignation":
+      case "hasEmployment":
+        return <span className="text-[13px] text-foreground/80">{emp[colKey as keyof Employee] ? "Yes" : "No"}</span>;
+      default:
+        return <span className="text-[13px] text-foreground/80">{emp[colKey as keyof Employee] || "-"}</span>;
+    }
+  };
+
   
   // Form modal state
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -128,25 +273,51 @@ export function EmployeeList() {
           </div>
         </div>
 
-        <div className="flex items-center gap-1 bg-muted p-1 rounded-xl">
-          <button 
-            onClick={() => setViewMode('grid')}
-            className={cn(
-              "p-2 rounded-lg transition-all",
-              viewMode === 'grid' ? "bg-white shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"
-            )}
-          >
-            <LayoutGrid className="w-4 h-4" />
-          </button>
-          <button 
-            onClick={() => setViewMode('list')}
-            className={cn(
-              "p-2 rounded-lg transition-all",
-              viewMode === 'list' ? "bg-white shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"
-            )}
-          >
-            <List className="w-4 h-4" />
-          </button>
+        <div className="flex items-center gap-2">
+          {viewMode === 'list' && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="flex items-center gap-2 bg-white border border-border/80 px-3 py-2 rounded-xl text-foreground/80 text-[13px] font-semibold hover:bg-muted/50 transition-colors shadow-sm">
+                  <Columns className="w-4 h-4" />
+                  Columns
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-[200px] max-h-[300px] overflow-y-auto rounded-xl p-2">
+                <DropdownMenuLabel className="text-xs">Toggle Columns</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                {COLUMN_OPTIONS.map((col) => (
+                  <DropdownMenuCheckboxItem 
+                    key={col.key}
+                    checked={!!visibleColumns[col.key]} 
+                    onCheckedChange={(c) => setVisibleColumns(prev => ({...prev, [col.key]: !!c}))}
+                  >
+                    {col.label}
+                  </DropdownMenuCheckboxItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
+
+          <div className="flex items-center gap-1 bg-muted p-1 rounded-xl">
+            <button 
+              onClick={() => setViewMode('grid')}
+              className={cn(
+                "p-2 rounded-lg transition-all",
+                viewMode === 'grid' ? "bg-white shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              <LayoutGrid className="w-4 h-4" />
+            </button>
+            <button 
+              onClick={() => setViewMode('list')}
+              className={cn(
+                "p-2 rounded-lg transition-all",
+                viewMode === 'list' ? "bg-white shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              <List className="w-4 h-4" />
+            </button>
+          </div>
         </div>
       </div>
 
@@ -267,85 +438,21 @@ export function EmployeeList() {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-muted/50/50 border-b border-border/50">
-                  <th className="px-6 py-4 text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Employee</th>
-                  <th className="px-6 py-4 text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Department</th>
-                  <th className="px-6 py-4 text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Status</th>
-                  <th className="px-6 py-4 text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Contact</th>
-                  <th className="px-6 py-4 text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Joined</th>
-                  <th className="px-6 py-4 text-[11px] font-bold text-muted-foreground uppercase tracking-wider text-right">Actions</th>
+                  {COLUMN_OPTIONS.map(col => visibleColumns[col.key] && (
+                    <th key={col.key} className={cn("px-6 py-4 text-[11px] font-bold text-muted-foreground uppercase tracking-wider", col.key === 'actions' ? 'text-right w-[1%] whitespace-nowrap' : '')}>
+                      {col.label}
+                    </th>
+                  ))}
                 </tr>
               </thead>
               <tbody>
                 {filteredEmployees.map((emp) => (
                   <tr key={emp.id} className="border-b border-slate-50 hover:bg-muted/50/50 transition-colors group">
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-3">
-                        <img src={emp.avatar} alt={emp.name} className="w-10 h-10 rounded-full object-cover" />
-                        <div>
-                          <p className="text-[14px] font-bold text-foreground">{emp.name}</p>
-                          <p className="text-[12px] text-muted-foreground">{emp.role}</p>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className="px-3 py-1 bg-muted text-foreground/80 text-[10px] font-bold rounded-lg">
-                        {emp.department}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-2">
-                        <span className={cn("w-2 h-2 rounded-full", getStatusColor(emp.status))} />
-                        <span className="text-[13px] font-medium text-foreground/80">{emp.status}</span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex flex-col gap-1 text-[12px] text-muted-foreground">
-                        <span className="flex items-center gap-1"><Mail className="w-3 h-3" /> {emp.email}</span>
-                        <span className="flex items-center gap-1"><Phone className="w-3 h-3" /> {emp.phone}</span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className="text-[13px] font-medium text-foreground/80">{emp.joinDate}</span>
-                    </td>
-                    <td className="px-6 py-4 text-right">
-                      <div className="flex justify-end gap-2">
-                        <button 
-                          onClick={() => setSelectedEmployee(emp)}
-                          className="text-[12px] font-bold text-[#00A56C] hover:text-[#00A56C]/80 px-3 py-1.5 rounded-lg hover:bg-[#00A56C]/10 transition-colors opacity-0 group-hover:opacity-100"
-                          title="View Profile"
-                        >
-                          View
-                        </button>
-                        <button 
-                          onClick={() => openEditForm(emp)}
-                          className="text-[12px] font-bold text-blue-600 hover:text-blue-800 px-3 py-1.5 rounded-lg hover:bg-blue-50 transition-colors opacity-0 group-hover:opacity-100"
-                          title="Edit Employee"
-                        >
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => toast.success("Permissions management coming soon!")}
-                          className="text-[12px] font-bold text-indigo-600 hover:text-indigo-800 px-3 py-1.5 rounded-lg hover:bg-indigo-50 transition-colors opacity-0 group-hover:opacity-100"
-                          title="Manage Permissions"
-                        >
-                          Permissions
-                        </button>
-                        <button
-                          onClick={() => {
-                            const newStatus = emp.status === 'Inactive' ? 'Active' : 'Inactive';
-                            updateEmployee(emp.id, { status: newStatus });
-                            toast.success(`${emp.name} is now ${newStatus}`);
-                          }}
-                          className={cn(
-                            "text-[12px] font-bold px-3 py-1.5 rounded-lg transition-colors opacity-0 group-hover:opacity-100",
-                            emp.status === 'Inactive' ? "text-amber-600 hover:text-amber-800 hover:bg-amber-50" : "text-amber-600 hover:text-amber-800 hover:bg-amber-50"
-                          )}
-                          title={emp.status === 'Inactive' ? "Mark as Active" : "Mark as Inactive"}
-                        >
-                          {emp.status === 'Inactive' ? 'Reactivate' : 'Deactivate'}
-                        </button>
-                      </div>
-                    </td>
+                    {COLUMN_OPTIONS.map(col => visibleColumns[col.key] && (
+                      <td key={col.key} className={cn("px-6 py-4", col.key === 'actions' ? 'text-right w-[1%] whitespace-nowrap' : '')}>
+                        {renderCell(emp, col.key)}
+                      </td>
+                    ))}
                   </tr>
                 ))}
               </tbody>
