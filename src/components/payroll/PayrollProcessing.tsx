@@ -3,16 +3,79 @@ import { formatCurrency, MOCK_PAYROLL_RUNS } from "./payroll-data";
 import { Users, Gift, MinusCircle, PlayCircle, CheckCircle2, Lock, FileSpreadsheet, FileText, Send, Search, Filter } from "lucide-react";
 import { SearchableSelect } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
+
+type PayrollStage = "not_generated" | "generated" | "approved" | "locked";
 
 export function PayrollProcessing() {
   const [searchTerm, setSearchTerm] = useState("");
   const [month, setMonth] = useState("July");
   const [year, setYear] = useState("2026");
+  const [stage, setStage] = useState<PayrollStage>("not_generated");
 
   const filteredRuns = (MOCK_PAYROLL_RUNS as any[]).filter(r => 
     r.employee.toLowerCase().includes(searchTerm.toLowerCase()) || 
     r.empId.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const handleGenerate = () => {
+    setStage("generated");
+    toast.success(`Payroll generated for ${month} ${year} — ${MOCK_PAYROLL_RUNS.length} employees processed.`);
+  };
+
+  const handleApprove = () => {
+    setStage("approved");
+    toast.success("Payroll approved. Ready to lock and disburse.");
+  };
+
+  const handleLock = () => {
+    setStage("locked");
+    toast.success("Payroll locked. No further edits allowed.");
+  };
+
+  const handleExcelExport = () => {
+    if (stage === "not_generated") {
+      toast.error("Generate payroll first before exporting.");
+      return;
+    }
+    toast.success("Payroll exported to Excel (Mock Mode).");
+  };
+
+  const handlePdfExport = () => {
+    if (stage === "not_generated") {
+      toast.error("Generate payroll first before exporting.");
+      return;
+    }
+    toast.success("Payroll exported to PDF (Mock Mode).");
+  };
+
+  const handleSendPayslips = () => {
+    if (stage === "not_generated") {
+      toast.error("Generate and approve payroll first before sending payslips.");
+      return;
+    }
+    if (stage === "generated") {
+      toast.error("Approve payroll before sending payslips.");
+      return;
+    }
+    toast.success(`Payslips sent to ${MOCK_PAYROLL_RUNS.length} employees via email (Mock Mode).`);
+  };
+
+  const statusLabel: Record<PayrollStage, string> = {
+    not_generated: "Not Generated",
+    generated: "Generated",
+    approved: "Approved",
+    locked: "Locked 🔒",
+  };
+
+  const statusColor: Record<PayrollStage, string> = {
+    not_generated: "bg-muted/50 text-foreground/80 border border-border",
+    generated: "bg-amber-100 text-amber-700 border border-amber-200",
+    approved: "bg-emerald-100 text-emerald-700 border border-emerald-200",
+    locked: "bg-slate-100 text-slate-600 border border-slate-200",
+  };
+
+  const processedCount = stage === "not_generated" ? 0 : MOCK_PAYROLL_RUNS.length;
 
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-[1400px]">
@@ -21,13 +84,13 @@ export function PayrollProcessing() {
       <div className="mb-8 flex items-end justify-between border-b border-border pb-6">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-foreground">Payroll Processing</h1>
-          <p className="mt-1 text-[14px] text-muted-foreground">July 2026 · Attendance, leave, OT, bonuses and recoveries fetched automatically</p>
+          <p className="mt-1 text-[14px] text-muted-foreground">{month} {year} · Attendance, leave, OT, bonuses and recoveries fetched automatically</p>
         </div>
         <div className="flex items-center gap-3">
           <div className="relative">
             <SearchableSelect
               value={month}
-              onChange={setMonth}
+              onChange={(val) => { setMonth(val); setStage("not_generated"); }}
               options={[
                 { label: "July", value: "July" },
                 { label: "August", value: "August" }
@@ -38,7 +101,7 @@ export function PayrollProcessing() {
           <div className="relative">
             <SearchableSelect
               value={year}
-              onChange={setYear}
+              onChange={(val) => { setYear(val); setStage("not_generated"); }}
               options={[
                 { label: "2026", value: "2026" },
                 { label: "2027", value: "2027" }
@@ -64,8 +127,8 @@ export function PayrollProcessing() {
             <p className="text-[12px] font-medium text-muted-foreground">Employees Processed</p>
             <Users className="h-4 w-4 text-[#0b6c4b]" />
           </div>
-          <p className="text-[32px] font-black text-foreground">0</p>
-          <p className="text-[12px] text-muted-foreground mt-1">8 eligible</p>
+          <p className="text-[32px] font-black text-foreground">{processedCount}</p>
+          <p className="text-[12px] text-muted-foreground mt-1">{MOCK_PAYROLL_RUNS.length} eligible</p>
         </div>
         <div className="bg-white border border-border/60 rounded-2xl p-5 shadow-sm relative">
           <div className="flex justify-between items-start mb-2">
@@ -85,26 +148,69 @@ export function PayrollProcessing() {
 
       {/* Action Bar */}
       <div className="flex flex-wrap items-center gap-3 mb-6 bg-white border border-border/60 p-2 rounded-2xl shadow-sm">
-        <div className="px-4 py-1.5 bg-muted/50 border border-border rounded-full text-[12px] font-bold text-foreground/80 whitespace-nowrap ml-2">
-          Status: Not Generated
+        <div className={cn("px-4 py-1.5 rounded-full text-[12px] font-bold whitespace-nowrap ml-2", statusColor[stage])}>
+          Status: {statusLabel[stage]}
         </div>
         <div className="w-px h-6 bg-border/60 mx-1 hidden sm:block"></div>
-        <button className="flex items-center gap-2 bg-[#00a56c] hover:bg-[#00925e] text-white px-4 py-2 rounded-lg text-[13px] font-bold shadow-sm transition-colors whitespace-nowrap">
-          <PlayCircle className="h-4 w-4" /> Generate Payroll
+
+        {/* Generate — always available unless locked */}
+        <button
+          onClick={handleGenerate}
+          disabled={stage === "locked"}
+          className={cn(
+            "flex items-center gap-2 px-4 py-2 rounded-lg text-[13px] font-bold shadow-sm transition-colors whitespace-nowrap",
+            stage === "locked"
+              ? "bg-muted text-muted-foreground opacity-50 cursor-not-allowed"
+              : "bg-[#00a56c] hover:bg-[#00925e] text-white"
+          )}
+        >
+          <PlayCircle className="h-4 w-4" /> {stage === "generated" || stage === "approved" ? "Re-Generate" : "Generate Payroll"}
         </button>
-        <button disabled className="flex items-center gap-2 bg-white border border-border/60 px-4 py-2 rounded-lg text-muted-foreground text-[13px] font-semibold opacity-60 whitespace-nowrap cursor-not-allowed">
+
+        {/* Approve — enabled only after generated */}
+        <button
+          onClick={handleApprove}
+          disabled={stage !== "generated"}
+          className={cn(
+            "flex items-center gap-2 border px-4 py-2 rounded-lg text-[13px] font-semibold transition-colors whitespace-nowrap",
+            stage === "generated"
+              ? "bg-white border-emerald-400 text-emerald-700 hover:bg-emerald-50"
+              : "bg-white border-border/60 text-muted-foreground opacity-50 cursor-not-allowed"
+          )}
+        >
           <CheckCircle2 className="h-4 w-4" /> Approve Payroll
         </button>
-        <button disabled className="flex items-center gap-2 bg-white border border-border/60 px-4 py-2 rounded-lg text-muted-foreground text-[13px] font-semibold opacity-60 whitespace-nowrap cursor-not-allowed">
+
+        {/* Lock — enabled only after approved */}
+        <button
+          onClick={handleLock}
+          disabled={stage !== "approved"}
+          className={cn(
+            "flex items-center gap-2 border px-4 py-2 rounded-lg text-[13px] font-semibold transition-colors whitespace-nowrap",
+            stage === "approved"
+              ? "bg-white border-slate-400 text-slate-700 hover:bg-slate-50"
+              : "bg-white border-border/60 text-muted-foreground opacity-50 cursor-not-allowed"
+          )}
+        >
           <Lock className="h-4 w-4" /> Lock Payroll
         </button>
-        <button className="flex items-center gap-2 bg-white border border-border/80 px-4 py-2 rounded-lg text-foreground/80 text-[13px] font-semibold hover:bg-muted/50 transition-colors shadow-sm whitespace-nowrap">
+
+        <button
+          onClick={handleExcelExport}
+          className="flex items-center gap-2 bg-white border border-border/80 px-4 py-2 rounded-lg text-foreground/80 text-[13px] font-semibold hover:bg-muted/50 transition-colors shadow-sm whitespace-nowrap"
+        >
           <FileSpreadsheet className="h-4 w-4" /> Export Excel
         </button>
-        <button className="flex items-center gap-2 bg-white border border-border/80 px-4 py-2 rounded-lg text-foreground/80 text-[13px] font-semibold hover:bg-muted/50 transition-colors shadow-sm whitespace-nowrap">
+        <button
+          onClick={handlePdfExport}
+          className="flex items-center gap-2 bg-white border border-border/80 px-4 py-2 rounded-lg text-foreground/80 text-[13px] font-semibold hover:bg-muted/50 transition-colors shadow-sm whitespace-nowrap"
+        >
           <FileText className="h-4 w-4" /> Export PDF
         </button>
-        <button className="flex items-center gap-2 bg-white border border-border/80 px-4 py-2 rounded-lg text-foreground/80 text-[13px] font-semibold hover:bg-muted/50 transition-colors shadow-sm whitespace-nowrap">
+        <button
+          onClick={handleSendPayslips}
+          className="flex items-center gap-2 bg-white border border-border/80 px-4 py-2 rounded-lg text-foreground/80 text-[13px] font-semibold hover:bg-muted/50 transition-colors shadow-sm whitespace-nowrap"
+        >
           <Send className="h-4 w-4" /> Send Payslips
         </button>
       </div>
@@ -114,7 +220,7 @@ export function PayrollProcessing() {
         <div className="p-5 border-b border-border/60 bg-white flex justify-between items-center">
           <div>
             <h2 className="text-[15px] font-bold text-foreground">Payroll Preview</h2>
-            <p className="text-[12px] text-muted-foreground mt-0.5">Computed from effective salary as on 01 July 2026</p>
+            <p className="text-[12px] text-muted-foreground mt-0.5">Computed from effective salary as on 01 {month} {year}</p>
           </div>
           <div className="flex items-center gap-3">
             <div className="relative">
@@ -172,8 +278,14 @@ export function PayrollProcessing() {
                   <td className="py-4 px-5 text-right text-[13px] font-medium text-rose-500">-{formatCurrency(run.deduction)}</td>
                   <td className="py-4 px-5 text-right text-[14px] font-bold text-foreground">{formatCurrency(run.netSalary)}</td>
                   <td className="py-4 px-5 text-center">
-                    <span className="inline-flex items-center justify-center px-3 py-1.5 rounded-full text-[10px] font-bold bg-white text-foreground/80 border border-border/80 tracking-wide">
-                      {run.status}
+                    <span className={cn(
+                      "inline-flex items-center justify-center px-3 py-1.5 rounded-full text-[10px] font-bold tracking-wide",
+                      stage === "locked" ? "bg-slate-100 text-slate-600 border border-slate-200" :
+                      stage === "approved" ? "bg-emerald-100 text-emerald-700 border border-emerald-200" :
+                      stage === "generated" ? "bg-amber-100 text-amber-700 border border-amber-200" :
+                      "bg-white text-foreground/80 border border-border/80"
+                    )}>
+                      {stage === "locked" ? "Locked" : stage === "approved" ? "Approved" : stage === "generated" ? "Generated" : run.status}
                     </span>
                   </td>
                 </tr>
@@ -193,3 +305,4 @@ export function PayrollProcessing() {
     </div>
   );
 }
+
