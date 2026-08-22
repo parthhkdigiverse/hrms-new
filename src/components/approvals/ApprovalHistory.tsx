@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Search, Filter, History, CalendarDays, AlertCircle, Activity, CheckCircle2, XCircle, FileText } from "lucide-react";
+import { SearchableSelect } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 
 type ApprovalType = "Leave Request" | "Penalty" | "Daily Progress" | "Invoice";
@@ -135,30 +136,32 @@ export function ApprovalHistory() {
         </div>
         <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
           <div className="relative w-full sm:w-auto">
-            <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <select
+            <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground z-10" />
+            <SearchableSelect
               value={typeFilter}
-              onChange={(e) => setTypeFilter(e.target.value as any)}
-              className="w-full sm:w-auto pl-9 pr-8 py-2.5 bg-background border border-border/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all text-sm font-bold appearance-none cursor-pointer"
-            >
-              <option value="All">All Categories</option>
-              <option value="Leave Request">Leave Requests</option>
-              <option value="Penalty">Penalties</option>
-              <option value="Daily Progress">Daily Progress</option>
-              <option value="Invoice">Invoices</option>
-            </select>
+              onChange={(val) => setTypeFilter(val as any)}
+              options={[
+                { label: "All Categories", value: "All" },
+                { label: "Leave Requests", value: "Leave Request" },
+                { label: "Penalties", value: "Penalty" },
+                { label: "Daily Progress", value: "Daily Progress" },
+                { label: "Invoices", value: "Invoice" }
+              ]}
+              className="w-[200px] h-[42px] pl-9 bg-background border border-border/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all text-sm font-bold cursor-pointer"
+            />
           </div>
           <div className="relative w-full sm:w-auto">
-            <select
+            <SearchableSelect
               value={actionFilter}
-              onChange={(e) => setActionFilter(e.target.value as any)}
-              className="w-full sm:w-auto px-4 pr-8 py-2.5 bg-background border border-border/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all text-sm font-bold appearance-none cursor-pointer"
-            >
-              <option value="All">All Actions</option>
-              <option value="Approved">Approved</option>
-              <option value="Verified">Verified</option>
-              <option value="Rejected">Rejected</option>
-            </select>
+              onChange={(val) => setActionFilter(val as any)}
+              options={[
+                { label: "All Actions", value: "All" },
+                { label: "Approved", value: "Approved" },
+                { label: "Verified", value: "Verified" },
+                { label: "Rejected", value: "Rejected" }
+              ]}
+              className="w-[180px] h-[42px] px-4 bg-background border border-border/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all text-sm font-bold cursor-pointer"
+            />
           </div>
         </div>
       </div>

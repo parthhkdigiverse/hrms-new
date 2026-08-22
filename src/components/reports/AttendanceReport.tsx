@@ -1,5 +1,7 @@
 import { Activity, Clock, CheckCircle2, AlertCircle, TrendingUp, CalendarDays } from "lucide-react";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Legend, PieChart, Pie, Cell } from 'recharts';
+import { useState } from 'react';
+import { SearchableSelect } from '@/components/ui/select';
 
 const dailyAttendance = [
   { name: '1', Present: 95, Absent: 3, Leave: 2 },
@@ -23,6 +25,8 @@ const leaveTypes = [
 const COLORS = ['var(--chart-1)', 'var(--chart-2)', 'var(--chart-3)', 'var(--chart-4)', 'var(--chart-5)'];
 
 export function AttendanceReport() {
+  const [timeRange, setTimeRange] = useState("This Month");
+
   return (
     <div className="w-full space-y-8 animate-in fade-in duration-500">
       
@@ -38,11 +42,16 @@ export function AttendanceReport() {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <select className="px-4 py-2.5 bg-card border border-border/50 text-foreground font-bold rounded-xl hover:bg-muted/50 transition-colors shadow-sm outline-none">
-            <option>This Month</option>
-            <option>Last Month</option>
-            <option>This Quarter</option>
-          </select>
+          <SearchableSelect
+            value={timeRange}
+            onChange={setTimeRange}
+            options={[
+              { label: "This Month", value: "This Month" },
+              { label: "Last Month", value: "Last Month" },
+              { label: "This Quarter", value: "This Quarter" }
+            ]}
+            className="w-[180px] h-[44px] bg-card border border-border/50 text-foreground font-bold rounded-xl shadow-sm outline-none"
+          />
         </div>
       </div>
 

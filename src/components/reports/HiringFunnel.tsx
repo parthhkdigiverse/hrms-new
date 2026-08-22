@@ -1,5 +1,7 @@
 import { UserPlus, Target, CheckCircle2, TrendingDown, Users } from "lucide-react";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Cell, LineChart, Line } from 'recharts';
+import { useState } from 'react';
+import { SearchableSelect } from '@/components/ui/select';
 
 const funnelData = [
   { name: 'Sourced', count: 1250 },
@@ -21,6 +23,8 @@ const timeToHireData = [
 const COLORS = ['var(--chart-1)', 'var(--chart-2)', 'var(--chart-3)', 'var(--chart-4)', 'var(--chart-5)'];
 
 export function HiringFunnel() {
+  const [timeRange, setTimeRange] = useState("Last 6 Months");
+
   return (
     <div className="w-full space-y-8 animate-in fade-in duration-500">
       
@@ -36,11 +40,16 @@ export function HiringFunnel() {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <select className="px-4 py-2.5 bg-card border border-border/50 text-foreground font-bold rounded-xl hover:bg-muted/50 transition-colors shadow-sm outline-none">
-            <option>Last 6 Months</option>
-            <option>This Year</option>
-            <option>Last Year</option>
-          </select>
+          <SearchableSelect
+            value={timeRange}
+            onChange={setTimeRange}
+            options={[
+              { label: "Last 6 Months", value: "Last 6 Months" },
+              { label: "This Year", value: "This Year" },
+              { label: "Last Year", value: "Last Year" }
+            ]}
+            className="w-[180px] h-[44px] bg-card border border-border/50 text-foreground font-bold rounded-xl shadow-sm outline-none"
+          />
         </div>
       </div>
 

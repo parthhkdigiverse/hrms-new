@@ -1,10 +1,13 @@
 import { useState } from "react";
 import { formatCurrency, MOCK_PAYROLL_RUNS } from "./payroll-data";
-import { ChevronDown, Users, Gift, MinusCircle, PlayCircle, CheckCircle2, Lock, FileSpreadsheet, FileText, Send, Search, Filter } from "lucide-react";
+import { Users, Gift, MinusCircle, PlayCircle, CheckCircle2, Lock, FileSpreadsheet, FileText, Send, Search, Filter } from "lucide-react";
+import { SearchableSelect } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 
 export function PayrollProcessing() {
   const [searchTerm, setSearchTerm] = useState("");
+  const [month, setMonth] = useState("July");
+  const [year, setYear] = useState("2026");
 
   const filteredRuns = (MOCK_PAYROLL_RUNS as any[]).filter(r => 
     r.employee.toLowerCase().includes(searchTerm.toLowerCase()) || 
@@ -22,18 +25,26 @@ export function PayrollProcessing() {
         </div>
         <div className="flex items-center gap-3">
           <div className="relative">
-            <select className="appearance-none pl-4 pr-10 py-2 bg-white border border-border/80 rounded-lg text-[13px] font-semibold text-foreground/80 outline-none focus:border-emerald-500 shadow-sm min-w-[120px]">
-              <option>July</option>
-              <option>August</option>
-            </select>
-            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+            <SearchableSelect
+              value={month}
+              onChange={setMonth}
+              options={[
+                { label: "July", value: "July" },
+                { label: "August", value: "August" }
+              ]}
+              className="w-[120px] bg-white border border-border/80 rounded-lg text-[13px] font-semibold text-foreground/80 focus:border-emerald-500 shadow-sm"
+            />
           </div>
           <div className="relative">
-            <select className="appearance-none pl-4 pr-10 py-2 bg-white border border-border/80 rounded-lg text-[13px] font-semibold text-foreground/80 outline-none focus:border-emerald-500 shadow-sm min-w-[100px]">
-              <option>2026</option>
-              <option>2027</option>
-            </select>
-            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+            <SearchableSelect
+              value={year}
+              onChange={setYear}
+              options={[
+                { label: "2026", value: "2026" },
+                { label: "2027", value: "2027" }
+              ]}
+              className="w-[100px] bg-white border border-border/80 rounded-lg text-[13px] font-semibold text-foreground/80 focus:border-emerald-500 shadow-sm"
+            />
           </div>
         </div>
       </div>

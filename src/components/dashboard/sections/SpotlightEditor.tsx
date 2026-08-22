@@ -7,6 +7,7 @@ import { moveToRecycleBin } from "@/lib/recycle-bin";
 import { EMPLOYEES } from "@/components/employees/employee-data";
 import { SparklesCelebration } from "../../common/SparklesCelebration";
 import { BADGE_PRESETS, CELEBRATION_PRESETS } from "./spotlight-constants";
+import { SearchableSelect } from "@/components/ui/select";
 
 export interface SpotlightEmployee {
   name: string;
@@ -175,10 +176,10 @@ export function SpotlightEditor({ spotlights, setSpotlights }: SpotlightEditorPr
             </h4>
             <div className="space-y-4">
               <div className="relative">
-                <select
+                <SearchableSelect
                   value={newName}
-                  onChange={(e) => {
-                    const selectedName = e.target.value;
+                  onChange={(val) => {
+                    const selectedName = val;
                     setNewName(selectedName);
                     const emp = EMPLOYEES.find(emp => emp.name === selectedName);
                     if (emp) {
@@ -186,13 +187,10 @@ export function SpotlightEditor({ spotlights, setSpotlights }: SpotlightEditorPr
                       if (emp.avatar) setNewImage(emp.avatar);
                     }
                   }}
-                  className="w-full px-4 py-2.5 rounded-xl border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 appearance-none pr-10"
-                >
-                  <option value="" disabled>Select Employee</option>
-                  {EMPLOYEES.map((emp) => (
-                    <option key={emp.id} value={emp.name}>{emp.name}</option>
-                  ))}
-                </select>
+                  options={EMPLOYEES.map((emp) => ({ label: emp.name, value: emp.name }))}
+                  placeholder="Select Employee"
+                  className="w-full h-[42px] px-4 rounded-xl border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 appearance-none pr-10"
+                />
                 <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
               </div>
               <input 
@@ -241,30 +239,24 @@ export function SpotlightEditor({ spotlights, setSpotlights }: SpotlightEditorPr
                 <div>
                   <label className="block text-xs font-semibold text-muted-foreground mb-1.5">Avatar Ring</label>
                   <div className="relative">
-                    <select
+                    <SearchableSelect
                       value={newRingStyle}
-                      onChange={(e) => setNewRingStyle(e.target.value as any)}
-                      className="w-full px-3 py-2 rounded-xl border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 appearance-none pr-8"
-                    >
-                      {Object.entries(BADGE_PRESETS).map(([key, preset]) => (
-                        <option key={key} value={key}>{preset.label}</option>
-                      ))}
-                    </select>
+                      onChange={(val) => setNewRingStyle(val as any)}
+                      options={Object.entries(BADGE_PRESETS).map(([key, preset]) => ({ label: preset.label, value: key }))}
+                      className="w-full h-[38px] px-3 bg-background border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 appearance-none pr-8"
+                    />
                     <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
                   </div>
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-muted-foreground mb-1.5">Celebrations</label>
                   <div className="relative">
-                    <select
+                    <SearchableSelect
                       value={newPopperStyle}
-                      onChange={(e) => setNewPopperStyle(e.target.value as any)}
-                      className="w-full px-3 py-2 rounded-xl border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 appearance-none pr-8"
-                    >
-                      {Object.entries(CELEBRATION_PRESETS).map(([key, preset]) => (
-                        <option key={key} value={key}>{preset.label}</option>
-                      ))}
-                    </select>
+                      onChange={(val) => setNewPopperStyle(val as any)}
+                      options={Object.entries(CELEBRATION_PRESETS).map(([key, preset]) => ({ label: preset.label, value: key }))}
+                      className="w-full h-[38px] px-3 bg-background border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 appearance-none pr-8"
+                    />
                     <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
                   </div>
                 </div>

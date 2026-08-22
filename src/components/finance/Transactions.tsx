@@ -3,6 +3,7 @@ import { Search, Download, Plus, RefreshCw, Wallet, Building2, Calendar, Filter,
 import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { DialogClose,  Dialog, DialogContent  } from "@/components/ui/dialog";
 import { moveToRecycleBin } from "@/lib/recycle-bin";
+import { SearchableSelect } from "@/components/ui/select";
 
 const MOCK_CREDIT_TRANSACTIONS = [
   { id: 'INV-001', date: '15/6/2026', amount: 1234.00, category: 'Sales', description: 'test', service: 'fgh', remarks: '1. Payment is due w...' },
@@ -33,6 +34,11 @@ export function Transactions() {
 
   const [isAddCreditOpen, setIsAddCreditOpen] = useState(false);
   const [isAddDebtOpen, setIsAddDebtOpen] = useState(false);
+
+  const [filterCategory, setFilterCategory] = useState("All Categories");
+  const [filterSyncStatus, setFilterSyncStatus] = useState("All Entries");
+  const [addCreditCategory, setAddCreditCategory] = useState("Sales");
+  const [addDebtCategory, setAddDebtCategory] = useState("General");
 
   const confirmDelete = () => {
     if (deleteConfirm.id) {
@@ -144,16 +150,22 @@ export function Transactions() {
         </div>
         <div className="flex items-center gap-2 text-sm">
           <span className="text-muted-foreground font-medium">Category:</span>
-          <select className="pl-3 pr-8 py-1.5 bg-background border border-border/50 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 cursor-pointer">
-            <option>All Categories</option>
-          </select>
+          <SearchableSelect
+            value={filterCategory}
+            onChange={setFilterCategory}
+            options={[{ label: "All Categories", value: "All Categories" }]}
+            className="w-[140px] h-[34px] pl-3 pr-3 bg-background border border-border/50 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 cursor-pointer"
+          />
         </div>
         {activeAccountTab === "bank" && (
           <div className="flex items-center gap-2 text-sm ml-2 border-l border-border/50 pl-4">
             <span className="text-muted-foreground font-medium">Sync Status:</span>
-            <select className="pl-3 pr-8 py-1.5 bg-background border border-border/50 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 cursor-pointer">
-              <option>All Entries</option>
-            </select>
+            <SearchableSelect
+              value={filterSyncStatus}
+              onChange={setFilterSyncStatus}
+              options={[{ label: "All Entries", value: "All Entries" }]}
+              className="w-[130px] h-[34px] pl-3 pr-3 bg-background border border-border/50 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 cursor-pointer"
+            />
           </div>
         )}
       </div>
@@ -389,11 +401,16 @@ export function Transactions() {
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-xs font-bold text-muted-foreground">Category *</label>
-                  <select className="w-full px-3 py-2 bg-background border border-border/50 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20">
-                    <option>Sales</option>
-                    <option>Services</option>
-                    <option>Other</option>
-                  </select>
+                  <SearchableSelect
+                    value={addCreditCategory}
+                    onChange={setAddCreditCategory}
+                    options={[
+                      { label: "Sales", value: "Sales" },
+                      { label: "Services", value: "Services" },
+                      { label: "Other", value: "Other" }
+                    ]}
+                    className="w-full h-[40px] px-3 bg-background border border-border/50 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+                  />
                 </div>
               </div>
               <div className="space-y-1.5">
@@ -446,11 +463,16 @@ export function Transactions() {
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-xs font-bold text-muted-foreground">Category *</label>
-                  <select className="w-full px-3 py-2 bg-background border border-border/50 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20">
-                    <option>General</option>
-                    <option>Office</option>
-                    <option>Travel</option>
-                  </select>
+                  <SearchableSelect
+                    value={addDebtCategory}
+                    onChange={setAddDebtCategory}
+                    options={[
+                      { label: "General", value: "General" },
+                      { label: "Office", value: "Office" },
+                      { label: "Travel", value: "Travel" }
+                    ]}
+                    className="w-full h-[40px] px-3 bg-background border border-border/50 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+                  />
                 </div>
               </div>
               <div className="space-y-1.5">

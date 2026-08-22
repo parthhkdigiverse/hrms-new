@@ -2,6 +2,7 @@ import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { X, Plus } from "lucide-react";
 import { useSettingsContext } from "./SettingsContext";
+import { SearchableSelect } from "@/components/ui/select";
 
 const TABS = [
   "General",
@@ -127,27 +128,29 @@ export function PayrollSettings() {
               <div className="grid grid-cols-2 gap-5">
                 <div>
                   <label className="text-[12px] font-semibold text-muted-foreground mb-2 block">Working days</label>
-                  <select 
+                  <SearchableSelect 
                     value={workingDays}
-                    onChange={(e) => setWorkingDays(e.target.value)}
-                    className="w-full rounded-[10px] border border-border/80 p-2.5 text-[13px] font-medium text-foreground/80 outline-none focus:border-emerald-500 bg-white shadow-sm"
-                  >
-                    <option value="26">26</option>
-                    <option value="28">28</option>
-                    <option value="30">30</option>
-                    <option value="actual">Actual days</option>
-                  </select>
+                    onChange={setWorkingDays}
+                    options={[
+                      { label: "26", value: "26" },
+                      { label: "28", value: "28" },
+                      { label: "30", value: "30" },
+                      { label: "Actual days", value: "actual" }
+                    ]}
+                    className="w-full h-[42px] rounded-[10px] border border-border/80 p-2.5 text-[13px] font-medium text-foreground/80 outline-none focus:border-emerald-500 bg-white shadow-sm"
+                  />
                 </div>
                 <div>
                   <label className="text-[12px] font-semibold text-muted-foreground mb-2 block">Salary calculation method</label>
-                  <select 
+                  <SearchableSelect 
                     value={calcMethod}
-                    onChange={(e) => setCalcMethod(e.target.value)}
-                    className="w-full rounded-[10px] border border-border/80 p-2.5 text-[13px] font-medium text-foreground/80 outline-none focus:border-emerald-500 bg-white shadow-sm"
-                  >
-                    <option value="Working Days">Working Days</option>
-                    <option value="Calendar Days">Calendar Days</option>
-                  </select>
+                    onChange={setCalcMethod}
+                    options={[
+                      { label: "Working Days", value: "Working Days" },
+                      { label: "Calendar Days", value: "Calendar Days" }
+                    ]}
+                    className="w-full h-[42px] rounded-[10px] border border-border/80 p-2.5 text-[13px] font-medium text-foreground/80 outline-none focus:border-emerald-500 bg-white shadow-sm"
+                  />
                 </div>
               </div>
             </div>
@@ -232,9 +235,12 @@ export function PayrollSettings() {
                 </div>
                 <div>
                   <label className="text-[12px] font-semibold text-muted-foreground mb-2 block">Half day rule</label>
-                  <select value={settings.halfDayRule} onChange={(e) => setSettings({...settings, halfDayRule: e.target.value})} className="w-full rounded-[10px] border border-border/80 p-2.5 text-[13px] font-medium text-foreground/80 outline-none focus:border-emerald-500 bg-white shadow-sm">
-                    <option>4 hours</option>
-                  </select>
+                  <SearchableSelect
+                    value={settings.halfDayRule}
+                    onChange={(val) => setSettings({...settings, halfDayRule: val})}
+                    options={[{ label: "4 hours", value: "4 hours" }]}
+                    className="w-full h-[42px] rounded-[10px] border border-border/80 p-2.5 text-[13px] font-medium text-foreground/80 outline-none focus:border-emerald-500 bg-white shadow-sm"
+                  />
                 </div>
               </div>
 
@@ -329,33 +335,45 @@ export function PayrollSettings() {
                 </div>
                 <div>
                   <label className="text-[12px] font-semibold text-muted-foreground mb-2 block">Late penalty</label>
-                  <select value={settings.latePenalty} onChange={(e) => setSettings({...settings, latePenalty: e.target.value})} className="w-full rounded-[10px] border border-border/80 p-2.5 text-[13px] font-medium text-foreground/80 outline-none focus:border-emerald-500 bg-white shadow-sm">
-                    <option>₹300 per instance</option>
-                  </select>
+                  <SearchableSelect
+                    value={settings.latePenalty}
+                    onChange={(val) => setSettings({...settings, latePenalty: val})}
+                    options={[{ label: "₹300 per instance", value: "₹300 per instance" }]}
+                    className="w-full h-[42px] rounded-[10px] border border-border/80 p-2.5 text-[13px] font-medium text-foreground/80 outline-none focus:border-emerald-500 bg-white shadow-sm"
+                  />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-5 mb-5">
                 <div>
                   <label className="text-[12px] font-semibold text-muted-foreground mb-2 block">Half day rule</label>
-                  <select value={settings.halfDayRule} onChange={(e) => setSettings({...settings, halfDayRule: e.target.value})} className="w-full rounded-[10px] border border-border/80 p-2.5 text-[13px] font-medium text-foreground/80 outline-none focus:border-emerald-500 bg-white shadow-sm">
-                    <option>Below 4 hrs</option>
-                  </select>
+                  <SearchableSelect
+                    value={settings.halfDayRule}
+                    onChange={(val) => setSettings({...settings, halfDayRule: val})}
+                    options={[{ label: "Below 4 hrs", value: "Below 4 hrs" }]}
+                    className="w-full h-[42px] rounded-[10px] border border-border/80 p-2.5 text-[13px] font-medium text-foreground/80 outline-none focus:border-emerald-500 bg-white shadow-sm"
+                  />
                 </div>
                 <div>
                   <label className="text-[12px] font-semibold text-muted-foreground mb-2 block">Absent rule</label>
-                  <select value={settings.absentRule} onChange={(e) => setSettings({...settings, absentRule: e.target.value})} className="w-full rounded-[10px] border border-border/80 p-2.5 text-[13px] font-medium text-foreground/80 outline-none focus:border-emerald-500 bg-white shadow-sm">
-                    <option>No punch = Absent</option>
-                  </select>
+                  <SearchableSelect
+                    value={settings.absentRule}
+                    onChange={(val) => setSettings({...settings, absentRule: val})}
+                    options={[{ label: "No punch = Absent", value: "No punch = Absent" }]}
+                    className="w-full h-[42px] rounded-[10px] border border-border/80 p-2.5 text-[13px] font-medium text-foreground/80 outline-none focus:border-emerald-500 bg-white shadow-sm"
+                  />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-5">
                 <div>
                   <label className="text-[12px] font-semibold text-muted-foreground mb-2 block">Missing punch rule</label>
-                  <select value={settings.missingPunch} onChange={(e) => setSettings({...settings, missingPunch: e.target.value})} className="w-full rounded-[10px] border border-border/80 p-2.5 text-[13px] font-medium text-foreground/80 outline-none focus:border-emerald-500 bg-white shadow-sm">
-                    <option>Regularize within 3 days</option>
-                  </select>
+                  <SearchableSelect
+                    value={settings.missingPunch}
+                    onChange={(val) => setSettings({...settings, missingPunch: val})}
+                    options={[{ label: "Regularize within 3 days", value: "Regularize within 3 days" }]}
+                    className="w-full h-[42px] rounded-[10px] border border-border/80 p-2.5 text-[13px] font-medium text-foreground/80 outline-none focus:border-emerald-500 bg-white shadow-sm"
+                  />
                 </div>
               </div>
             </div>
@@ -386,9 +404,12 @@ export function PayrollSettings() {
                 </div>
                 <div>
                   <label className="text-[12px] font-semibold text-muted-foreground mb-2 block">Holiday OT multiplier</label>
-                  <select value={settings.holidayOT} onChange={(e) => setSettings({...settings, holidayOT: e.target.value})} className="w-full rounded-[10px] border border-border/80 p-2.5 text-[13px] font-medium text-foreground/80 outline-none focus:border-emerald-500 bg-white shadow-sm">
-                    <option>2x</option>
-                  </select>
+                  <SearchableSelect
+                    value={settings.holidayOT}
+                    onChange={(val) => setSettings({...settings, holidayOT: val})}
+                    options={[{ label: "2x", value: "2x" }]}
+                    className="w-full h-[42px] rounded-[10px] border border-border/80 p-2.5 text-[13px] font-medium text-foreground/80 outline-none focus:border-emerald-500 bg-white shadow-sm"
+                  />
                 </div>
               </div>
             </div>

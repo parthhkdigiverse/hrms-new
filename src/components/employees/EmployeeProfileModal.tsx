@@ -1,4 +1,4 @@
-import { X, Calendar, MapPin, Phone, Mail, Briefcase, Award, TrendingUp, Clock, CheckCircle2 } from "lucide-react";
+import { X, Calendar, MapPin, Phone, Mail, Briefcase, Award, TrendingUp, Clock, CheckCircle2, FileText, LogOut } from "lucide-react";
 import { Employee } from "./employee-data";
 import { DialogClose,  Dialog, DialogContent  } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
@@ -118,6 +118,32 @@ export function EmployeeProfileModal({ employee, onClose }: EmployeeProfileModal
                   </div>
                 </div>
               </div>
+
+              {(employee.hasBond || employee.hasResignation || employee.hasNoticePeriod) && (
+                <div>
+                  <h3 className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider mb-3">Important Status</h3>
+                  <div className="space-y-3">
+                    {employee.hasBond && (
+                      <div className="flex items-center gap-3 text-[13px] font-medium text-amber-600 bg-amber-50 p-2 rounded-xl border border-amber-100">
+                        <div className="p-1.5 bg-amber-100 rounded-lg text-amber-600"><FileText className="w-4 h-4" /></div>
+                        <span className="truncate">Bond: {employee.bondEndDate ? `Until ${new Date(employee.bondEndDate).toLocaleDateString()}` : 'Active'}</span>
+                      </div>
+                    )}
+                    {employee.hasResignation && (
+                      <div className="flex items-center gap-3 text-[13px] font-medium text-rose-600 bg-rose-50 p-2 rounded-xl border border-rose-100">
+                        <div className="p-1.5 bg-rose-100 rounded-lg text-rose-600"><LogOut className="w-4 h-4" /></div>
+                        <span className="truncate">Exiting: {employee.resignationDate ? new Date(employee.resignationDate).toLocaleDateString() : 'Pending'}</span>
+                      </div>
+                    )}
+                    {employee.hasNoticePeriod && !employee.hasResignation && (
+                      <div className="flex items-center gap-3 text-[13px] font-medium text-blue-600 bg-blue-50 p-2 rounded-xl border border-blue-100">
+                        <div className="p-1.5 bg-blue-100 rounded-lg text-blue-600"><Clock className="w-4 h-4" /></div>
+                        <span className="truncate">Notice Period: {employee.noticePeriodDays || '30'} Days</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Right Column: Lifetime Stats */}

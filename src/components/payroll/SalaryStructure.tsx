@@ -11,9 +11,15 @@ import {
   Activity,
   AlertCircle,
   X,
-  Plus
+  Plus,
+  CheckCircle2,
+  Edit2,
+  FileText,
+  Download,
+  RefreshCcw
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { SearchableSelect } from "@/components/ui/select";
 import { MOCK_EMPLOYEES, formatCurrency } from "./payroll-data";
 
 export function SalaryStructure() {
@@ -361,18 +367,18 @@ export function SalaryStructure() {
                         <label className="text-xs font-bold text-muted-foreground flex gap-1">
                           Reason for change <span className="text-rose-500">*</span>
                         </label>
-                        <select 
-                          required
+                        <SearchableSelect 
                           value={editForm.reason}
-                          onChange={(e) => setEditForm({ ...editForm, reason: e.target.value })}
-                          className="mt-1 w-full rounded-md border border-border p-2 text-sm outline-none focus:border-emerald-500 bg-white"
-                        >
-                          <option value="">Select reason...</option>
-                          <option value="Annual appraisal">Annual appraisal</option>
-                          <option value="Promotion">Promotion</option>
-                          <option value="Mid-year adjustment">Mid-year adjustment</option>
-                          <option value="Correction">Correction</option>
-                        </select>
+                          onChange={(val) => setEditForm({ ...editForm, reason: val })}
+                          options={[
+                            { label: "Annual appraisal", value: "Annual appraisal" },
+                            { label: "Promotion", value: "Promotion" },
+                            { label: "Mid-year adjustment", value: "Mid-year adjustment" },
+                            { label: "Correction", value: "Correction" }
+                          ]}
+                          placeholder="Select reason..."
+                          className="mt-1 w-full h-[38px] px-2 rounded-md border border-border text-sm outline-none focus:border-emerald-500 bg-white"
+                        />
                       </div>
                     </div>
                     <button 

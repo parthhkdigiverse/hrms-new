@@ -3,6 +3,7 @@ import { X,  Search, Plus, Filter, Users, Briefcase, MapPin, Clock, MoreHorizont
 import { DialogClose,  Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger  } from "@/components/ui/dialog";
 import { useDepartments } from "../employees/DepartmentContext";
 import { toast } from "sonner";
+import { SearchableSelect } from "@/components/ui/select";
 
 interface JobOpening {
   id: string;
@@ -187,28 +188,26 @@ export function Hirings() {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Department</label>
-                    <select 
+                    <SearchableSelect 
                       value={newDepartment}
-                      onChange={e => setNewDepartment(e.target.value)}
-                      className="w-full px-3 py-2 bg-white border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-                    >
-                      {departments.map(dept => (
-                        <option key={dept} value={dept}>{dept}</option>
-                      ))}
-                    </select>
+                      onChange={val => setNewDepartment(val)}
+                      options={departments.map(dept => ({ label: dept, value: dept }))}
+                      className="w-full h-[38px] px-3 bg-white border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    />
                   </div>
                   <div className="space-y-2">
                     <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Employment Type</label>
-                    <select 
+                    <SearchableSelect 
                       value={newType}
-                      onChange={e => setNewType(e.target.value)}
-                      className="w-full px-3 py-2 bg-white border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-                    >
-                      <option>Full-time</option>
-                      <option>Part-time</option>
-                      <option>Contract</option>
-                      <option>Internship</option>
-                    </select>
+                      onChange={val => setNewType(val)}
+                      options={[
+                        { label: "Full-time", value: "Full-time" },
+                        { label: "Part-time", value: "Part-time" },
+                        { label: "Contract", value: "Contract" },
+                        { label: "Internship", value: "Internship" }
+                      ]}
+                      className="w-full h-[38px] px-3 bg-white border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    />
                   </div>
                 </div>
                 <div className="space-y-2">

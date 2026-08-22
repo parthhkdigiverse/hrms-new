@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import { DialogClose,  Dialog, DialogContent, DialogHeader, DialogTitle  } from "@/components/ui/dialog";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { moveToRecycleBin } from "@/lib/recycle-bin";
+import { SearchableSelect } from "@/components/ui/select";
 
 export interface Resource {
   id: string;
@@ -273,15 +274,12 @@ export function ResourceManagement() {
                   <Settings2 className="w-3 h-3" /> Manage Types
                 </button>
               </div>
-              <select 
+              <SearchableSelect 
                 value={newType}
-                onChange={(e) => setNewType(e.target.value)}
-                className="w-full px-4 py-3 bg-muted/50 border border-border/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium appearance-none"
-              >
-                {resourceTypes.map(type => (
-                  <option key={type} value={type}>{type}</option>
-                ))}
-              </select>
+                onChange={(val) => setNewType(val)}
+                options={resourceTypes.map(type => ({ label: type, value: type }))}
+                className="w-full h-[46px] px-4 bg-muted/50 border border-border/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium"
+              />
             </div>
             
             {newType === "Room" && (

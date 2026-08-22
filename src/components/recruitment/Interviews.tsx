@@ -3,6 +3,7 @@ import { X,  Search, Plus, Calendar as CalendarIcon, Video, MoreHorizontal, Cloc
 import { DialogClose,  Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger  } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { SearchableSelect } from "@/components/ui/select";
 
 type InterviewStage = string;
 
@@ -257,13 +258,12 @@ export function Interviews() {
                 </div>
                 <div className="space-y-2">
                   <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Interview Stage</label>
-                  <select 
+                  <SearchableSelect 
                     value={newStage}
-                    onChange={e => setNewStage(e.target.value as InterviewStage)}
-                    className="w-full px-3 py-2 bg-white border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-                  >
-                    {stages.map(s => <option key={s.label} value={s.label}>{s.label}</option>)}
-                  </select>
+                    onChange={val => setNewStage(val as InterviewStage)}
+                    options={stages.map(s => ({ label: s.label, value: s.label }))}
+                    className="w-full h-[38px] px-3 bg-white border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+                  />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">

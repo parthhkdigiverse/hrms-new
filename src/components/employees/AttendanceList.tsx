@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { X,  Search, Filter, Download, MoreHorizontal, CheckCircle2, XCircle, Clock, ChevronLeft, ChevronRight, Calendar as CalendarIcon  } from "lucide-react";
+import { X,  Search, Filter, Download, MoreHorizontal, CheckCircle2, XCircle, Clock, ChevronLeft, ChevronRight, Calendar as CalendarIcon, Coffee, Briefcase } from "lucide-react";
 import { format } from "date-fns";
 import { DateRange } from "react-day-picker";
 import { Calendar } from "@/components/ui/calendar";
@@ -185,23 +185,49 @@ export function AttendanceList() {
         </div>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {[
-          { label: "Total Present", value: stats.present, color: "text-emerald-600", bg: "bg-emerald-50" },
-          { label: "Total Absent", value: stats.absent, color: "text-rose-600", bg: "bg-rose-50" },
-          { label: "Late Arrivals", value: stats.late, color: "text-amber-600", bg: "bg-amber-50" },
-          { label: "On Leave", value: stats.onLeave, color: "text-blue-600", bg: "bg-blue-50" },
-        ].map((stat, i) => (
-          <div key={i} className="bg-white border border-border rounded-2xl p-5 shadow-sm">
-            <p className="text-sm font-bold text-muted-foreground">{stat.label}</p>
-            <p className={cn("text-3xl font-black mt-2", stat.color)}>{stat.value}</p>
+      {/* Top Section: Stats & Calendar */}
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+        
+        {/* Left Column: KPI Cards & Table */}
+        <div className="xl:col-span-2 flex flex-col gap-6">
+          {/* Overall Stats Cards */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {[
+              { label: "Total Present", value: stats.present, color: "text-emerald-600", bg: "bg-emerald-50" },
+              { label: "Total Absent", value: stats.absent, color: "text-rose-600", bg: "bg-rose-50" },
+              { label: "Late Arrivals", value: stats.late, color: "text-amber-600", bg: "bg-amber-50" },
+              { label: "On Leave", value: stats.onLeave, color: "text-blue-600", bg: "bg-blue-50" },
+            ].map((stat, i) => (
+              <div key={i} className="bg-white border border-border rounded-2xl p-5 shadow-sm flex flex-col justify-center">
+                <p className="text-sm font-bold text-muted-foreground">{stat.label}</p>
+                <p className={cn("text-3xl font-black mt-2", stat.color)}>{stat.value}</p>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
 
-      {/* Main Content Area */}
-      <div className="flex-1 bg-white border border-border rounded-3xl shadow-sm overflow-hidden flex flex-col">
+          {/* Personal Stats Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {[
+              { label: "Avg Daily Hours", value: "8h 23m", sub: "Based on active logs", icon: Clock },
+              { label: "Break Time", value: "51h 01m", sub: "Cumulative break duration", icon: Coffee },
+              { label: "Working Time", value: "142h 34m", sub: "Total hours this month", icon: Briefcase },
+            ].map((stat, i) => {
+              const Icon = stat.icon;
+              return (
+                <div key={i} className="bg-white border border-border/60 rounded-2xl p-4 shadow-sm hover:shadow-md transition-shadow">
+                  <div className="flex items-start justify-between mb-1.5">
+                    <p className="text-[12px] font-bold text-muted-foreground truncate mr-2">{stat.label}</p>
+                    <Icon className="w-4 h-4 text-muted-foreground/60 shrink-0" />
+                  </div>
+                  <p className="text-2xl font-black text-foreground">{stat.value}</p>
+                  <p className="text-[10px] font-medium text-muted-foreground mt-1.5 truncate" title={stat.sub}>{stat.sub}</p>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Main Content Area */}
+          <div className="flex-1 bg-white border border-border rounded-3xl shadow-sm overflow-hidden flex flex-col min-h-[500px]">
         {/* Toolbar */}
         <div className="p-4 border-b border-border flex flex-col sm:flex-row justify-between items-center gap-4 bg-muted/50/50">
           <div className="relative w-full sm:w-72">
@@ -374,6 +400,23 @@ export function AttendanceList() {
             </div>
           </div>
         )}
+          </div>
+        </div>
+        
+        {/* Right Column: Calendar Preview */}
+        <div className="xl:col-span-1 flex flex-col gap-6">
+          <div className="bg-white border border-border/60 rounded-3xl shadow-sm p-6 flex flex-col relative overflow-hidden shrink-0">
+            <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-emerald-400 to-teal-400" />
+            <h3 className="text-lg font-black text-foreground mb-2">Schedule Preview</h3>
+            <div className="flex-1 flex items-center justify-center">
+              <Calendar
+                mode="single"
+                selected={new Date()}
+                className="bg-transparent p-0 [&_.rdp]:bg-transparent"
+              />
+            </div>
+          </div>
+        </div>
       </div>
 
       <Dialog open={!!selectedRecord} onOpenChange={(open) => !open && setSelectedRecord(null)}>
@@ -389,7 +432,7 @@ export function AttendanceList() {
             </button>
           </DialogClose>
         </div>
-          <div className="mt-4">
+          <div className="mt-4 px-6 md:px-8 py-6">
             {selectedRecord && (
               <>
                 <div className="flex items-center gap-4 mb-6 pb-4 border-b border-border/50">

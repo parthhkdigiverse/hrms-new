@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Search, Filter, LayoutGrid, List, MoreVertical, Phone, Mail, Plus, MapPin, Edit2, Trash2, Key } from "lucide-react";
+import { Search, Filter, LayoutGrid, List, MoreVertical, Phone, Mail, Plus, MapPin, Edit2, Trash2, Key, UserMinus, UserCheck, Shield, FileText, LogOut, Clock } from "lucide-react";
 import { EMPLOYEES, Employee } from "./employee-data";
 import { useDepartments } from "./DepartmentContext";
 import { EmployeeProfileModal } from "./EmployeeProfileModal";
@@ -159,8 +159,30 @@ export function EmployeeList() {
                 <button 
                   onClick={() => openEditForm(emp)}
                   className="p-2 text-muted-foreground hover:bg-muted hover:text-foreground/80 rounded-full transition-colors"
+                  title="Edit"
                 >
                   <Edit2 className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => {
+                    const newStatus = emp.status === 'Inactive' ? 'Active' : 'Inactive';
+                    updateEmployee(emp.id, { status: newStatus });
+                    toast.success(`${emp.name} is now ${newStatus}`);
+                  }}
+                  className={cn(
+                    "p-2 rounded-full transition-colors",
+                    emp.status === 'Inactive' ? "text-amber-500 hover:bg-amber-50" : "text-muted-foreground hover:bg-amber-50 hover:text-amber-600"
+                  )}
+                  title={emp.status === 'Inactive' ? "Mark as Active" : "Mark as Inactive"}
+                >
+                  {emp.status === 'Inactive' ? <UserCheck className="w-4 h-4" /> : <UserMinus className="w-4 h-4" />}
+                </button>
+                <button
+                  onClick={() => toast.success("Permissions management coming soon!")}
+                  className="p-2 text-muted-foreground hover:bg-blue-50 hover:text-blue-600 rounded-full transition-colors"
+                  title="Permissions"
+                >
+                  <Shield className="w-4 h-4" />
                 </button>
                 <button 
                   onClick={() => handleDeleteEmployee(emp.id, emp.name)}
@@ -187,6 +209,29 @@ export function EmployeeList() {
                 <span className="px-3 py-1 bg-muted/50 text-foreground/80 text-[10px] font-bold uppercase tracking-wider rounded-lg mb-4">
                   {emp.department}
                 </span>
+
+                {(emp.hasBond || emp.hasResignation || emp.hasNoticePeriod) && (
+                  <div className="w-full flex flex-col gap-1.5 mb-4 px-2">
+                    {emp.hasBond && (
+                      <div className="flex items-center gap-2 text-[11px] font-medium text-amber-600 bg-amber-50 px-2.5 py-1.5 rounded-lg border border-amber-100">
+                        <FileText className="w-3.5 h-3.5 flex-shrink-0" />
+                        <span className="truncate">Bond: {emp.bondEndDate ? `Until ${new Date(emp.bondEndDate).toLocaleDateString()}` : 'Active'}</span>
+                      </div>
+                    )}
+                    {emp.hasResignation && (
+                      <div className="flex items-center gap-2 text-[11px] font-medium text-rose-600 bg-rose-50 px-2.5 py-1.5 rounded-lg border border-rose-100">
+                        <LogOut className="w-3.5 h-3.5 flex-shrink-0" />
+                        <span className="truncate">Exiting: {emp.resignationDate ? new Date(emp.resignationDate).toLocaleDateString() : 'Pending'}</span>
+                      </div>
+                    )}
+                    {emp.hasNoticePeriod && !emp.hasResignation && (
+                      <div className="flex items-center gap-2 text-[11px] font-medium text-blue-600 bg-blue-50 px-2.5 py-1.5 rounded-lg border border-blue-100">
+                        <Clock className="w-3.5 h-3.5 flex-shrink-0" />
+                        <span className="truncate">Notice Period: {emp.noticePeriodDays || '30'} Days</span>
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 <div className="w-full flex flex-col gap-2 mb-6 text-[12px] text-muted-foreground bg-muted/20 p-3 rounded-2xl border border-border/50">
                   <div className="flex items-center justify-center gap-2">
@@ -267,14 +312,37 @@ export function EmployeeList() {
                         <button 
                           onClick={() => setSelectedEmployee(emp)}
                           className="text-[12px] font-bold text-[#00A56C] hover:text-[#00A56C]/80 px-3 py-1.5 rounded-lg hover:bg-[#00A56C]/10 transition-colors opacity-0 group-hover:opacity-100"
+                          title="View Profile"
                         >
                           View
                         </button>
                         <button 
                           onClick={() => openEditForm(emp)}
                           className="text-[12px] font-bold text-blue-600 hover:text-blue-800 px-3 py-1.5 rounded-lg hover:bg-blue-50 transition-colors opacity-0 group-hover:opacity-100"
+                          title="Edit Employee"
                         >
                           Edit
+                        </button>
+                        <button
+                          onClick={() => toast.success("Permissions management coming soon!")}
+                          className="text-[12px] font-bold text-indigo-600 hover:text-indigo-800 px-3 py-1.5 rounded-lg hover:bg-indigo-50 transition-colors opacity-0 group-hover:opacity-100"
+                          title="Manage Permissions"
+                        >
+                          Permissions
+                        </button>
+                        <button
+                          onClick={() => {
+                            const newStatus = emp.status === 'Inactive' ? 'Active' : 'Inactive';
+                            updateEmployee(emp.id, { status: newStatus });
+                            toast.success(`${emp.name} is now ${newStatus}`);
+                          }}
+                          className={cn(
+                            "text-[12px] font-bold px-3 py-1.5 rounded-lg transition-colors opacity-0 group-hover:opacity-100",
+                            emp.status === 'Inactive' ? "text-amber-600 hover:text-amber-800 hover:bg-amber-50" : "text-amber-600 hover:text-amber-800 hover:bg-amber-50"
+                          )}
+                          title={emp.status === 'Inactive' ? "Mark as Active" : "Mark as Inactive"}
+                        >
+                          {emp.status === 'Inactive' ? 'Reactivate' : 'Deactivate'}
                         </button>
                       </div>
                     </td>

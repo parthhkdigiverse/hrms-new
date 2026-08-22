@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { X,  Search, Plus, Filter, MoreHorizontal, LayoutGrid, List, Briefcase, Calendar, Clock, Star, Circle, Trash2, Edit2, Archive, ArrowLeft, Users, IndianRupee, FolderGit2, CheckCircle2, Settings2, TrendingUp, MousePointerClick, Target, BarChart3, ChevronDown  } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -10,6 +10,7 @@ import { Calendar as CalendarUI } from "@/components/ui/calendar";
 import { format, subDays, startOfYear, differenceInDays } from "date-fns";
 import { DateRange } from "react-day-picker";
 import { moveToRecycleBin } from "@/lib/recycle-bin";
+import { SearchableSelect } from "@/components/ui/select";
 
 type ProjectStatus = "In Progress" | "In Review" | "Completed" | "On Hold";
 type ClientStatus = "Active" | "Archived";
@@ -471,6 +472,22 @@ export function Projects() {
       default: return "bg-primary";
     }
   };
+
+  const categoryStats = useMemo(() => {
+    const stats: Record<string, Set<string>> = {};
+    categories.forEach(cat => {
+      stats[cat] = new Set();
+    });
+    projects.forEach(p => {
+      if (stats[p.category]) {
+        stats[p.category]?.add(p.clientId);
+      }
+    });
+    return categories.map(cat => ({
+      category: cat,
+      clientCount: stats[cat]?.size || 0
+    })).sort((a, b) => b.clientCount - a.clientCount);
+  }, [projects, categories]);
 
   const filteredClients = clients.filter(client => {
     if (activeTab === "Active Clients" && client.status !== "Active") return false;
@@ -1219,20 +1236,16 @@ export function Projects() {
                     <Settings2 className="w-3 h-3" /> Manage Categories
                   </button>
                 </div>
-                <select 
+                <SearchableSelect 
                   value={newProjectCategory}
-                  onChange={(e) => setNewProjectCategory(e.target.value)}
+                  onChange={(val) => setNewProjectCategory(val)}
+                  options={categories.map(cat => ({ label: cat, value: cat }))}
+                  placeholder="Select Category"
                   className={cn(
-                    "w-full px-4 py-3 bg-muted/50 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium appearance-none",
-                    !newProjectCategory && "text-muted-foreground",
+                    "w-full h-[46px] px-4 bg-muted/50 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium",
                     showNewProjectErrors && !newProjectCategory ? "border-red-500 ring-1 ring-red-500" : "border-border/50"
                   )}
-                >
-                  <option value="" disabled>Select Category</option>
-                  {categories.map(cat => (
-                    <option key={cat} value={cat}>{cat}</option>
-                  ))}
-                </select>
+                />
               </div>
             </div>
             <div className="px-6 md:px-8 py-4 md:py-6 bg-muted/30 border-t border-border/50 flex justify-end gap-3 mt-auto shrink-0">
@@ -1391,27 +1404,26 @@ export function Projects() {
                       <Settings2 className="w-3 h-3" /> Manage Categories
                     </button>
                   </div>
-                  <select 
+                  <SearchableSelect 
                     value={editingProject.category}
-                    onChange={(e) => setEditingProject({...editingProject, category: e.target.value})}
-                    className={"w-full px-4 py-3 bg-muted/50 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium appearance-none " + (showEditProjectErrors && !editingProject.category ? "border-red-500 ring-1 ring-red-500" : "border-border/50")}
-                  >
-                    {categories.map(cat => (
-                      <option key={cat} value={cat}>{cat}</option>
-                    ))}
-                  </select>
+                    onChange={(val) => setEditingProject({...editingProject, category: val})}
+                    options={categories.map(cat => ({ label: cat, value: cat }))}
+                    className={"w-full h-[46px] px-4 bg-muted/50 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium " + (showEditProjectErrors && !editingProject.category ? "border-red-500 ring-1 ring-red-500" : "border-border/50")}
+                  />
                 </div>
                 <div>
                   <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Status <span className="text-red-500">*</span></label>
-                  <select 
+                  <SearchableSelect 
                     value={editingProject.status}
-                    onChange={(e) => setEditingProject({...editingProject, status: e.target.value as ProjectStatus})}
-                    className="w-full px-4 py-3 bg-muted/50 border border-border/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium appearance-none"
-                  >
-                    {["In Progress", "In Review", "Completed", "On Hold"].map(status => (
-                      <option key={status} value={status}>{status}</option>
-                    ))}
-                  </select>
+                    onChange={(val) => setEditingProject({...editingProject, status: val as ProjectStatus})}
+                    options={[
+                      { label: "In Progress", value: "In Progress" },
+                      { label: "In Review", value: "In Review" },
+                      { label: "Completed", value: "Completed" },
+                      { label: "On Hold", value: "On Hold" }
+                    ]}
+                    className="w-full h-[46px] px-4 bg-muted/50 border border-border/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium"
+                  />
                 </div>
                 <div>
                   <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 flex justify-between">
@@ -1518,7 +1530,7 @@ export function Projects() {
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-black tracking-tight text-foreground">Clients</h1>
+          <h1 className="text-3xl font-black tracking-tight text-foreground bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text text-transparent">Clients</h1>
           <p className="text-muted-foreground mt-1">Manage your clients and view their projects.</p>
         </div>
         <div className="flex items-center gap-3 w-full md:w-auto">
@@ -1636,6 +1648,21 @@ export function Projects() {
         </div>
       </div>
 
+      {/* Category KPIs */}
+      <div className="flex flex-wrap gap-4 pt-4 pb-2">
+        {categoryStats.map((stat, i) => (
+          <div key={i} className="flex-1 min-w-[150px] bg-white border border-border/60 rounded-3xl p-5 shadow-sm flex flex-col justify-center transition-all hover:shadow-lg hover:-translate-y-1 relative overflow-hidden group">
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary/50 to-primary/20 opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="absolute -right-4 -bottom-4 w-16 h-16 bg-primary/5 rounded-full blur-2xl group-hover:bg-primary/10 transition-colors" />
+            <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider mb-2 truncate relative z-10" title={stat.category}>{stat.category}</p>
+            <div className="flex items-baseline gap-1.5 relative z-10">
+              <p className="text-3xl font-black text-foreground tracking-tighter">{stat.clientCount}</p>
+              <p className="text-[10px] font-medium text-muted-foreground mb-1 uppercase">Clients</p>
+            </div>
+          </div>
+        ))}
+      </div>
+
       {/* Tabs */}
       <div className="flex gap-2 border-b border-border/40 pb-4 overflow-x-auto hide-scrollbar">
         {TABS.map(tab => (
@@ -1660,19 +1687,19 @@ export function Projects() {
           <div 
             key={client.id} 
             onClick={() => setSelectedClientId(client.id)}
-            className="group bg-card border border-border/60 rounded-3xl p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 hover:border-primary/50 transition-all duration-300 relative overflow-hidden flex flex-col cursor-pointer"
+            className="group bg-white border border-border/40 rounded-[2rem] p-6 shadow-sm hover:shadow-2xl hover:shadow-primary/5 hover:-translate-y-1 hover:border-primary/30 transition-all duration-300 relative flex flex-col cursor-pointer"
           >
             {/* Background Accent */}
-            <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none transition-opacity opacity-0 group-hover:opacity-100"></div>
+            <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-primary/[0.03] to-transparent rounded-t-[2rem] pointer-events-none transition-opacity opacity-0 group-hover:opacity-100"></div>
 
-            <div className="flex justify-between items-start mb-6 relative z-10">
-              <div className="w-16 h-16 rounded-2xl border-2 border-border/50 overflow-hidden shadow-sm bg-card group-hover:border-primary/30 transition-colors">
-                <img src={client.logo} alt={client.name} className="w-full h-full object-cover" />
+            <div className="flex justify-between items-start mb-5 relative z-10">
+              <div className="w-16 h-16 rounded-2xl border border-border/50 overflow-hidden shadow-sm bg-white p-1 group-hover:scale-105 group-hover:border-primary/30 transition-all duration-300">
+                <img src={client.logo} alt={client.name} className="w-full h-full object-cover rounded-xl" />
               </div>
               
               <DropdownMenu>
                 <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-                  <button className="p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground rounded-lg transition-colors outline-none focus:ring-2 focus:ring-primary/20">
+                  <button className="p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground rounded-lg transition-colors outline-none focus:ring-2 focus:ring-primary/20 bg-background/50 backdrop-blur-sm">
                     <MoreHorizontal className="w-5 h-5" />
                   </button>
                 </DropdownMenuTrigger>
@@ -1699,25 +1726,38 @@ export function Projects() {
 
             <div className="relative z-10 mb-6 flex-grow">
               <h3 className="text-xl font-black tracking-tight text-foreground line-clamp-2 leading-tight group-hover:text-primary transition-colors">{client.name}</h3>
+              
+              <div className="flex flex-wrap items-center gap-3 mt-3">
+                <span className="inline-flex items-center gap-1.5 text-[11px] font-bold px-2 py-1 bg-primary/10 text-primary rounded-md">
+                  <Briefcase className="w-3.5 h-3.5" /> {projects.filter(p => p.clientId === client.id).length} Active Projects
+                </span>
+                <span className="inline-flex items-center gap-1.5 text-[11px] font-bold px-2 py-1 bg-muted rounded-md text-muted-foreground">
+                  <Calendar className="w-3.5 h-3.5" /> {client.onboardingDate ? format(new Date(client.onboardingDate), "MMM yyyy") : "-"}
+                </span>
+              </div>
             </div>
 
+            {/* Contacts overlap */}
+            {client.contacts && client.contacts.length > 0 && (
+              <div className="flex items-center gap-3 mb-6 relative z-10">
+                <div className="flex -space-x-2">
+                  {client.contacts.map((c, idx) => (
+                    <img key={idx} src={c.avatar} className="w-8 h-8 rounded-full border-2 border-white shadow-sm" title={c.name} />
+                  ))}
+                </div>
+                <span className="text-xs font-bold text-muted-foreground">Key Contacts</span>
+              </div>
+            )}
+
             {/* Footer Summary */}
-            <div className="grid grid-cols-2 gap-4 pt-4 border-t border-border/40 relative z-10">
-              <div className="flex flex-col">
-                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Active Projects</span>
-                <span className="text-lg font-black text-foreground">{projects.filter(p => p.clientId === client.id).length}</span>
-              </div>
-              <div className="flex flex-col text-right">
-                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Onboarded</span>
-                <span className="text-sm mt-1 font-black text-foreground">{client.onboardingDate ? format(new Date(client.onboardingDate), "MMM yyyy") : "-"}</span>
-              </div>
+            <div className="flex justify-between items-end pt-5 border-t border-border/40 relative z-10">
               <div className="flex flex-col">
                 <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Total Budget</span>
-                <span className="text-sm mt-1 font-black font-mono text-primary">{client.totalBudget}</span>
+                <span className="text-base font-black text-foreground mt-0.5 font-mono">{client.totalBudget}</span>
               </div>
               <div className="flex flex-col text-right">
                 <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Outstanding</span>
-                <span className="text-sm mt-1 font-black font-mono text-destructive">{client.outstandingPayment}</span>
+                <span className="text-base font-black text-rose-500 mt-0.5 font-mono">{client.outstandingPayment}</span>
               </div>
             </div>
 

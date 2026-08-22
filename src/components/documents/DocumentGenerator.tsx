@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { ArrowLeft, Download, Send, Printer, User, FileText, Sparkles, Building2, Calendar, IndianRupee, Settings2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { SearchableSelect } from "@/components/ui/select";
 
 // Mock Data
 const MOCK_EMPLOYEES = [
@@ -131,31 +132,25 @@ export function DocumentGenerator({ onBack }: { onBack?: () => void }) {
               <User className="w-4 h-4 text-primary" />
               Target Employee
             </h3>
-            <select 
+            <SearchableSelect 
               value={selectedEmpId}
-              onChange={(e) => setSelectedEmpId(e.target.value)}
-              className="w-full px-4 py-2.5 bg-background border border-border/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all text-sm font-medium"
-            >
-              <option value="">Select Employee...</option>
-              {MOCK_EMPLOYEES.map(emp => (
-                <option key={emp.id} value={emp.id}>{emp.name} - {emp.role}</option>
-              ))}
-            </select>
+              onChange={(val) => setSelectedEmpId(val)}
+              options={MOCK_EMPLOYEES.map(emp => ({ label: `${emp.name} - ${emp.role}`, value: emp.id }))}
+              placeholder="Select Employee..."
+              className="w-full h-[38px] px-4 bg-background border border-border/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all text-sm font-medium"
+            />
             
             <h3 className="font-bold flex items-center gap-2 text-foreground pt-2">
               <FileText className="w-4 h-4 text-primary" />
               Document Template
             </h3>
-            <select 
+            <SearchableSelect 
               value={selectedTempId}
-              onChange={(e) => setSelectedTempId(e.target.value)}
-              className="w-full px-4 py-2.5 bg-background border border-border/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all text-sm font-medium"
-            >
-              <option value="">Select Template...</option>
-              {MOCK_TEMPLATES.map(tmp => (
-                <option key={tmp.id} value={tmp.id}>{tmp.name}</option>
-              ))}
-            </select>
+              onChange={(val) => setSelectedTempId(val)}
+              options={MOCK_TEMPLATES.map(tmp => ({ label: tmp.name, value: tmp.id }))}
+              placeholder="Select Template..."
+              className="w-full h-[38px] px-4 bg-background border border-border/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all text-sm font-medium"
+            />
           </div>
 
           {/* Dynamic Variables */}

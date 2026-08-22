@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Search, Filter, CheckCircle2, Clock, Check, X, Star, AlertCircle, MessageSquare, Activity, User, Eye } from "lucide-react";
 import { DialogClose,  Dialog, DialogContent  } from "@/components/ui/dialog";
+import { SearchableSelect } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 
 type VerificationStatus = "Pending" | "Verified";
@@ -202,16 +203,17 @@ export function DailyProgress() {
             />
           </div>
           <div className="relative w-full sm:w-auto">
-            <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <select
+            <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground z-10" />
+            <SearchableSelect
               value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value as any)}
-              className="w-full sm:w-auto pl-9 pr-8 py-2.5 bg-background border border-border/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all text-sm font-bold appearance-none cursor-pointer"
-            >
-              <option value="All">All Statuses</option>
-              <option value="Pending">Pending Verification</option>
-              <option value="Verified">Verified</option>
-            </select>
+              onChange={(val) => setStatusFilter(val as any)}
+              options={[
+                { label: "All Statuses", value: "All" },
+                { label: "Pending Verification", value: "Pending" },
+                { label: "Verified", value: "Verified" }
+              ]}
+              className="w-[200px] h-[42px] pl-9 bg-background border border-border/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all text-sm font-bold cursor-pointer"
+            />
           </div>
         </div>
       </div>

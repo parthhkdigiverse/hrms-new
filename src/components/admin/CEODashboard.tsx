@@ -6,6 +6,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { SearchableSelect } from "@/components/ui/select";
 
 export function CEODashboard({ active = "/ceo-dashboard" }: { active?: string }) {
   const [timeRange, setTimeRange] = useState("This Month");
@@ -64,16 +65,17 @@ export function CEODashboard({ active = "/ceo-dashboard" }: { active?: string })
           <p className="text-muted-foreground mt-2 font-medium">Here's what is happening across HK DigiVerse today.</p>
         </div>
         <div className="flex gap-2">
-          <select 
+          <SearchableSelect 
             value={timeRange}
-            onChange={(e) => setTimeRange(e.target.value)}
-            className="px-4 py-2 bg-card border border-border/50 rounded-xl text-sm font-bold shadow-sm outline-none"
-          >
-            <option>Today</option>
-            <option>This Week</option>
-            <option>This Month</option>
-            <option>This Quarter</option>
-          </select>
+            onChange={(val) => setTimeRange(val)}
+            options={[
+              { label: "Today", value: "Today" },
+              { label: "This Week", value: "This Week" },
+              { label: "This Month", value: "This Month" },
+              { label: "This Quarter", value: "This Quarter" }
+            ]}
+            className="w-[140px] h-[38px] px-4 bg-card border border-border/50 rounded-xl text-sm font-bold shadow-sm outline-none"
+          />
         </div>
       </div>
 

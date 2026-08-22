@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Activity, MousePointerClick, Keyboard, TrendingUp, Monitor, Globe, Search, Download, ArrowUpDown, Filter } from "lucide-react";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import { SearchableSelect } from "@/components/ui/select";
 
 const trendData = [
   { date: 'Mon', clicks: 12500, keystrokes: 45000 },
@@ -70,11 +71,16 @@ export function ActivityTracker() {
               className="w-full pl-9 pr-4 py-2.5 bg-card border border-border/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all text-sm font-medium"
             />
           </div>
-          <select className="px-4 py-2.5 bg-card border border-border/50 text-foreground font-bold rounded-xl hover:bg-muted/50 transition-colors shadow-sm outline-none cursor-pointer">
-            <option>Today</option>
-            <option>This Week</option>
-            <option>This Month</option>
-          </select>
+          <SearchableSelect 
+            value="Today"
+            onChange={() => {}}
+            options={[
+              { label: "Today", value: "Today" },
+              { label: "This Week", value: "This Week" },
+              { label: "This Month", value: "This Month" }
+            ]}
+            className="w-[120px] h-[42px] px-4 bg-card border border-border/50 text-foreground font-bold rounded-xl hover:bg-muted/50 transition-colors shadow-sm outline-none cursor-pointer"
+          />
           <button className="px-4 py-2.5 bg-primary/10 text-primary font-bold rounded-xl hover:bg-primary/20 transition-colors shadow-sm flex items-center gap-2">
             <Download className="w-4 h-4" />
             Export

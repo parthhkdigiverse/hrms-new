@@ -3,6 +3,7 @@ import { X,  Search, BookOpen, Clock, TrendingUp, Sparkles, Filter, Bookmark, Pl
 import { DialogClose,  Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger  } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { SearchableSelect } from "@/components/ui/select";
 
 type Category = "All" | "Engineering" | "Market Intel" | "Design" | "Company Policies";
 
@@ -208,15 +209,12 @@ export function Research() {
                   </div>
                   <div className="space-y-2">
                     <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Category</label>
-                    <select 
+                    <SearchableSelect 
                       value={newCategory}
-                      onChange={e => setNewCategory(e.target.value as Category)}
-                      className="w-full px-3 py-2 bg-white border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-                    >
-                      {categories.filter(c => c !== "All").map(c => (
-                        <option key={c} value={c}>{c}</option>
-                      ))}
-                    </select>
+                      onChange={(val) => setNewCategory(val as Category)}
+                      options={categories.filter(c => c !== "All").map(c => ({ label: c, value: c }))}
+                      className="w-full h-[38px] px-3 bg-white border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    />
                   </div>
                   <div className="space-y-2">
                     <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Summary / Excerpt</label>

@@ -5,6 +5,7 @@ import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { useTheme } from "../ThemeProvider";
 import { useSettingsContext } from "../payroll/SettingsContext";
 import { moveToRecycleBin } from "@/lib/recycle-bin";
+import { SearchableSelect } from "@/components/ui/select";
 
 const FONTS = [
   { value: "System", label: "System Default" },
@@ -236,30 +237,32 @@ export function AdminSettings() {
                   <div className="grid grid-cols-2 gap-2 mt-2">
                     <div>
                       <label className="block text-[10px] font-bold text-muted-foreground uppercase mb-1">Type</label>
-                      <select 
+                      <SearchableSelect 
                         value={gradientType}
-                        onChange={(e) => setGradientType(e.target.value as "linear" | "radial")}
-                        className="w-full text-xs p-2 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/50"
-                      >
-                        <option value="linear">Linear</option>
-                        <option value="radial">Radial</option>
-                      </select>
+                        onChange={(val) => setGradientType(val as "linear" | "radial")}
+                        options={[
+                          { label: "Linear", value: "linear" },
+                          { label: "Radial", value: "radial" }
+                        ]}
+                        className="w-full h-[32px] text-xs px-2 border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/50"
+                      />
                     </div>
                     {gradientType === "linear" && (
                       <div>
                         <label className="block text-[10px] font-bold text-muted-foreground uppercase mb-1">Direction</label>
-                        <select 
+                        <SearchableSelect 
                           value={gradientDirection}
-                          onChange={(e) => setGradientDirection(e.target.value)}
-                          className="w-full text-xs p-2 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/50"
-                        >
-                          <option value="to right">Right</option>
-                          <option value="to left">Left</option>
-                          <option value="to bottom">Bottom</option>
-                          <option value="to top">Top</option>
-                          <option value="to bottom right">Bottom Right</option>
-                          <option value="to top left">Top Left</option>
-                        </select>
+                          onChange={setGradientDirection}
+                          options={[
+                            { label: "Right", value: "to right" },
+                            { label: "Left", value: "to left" },
+                            { label: "Bottom", value: "to bottom" },
+                            { label: "Top", value: "to top" },
+                            { label: "Bottom Right", value: "to bottom right" },
+                            { label: "Top Left", value: "to top left" }
+                          ]}
+                          className="w-full h-[32px] text-xs px-2 border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/50"
+                        />
                       </div>
                     )}
                   </div>
@@ -424,14 +427,15 @@ export function AdminSettings() {
               onChange={e => setNewTemplateLabel(e.target.value)}
               className="w-full px-3 py-2 rounded-xl border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 bg-background"
             />
-            <select 
+            <SearchableSelect 
               value={newTemplateType}
-              onChange={e => setNewTemplateType(e.target.value as "Penalty" | "Warning")}
-              className="w-full px-3 py-2 rounded-xl border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 bg-background"
-            >
-              <option value="Penalty">Penalty</option>
-              <option value="Warning">Warning</option>
-            </select>
+              onChange={(val) => setNewTemplateType(val as "Penalty" | "Warning")}
+              options={[
+                { label: "Penalty", value: "Penalty" },
+                { label: "Warning", value: "Warning" }
+              ]}
+              className="w-full h-[38px] px-3 border border-border text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary/20"
+            />
             {newTemplateType === "Penalty" && (
               <input 
                 type="number" 

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Search, Filter, FileText, CheckCircle2, Clock, AlertCircle, Eye, Download } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { SearchableSelect } from "@/components/ui/select";
 
 type DocStatus = "Accepted" | "Pending Review" | "Pending Submission" | "Rejected";
 
@@ -65,17 +66,18 @@ export function SubmittedDocuments() {
         <div className="flex items-center gap-2">
           <div className="relative">
             <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <select
+            <SearchableSelect
               value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value as any)}
-              className="pl-9 pr-8 py-2.5 bg-card border border-border/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all text-sm font-bold appearance-none cursor-pointer"
-            >
-              <option value="All">All Statuses</option>
-              <option value="Accepted">Accepted</option>
-              <option value="Pending Review">Pending Review</option>
-              <option value="Pending Submission">Pending Submission</option>
-              <option value="Rejected">Rejected</option>
-            </select>
+              onChange={(val) => setStatusFilter(val as any)}
+              options={[
+                { label: "All Statuses", value: "All" },
+                { label: "Accepted", value: "Accepted" },
+                { label: "Pending Review", value: "Pending Review" },
+                { label: "Pending Submission", value: "Pending Submission" },
+                { label: "Rejected", value: "Rejected" }
+              ]}
+              className="w-full sm:w-[200px] pl-9 py-2.5 bg-card border border-border/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all text-sm font-bold appearance-none cursor-pointer"
+            />
           </div>
         </div>
       </div>

@@ -1,14 +1,15 @@
 import { useState } from "react";
 import { 
-  format, addMonths, subMonths, addWeeks, subWeeks, 
+  format, addMonths, subMonths, addWeeks, subWeeks, addDays, subDays,
   startOfWeek, endOfWeek, startOfMonth, endOfMonth, 
   eachDayOfInterval, isSameMonth, isSameDay, isToday
 } from "date-fns";
 import { 
-  ChevronLeft, ChevronRight, Search, Plus, Calendar as CalendarIcon, ChevronDown
+  ChevronLeft, ChevronRight, Search, Plus, Calendar as CalendarIcon, ChevronDown, Clock
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Calendar as MiniCalendar } from "@/components/ui/calendar";
+import { CreateEventModal } from "./CreateEventModal";
 
 type ViewType = "Month" | "Week" | "Day";
 
@@ -30,6 +31,9 @@ const MOCK_EVENTS: ScheduleEvent[] = [
 export function Schedule() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [view, setView] = useState<ViewType>("Month");
+  const [events, setEvents] = useState<ScheduleEvent[]>(MOCK_EVENTS);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [selectedDateForCreate, setSelectedDateForCreate] = useState<Date>(new Date());
   
   // Date calculations
   const monthStart = startOfMonth(currentDate);
@@ -46,12 +50,13 @@ export function Schedule() {
   const next = () => {
     if (view === "Month") setCurrentDate(addMonths(currentDate, 1));
     else if (view === "Week") setCurrentDate(addWeeks(currentDate, 1));
-    // handle day
+    else if (view === "Day") setCurrentDate(addDays(currentDate, 1));
   };
   
   const prev = () => {
     if (view === "Month") setCurrentDate(subMonths(currentDate, 1));
     else if (view === "Week") setCurrentDate(subWeeks(currentDate, 1));
+    else if (view === "Day") setCurrentDate(subDays(currentDate, 1));
   };
   
   const today = () => setCurrentDate(new Date());
@@ -60,7 +65,7 @@ export function Schedule() {
   const hours = Array.from({ length: 13 }, (_, i) => i + 8);
 
   const getEventsForDay = (dateStr: string) => {
-    return MOCK_EVENTS.filter(e => e.date === dateStr);
+    return events.filter(e => e.date === dateStr);
   };
   
   return (
@@ -90,8 +95,8 @@ export function Schedule() {
             </button>
           </div>
           
-          <h2 className="text-xl font-medium text-foreground/80 w-48">
-            {format(currentDate, "MMMM yyyy")}
+          <h2 className="text-xl font-medium text-foreground/80 w-64">
+            {view === "Day" ? format(currentDate, "d MMMM yyyy") : format(currentDate, "MMMM yyyy")}
           </h2>
         </div>
         
@@ -120,7 +125,12 @@ export function Schedule() {
             ))}
           </div>
           
-          <button className="flex items-center gap-2 px-3 py-1.5 bg-primary text-primary-foreground text-sm font-semibold rounded-lg hover:bg-primary transition-colors shadow-sm ml-2">
+          <button 
+            onClick={() => {
+              setSelectedDateForCreate(currentDate);
+              setIsCreateModalOpen(true);
+            }}
+            className="flex items-center gap-2 px-3 py-1.5 bg-primary text-primary-foreground text-sm font-semibold rounded-lg hover:bg-primary transition-colors shadow-sm ml-2">
             <Plus className="w-4 h-4" /> Create
           </button>
         </div>
@@ -134,6 +144,8 @@ export function Schedule() {
                mode="single" 
                selected={currentDate} 
                onSelect={(date) => date && setCurrentDate(date)} 
+               month={currentDate}
+               onMonthChange={setCurrentDate}
                className="bg-transparent"
              />
           </div>
@@ -307,20 +319,102 @@ export function Schedule() {
           )}
           
           {view === "Day" && (
-            <div className="flex-1 flex flex-col items-center justify-center p-12 text-center text-muted-foreground">
-              <CalendarIcon className="w-16 h-16 text-slate-200 mb-4" />
-              <h3 className="text-lg font-bold text-foreground/80">Day View</h3>
-              <p className="text-sm mt-2">Currently showing <span className="font-semibold text-primary">{format(currentDate, "dd/MM/yyyy")}</span>.</p>
-              <button 
-                onClick={() => setView("Week")}
-                className="mt-6 px-4 py-2 bg-muted hover:bg-slate-200 text-foreground/80 font-medium rounded-lg transition-colors"
-              >
-                Back to Week View
-              </button>
+            <div className="flex-1 flex flex-col min-h-[600px] relative">
+              {/* Day Header */}
+              <div className="flex border-b border-border sticky top-0 bg-white z-20 ml-16">
+                {[currentDate].map(day => (
+                  <div key={day.toString()} className="flex-1 flex flex-col items-center justify-center py-3 border-l border-border bg-muted/20">
+                    <span className="text-xs font-semibold text-primary uppercase tracking-widest mb-1">{format(day, "EEEE")}</span>
+                    <span className="text-2xl flex items-center justify-center rounded-full w-12 h-12 bg-primary text-primary-foreground font-black shadow-md">
+                      {format(day, "d")}
+                    </span>
+                  </div>
+                ))}
+              </div>
+              
+              {/* Time Grid */}
+              <div className="flex-1 overflow-y-auto relative bg-muted/50/30">
+                <div className="flex min-h-[960px]">
+                  {/* Time Axis */}
+                  <div className="w-16 flex-shrink-0 border-r border-border bg-white relative z-10">
+                    {hours.map(hour => (
+                      <div key={hour} className="h-20 relative border-b border-transparent">
+                        <span className="absolute -top-2.5 right-3 text-[11px] font-semibold text-muted-foreground bg-white px-1">
+                          {hour > 12 ? `${hour-12} PM` : hour === 12 ? "12 PM" : `${hour} AM`}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                  
+                  {/* Day Column */}
+                  <div className="flex-1 flex relative">
+                    {[currentDate].map(day => {
+                      const dateStr = format(day, "yyyy-MM-dd");
+                      const dayEvents = getEventsForDay(dateStr);
+                      
+                      return (
+                        <div key={day.toString()} className="flex-1 border-l border-border relative min-w-0 bg-white">
+                          {/* Grid Lines */}
+                          {hours.map(hour => (
+                            <div key={hour} className="h-20 border-b border-border/60 w-full absolute left-0 right-0 pointer-events-none" style={{ top: `${(hour - 8) * 80}px` }}></div>
+                          ))}
+                          
+                          {/* Events */}
+                          {dayEvents.map(event => {
+                            if (!event.startTime || !event.endTime) return null;
+                            const startParts = event.startTime.split(':').map(Number);
+                            const endParts = event.endTime.split(':').map(Number);
+                            const startH = startParts[0] || 0;
+                            const startM = startParts[1] || 0;
+                            const endH = endParts[0] || 0;
+                            const endM = endParts[1] || 0;
+                            
+                            const top = ((startH - 8) + (startM / 60)) * 80;
+                            const height = (((endH - startH) + ((endM - startM) / 60))) * 80;
+                            
+                            if (startH < 8) return null; // skip events outside view
+                            
+                            return (
+                              <div 
+                                key={event.id}
+                                className={cn(
+                                  "absolute left-4 right-4 rounded-xl px-3 py-1.5 text-white shadow-md overflow-hidden border border-white/20 transition-all hover:scale-[1.02] hover:z-20 cursor-pointer z-10 flex flex-col justify-start",
+                                  event.color
+                                )}
+                                style={{ top: `${top}px`, height: `${height}px` }}
+                              >
+                                <div className="text-sm font-bold truncate leading-tight mt-0.5 flex items-center gap-2">
+                                  <span>{event.title}</span>
+                                  {height <= 45 && <span className="text-[10px] font-normal opacity-80">{event.startTime}</span>}
+                                </div>
+                                {height > 45 && (
+                                  <div className="text-xs opacity-90 font-medium truncate flex items-center gap-1 mt-0.5">
+                                    <Clock className="w-3 h-3" /> {event.startTime} - {event.endTime}
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              </div>
             </div>
           )}
         </main>
       </div>
+
+      <CreateEventModal 
+        isOpen={isCreateModalOpen} 
+        onClose={() => setIsCreateModalOpen(false)} 
+        onSave={(newEvent) => {
+          setEvents([...events, { id: Date.now().toString(), ...newEvent }]);
+          setIsCreateModalOpen(false);
+        }}
+        selectedDate={selectedDateForCreate}
+      />
     </div>
   );
 }

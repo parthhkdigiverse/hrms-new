@@ -5,6 +5,7 @@ import { OrgNodeData } from "./org-data";
 import { EMPLOYEES } from "@/components/employees/employee-data";
 import { toast } from "sonner";
 import { useDepartments } from "./DepartmentContext";
+import { SearchableSelect } from "@/components/ui/select";
 
 interface AddOrgNodeModalProps {
   isOpen: boolean;
@@ -68,18 +69,13 @@ export function AddOrgNodeModal({ isOpen, onClose, onSubmit, parentName }: AddOr
             <div className="space-y-2">
               <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Full Name</label>
               <div className="relative">
-                <select 
-                  required
+                <SearchableSelect 
                   value={formData.name}
-                  onChange={(e) => setFormData({...formData, name: e.target.value})}
-                  className="w-full px-4 py-3 bg-muted/50 border border-border/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium appearance-none pr-8"
-                >
-                  <option value="" disabled>Select Employee</option>
-                  {EMPLOYEES.map(emp => (
-                    <option key={emp.id} value={emp.name}>{emp.name}</option>
-                  ))}
-                </select>
-                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+                  onChange={(val) => setFormData({...formData, name: val})}
+                  options={EMPLOYEES.map(emp => ({ label: emp.name, value: emp.name }))}
+                  placeholder="Select Employee"
+                  className="w-full px-4 py-3 bg-muted/50 border border-border/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium"
+                />
               </div>
             </div>
 
@@ -97,28 +93,26 @@ export function AddOrgNodeModal({ isOpen, onClose, onSubmit, parentName }: AddOr
 
             <div className="space-y-2">
               <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Department</label>
-              <select 
+              <SearchableSelect 
                 value={formData.department}
-                onChange={(e) => setFormData({...formData, department: e.target.value})}
+                onChange={(val) => setFormData({...formData, department: val})}
+                options={departments.map(dept => ({ label: dept, value: dept }))}
                 className="w-full px-4 py-3 bg-muted/50 border border-border/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium"
-              >
-                {departments.map(dept => (
-                  <option key={dept} value={dept}>{dept}</option>
-                ))}
-              </select>
+              />
             </div>
 
             <div className="space-y-2">
               <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Status</label>
-              <select 
+              <SearchableSelect 
                 value={formData.status}
-                onChange={(e) => setFormData({...formData, status: e.target.value as 'Active' | 'On Leave' | 'Remote'})}
+                onChange={(val) => setFormData({...formData, status: val as 'Active' | 'On Leave' | 'Remote'})}
+                options={[
+                  { label: "Active", value: "Active" },
+                  { label: "Remote", value: "Remote" },
+                  { label: "On Leave", value: "On Leave" }
+                ]}
                 className="w-full px-4 py-3 bg-muted/50 border border-border/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium"
-              >
-                <option value="Active">Active</option>
-                <option value="Remote">Remote</option>
-                <option value="On Leave">On Leave</option>
-              </select>
+              />
             </div>
 
             </div>

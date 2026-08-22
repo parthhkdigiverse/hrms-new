@@ -3,6 +3,7 @@ import { Search, Plus, Filter, FileText, CheckCircle2, Clock, X, Download, Eye, 
 import { DialogClose,  Dialog, DialogContent  } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { EMPLOYEES } from "@/components/employees/employee-data";
+import { SearchableSelect } from "@/components/ui/select";
 
 type RequestStatus = "Pending" | "Approved" | "Sent" | "Rejected";
 
@@ -105,32 +106,30 @@ export function OfficialLetters({ onNavigate }: { onNavigate?: ((path: string) =
               <div>
                 <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">Employee Name</label>
                 <div className="relative">
-                  <select
+                  <SearchableSelect
                     value={newEmployeeName}
-                    onChange={(e) => setNewEmployeeName(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl border border-border/50 bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all text-sm font-medium appearance-none pr-8"
-                  >
-                    <option value="" disabled>Select Employee</option>
-                    {EMPLOYEES.map(emp => (
-                      <option key={emp.id} value={emp.name}>{emp.name}</option>
-                    ))}
-                  </select>
+                    onChange={(val) => setNewEmployeeName(val)}
+                    options={EMPLOYEES.map(emp => ({ label: emp.name, value: emp.name }))}
+                    placeholder="Select Employee"
+                    className="w-full h-[38px] px-4 rounded-xl border border-border/50 bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all text-sm font-medium appearance-none pr-8"
+                  />
                   <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
                 </div>
               </div>
               
               <div>
                 <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">Letter Type</label>
-                <select
+                <SearchableSelect
                   value={newLetterType}
-                  onChange={(e) => setNewLetterType(e.target.value)}
-                  className="w-full px-4 py-2.5 bg-background border border-border/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all text-sm font-medium"
-                >
-                  <option value="Relieving Letter">Relieving Letter</option>
-                  <option value="Salary Certificate">Salary Certificate</option>
-                  <option value="Employment Proof">Employment Proof</option>
-                  <option value="Offer Letter">Offer Letter</option>
-                </select>
+                  onChange={(val) => setNewLetterType(val)}
+                  options={[
+                    { label: "Relieving Letter", value: "Relieving Letter" },
+                    { label: "Salary Certificate", value: "Salary Certificate" },
+                    { label: "Employment Proof", value: "Employment Proof" },
+                    { label: "Offer Letter", value: "Offer Letter" }
+                  ]}
+                  className="w-full h-[38px] px-4 bg-background border border-border/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all text-sm font-medium"
+                />
               </div>
 
               <div>

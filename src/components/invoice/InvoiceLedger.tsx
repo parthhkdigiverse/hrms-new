@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Search, Filter, Landmark, Download, FileText, IndianRupee, Activity } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { SearchableSelect } from "@/components/ui/select";
 
 interface LedgerEntry {
   id: string;
@@ -94,14 +95,15 @@ export function InvoiceLedger() {
         <div className="flex items-center gap-2 w-full sm:w-auto">
           <div className="relative w-full sm:w-auto">
             <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <select
+            <SearchableSelect
               value={clientFilter}
-              onChange={(e) => setClientFilter(e.target.value)}
-              className="w-full sm:w-auto pl-9 pr-8 py-2.5 bg-background border border-border/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all text-sm font-bold appearance-none cursor-pointer"
-            >
-              <option value="All">All Clients</option>
-              {clients.map(c => <option key={c} value={c}>{c}</option>)}
-            </select>
+              onChange={setClientFilter}
+              options={[
+                { label: "All Clients", value: "All" },
+                ...clients.map(c => ({ label: c, value: c }))
+              ]}
+              className="w-full sm:w-[200px] pl-9 py-2.5 bg-background border border-border/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all text-sm font-bold appearance-none cursor-pointer"
+            />
           </div>
         </div>
       </div>

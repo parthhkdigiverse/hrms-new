@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Search, Filter, Plus, FileText, Download, MoreVertical, Trash2, Edit2, ReceiptText, ArrowUpRight } from "lucide-react";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { cn } from "@/lib/utils";
+import { SearchableSelect } from "@/components/ui/select";
 
 type InvoiceStatus = "Draft" | "Pending" | "Paid" | "Overdue";
 
@@ -112,17 +113,18 @@ export function AllInvoices() {
         <div className="flex items-center gap-2 w-full sm:w-auto">
           <div className="relative w-full sm:w-auto">
             <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <select
+            <SearchableSelect
               value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value as any)}
-              className="w-full sm:w-auto pl-9 pr-8 py-2.5 bg-background border border-border/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all text-sm font-bold appearance-none cursor-pointer"
-            >
-              <option value="All">All Statuses</option>
-              <option value="Draft">Draft</option>
-              <option value="Pending">Pending</option>
-              <option value="Paid">Paid</option>
-              <option value="Overdue">Overdue</option>
-            </select>
+              onChange={(val) => setStatusFilter(val as any)}
+              options={[
+                { label: "All Statuses", value: "All" },
+                { label: "Draft", value: "Draft" },
+                { label: "Pending", value: "Pending" },
+                { label: "Paid", value: "Paid" },
+                { label: "Overdue", value: "Overdue" }
+              ]}
+              className="w-full sm:w-[200px] pl-9 py-2.5 bg-background border border-border/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all text-sm font-bold appearance-none cursor-pointer"
+            />
           </div>
         </div>
       </div>

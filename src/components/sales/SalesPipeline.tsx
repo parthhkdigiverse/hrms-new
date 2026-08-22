@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { formatCurrency, type Lead, type LeadStage } from "./sales-data";
 import { useSales } from "./SalesContext";
+import { SearchableSelect } from "@/components/ui/select";
 
 /* ─── Kanban Card ──────────────────────────────────────────────────────── */
 
@@ -102,21 +103,15 @@ function TableView({ data, onStageChange, activeStages }: { data: Lead[]; onStag
               <td className="px-4 py-3 font-medium">{lead.company}</td>
               <td className="px-4 py-3 text-muted-foreground">{lead.contact} · {lead.city}</td>
               <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
-                <select
+                <SearchableSelect
                   value={lead.stage}
-                  onChange={(e) => onStageChange(lead.id, e.target.value)}
+                  onChange={(val) => onStageChange(lead.id, val)}
+                  options={Array.from(new Set([...stages, lead.stage])).map((s) => ({ label: s, value: s }))}
                   className={cn(
-                    "cursor-pointer appearance-none rounded-full px-2 py-0.5 text-[10px] font-semibold outline-none ring-2 ring-transparent transition-all focus:ring-emerald-500/50",
+                    "w-[120px] h-[30px] px-2 text-[10px] font-semibold",
                     stageColor[lead.stage] || "bg-emerald-100 text-emerald-700"
                   )}
-                  style={{ textAlignLast: "center" }}
-                >
-                  {Array.from(new Set([...stages, lead.stage])).map((s) => (
-                    <option key={s} value={s} className="bg-background text-foreground text-xs font-medium">
-                      {s}
-                    </option>
-                  ))}
-                </select>
+                />
               </td>
               <td className="px-4 py-3 text-muted-foreground">{lead.owner}</td>
               <td className="px-4 py-3 text-right font-semibold">{formatCurrency(lead.budget)}</td>

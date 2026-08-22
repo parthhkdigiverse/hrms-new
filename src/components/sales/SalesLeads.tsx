@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { formatCurrency, type Lead, type LeadStage } from "./sales-data";
 import { useSales } from "./SalesContext";
+import { SearchableSelect } from "@/components/ui/select";
 
 const stageColors: Record<string, string> = {
   "New Lead": "bg-primary/10 text-primary",
@@ -173,21 +174,15 @@ export function SalesLeads({ onAction }: { onAction?: (action: string) => void }
                 <td className="px-4 py-3 text-xs text-muted-foreground">{lead.category}</td>
                 <td className="px-4 py-3 text-xs text-muted-foreground">{lead.source}</td>
                 <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
-                  <select
+                  <SearchableSelect
                     value={lead.stage}
-                    onChange={(e) => handleStageChange(lead.id, e.target.value)}
+                    onChange={(val) => handleStageChange(lead.id, val)}
+                    options={Array.from(new Set([...stages, lead.stage])).map((s) => ({ label: s, value: s }))}
                     className={cn(
-                      "cursor-pointer appearance-none rounded-full px-2 py-0.5 text-[10px] font-semibold outline-none ring-2 ring-transparent transition-all focus:ring-emerald-500/50",
+                      "w-[120px] h-[30px] px-2 text-[10px] font-semibold",
                       stageColors[lead.stage] || "bg-emerald-100 text-emerald-700"
                     )}
-                    style={{ textAlignLast: "center" }}
-                  >
-                    {Array.from(new Set([...stages, lead.stage])).map((s) => (
-                      <option key={s} value={s} className="bg-background text-foreground text-xs font-medium">
-                        {s}
-                      </option>
-                    ))}
-                  </select>
+                  />
                 </td>
                 <td className="px-4 py-3 text-xs">{lead.owner}</td>
                 <td className="px-4 py-3">
@@ -234,24 +229,18 @@ export function SalesLeads({ onAction }: { onAction?: (action: string) => void }
               </div>
 
               <div className="flex flex-wrap gap-2">
-                <select
+                <SearchableSelect
                   value={selectedLead.stage}
-                  onChange={(e) => {
-                    handleStageChange(selectedLead.id, e.target.value);
-                    setSelectedLead({ ...selectedLead, stage: e.target.value });
+                  onChange={(val) => {
+                    handleStageChange(selectedLead.id, val);
+                    setSelectedLead({ ...selectedLead, stage: val });
                   }}
+                  options={Array.from(new Set([...stages, selectedLead.stage])).map((s) => ({ label: s, value: s }))}
                   className={cn(
-                    "cursor-pointer appearance-none rounded-full px-3 py-1 text-xs font-semibold outline-none ring-2 ring-transparent transition-all focus:ring-emerald-500/50",
+                    "w-[140px] h-[36px] px-3 text-xs font-semibold",
                     stageColors[selectedLead.stage] || "bg-emerald-100 text-emerald-700"
                   )}
-                  style={{ textAlignLast: "center" }}
-                >
-                  {Array.from(new Set([...stages, selectedLead.stage])).map((s) => (
-                    <option key={s} value={s} className="bg-background text-foreground font-medium">
-                      {s}
-                    </option>
-                  ))}
-                </select>
+                />
                 <span className={cn("rounded-full px-3 py-1 text-xs font-semibold", priorityColors[selectedLead.priority])}>{selectedLead.priority} Priority</span>
               </div>
 

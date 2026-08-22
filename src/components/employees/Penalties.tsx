@@ -6,6 +6,7 @@ import { EMPLOYEES } from "@/components/employees/employee-data";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { useSettingsContext } from "../payroll/SettingsContext";
+import { SearchableSelect } from "@/components/ui/select";
 
 type RecordType = "Penalty" | "Warning";
 type RecordStatus = "Active" | "Resolved" | "Waived";
@@ -329,42 +330,38 @@ export function Penalties() {
                 <div className="p-6 md:p-8 space-y-6 overflow-y-auto">
                   <div className="space-y-2">
                     <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Pre-defined Template</label>
-                    <select 
+                    <SearchableSelect 
                       value={selectedTemplate}
-                      onChange={handleTemplateChange}
-                      className="w-full px-3 py-2 bg-muted/30 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 font-medium"
-                    >
-                      {penaltyTemplates.map(t => (
-                        <option key={t.label} value={t.label}>{t.label}</option>
-                      ))}
-                    </select>
+                      onChange={(val) => {
+                        const fakeEvent = { target: { value: val } } as React.ChangeEvent<HTMLSelectElement>;
+                        handleTemplateChange(fakeEvent);
+                      }}
+                      options={penaltyTemplates.map(t => ({ label: t.label, value: t.label }))}
+                      className="w-full h-[38px] px-3 bg-muted/30 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 font-medium"
+                    />
                   </div>
                   <div className="space-y-2">
                     <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Record Type</label>
-                    <select 
+                    <SearchableSelect 
                       value={newType}
-                      onChange={e => setNewType(e.target.value as RecordType)}
-                      className="w-full px-3 py-2 bg-background border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 font-medium"
-                    >
-                      <option value="Penalty">Penalty (Financial impact possible)</option>
-                      <option value="Warning">Warning (Written notice)</option>
-                    </select>
+                      onChange={(val) => setNewType(val as RecordType)}
+                      options={[
+                        { label: "Penalty (Financial impact possible)", value: "Penalty" },
+                        { label: "Warning (Written notice)", value: "Warning" }
+                      ]}
+                      className="w-full h-[38px] px-3 bg-background border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 font-medium"
+                    />
                   </div>
                   <div className="space-y-2">
                     <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Employee Name</label>
                     <div className="relative">
-                      <select 
-                        required
+                      <SearchableSelect 
                         value={newEmpName}
-                        onChange={e => setNewEmpName(e.target.value)}
-                        className="w-full px-3 py-2 bg-background border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 appearance-none pr-8"
-                      >
-                        <option value="" disabled>Select Employee</option>
-                        {EMPLOYEES.map(emp => (
-                          <option key={emp.id} value={emp.name}>{emp.name}</option>
-                        ))}
-                      </select>
-                      <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+                        onChange={setNewEmpName}
+                        options={EMPLOYEES.map(emp => ({ label: emp.name, value: emp.name }))}
+                        placeholder="Select Employee"
+                        className="w-full h-[38px] px-3 bg-background border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+                      />
                     </div>
                   </div>
                   

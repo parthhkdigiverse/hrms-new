@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { FileText, Download, Filter, Info, Eye } from "lucide-react";
+import { SearchableSelect } from "@/components/ui/select";
 
 const mockSummaryData = {
   "FINANCIAL - REVENUE": [
@@ -44,16 +45,17 @@ export function FinancialSummary() {
         <div className="flex items-center gap-2 text-sm font-bold text-muted-foreground pl-2">
           <Filter className="w-4 h-4" /> View Period:
         </div>
-        <select 
+        <SearchableSelect 
           value={selectedMonth}
-          onChange={(e) => setSelectedMonth(e.target.value)}
-          className="pl-3 pr-8 py-1.5 bg-background border border-border/50 rounded-lg text-sm font-bold focus:outline-none focus:ring-2 focus:ring-primary/20 cursor-pointer"
-        >
-          <option>Oct 2023</option>
-          <option>Nov 2023</option>
-          <option>Dec 2023</option>
-          <option>Q4 2023 Combined</option>
-        </select>
+          onChange={setSelectedMonth}
+          options={[
+            { label: "Oct 2023", value: "Oct 2023" },
+            { label: "Nov 2023", value: "Nov 2023" },
+            { label: "Dec 2023", value: "Dec 2023" },
+            { label: "Q4 2023 Combined", value: "Q4 2023 Combined" }
+          ]}
+          className="w-[180px] h-[34px] pl-3 pr-3 bg-background border border-border/50 rounded-lg text-sm font-bold focus:outline-none focus:ring-2 focus:ring-primary/20 cursor-pointer"
+        />
       </div>
 
       <div className="bg-rose-500/10 border border-rose-500/20 rounded-xl p-3 flex gap-3 text-rose-700/90 dark:text-rose-400 items-start">

@@ -3,6 +3,7 @@ import { X,  Search, MousePointerClick, UserMinus, UserPlus, ChevronDown  } from
 import { cn } from "@/lib/utils";
 import { DialogClose,  Dialog, DialogContent } from "@/components/ui/dialog";
 import { EMPLOYEES } from "@/components/employees/employee-data";
+import { SearchableSelect } from "@/components/ui/select";
 
 // Mock Data
 const ZONES = [
@@ -230,17 +231,13 @@ export function SeatingArrangement() {
                 <div className="space-y-2">
                     <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Employee Name</label>
                     <div className="relative">
-                      <select 
-                        required
+                      <SearchableSelect 
                         value={newAssigneeName}
-                        onChange={e => setNewAssigneeName(e.target.value)}
-                        className="w-full px-3 py-2 bg-background border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 appearance-none pr-8"
-                      >
-                        <option value="" disabled>Select Employee</option>
-                        {EMPLOYEES.map(emp => (
-                          <option key={emp.id} value={emp.name}>{emp.name}</option>
-                        ))}
-                      </select>
+                        onChange={val => setNewAssigneeName(val)}
+                        options={EMPLOYEES.map(emp => ({ label: emp.name, value: emp.name }))}
+                        placeholder="Select Employee"
+                        className="w-full h-[38px] px-3 bg-background border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 appearance-none pr-8"
+                      />
                       <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
                     </div>
                   </div>

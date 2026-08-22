@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { Check, X, Calendar, Clock, ChevronDown, Filter, CalendarDays, Activity, Plus } from "lucide-react";
 import { DialogClose,  Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger  } from "@/components/ui/dialog";
+import { SearchableSelect } from "@/components/ui/select";
 import { useSettingsContext } from "../payroll/SettingsContext";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -253,15 +254,12 @@ export function LeaveRequests() {
                 <div className="p-6 md:p-8 space-y-6 overflow-y-auto max-h-[70vh]">
                   <div className="space-y-2">
                     <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Leave Type</label>
-                    <select 
+                    <SearchableSelect 
                       value={newLeaveType}
-                      onChange={e => setNewLeaveType(e.target.value)}
-                      className="w-full px-4 py-3 bg-muted/50 border border-border/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium"
-                    >
-                      {leaveTypes.map(type => (
-                        <option key={type} value={type}>{type}</option>
-                      ))}
-                    </select>
+                      onChange={setNewLeaveType}
+                      options={leaveTypes.map(type => ({ label: type, value: type }))}
+                      className="w-full px-4 h-[46px] bg-muted/50 border border-border/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium"
+                    />
                   </div>
                   
                   <div className="grid grid-cols-2 gap-4">

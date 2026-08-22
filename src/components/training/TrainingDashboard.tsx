@@ -5,6 +5,7 @@ import {
   Trophy, BarChart3, Users, Settings, Shield, Plus, Download,
   QrCode
 } from "lucide-react";
+import { SearchableSelect } from "@/components/ui/select";
 
 const mockCourses = [
   { id: "course-1", title: "Digital Marketing Mastery", category: "Marketing · Intermediate", progress: 64, status: "In Progress", duration: "8h 40m", thumbnail: "bg-blue-500", modules: 12, completedModules: 7, learners: 148, rating: 4.8 },
@@ -167,12 +168,18 @@ export function TrainingDashboard({ active, setActive }: { active: string, setAc
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <input type="text" placeholder="Search course or tag..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full pl-9 pr-4 py-2 bg-background border border-border/50 rounded-lg text-sm font-medium focus:ring-2 focus:ring-primary/20 outline-none shadow-sm" />
               </div>
-              <select className="px-3 py-2 bg-background border border-border/50 rounded-lg text-sm font-medium shadow-sm outline-none">
-                <option>All departments</option>
-              </select>
-              <select className="px-3 py-2 bg-background border border-border/50 rounded-lg text-sm font-medium shadow-sm outline-none">
-                <option>All categories</option>
-              </select>
+              <SearchableSelect 
+                value="All departments"
+                onChange={() => {}}
+                options={[{ label: "All departments", value: "All departments" }]}
+                className="w-[160px] h-[36px] px-3 bg-background border border-border/50 rounded-lg text-sm font-medium shadow-sm outline-none"
+              />
+              <SearchableSelect 
+                value="All categories"
+                onChange={() => {}}
+                options={[{ label: "All categories", value: "All categories" }]}
+                className="w-[160px] h-[36px] px-3 bg-background border border-border/50 rounded-lg text-sm font-medium shadow-sm outline-none"
+              />
               <button className="text-sm font-bold text-muted-foreground hover:text-foreground px-2">Reset</button>
               <span className="text-xs font-bold text-muted-foreground ml-auto">Showing {filteredCourses.length} of {mockCourses.length} courses</span>
             </div>
@@ -685,22 +692,33 @@ export function TrainingDashboard({ active, setActive }: { active: string, setAc
               <div className="flex flex-col md:flex-row gap-4 items-end">
                 <div className="flex-1 space-y-1.5 w-full">
                   <label className="text-xs font-bold text-foreground">Course</label>
-                  <select className="w-full px-3 py-2 bg-background border border-border/50 rounded-lg text-sm font-medium shadow-sm outline-none">
-                    <option>Digital Marketing Mastery</option>
-                  </select>
+                  <SearchableSelect 
+                    value="Digital Marketing Mastery"
+                    onChange={() => {}}
+                    options={[{ label: "Digital Marketing Mastery", value: "Digital Marketing Mastery" }]}
+                    className="w-full h-[36px] px-3 bg-background border border-border/50 rounded-lg text-sm font-medium shadow-sm outline-none"
+                  />
                 </div>
                 <div className="flex-1 space-y-1.5 w-full">
                   <label className="text-xs font-bold text-foreground">Audience</label>
-                  <select className="w-full px-3 py-2 bg-background border border-border/50 rounded-lg text-sm font-medium shadow-sm outline-none">
-                    <option>Entire company</option>
-                    <option>Marketing Department</option>
-                  </select>
+                  <SearchableSelect 
+                    value="Entire company"
+                    onChange={() => {}}
+                    options={[
+                      { label: "Entire company", value: "Entire company" },
+                      { label: "Marketing Department", value: "Marketing Department" }
+                    ]}
+                    className="w-full h-[36px] px-3 bg-background border border-border/50 rounded-lg text-sm font-medium shadow-sm outline-none"
+                  />
                 </div>
                 <div className="flex-1 space-y-1.5 w-full">
                   <label className="text-xs font-bold text-foreground">Deadline</label>
-                  <select className="w-full px-3 py-2 bg-background border border-border/50 rounded-lg text-sm font-medium shadow-sm outline-none">
-                    <option>30 days from assignment</option>
-                  </select>
+                  <SearchableSelect 
+                    value="30 days from assignment"
+                    onChange={() => {}}
+                    options={[{ label: "30 days from assignment", value: "30 days from assignment" }]}
+                    className="w-full h-[36px] px-3 bg-background border border-border/50 rounded-lg text-sm font-medium shadow-sm outline-none"
+                  />
                 </div>
                 <button className="px-6 py-2.5 bg-emerald-600 text-white font-bold rounded-lg shadow-sm hover:bg-emerald-700 transition-colors shrink-0 w-full md:w-auto">
                   Assign course

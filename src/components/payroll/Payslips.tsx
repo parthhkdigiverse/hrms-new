@@ -10,12 +10,27 @@ import {
   ShieldCheck
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { SearchableSelect } from "@/components/ui/select";
+
+const PAY_PERIODS = [
+  { id: "2026-01", label: "January 2026", period: "01 Jan 2026 – 31 Jan 2026" },
+  { id: "2026-02", label: "February 2026", period: "01 Feb 2026 – 28 Feb 2026" },
+  { id: "2026-03", label: "March 2026", period: "01 Mar 2026 – 31 Mar 2026" },
+  { id: "2026-04", label: "April 2026", period: "01 Apr 2026 – 30 Apr 2026" },
+  { id: "2026-05", label: "May 2026", period: "01 May 2026 – 31 May 2026" },
+  { id: "2026-06", label: "June 2026", period: "01 Jun 2026 – 30 Jun 2026" },
+  { id: "2026-07", label: "July 2026", period: "01 Jul 2026 – 31 Jul 2026" },
+  { id: "2026-08", label: "August 2026", period: "01 Aug 2026 – 31 Aug 2026" },
+];
 
 export function Payslips() {
   const [selectedEmpId, setSelectedEmpId] = useState(MOCK_EMPLOYEES[0]?.id || "");
+  const [selectedPeriodId, setSelectedPeriodId] = useState("2026-07");
+  
   const selectedEmp = MOCK_EMPLOYEES.find(e => e.id === selectedEmpId) || MOCK_EMPLOYEES[0];
+  const selectedPeriod = PAY_PERIODS.find(p => p.id === selectedPeriodId) || PAY_PERIODS[6];
 
-  if (!selectedEmp) return null;
+  if (!selectedEmp || !selectedPeriod) return null;
 
   const totalEarnings = 105304;
   const totalDeductions = 11708;
@@ -28,25 +43,28 @@ export function Payslips() {
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 pb-12">
       
       {/* Top Page Header */}
-      <div className="mb-8 flex items-end justify-between border-b border-border pb-6">
+      <div className="mb-8 flex flex-col xl:flex-row xl:items-end justify-between gap-4 border-b border-border pb-6">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-foreground">Payslip</h1>
-          <p className="mt-1 text-[14px] text-muted-foreground">Pay period: 01 Jul 2026 – 31 Jul 2026</p>
+          <p className="mt-1 text-[14px] text-muted-foreground">Pay period: {selectedPeriod.period}</p>
         </div>
         
-        <div className="flex items-center gap-3">
-          <div className="relative">
-            <select 
-              value={selectedEmpId}
-              onChange={(e) => setSelectedEmpId(e.target.value)}
-              className="appearance-none pl-4 pr-10 py-2 bg-white border border-border/80 rounded-lg text-[13px] font-semibold text-foreground/80 outline-none focus:border-emerald-500 shadow-sm min-w-[200px]"
-            >
-              {MOCK_EMPLOYEES.map(emp => (
-                <option key={emp.id} value={emp.id}>{emp.name}</option>
-              ))}
-            </select>
-            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
-          </div>
+        <div className="flex flex-wrap items-center gap-3">
+          <SearchableSelect 
+            value={selectedPeriodId} 
+            onChange={setSelectedPeriodId}
+            options={PAY_PERIODS.map(p => ({ label: p.label, value: p.id }))}
+            placeholder="Select month"
+            className="w-[160px] bg-white border border-border/80 text-[13px] font-semibold text-foreground/80 rounded-lg h-[38px] shadow-sm focus:ring-emerald-500"
+          />
+
+          <SearchableSelect 
+            value={selectedEmpId} 
+            onChange={setSelectedEmpId}
+            options={MOCK_EMPLOYEES.map(emp => ({ label: emp.name, value: emp.id }))}
+            placeholder="Select employee"
+            className="w-[220px] bg-white border border-border/80 text-[13px] font-semibold text-foreground/80 rounded-lg h-[38px] shadow-sm focus:ring-emerald-500"
+          />
           
           <button className="flex items-center gap-2 bg-white border border-border/80 px-4 py-2 rounded-lg text-foreground/80 text-[13px] font-semibold hover:bg-muted/50 transition-colors shadow-sm">
             <FileText className="h-4 w-4" /> PDF
@@ -82,7 +100,7 @@ export function Payslips() {
           </div>
           <div className="text-right">
             <p className="text-[10px] font-bold uppercase tracking-widest text-white/80 mb-0.5">PAYSLIP</p>
-            <h3 className="text-2xl font-bold">July 2026</h3>
+            <h3 className="text-2xl font-bold">{selectedPeriod.label}</h3>
           </div>
         </div>
 

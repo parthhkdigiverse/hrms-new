@@ -2,6 +2,7 @@ import { useState } from "react";
 import { X,  Search, Plus, Filter, LayoutGrid, List as ListIcon, MoreHorizontal, Calendar, Clock, CheckCircle2, MessageSquare, Paperclip  } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { DialogClose,  Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger  } from "@/components/ui/dialog";
+import { SearchableSelect } from "@/components/ui/select";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { toast } from "sonner";
 import { format } from "date-fns";
@@ -226,15 +227,16 @@ export function Tasks() {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Priority</label>
-                    <select
+                    <SearchableSelect
                       value={newTaskPriority}
-                      onChange={e => setNewTaskPriority(e.target.value as Priority)}
-                      className="w-full px-3 py-2 bg-white border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-                    >
-                      <option value="High">High</option>
-                      <option value="Medium">Medium</option>
-                      <option value="Low">Low</option>
-                    </select>
+                      onChange={(val) => setNewTaskPriority(val as Priority)}
+                      options={[
+                        { label: "High", value: "High" },
+                        { label: "Medium", value: "Medium" },
+                        { label: "Low", value: "Low" }
+                      ]}
+                      className="w-full h-[38px] px-3 bg-white border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    />
                   </div>
                   <div className="space-y-2">
                     <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Due Date</label>
@@ -372,27 +374,29 @@ export function Tasks() {
                           />
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <select 
+                          <SearchableSelect 
                             value={inlineTaskStatus}
-                            onChange={(e) => setInlineTaskStatus(e.target.value as TaskStatus)}
-                            className="px-2 py-1 text-xs font-semibold text-foreground/80 bg-white border border-border rounded-md focus:outline-none"
-                          >
-                            <option value="Todo">Todo</option>
-                            <option value="In Progress">In Progress</option>
-                            <option value="In Review">In Review</option>
-                            <option value="Done">Done</option>
-                          </select>
+                            onChange={(val) => setInlineTaskStatus(val as TaskStatus)}
+                            options={[
+                              { label: "Todo", value: "Todo" },
+                              { label: "In Progress", value: "In Progress" },
+                              { label: "In Review", value: "In Review" },
+                              { label: "Done", value: "Done" }
+                            ]}
+                            className="w-[120px] h-[28px] px-2 text-xs font-semibold text-foreground/80 bg-white border border-border rounded-md focus:outline-none"
+                          />
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <select 
+                          <SearchableSelect 
                             value={inlineTaskPriority}
-                            onChange={(e) => setInlineTaskPriority(e.target.value as Priority)}
-                            className="px-2 py-1 text-xs font-bold border border-border rounded-md bg-white focus:outline-none"
-                          >
-                            <option value="High">High</option>
-                            <option value="Medium">Medium</option>
-                            <option value="Low">Low</option>
-                          </select>
+                            onChange={(val) => setInlineTaskPriority(val as Priority)}
+                            options={[
+                              { label: "High", value: "High" },
+                              { label: "Medium", value: "Medium" },
+                              { label: "Low", value: "Low" }
+                            ]}
+                            className="w-[100px] h-[28px] px-2 text-xs font-bold border border-border rounded-md bg-white focus:outline-none"
+                          />
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <input 

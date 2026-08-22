@@ -3,6 +3,7 @@ import { Download, ChevronDown, CheckCircle2, TrendingUp, TrendingDown, DollarSi
 import { DialogClose,  Dialog, DialogContent  } from "@/components/ui/dialog";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { moveToRecycleBin } from "@/lib/recycle-bin";
+import { SearchableSelect } from "@/components/ui/select";
 
 const mockPlanData = {
   "FINANCIAL - REVENUE": [
@@ -41,6 +42,7 @@ export function FinancialPlan() {
   const [isAddRowOpen, setIsAddRowOpen] = useState(false);
   const [isEditRowOpen, setIsEditRowOpen] = useState(false);
   const [activeCategory, setActiveCategory] = useState<string>("");
+  const [rowUnit, setRowUnit] = useState("INR");
 
   const confirmDeleteCategory = () => {
     if (deleteConfirm.category) {
@@ -226,11 +228,16 @@ export function FinancialPlan() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wide">Unit</label>
-                  <select className="w-full px-3 py-2 bg-background border border-border/50 rounded-lg text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-primary/20">
-                    <option>INR</option>
-                    <option>Number</option>
-                    <option>Active</option>
-                  </select>
+                  <SearchableSelect
+                    value={rowUnit}
+                    onChange={setRowUnit}
+                    options={[
+                      { label: "INR", value: "INR" },
+                      { label: "Number", value: "Number" },
+                      { label: "Active", value: "Active" }
+                    ]}
+                    className="w-full h-[40px] px-3 bg-background border border-border/50 rounded-lg text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-primary/20"
+                  />
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wide">Target Value</label>

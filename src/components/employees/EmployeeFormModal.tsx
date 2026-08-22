@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { User, Briefcase, FileText, Check, ChevronRight, Upload, X, MapPin, Phone, Mail, Building2, CreditCard, ShieldAlert } from "lucide-react";
 import { DialogClose,  Dialog, DialogContent  } from "@/components/ui/dialog";
+import { SearchableSelect } from "@/components/ui/select";
 import { Employee, EmployeeStatus } from "./employee-data";
 import { useDepartments } from "./DepartmentContext";
 import { toast } from "sonner";
@@ -179,11 +180,12 @@ export function EmployeeFormModal({ isOpen, onClose, onSubmit, initialData, isSe
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.name || !formData.email || !formData.role) {
-      toast.error("Please fill in all required fields.");
+    const fullName = formData.name || `${formData.firstName || ''} ${formData.lastName || ''}`.trim();
+    if (!fullName || !formData.email || !formData.role || !formData.phone) {
+      toast.error("Please fill in all required fields (Name, Email, Phone, System Role).");
       return;
     }
-    onSubmit(formData);
+    onSubmit({ ...formData, name: fullName });
     onClose();
   };
 
@@ -256,7 +258,7 @@ export function EmployeeFormModal({ isOpen, onClose, onSubmit, initialData, isSe
                     <div className="space-y-2">
                       <label className="text-[12px] font-bold text-foreground/80 uppercase tracking-wider">First Name *</label>
                       <input 
-                        type="text" required value={formData.firstName || ''} onChange={(e) => handleInputChange('firstName', e.target.value)}
+                        type="text" value={formData.firstName || ''} onChange={(e) => handleInputChange('firstName', e.target.value)}
                         className="w-full px-4 py-2.5 bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all"
                         placeholder="John"
                       />
@@ -272,7 +274,7 @@ export function EmployeeFormModal({ isOpen, onClose, onSubmit, initialData, isSe
                     <div className="space-y-2">
                       <label className="text-[12px] font-bold text-foreground/80 uppercase tracking-wider">Last Name *</label>
                       <input 
-                        type="text" required value={formData.lastName || ''} onChange={(e) => handleInputChange('lastName', e.target.value)}
+                        type="text" value={formData.lastName || ''} onChange={(e) => handleInputChange('lastName', e.target.value)}
                         className="w-full px-4 py-2.5 bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all"
                         placeholder="Doe"
                       />
@@ -281,7 +283,7 @@ export function EmployeeFormModal({ isOpen, onClose, onSubmit, initialData, isSe
                     <div className="space-y-2">
                       <label className="text-[12px] font-bold text-foreground/80 uppercase tracking-wider">Email Address *</label>
                       <input 
-                        type="email" required value={formData.email || ''} onChange={(e) => handleInputChange('email', e.target.value)}
+                        type="email" value={formData.email || ''} onChange={(e) => handleInputChange('email', e.target.value)}
                         className="w-full px-4 py-2.5 bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all"
                         placeholder="john@example.com"
                       />
@@ -289,7 +291,7 @@ export function EmployeeFormModal({ isOpen, onClose, onSubmit, initialData, isSe
                     <div className="space-y-2">
                       <label className="text-[12px] font-bold text-foreground/80 uppercase tracking-wider">Phone Number *</label>
                       <input 
-                        type="tel" required value={formData.phone || ''} onChange={(e) => handleInputChange('phone', e.target.value)}
+                        type="tel" value={formData.phone || ''} onChange={(e) => handleInputChange('phone', e.target.value)}
                         className="w-full px-4 py-2.5 bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all"
                         placeholder="+1 234 567 890"
                       />
@@ -304,14 +306,15 @@ export function EmployeeFormModal({ isOpen, onClose, onSubmit, initialData, isSe
 
                     <div className="space-y-2">
                       <label className="text-[12px] font-bold text-foreground/80 uppercase tracking-wider">Gender</label>
-                      <select 
-                        value={formData.gender || ''} onChange={(e) => handleInputChange('gender', e.target.value)}
-                        className="w-full px-4 py-2.5 bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all"
-                      >
-                        <option value="Male">Male</option>
-                        <option value="Female">Female</option>
-                        <option value="Other">Other</option>
-                      </select>
+                      <SearchableSelect 
+                        value={formData.gender || ''} onChange={(val) => handleInputChange('gender', val)}
+                        options={[
+                          { label: 'Male', value: 'Male' },
+                          { label: 'Female', value: 'Female' },
+                          { label: 'Other', value: 'Other' }
+                        ]}
+                        className="w-full px-4 h-[42px] bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all"
+                      />
                     </div>
 
                     <div className="space-y-2 col-span-1 md:col-span-2">
@@ -343,17 +346,19 @@ export function EmployeeFormModal({ isOpen, onClose, onSubmit, initialData, isSe
                       </div>
                       <div className="space-y-2">
                         <label className="text-[12px] font-bold text-foreground/80 uppercase tracking-wider">Relation</label>
-                        <select 
-                          value={formData.relation || ''} onChange={(e) => handleInputChange('relation', e.target.value)}
-                          className="w-full px-4 py-2.5 bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all"
-                        >
-                          <option value="">Select Relation</option>
-                          <option value="Father">Father</option>
-                          <option value="Mother">Mother</option>
-                          <option value="Spouse">Spouse</option>
-                          <option value="Sibling">Sibling</option>
-                          <option value="Other">Other</option>
-                        </select>
+                        <SearchableSelect 
+                          value={formData.relation || ''} 
+                          onChange={(val) => handleInputChange('relation', val)}
+                          options={[
+                            { label: "Father", value: "Father" },
+                            { label: "Mother", value: "Mother" },
+                            { label: "Spouse", value: "Spouse" },
+                            { label: "Sibling", value: "Sibling" },
+                            { label: "Other", value: "Other" }
+                          ]}
+                          placeholder="Select Relation"
+                          className="w-full h-[42px] px-4 bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all"
+                        />
                       </div>
                     </div>
                   </div>
@@ -373,26 +378,24 @@ export function EmployeeFormModal({ isOpen, onClose, onSubmit, initialData, isSe
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
                       <label className="text-[12px] font-bold text-foreground/80 uppercase tracking-wider">System Role *</label>
-                      <select 
-                        value={formData.role || ''} onChange={(e) => handleInputChange('role', e.target.value)}
-                        className="w-full px-4 py-2.5 bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all"
-                      >
-                        <option value="Employee">Employee</option>
-                        <option value="Manager">Manager</option>
-                        <option value="Admin">Admin</option>
-                      </select>
+                      <SearchableSelect 
+                        value={formData.role || ''} onChange={(val) => handleInputChange('role', val)}
+                        options={[
+                          { label: 'Employee', value: 'Employee' },
+                          { label: 'Manager', value: 'Manager' },
+                          { label: 'Admin', value: 'Admin' }
+                        ]}
+                        className="w-full px-4 h-[42px] bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all"
+                      />
                     </div>
 
                     <div className="space-y-2">
                       <label className="text-[12px] font-bold text-foreground/80 uppercase tracking-wider">Department *</label>
-                      <select 
-                        value={formData.department || ''} onChange={(e) => handleInputChange('department', e.target.value)}
-                        className="w-full px-4 py-2.5 bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all"
-                      >
-                        {departments.map(dept => (
-                          <option key={dept} value={dept}>{dept}</option>
-                        ))}
-                      </select>
+                      <SearchableSelect 
+                        value={formData.department || ''} onChange={(val) => handleInputChange('department', val)}
+                        options={departments.map(dept => ({ label: dept, value: dept }))}
+                        className="w-full px-4 h-[42px] bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all"
+                      />
                     </div>
 
                     <div className="space-y-2">
@@ -415,26 +418,29 @@ export function EmployeeFormModal({ isOpen, onClose, onSubmit, initialData, isSe
 
                     <div className="space-y-2">
                       <label className="text-[12px] font-bold text-foreground/80 uppercase tracking-wider">Status</label>
-                      <select 
-                        value={formData.status || 'Active'} onChange={(e) => handleInputChange('status', e.target.value as EmployeeStatus)}
-                        className="w-full px-4 py-2.5 bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all"
-                      >
-                        <option value="Active">Active</option>
-                        <option value="Remote">Remote</option>
-                        <option value="On Leave">On Leave</option>
-                      </select>
+                      <SearchableSelect 
+                        value={formData.status || 'Active'} onChange={(val) => handleInputChange('status', val as EmployeeStatus)}
+                        options={[
+                          { label: 'Active', value: 'Active' },
+                          { label: 'Remote', value: 'Remote' },
+                          { label: 'On Leave', value: 'On Leave' },
+                          { label: 'Inactive', value: 'Inactive' }
+                        ]}
+                        className="w-full px-4 h-[42px] bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all"
+                      />
                     </div>
 
                     <div className="space-y-2">
                       <label className="text-[12px] font-bold text-foreground/80 uppercase tracking-wider">Work Mode</label>
-                      <select 
-                        value={formData.workMode || 'WFO'} onChange={(e) => handleInputChange('workMode', e.target.value)}
-                        className="w-full px-4 py-2.5 bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all"
-                      >
-                        <option value="WFO">Work From Office</option>
-                        <option value="WFH">Work From Home</option>
-                        <option value="Hybrid">Hybrid</option>
-                      </select>
+                      <SearchableSelect 
+                        value={formData.workMode || 'WFO'} onChange={(val) => handleInputChange('workMode', val)}
+                        options={[
+                          { label: 'Work From Office', value: 'WFO' },
+                          { label: 'Work From Home', value: 'WFH' },
+                          { label: 'Hybrid', value: 'Hybrid' }
+                        ]}
+                        className="w-full px-4 h-[42px] bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all"
+                      />
                     </div>
                   </div>
 

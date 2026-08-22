@@ -3,6 +3,7 @@ import { Download, Plus, Edit3, Trash2, ArrowUpRight, ArrowDownRight, Search, Fi
 import { DialogClose,  Dialog, DialogContent  } from "@/components/ui/dialog";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { moveToRecycleBin } from "@/lib/recycle-bin";
+import { SearchableSelect } from "@/components/ui/select";
 
 const mockClientData = [
   {
@@ -41,6 +42,12 @@ export function OtherTransactions() {
   // Modal States
   const [isAddTxOpen, setIsAddTxOpen] = useState(false);
   const [isManageClientOpen, setIsManageClientOpen] = useState(false);
+
+  const [addTxType, setAddTxType] = useState("Inflow (Received)");
+  const [addTxMethod, setAddTxMethod] = useState("Wire Transfer");
+  
+  const [manageTxType, setManageTxType] = useState("Inflow (Received)");
+  const [manageTxMethod, setManageTxMethod] = useState("Wire Transfer");
 
   const toggleExpand = (clientName: string) => {
     setExpandedClients(prev => 
@@ -279,10 +286,15 @@ export function OtherTransactions() {
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wide">Transaction Type *</label>
-                  <select className="w-full px-3 py-2 bg-background border border-border/50 rounded-lg text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-primary/20">
-                    <option>Inflow (Received)</option>
-                    <option>Outflow (Paid)</option>
-                  </select>
+                  <SearchableSelect
+                    value={addTxType}
+                    onChange={setAddTxType}
+                    options={[
+                      { label: "Inflow (Received)", value: "Inflow (Received)" },
+                      { label: "Outflow (Paid)", value: "Outflow (Paid)" }
+                    ]}
+                    className="w-full h-[40px] px-3 bg-background border border-border/50 rounded-lg text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-primary/20"
+                  />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
@@ -292,12 +304,17 @@ export function OtherTransactions() {
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wide">Payment Method</label>
-                  <select className="w-full px-3 py-2 bg-background border border-border/50 rounded-lg text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-primary/20">
-                    <option>Wire Transfer</option>
-                    <option>Bank Transfer</option>
-                    <option>ACH</option>
-                    <option>Cash</option>
-                  </select>
+                  <SearchableSelect
+                    value={addTxMethod}
+                    onChange={setAddTxMethod}
+                    options={[
+                      { label: "Wire Transfer", value: "Wire Transfer" },
+                      { label: "Bank Transfer", value: "Bank Transfer" },
+                      { label: "ACH", value: "ACH" },
+                      { label: "Cash", value: "Cash" }
+                    ]}
+                    className="w-full h-[40px] px-3 bg-background border border-border/50 rounded-lg text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-primary/20"
+                  />
                 </div>
               </div>
               <div className="space-y-1.5">
@@ -358,10 +375,15 @@ export function OtherTransactions() {
                   </div>
                   <div className="space-y-1.5">
                     <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wide">Transaction Type *</label>
-                    <select className="w-full px-3 py-2 bg-background border border-border/50 rounded-lg text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500/20">
-                      <option>Inflow (Received)</option>
-                      <option>Outflow (Paid)</option>
-                    </select>
+                    <SearchableSelect
+                      value={manageTxType}
+                      onChange={setManageTxType}
+                      options={[
+                        { label: "Inflow (Received)", value: "Inflow (Received)" },
+                        { label: "Outflow (Paid)", value: "Outflow (Paid)" }
+                      ]}
+                      className="w-full h-[40px] px-3 bg-background border border-border/50 rounded-lg text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                    />
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
@@ -371,12 +393,17 @@ export function OtherTransactions() {
                   </div>
                   <div className="space-y-1.5">
                     <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wide">Payment Method</label>
-                    <select className="w-full px-3 py-2 bg-background border border-border/50 rounded-lg text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500/20">
-                      <option>Wire Transfer</option>
-                      <option>Bank Transfer</option>
-                      <option>ACH</option>
-                      <option>Cash</option>
-                    </select>
+                    <SearchableSelect
+                      value={manageTxMethod}
+                      onChange={setManageTxMethod}
+                      options={[
+                        { label: "Wire Transfer", value: "Wire Transfer" },
+                        { label: "Bank Transfer", value: "Bank Transfer" },
+                        { label: "ACH", value: "ACH" },
+                        { label: "Cash", value: "Cash" }
+                      ]}
+                      className="w-full h-[40px] px-3 bg-background border border-border/50 rounded-lg text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                    />
                   </div>
                 </div>
                 <div className="space-y-1.5">

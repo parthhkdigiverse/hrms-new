@@ -1,5 +1,7 @@
 import { Briefcase, CheckCircle2, Clock, CheckCircle, Activity, LayoutList } from "lucide-react";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Legend, Cell, Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis } from 'recharts';
+import { useState } from 'react';
+import { SearchableSelect } from '@/components/ui/select';
 
 const taskCompletion = [
   { name: 'Mon', completed: 145, overdue: 12 },
@@ -19,6 +21,8 @@ const projectAllocation = [
 ];
 
 export function WorkReport() {
+  const [timeRange, setTimeRange] = useState("This Week");
+
   return (
     <div className="w-full space-y-8 animate-in fade-in duration-500">
       
@@ -34,11 +38,16 @@ export function WorkReport() {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <select className="px-4 py-2.5 bg-card border border-border/50 text-foreground font-bold rounded-xl hover:bg-muted/50 transition-colors shadow-sm outline-none">
-            <option>This Week</option>
-            <option>Last Week</option>
-            <option>This Month</option>
-          </select>
+          <SearchableSelect
+            value={timeRange}
+            onChange={setTimeRange}
+            options={[
+              { label: "This Week", value: "This Week" },
+              { label: "Last Week", value: "Last Week" },
+              { label: "This Month", value: "This Month" }
+            ]}
+            className="w-[180px] h-[44px] bg-card border border-border/50 text-foreground font-bold rounded-xl shadow-sm outline-none"
+          />
         </div>
       </div>
 
