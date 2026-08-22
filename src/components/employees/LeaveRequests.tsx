@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
-import { Check, X, Calendar, Clock, ChevronDown, Filter, CalendarDays, Activity, Plus } from "lucide-react";
+import { Check, X, Calendar, Clock, ChevronDown, Filter, CalendarDays, Activity, Plus, Edit2 } from "lucide-react";
 import { DialogClose,  Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger  } from "@/components/ui/dialog";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { SearchableSelect } from "@/components/ui/select";
 import { useSettingsContext } from "../payroll/SettingsContext";
 import { cn } from "@/lib/utils";
@@ -152,9 +153,13 @@ export function LeaveRequests() {
   const [newReason, setNewReason] = useState("");
   const [newIsConditional, setNewIsConditional] = useState(false);
 
-  const handleAction = (id: string, action: "Approved" | "Rejected") => {
-    setRequests(prev => prev.map(r => r.id === id ? { ...r, status: action } : r));
-    toast.success(`Leave request ${action.toLowerCase()} successfully`);
+  const handleAction = (id: string, action: "Approved" | "Rejected" | "Pending", isConditional?: boolean) => {
+    setRequests(prev => prev.map(r => r.id === id ? { ...r, status: action, isConditional: isConditional ?? r.isConditional } : r));
+    if (action === "Pending") {
+      toast.success(`Leave request reverted to pending for review`);
+    } else {
+      toast.success(`Leave request ${action.toLowerCase()}${isConditional ? ' conditionally (WFH)' : ''} successfully`);
+    }
   };
 
   const handleAddLeave = (e: React.FormEvent) => {
@@ -410,13 +415,20 @@ export function LeaveRequests() {
                   <p className="text-[11px] text-muted-foreground font-medium">Applied on {request.appliedOn}</p>
                   
                   {request.status === "Pending" && (
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
                       <button 
                         onClick={() => handleAction(request.id, "Rejected")}
                         className="p-2 text-rose-500 hover:bg-rose-50 rounded-lg transition-colors"
                         title="Reject"
                       >
                         <X className="w-5 h-5" />
+                      </button>
+                      <button 
+                        onClick={() => handleAction(request.id, "Approved", true)}
+                        className="px-3 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-sm font-bold rounded-lg transition-colors flex items-center gap-1.5 shadow-sm"
+                        title="Approve as Work From Home"
+                      >
+                        <Clock className="w-4 h-4" /> WFH
                       </button>
                       <button 
                         onClick={() => handleAction(request.id, "Approved")}
@@ -427,12 +439,33 @@ export function LeaveRequests() {
                     </div>
                   )}
                   {request.status !== "Pending" && (
-                    <div className={cn(
-                      "px-3 py-1 rounded-lg text-xs font-bold",
-                      request.status === "Approved" ? "bg-emerald-50 text-emerald-600" : "bg-rose-50 text-rose-600"
-                    )}>
-                      {request.status}
-                    </div>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <button className="flex items-center gap-1.5 hover:bg-muted/50 p-1 -m-1 rounded-lg transition-colors outline-none focus:ring-2 focus:ring-primary/20">
+                          <div className={cn(
+                            "px-3 py-1 rounded-lg text-xs font-bold flex items-center gap-1.5",
+                            request.status === "Approved" ? "bg-emerald-50 text-emerald-600" : "bg-rose-50 text-rose-600"
+                          )}>
+                            {request.status}
+                            <ChevronDown className="w-3 h-3 opacity-50" />
+                          </div>
+                        </button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-[200px] rounded-xl p-1.5 shadow-xl border-border/60">
+                        <DropdownMenuItem onClick={() => handleAction(request.id, "Approved", false)} className="text-emerald-600 font-medium cursor-pointer rounded-lg mb-1">
+                          <Check className="w-4 h-4 mr-2" /> Approve Leave
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleAction(request.id, "Approved", true)} className="text-indigo-600 font-medium cursor-pointer rounded-lg mb-1">
+                          <Clock className="w-4 h-4 mr-2" /> Approve as WFH
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleAction(request.id, "Rejected", false)} className="text-rose-600 font-medium cursor-pointer rounded-lg mb-1">
+                          <X className="w-4 h-4 mr-2" /> Reject Leave
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleAction(request.id, "Pending", false)} className="text-amber-600 font-medium cursor-pointer rounded-lg">
+                          <Activity className="w-4 h-4 mr-2" /> Revert to Pending
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   )}
                 </div>
               </div>

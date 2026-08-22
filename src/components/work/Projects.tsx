@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { X,  Search, Plus, Filter, MoreHorizontal, LayoutGrid, List, Briefcase, Calendar, Clock, Star, Circle, Trash2, Edit2, Archive, ArrowLeft, Users, IndianRupee, FolderGit2, CheckCircle2, Settings2, TrendingUp, MousePointerClick, Target, BarChart3, ChevronDown  } from "lucide-react";
+import { X,  Search, Plus, Filter, MoreHorizontal, LayoutGrid, List, Briefcase, Calendar, Clock, Star, Circle, Trash2, Edit2, Archive, ArrowLeft, Users, IndianRupee, FolderGit2, CheckCircle2, Settings2, TrendingUp, MousePointerClick, Target, BarChart3, ChevronDown, User, Building2, CreditCard, FileText, ChevronRight  } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -14,10 +14,23 @@ import { SearchableSelect } from "@/components/ui/select";
 
 type ProjectStatus = "In Progress" | "In Review" | "Completed" | "On Hold";
 type ClientStatus = "Active" | "Archived";
+type ClientTab = 'general' | 'company' | 'service' | 'remarks';
 
 interface Client {
   id: string;
   name: string;
+  companyName?: string;
+  email?: string;
+  phone?: string;
+  address?: string;
+  state?: string;
+  gstin?: string;
+  department?: string;
+  salesFocused?: string;
+
+  remarks?: string;
+  dailyFollowup?: string;
+  assignedEmployeeId?: string;
   logo: string;
   totalBudget: string;
   outstandingPayment: string;
@@ -194,13 +207,29 @@ const INITIAL_PROJECTS: Project[] = [
 const TABS = ["Active Clients", "Archived Clients"];
 
 export function Projects() {
+  // One-time migration: clear old localStorage if version mismatch
+  const STORAGE_VERSION = 'v3';
+  if (localStorage.getItem('hrms_storage_version') !== STORAGE_VERSION) {
+    localStorage.removeItem('hrms_clients');
+    localStorage.removeItem('hrms_projects');
+    localStorage.removeItem('hrms_categories');
+    localStorage.setItem('hrms_storage_version', STORAGE_VERSION);
+  }
+
   const [clients, setClients] = useState<Client[]>(() => {
     const saved = localStorage.getItem('hrms_clients');
     if (saved) {
       try { 
         const parsed = JSON.parse(saved);
         if (JSON.stringify(parsed).includes('$')) return INITIAL_CLIENTS; // Force update to ₹
-        return parsed;
+        // Normalize: ensure all clients have a contacts array and logo
+        return (parsed as Client[]).map((c: Client) => ({
+          ...c,
+          contacts: c.contacts ?? [],
+          logo: c.logo || `https://i.pravatar.cc/150?u=${encodeURIComponent(c.name)}`,
+          totalBudget: c.totalBudget ?? '₹0',
+          outstandingPayment: c.outstandingPayment ?? '₹0',
+        }));
       } catch (e) {}
     }
     return INITIAL_CLIENTS;
@@ -250,16 +279,47 @@ export function Projects() {
   const [isKanbanView, setIsKanbanView] = useState(false);
 
   const [isNewClientModalOpen, setIsNewClientModalOpen] = useState(false);
+  const [activeClientTab, setActiveClientTab] = useState<ClientTab>('general');
+  const clientTabs = [
+    { id: 'general', label: 'General Info', icon: User },
+    { id: 'company', label: 'Company Details', icon: Building2 },
+    { id: 'service', label: 'Service Details', icon: CreditCard },
+    { id: 'remarks', label: 'Remarks', icon: FileText }
+  ];
   const [isNewProjectModalOpen, setIsNewProjectModalOpen] = useState(false);
   const [isEditClientModalOpen, setIsEditClientModalOpen] = useState(false);
   const [editingClient, setEditingClient] = useState<Client | null>(null);
   const [showEditClientErrors, setShowEditClientErrors] = useState(false);
   const [isEditProjectModalOpen, setIsEditProjectModalOpen] = useState(false);
   
-  const [newClientName, setNewClientName] = useState("");
-  const [newClientBudget, setNewClientBudget] = useState("");
-  const [newClientOutstanding, setNewClientOutstanding] = useState("");
-  const [newClientOnboarding, setNewClientOnboarding] = useState(new Date().toISOString().split('T')[0] || "");
+  const defaultClientForm = {
+    name: "",
+    companyName: "",
+    phone: "",
+    email: "",
+    address: "",
+    state: "",
+    gstin: "",
+    department: "",
+    status: "Active" as ClientStatus,
+    salesFocused: "",
+
+    remarks: "",
+    dailyFollowup: "No",
+    assignedEmployeeId: "",
+    totalBudget: "",
+    outstandingPayment: "",
+    onboardingDate: new Date().toISOString().split('T')[0] || "",
+  };
+  const [newClientFormData, setNewClientFormData] = useState(defaultClientForm);
+  
+  const handleClientFormChange = (field: string, value: any, isEdit: boolean = false) => {
+    if (isEdit) {
+      setEditingClient(prev => prev ? { ...prev, [field]: value } : prev);
+    } else {
+      setNewClientFormData(prev => ({ ...prev, [field]: value }));
+    }
+  };
   
   const [newProjectName, setNewProjectName] = useState("");
   const [newProjectBudget, setNewProjectBudget] = useState("");
@@ -284,43 +344,40 @@ export function Projects() {
   const [editingProject, setEditingProject] = useState<Project | null>(null);
 
   const handleCreateClient = () => {
-    setShowNewClientErrors(true);
-    if (!newClientName.trim()) {
-      toast.error("Please fill in all required fields");
-      setTimeout(() => setShowNewClientErrors(false), 3000);
+    if (!newClientFormData.name.trim() || !newClientFormData.companyName?.trim() || !newClientFormData.phone?.trim()) {
+      setShowNewClientErrors(true);
+      toast.error("Please fill all required fields");
       return;
     }
+
     const newClient: Client = {
       id: `c${Date.now()}`,
-      name: newClientName,
-      logo: `https://i.pravatar.cc/150?u=${encodeURIComponent(newClientName)}`,
-      totalBudget: newClientBudget || "₹0",
-      outstandingPayment: newClientOutstanding || "₹0",
-      onboardingDate: newClientOnboarding || new Date().toISOString().split('T')[0] || "",
+      ...newClientFormData,
+      logo: `https://i.pravatar.cc/150?u=${encodeURIComponent(newClientFormData.name)}`,
+      totalBudget: newClientFormData.totalBudget || "₹0",
+      outstandingPayment: newClientFormData.outstandingPayment || "₹0",
       activeProjects: 0,
-      status: "Active",
-      contacts: [{ name: "User", avatar: "https://i.pravatar.cc/150?u=user" }]
+      contacts: []
     };
-    setClients([newClient, ...clients]);
-    setNewClientName("");
-    setNewClientBudget("");
-    setNewClientOutstanding("");
-    setNewClientOnboarding(new Date().toISOString().split('T')[0] || "");
-    setShowNewClientErrors(false);
-    setIsNewClientModalOpen(false);
-  };
 
+    setClients([newClient, ...clients]);
+    setIsNewClientModalOpen(false);
+    setNewClientFormData(defaultClientForm);
+    setShowNewClientErrors(false);
+    toast.success("Client created successfully");
+  };
   const handleUpdateClient = () => {
-    setShowEditClientErrors(true);
-    if (!editingClient || !editingClient.name.trim()) {
-      toast.error("Please fill in all required fields");
-      setTimeout(() => setShowEditClientErrors(false), 3000);
+    if (!editingClient || !editingClient.name.trim() || !editingClient.companyName?.trim() || !editingClient.phone?.trim()) {
+      setShowEditClientErrors(true);
+      toast.error("Please fill all required fields");
       return;
     }
+
     setClients(clients.map(c => c.id === editingClient.id ? editingClient : c));
-    setShowEditClientErrors(false);
     setIsEditClientModalOpen(false);
     setEditingClient(null);
+    setShowEditClientErrors(false);
+    toast.success("Client updated successfully");
   };
 
   const handleCreateProject = () => {
@@ -473,6 +530,17 @@ export function Projects() {
     }
   };
 
+  const safeFormat = (dateStr: string | undefined, fmt: string, fallback = "-") => {
+    if (!dateStr) return fallback;
+    try {
+      const d = new Date(dateStr);
+      if (isNaN(d.getTime())) return fallback;
+      return format(d, fmt);
+    } catch {
+      return fallback;
+    }
+  };
+
   const categoryStats = useMemo(() => {
     const stats: Record<string, Set<string>> = {};
     categories.forEach(cat => {
@@ -584,7 +652,7 @@ export function Projects() {
               </div>
               <div>
                 <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Timeline</p>
-                <h3 className="text-sm font-black text-foreground">{format(new Date(project.startDate), "dd/MM/yyyy")} - {format(new Date(project.endDate), "dd/MM/yyyy")}</h3>
+                <h3 className="text-sm font-black text-foreground">{safeFormat(project.startDate, "dd/MM/yyyy")} - {safeFormat(project.endDate, "dd/MM/yyyy")}</h3>
               </div>
             </div>
           </div>
@@ -822,7 +890,7 @@ export function Projects() {
               </div>
               <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Onboarded</p>
             </div>
-            <h3 className="text-2xl font-black text-foreground font-mono">{client.onboardingDate ? format(new Date(client.onboardingDate), "dd MMM yyyy") : "-"}</h3>
+            <h3 className="text-2xl font-black text-foreground font-mono">{safeFormat(client.onboardingDate, "dd MMM yyyy")}</h3>
           </div>
           <div className="bg-card border border-border/60 rounded-3xl p-5 flex flex-col justify-center shadow-sm">
             <div className="flex items-center gap-3 mb-2">
@@ -832,7 +900,7 @@ export function Projects() {
               <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Contacts</p>
             </div>
             <div className="flex -space-x-2">
-              {client.contacts.map((contact, i) => (
+              {(client.contacts ?? []).map((contact, i) => (
                 <div key={i} className="w-8 h-8 rounded-full border-2 border-card overflow-hidden bg-muted shadow-sm">
                   <img src={contact.avatar} alt={contact.name} className="w-full h-full object-cover" />
                 </div>
@@ -1141,7 +1209,7 @@ export function Projects() {
 
                   <div className="flex items-center gap-1.5 px-3 py-1.5 bg-muted/30 rounded-lg border border-border/30">
                     <Calendar className="w-3.5 h-3.5 text-muted-foreground" />
-                    <span className="text-xs font-bold text-foreground/80">{format(new Date(project.startDate), "dd/MM/yyyy")} - {format(new Date(project.endDate), "dd/MM/yyyy")}</span>
+                    <span className="text-xs font-bold text-foreground/80">{safeFormat(project.startDate, "dd/MM/yyyy")} - {safeFormat(project.endDate, "dd/MM/yyyy")}</span>
                   </div>
                 </div>
 
@@ -1686,7 +1754,7 @@ export function Projects() {
         {filteredClients.map((client) => (
           <div 
             key={client.id} 
-            onClick={() => setSelectedClientId(client.id)}
+            onClick={() => { setSelectedClientId(client.id); setSelectedProjectId(null); }}
             className="group bg-white border border-border/40 rounded-[2rem] p-6 shadow-sm hover:shadow-2xl hover:shadow-primary/5 hover:-translate-y-1 hover:border-primary/30 transition-all duration-300 relative flex flex-col cursor-pointer"
           >
             {/* Background Accent */}
@@ -1732,16 +1800,16 @@ export function Projects() {
                   <Briefcase className="w-3.5 h-3.5" /> {projects.filter(p => p.clientId === client.id).length} Active Projects
                 </span>
                 <span className="inline-flex items-center gap-1.5 text-[11px] font-bold px-2 py-1 bg-muted rounded-md text-muted-foreground">
-                  <Calendar className="w-3.5 h-3.5" /> {client.onboardingDate ? format(new Date(client.onboardingDate), "MMM yyyy") : "-"}
+                  <Calendar className="w-3.5 h-3.5" /> {safeFormat(client.onboardingDate, "MMM yyyy")}
                 </span>
               </div>
             </div>
 
             {/* Contacts overlap */}
-            {client.contacts && client.contacts.length > 0 && (
+            {(client.contacts ?? []).length > 0 && (
               <div className="flex items-center gap-3 mb-6 relative z-10">
                 <div className="flex -space-x-2">
-                  {client.contacts.map((c, idx) => (
+                  {(client.contacts ?? []).map((c, idx) => (
                     <img key={idx} src={c.avatar} className="w-8 h-8 rounded-full border-2 border-white shadow-sm" title={c.name} />
                   ))}
                 </div>
@@ -1773,71 +1841,178 @@ export function Projects() {
 
       {/* New Client Modal */}
       <Dialog open={isNewClientModalOpen} onOpenChange={setIsNewClientModalOpen}>
-        <DialogContent className="sm:max-w-[425px] md:max-w-[500px] p-0 overflow-hidden rounded-[2rem] gap-0 border-border/60 shadow-2xl [&>button]:hidden bg-card">
-          <div className="p-6 pb-4">
-            <div className="flex items-center justify-between px-6 md:px-8 py-6 border-b border-border/50 bg-muted/30">
-          <div>
-            <h2 className="text-xl md:text-2xl font-black tracking-tight">New Client</h2>
-            
-          </div>
-          <DialogClose asChild>
-            <button className="p-2 text-muted-foreground hover:text-foreground/80 hover:bg-muted rounded-full transition-colors">
+        <DialogContent className="max-w-5xl p-0 overflow-hidden rounded-[2rem] gap-0 border-border/60 shadow-2xl [&>button]:hidden bg-card">
+          <div className="flex items-center justify-between px-8 py-6 border-b border-border/50 bg-muted/30">
+            <div>
+              <h2 className="text-2xl font-black tracking-tight">Add Client</h2>
+              <p className="text-sm text-muted-foreground mt-1">Complete all sections to register a new client.</p>
+            </div>
+            <button 
+              onClick={() => { setIsNewClientModalOpen(false); setNewClientFormData(defaultClientForm); setShowNewClientErrors(false); setActiveClientTab('general'); }}
+              className="p-2 text-muted-foreground hover:text-foreground/80 hover:bg-muted rounded-full transition-colors"
+            >
               <X className="w-5 h-5" />
             </button>
-          </DialogClose>
-        </div>
           </div>
-          <div className="p-6 md:p-8 space-y-6 overflow-y-auto max-h-[70vh]">
-            <div>
-              <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Client Name <span className="text-red-500">*</span></label>
-              <input 
-                type="text" 
-                value={newClientName}
-                onChange={(e) => setNewClientName(e.target.value)}
-                placeholder="e.g. Acme Corp"
-                className={"w-full px-4 py-3 bg-muted/50 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium " + (showNewClientErrors && !newClientName.trim() ? "border-red-500 ring-1 ring-red-500" : "border-border/50")}
-              />
+          
+          <div className="flex flex-col md:flex-row h-[70vh] max-h-[800px]">
+            {/* Sidebar Tabs */}
+            <div className="w-full md:w-64 bg-muted/20 border-r border-border/50 p-4 space-y-2 overflow-y-auto shrink-0">
+              {clientTabs.map(tab => {
+                const Icon = tab.icon;
+                const isActive = activeClientTab === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    onClick={() => setActiveClientTab(tab.id as ClientTab)}
+                    className={cn(
+                      "w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all",
+                      isActive 
+                        ? "bg-primary text-primary-foreground shadow-md" 
+                        : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                    )}
+                  >
+                    <Icon className="w-4 h-4" />
+                    {tab.label}
+                    {isActive && <ChevronRight className="w-4 h-4 ml-auto" />}
+                  </button>
+                )
+              })}
             </div>
-            <div>
-              <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Total Budget (Optional)</label>
-              <input 
-                type="text" 
-                value={newClientBudget}
-                onChange={(e) => setNewClientBudget(e.target.value)}
-                placeholder="e.g. ₹100,000"
-                className="w-full px-4 py-3 bg-muted/50 border border-border/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium"
-              />
-            </div>
-            <div>
-              <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Outstanding Payment (Optional)</label>
-              <input 
-                type="text" 
-                value={newClientOutstanding}
-                onChange={(e) => setNewClientOutstanding(e.target.value)}
-                placeholder="e.g. ₹50,000"
-                className="w-full px-4 py-3 bg-muted/50 border border-border/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium"
-              />
-            </div>
-            <div>
-              <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Onboarding Date</label>
-              <input 
-                type="date" 
-                value={newClientOnboarding}
-                onChange={(e) => setNewClientOnboarding(e.target.value)}
-                className="w-full px-4 py-3 bg-muted/50 border border-border/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium"
-              />
+
+            {/* Form Content */}
+            <div className="flex-1 overflow-y-auto p-8 relative">
+              <div className="space-y-8">
+                {activeClientTab === 'general' && (
+                  <div className="space-y-6">
+                    <h3 className="text-lg font-black tracking-tight text-foreground flex items-center gap-2">
+                      <User className="w-5 h-5 text-primary" /> General Information
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-2">
+                        <label className="text-[12px] font-bold text-foreground/80 uppercase tracking-wider">Contact Person Name <span className="text-red-500">*</span></label>
+                        <input 
+                          type="text" value={newClientFormData.name} onChange={(e) => handleClientFormChange('name', e.target.value)} placeholder="e.g. John Doe"
+                          className={cn("w-full px-4 h-[42px] bg-muted/50 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all", showNewClientErrors && !newClientFormData.name.trim() ? "border-red-500 ring-1 ring-red-500" : "border-border")}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-[12px] font-bold text-foreground/80 uppercase tracking-wider">Phone Number <span className="text-red-500">*</span></label>
+                        <input 
+                          type="text" value={newClientFormData.phone} onChange={(e) => handleClientFormChange('phone', e.target.value)} placeholder="+91 00000 00000"
+                          className={cn("w-full px-4 h-[42px] bg-muted/50 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all", showNewClientErrors && !newClientFormData.phone?.trim() ? "border-red-500 ring-1 ring-red-500" : "border-border")}
+                        />
+                      </div>
+                      <div className="space-y-2 md:col-span-2">
+                        <label className="text-[12px] font-bold text-foreground/80 uppercase tracking-wider">Email Address</label>
+                        <input 
+                          type="email" value={newClientFormData.email} onChange={(e) => handleClientFormChange('email', e.target.value)} placeholder="client@example.com"
+                          className="w-full px-4 h-[42px] bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {activeClientTab === 'company' && (
+                  <div className="space-y-6">
+                    <h3 className="text-lg font-black tracking-tight text-foreground flex items-center gap-2">
+                      <Building2 className="w-5 h-5 text-primary" /> Company Details
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-2 md:col-span-2">
+                        <label className="text-[12px] font-bold text-foreground/80 uppercase tracking-wider">Company Name <span className="text-red-500">*</span></label>
+                        <input 
+                          type="text" value={newClientFormData.companyName} onChange={(e) => handleClientFormChange('companyName', e.target.value)} placeholder="e.g. Acme Corp"
+                          className={cn("w-full px-4 h-[42px] bg-muted/50 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all", showNewClientErrors && !newClientFormData.companyName?.trim() ? "border-red-500 ring-1 ring-red-500" : "border-border")}
+                        />
+                      </div>
+                      <div className="space-y-2 md:col-span-2">
+                        <label className="text-[12px] font-bold text-foreground/80 uppercase tracking-wider">Address</label>
+                        <input 
+                          type="text" value={newClientFormData.address} onChange={(e) => handleClientFormChange('address', e.target.value)} placeholder="123 Main St, City"
+                          className="w-full px-4 h-[42px] bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-[12px] font-bold text-foreground/80 uppercase tracking-wider">State / UT</label>
+                        <input 
+                          type="text" value={newClientFormData.state} onChange={(e) => handleClientFormChange('state', e.target.value)} placeholder="e.g. MH"
+                          className="w-full px-4 h-[42px] bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-[12px] font-bold text-foreground/80 uppercase tracking-wider">GSTIN</label>
+                        <input 
+                          type="text" value={newClientFormData.gstin} onChange={(e) => handleClientFormChange('gstin', e.target.value)} placeholder="e.g. 22AAAAA0000A1Z5"
+                          className="w-full px-4 h-[42px] bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                        />
+                      </div>
+                      <div className="space-y-2 md:col-span-2">
+                        <label className="text-[12px] font-bold text-foreground/80 uppercase tracking-wider">Department(s)</label>
+                        <input 
+                          type="text" value={newClientFormData.department} onChange={(e) => handleClientFormChange('department', e.target.value)} placeholder="e.g. Marketing, Development"
+                          className="w-full px-4 h-[42px] bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {activeClientTab === 'service' && (
+                  <div className="space-y-6">
+                    <h3 className="text-lg font-black tracking-tight text-foreground flex items-center gap-2">
+                      <CreditCard className="w-5 h-5 text-primary" /> Service & Billing Details
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-2 md:col-span-2">
+                        <label className="text-[12px] font-bold text-foreground/80 uppercase tracking-wider">Sales Focused</label>
+                        <input type="text" value={newClientFormData.salesFocused} onChange={(e) => handleClientFormChange('salesFocused', e.target.value)} className="w-full px-4 h-[42px] bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all" />
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-[12px] font-bold text-foreground/80 uppercase tracking-wider">Total Budget</label>
+                        <input type="text" value={newClientFormData.totalBudget} onChange={(e) => handleClientFormChange('totalBudget', e.target.value)} className="w-full px-4 h-[42px] bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all" />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-[12px] font-bold text-foreground/80 uppercase tracking-wider">Outstanding Payment</label>
+                        <input type="text" value={newClientFormData.outstandingPayment} onChange={(e) => handleClientFormChange('outstandingPayment', e.target.value)} className="w-full px-4 h-[42px] bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all" />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-[12px] font-bold text-foreground/80 uppercase tracking-wider">Onboarding Date</label>
+                        <input type="date" value={newClientFormData.onboardingDate} onChange={(e) => handleClientFormChange('onboardingDate', e.target.value)} className="w-full px-4 h-[42px] bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all" />
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {activeClientTab === 'remarks' && (
+                  <div className="space-y-6">
+                    <h3 className="text-lg font-black tracking-tight text-foreground flex items-center gap-2">
+                      <FileText className="w-5 h-5 text-primary" /> Remarks
+                    </h3>
+                    <div className="space-y-2">
+                      <label className="text-[12px] font-bold text-foreground/80 uppercase tracking-wider">Additional Notes</label>
+                      <textarea value={newClientFormData.remarks} onChange={(e) => handleClientFormChange('remarks', e.target.value)} className="w-full px-4 py-3 bg-muted/50 border border-border rounded-xl text-sm min-h-[120px] resize-none focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all" />
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
-          <div className="px-6 md:px-8 py-4 md:py-6 bg-muted/30 border-t border-border/50 flex justify-end gap-3 mt-auto shrink-0">
+          
+          {/* Footer Actions */}
+          <div className="px-6 md:px-8 py-4 md:py-6 bg-muted/30 border-t border-border/50 flex justify-between gap-3 mt-auto shrink-0">
             <button 
-              onClick={() => setIsNewClientModalOpen(false)}
+              onClick={() => { setIsNewClientModalOpen(false); setNewClientFormData(defaultClientForm); setShowNewClientErrors(false); setActiveClientTab('general'); }}
               className="px-5 py-2.5 rounded-xl font-bold text-muted-foreground hover:bg-muted transition-colors"
             >
               Cancel
             </button>
             <button 
               onClick={handleCreateClient}
-              className="px-6 py-2.5 bg-primary text-primary-foreground font-bold rounded-xl shadow-md hover:bg-primary/90 transition-all disabled:opacity-50"
+              className="px-6 py-2.5 bg-primary text-primary-foreground font-bold rounded-xl shadow-md hover:bg-primary/90 transition-all"
             >
               Create Client
             </button>
@@ -1846,76 +2021,187 @@ export function Projects() {
       </Dialog>
       {/* Edit Client Modal */}
       <Dialog open={isEditClientModalOpen} onOpenChange={setIsEditClientModalOpen}>
-        <DialogContent className="sm:max-w-[425px] md:max-w-[500px] p-0 overflow-hidden rounded-[2rem] gap-0 border-border/60 shadow-2xl [&>button]:hidden bg-card">
-          <div className="p-6 pb-4">
-            <div className="flex items-center justify-between px-6 md:px-8 py-6 border-b border-border/50 bg-muted/30">
-          <div>
-            <h2 className="text-xl md:text-2xl font-black tracking-tight">Edit Client</h2>
-            
-          </div>
-          <DialogClose asChild>
-            <button className="p-2 text-muted-foreground hover:text-foreground/80 hover:bg-muted rounded-full transition-colors">
+        <DialogContent className="max-w-5xl p-0 overflow-hidden rounded-[2rem] gap-0 border-border/60 shadow-2xl [&>button]:hidden bg-card">
+          <div className="flex items-center justify-between px-8 py-6 border-b border-border/50 bg-muted/30">
+            <div>
+              <h2 className="text-2xl font-black tracking-tight">Edit Client</h2>
+              <p className="text-sm text-muted-foreground mt-1">Update existing client information.</p>
+            </div>
+            <button 
+              onClick={() => { setIsEditClientModalOpen(false); setEditingClient(null); setActiveClientTab('general'); }}
+              className="p-2 text-muted-foreground hover:text-foreground/80 hover:bg-muted rounded-full transition-colors"
+            >
               <X className="w-5 h-5" />
             </button>
-          </DialogClose>
-        </div>
           </div>
+          
           {editingClient && (
-            <div className="p-6 md:p-8 space-y-6 overflow-y-auto max-h-[70vh]">
-              <div>
-                <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Client Name <span className="text-red-500">*</span></label>
-                <input 
-                  type="text" 
-                  value={editingClient.name}
-                  onChange={(e) => setEditingClient({...editingClient, name: e.target.value})}
-                  className={"w-full px-4 py-3 bg-muted/50 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium " + (showEditClientErrors && !editingClient.name.trim() ? "border-red-500 ring-1 ring-red-500" : "border-border/50")}
-                />
+            <div className="flex flex-col md:flex-row h-[70vh] max-h-[800px]">
+              {/* Sidebar Tabs */}
+              <div className="w-full md:w-64 bg-muted/20 border-r border-border/50 p-4 space-y-2 overflow-y-auto shrink-0">
+                {clientTabs.map(tab => {
+                  const Icon = tab.icon;
+                  const isActive = activeClientTab === tab.id;
+                  return (
+                    <button
+                      key={tab.id}
+                      type="button"
+                      onClick={() => setActiveClientTab(tab.id as ClientTab)}
+                      className={cn(
+                        "w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all",
+                        isActive 
+                          ? "bg-primary text-primary-foreground shadow-md" 
+                          : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                      )}
+                    >
+                      <Icon className="w-4 h-4" />
+                      {tab.label}
+                      {isActive && <ChevronRight className="w-4 h-4 ml-auto" />}
+                    </button>
+                  )
+                })}
               </div>
-              <div>
-                <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Total Budget (Optional)</label>
-                <input 
-                  type="text" 
-                  value={editingClient.totalBudget}
-                  onChange={(e) => setEditingClient({...editingClient, totalBudget: e.target.value})}
-                  className="w-full px-4 py-3 bg-muted/50 border border-border/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium"
-                />
-              </div>
-              <div>
-                <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Outstanding Payment (Optional)</label>
-                <input 
-                  type="text" 
-                  value={editingClient.outstandingPayment}
-                  onChange={(e) => setEditingClient({...editingClient, outstandingPayment: e.target.value})}
-                  className="w-full px-4 py-3 bg-muted/50 border border-border/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium"
-                />
-              </div>
-              <div>
-                <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Onboarding Date</label>
-                <input 
-                  type="date" 
-                  value={editingClient.onboardingDate}
-                  onChange={(e) => setEditingClient({...editingClient, onboardingDate: e.target.value})}
-                  className="w-full px-4 py-3 bg-muted/50 border border-border/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium"
-                />
+
+              {/* Form Content */}
+              <div className="flex-1 overflow-y-auto p-8 relative">
+                <div className="space-y-8">
+                  {activeClientTab === 'general' && (
+                    <div className="space-y-6">
+                      <h3 className="text-lg font-black tracking-tight text-foreground flex items-center gap-2">
+                        <User className="w-5 h-5 text-primary" /> General Information
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-2">
+                          <label className="text-[12px] font-bold text-foreground/80 uppercase tracking-wider">Contact Person Name <span className="text-red-500">*</span></label>
+                          <input 
+                            type="text" value={editingClient.name || ''} onChange={(e) => handleClientFormChange('name', e.target.value, true)} 
+                            className={cn("w-full px-4 h-[42px] bg-muted/50 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all", showEditClientErrors && !editingClient.name?.trim() ? "border-red-500 ring-1 ring-red-500" : "border-border")}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-[12px] font-bold text-foreground/80 uppercase tracking-wider">Phone Number <span className="text-red-500">*</span></label>
+                          <input 
+                            type="text" value={editingClient.phone || ''} onChange={(e) => handleClientFormChange('phone', e.target.value, true)} 
+                            className={cn("w-full px-4 h-[42px] bg-muted/50 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all", showEditClientErrors && !editingClient.phone?.trim() ? "border-red-500 ring-1 ring-red-500" : "border-border")}
+                          />
+                        </div>
+                        <div className="space-y-2 md:col-span-2">
+                          <label className="text-[12px] font-bold text-foreground/80 uppercase tracking-wider">Email Address</label>
+                          <input 
+                            type="email" value={editingClient.email || ''} onChange={(e) => handleClientFormChange('email', e.target.value, true)} 
+                            className="w-full px-4 h-[42px] bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {activeClientTab === 'company' && (
+                    <div className="space-y-6">
+                      <h3 className="text-lg font-black tracking-tight text-foreground flex items-center gap-2">
+                        <Building2 className="w-5 h-5 text-primary" /> Company Details
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-2 md:col-span-2">
+                          <label className="text-[12px] font-bold text-foreground/80 uppercase tracking-wider">Company Name <span className="text-red-500">*</span></label>
+                          <input 
+                            type="text" value={editingClient.companyName || ''} onChange={(e) => handleClientFormChange('companyName', e.target.value, true)} 
+                            className={cn("w-full px-4 h-[42px] bg-muted/50 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all", showEditClientErrors && !editingClient.companyName?.trim() ? "border-red-500 ring-1 ring-red-500" : "border-border")}
+                          />
+                        </div>
+                        <div className="space-y-2 md:col-span-2">
+                          <label className="text-[12px] font-bold text-foreground/80 uppercase tracking-wider">Address</label>
+                          <input 
+                            type="text" value={editingClient.address || ''} onChange={(e) => handleClientFormChange('address', e.target.value, true)} 
+                            className="w-full px-4 h-[42px] bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-[12px] font-bold text-foreground/80 uppercase tracking-wider">State / UT</label>
+                          <input 
+                            type="text" value={editingClient.state || ''} onChange={(e) => handleClientFormChange('state', e.target.value, true)} 
+                            className="w-full px-4 h-[42px] bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-[12px] font-bold text-foreground/80 uppercase tracking-wider">GSTIN</label>
+                          <input 
+                            type="text" value={editingClient.gstin || ''} onChange={(e) => handleClientFormChange('gstin', e.target.value, true)} 
+                            className="w-full px-4 h-[42px] bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                          />
+                        </div>
+                        <div className="space-y-2 md:col-span-2">
+                          <label className="text-[12px] font-bold text-foreground/80 uppercase tracking-wider">Department(s)</label>
+                          <input 
+                            type="text" value={editingClient.department || ''} onChange={(e) => handleClientFormChange('department', e.target.value, true)} 
+                            className="w-full px-4 h-[42px] bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {activeClientTab === 'service' && (
+                    <div className="space-y-6">
+                      <h3 className="text-lg font-black tracking-tight text-foreground flex items-center gap-2">
+                        <CreditCard className="w-5 h-5 text-primary" /> Service & Billing Details
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-2 md:col-span-2">
+                          <label className="text-[12px] font-bold text-foreground/80 uppercase tracking-wider">Sales Focused</label>
+                          <input type="text" value={editingClient.salesFocused || ''} onChange={(e) => handleClientFormChange('salesFocused', e.target.value, true)} className="w-full px-4 h-[42px] bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all" />
+                        </div>
+
+                        <div className="space-y-2">
+                          <label className="text-[12px] font-bold text-foreground/80 uppercase tracking-wider">Total Budget</label>
+                          <input type="text" value={editingClient.totalBudget || ''} onChange={(e) => handleClientFormChange('totalBudget', e.target.value, true)} className="w-full px-4 h-[42px] bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all" />
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-[12px] font-bold text-foreground/80 uppercase tracking-wider">Outstanding Payment</label>
+                          <input type="text" value={editingClient.outstandingPayment || ''} onChange={(e) => handleClientFormChange('outstandingPayment', e.target.value, true)} className="w-full px-4 h-[42px] bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all" />
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-[12px] font-bold text-foreground/80 uppercase tracking-wider">Onboarding Date</label>
+                          <input type="date" value={editingClient.onboardingDate || ''} onChange={(e) => handleClientFormChange('onboardingDate', e.target.value, true)} className="w-full px-4 h-[42px] bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all" />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {activeClientTab === 'remarks' && (
+                    <div className="space-y-6">
+                      <h3 className="text-lg font-black tracking-tight text-foreground flex items-center gap-2">
+                        <FileText className="w-5 h-5 text-primary" /> Remarks
+                      </h3>
+                      <div className="space-y-2">
+                        <label className="text-[12px] font-bold text-foreground/80 uppercase tracking-wider">Additional Notes</label>
+                        <textarea value={editingClient.remarks || ''} onChange={(e) => handleClientFormChange('remarks', e.target.value, true)} className="w-full px-4 py-3 bg-muted/50 border border-border rounded-xl text-sm min-h-[120px] resize-none focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all" />
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           )}
-          <div className="px-6 md:px-8 py-4 md:py-6 bg-muted/30 border-t border-border/50 flex justify-end gap-3 mt-auto shrink-0">
+          
+          {/* Footer Actions */}
+          <div className="px-6 md:px-8 py-4 md:py-6 bg-muted/30 border-t border-border/50 flex justify-between gap-3 mt-auto shrink-0">
             <button 
-              onClick={() => { setIsEditClientModalOpen(false); setEditingClient(null); }}
+              onClick={() => { setIsEditClientModalOpen(false); setEditingClient(null); setActiveClientTab('general'); }}
               className="px-5 py-2.5 rounded-xl font-bold text-muted-foreground hover:bg-muted transition-colors"
             >
               Cancel
             </button>
             <button 
               onClick={handleUpdateClient}
-              className="px-6 py-2.5 bg-primary text-primary-foreground font-bold rounded-xl shadow-md hover:bg-primary/90 transition-all disabled:opacity-50"
+              className="px-6 py-2.5 bg-primary text-primary-foreground font-bold rounded-xl shadow-md hover:bg-primary/90 transition-all"
             >
               Save Changes
             </button>
           </div>
         </DialogContent>
       </Dialog>
+
       <ConfirmModal 
         isOpen={confirmModalState.isOpen}
         onClose={() => setConfirmModalState(prev => ({ ...prev, isOpen: false }))}
