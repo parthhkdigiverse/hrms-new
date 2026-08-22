@@ -44,16 +44,27 @@ interface Project {
   id: string;
   clientId: string;
   name: string;
+  description?: string;
   category: string;
   status: ProjectStatus;
+  priority?: "Low" | "Medium" | "High" | "Critical";
   progress: number;
   startDate: string;
   endDate: string;
+  teamDeadline?: string;
   budget: string;
+  services?: string;
+  post?: number;
+  reel?: number;
+  festivalPost?: string;
+  amountReceived?: string;
+  nextPaymentDate?: string;
   team: { name: string; avatar: string }[];
 }
 
-const DEFAULT_CATEGORIES = ["Web Dev", "App Dev", "Digital Marketing", "Design", "Consulting", "General"];
+const LOCKED_CATEGORIES = ["Digital Marketing", "Social Media Management", "Web Dev", "App Dev"];
+const DEFAULT_CATEGORIES = ["Digital Marketing", "Social Media Management", "Web Dev", "App Dev", "Design", "Consulting", "General"];
+
 
 const INITIAL_CLIENTS: Client[] = [
   {
@@ -250,7 +261,19 @@ export function Projects() {
   const [categories, setCategories] = useState<string[]>(() => {
     const saved = localStorage.getItem('hrms_categories');
     if (saved) {
-      try { return JSON.parse(saved); } catch (e) {}
+      try {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) {
+          // Ensure all locked categories are present
+          const merged = [...parsed];
+          LOCKED_CATEGORIES.forEach(cat => {
+            if (!merged.includes(cat)) {
+              merged.push(cat);
+            }
+          });
+          return merged;
+        }
+      } catch (e) {}
     }
     return DEFAULT_CATEGORIES;
   });
@@ -324,14 +347,25 @@ export function Projects() {
   const [newProjectName, setNewProjectName] = useState("");
   const [newProjectBudget, setNewProjectBudget] = useState("");
   const [newProjectCategory, setNewProjectCategory] = useState("");
-  const [newProjectStartDate, setNewProjectStartDate] = useState(new Date().toISOString().split('T')[0] || "");
-  const [newProjectEndDate, setNewProjectEndDate] = useState(new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] || "");
+  const [newProjectStartDate, setNewProjectStartDate] = useState(new Date().toISOString().split('T')[0] ?? "");
+  const [newProjectEndDate, setNewProjectEndDate] = useState(new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] ?? "");
+  const [newProjectDescription, setNewProjectDescription] = useState("");
+  const [newProjectPriority, setNewProjectPriority] = useState<"Low" | "Medium" | "High" | "Critical">("Medium");
+  const [newProjectTeamDeadline, setNewProjectTeamDeadline] = useState("");
+  const [newProjectServices, setNewProjectServices] = useState("");
+  const [newProjectPost, setNewProjectPost] = useState("");
+  const [newProjectReel, setNewProjectReel] = useState("");
+  const [newProjectFestivalPost, setNewProjectFestivalPost] = useState("No");
+  const [newProjectAmountReceived, setNewProjectAmountReceived] = useState("");
+  const [newProjectNextPaymentDate, setNewProjectNextPaymentDate] = useState("");
+  const [activeProjectTab, setActiveProjectTab] = useState<'general' | 'creative' | 'finance'>('general');
   const [isManageCategoriesModalOpen, setIsManageCategoriesModalOpen] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState("");
   const [showNewProjectErrors, setShowNewProjectErrors] = useState(false);
   const [showEditProjectErrors, setShowEditProjectErrors] = useState(false);
   const [showNewClientErrors, setShowNewClientErrors] = useState(false);
   const [showCategoryErrors, setShowCategoryErrors] = useState(false);
+  const [categoryPendingDelete, setCategoryPendingDelete] = useState<string | null>(null);
 
   const [confirmModalState, setConfirmModalState] = useState<{
     isOpen: boolean;
@@ -391,16 +425,24 @@ export function Projects() {
       id: `p${Date.now()}`,
       clientId: selectedClientId,
       name: newProjectName,
+      description: newProjectDescription,
       category: newProjectCategory,
       status: "In Progress",
+      priority: newProjectPriority,
       progress: 0,
-      startDate: newProjectStartDate || (new Date().toISOString().split('T')[0] as string),
-      endDate: newProjectEndDate || (new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] as string),
+      startDate: newProjectStartDate ?? (new Date().toISOString().split('T')[0] as string),
+      endDate: newProjectEndDate ?? (new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] as string),
+      teamDeadline: newProjectTeamDeadline || undefined,
       budget: newProjectBudget || "₹0",
+      services: newProjectServices || undefined,
+      post: newProjectPost ? parseInt(newProjectPost) : undefined,
+      reel: newProjectReel ? parseInt(newProjectReel) : undefined,
+      festivalPost: newProjectFestivalPost,
+      amountReceived: newProjectAmountReceived || undefined,
+      nextPaymentDate: newProjectNextPaymentDate || undefined,
       team: [{ name: "User", avatar: "https://i.pravatar.cc/150?u=user" }]
     };
     
-    // Update client active project count
     setClients(clients.map(c => 
       c.id === selectedClientId ? { ...c, activeProjects: c.activeProjects + 1 } : c
     ));
@@ -409,8 +451,19 @@ export function Projects() {
     setNewProjectName("");
     setNewProjectBudget("");
     setNewProjectCategory("");
+    setNewProjectDescription("");
+    setNewProjectPriority("Medium");
+    setNewProjectTeamDeadline("");
+    setNewProjectServices("");
+    setNewProjectPost("");
+    setNewProjectReel("");
+    setNewProjectFestivalPost("No");
+    setNewProjectAmountReceived("");
+    setNewProjectNextPaymentDate("");
+    setActiveProjectTab('general');
     setShowNewProjectErrors(false);
     setIsNewProjectModalOpen(false);
+    toast.success("Project created successfully!");
   };
 
   const openEditModal = (project: Project) => {
@@ -446,31 +499,23 @@ export function Projects() {
   };
 
   const confirmDeleteCategory = (categoryToDelete: string) => {
-    if (categories.length <= 1) {
-      alert("Cannot delete the last category.");
+    if (LOCKED_CATEGORIES.includes(categoryToDelete)) {
+      toast.error(`"${categoryToDelete}" is a system category and cannot be deleted.`);
       return;
     }
-    
+    if (categories.length <= 1) {
+      toast.error("Cannot delete the last category.");
+      return;
+    }
     const isCategoryInUse = projects.some(p => p.category === categoryToDelete);
     if (isCategoryInUse) {
-      alert("Cannot delete this category because it is currently in use by a project.");
+      toast.error("Cannot delete — this category is in use by a project.");
       return;
     }
-
-    setConfirmModalState({
-      isOpen: true,
-      title: "Delete Category",
-      description: "Are you sure you want to delete this category? This action cannot be undone.",
-      itemName: categoryToDelete,
-      action: () => {
-        moveToRecycleBin('Project Category', categoryToDelete, categoryToDelete, 'hrms_categories');
-        const newCategories = categories.filter(c => c !== categoryToDelete);
-        setCategories(newCategories);
-        if (newProjectCategory === categoryToDelete) {
-          setNewProjectCategory(newCategories[0] || "");
-        }
-      }
-    });
+    moveToRecycleBin('Project Category', categoryToDelete, categoryToDelete, 'hrms_categories');
+    setCategories(prev => prev.filter(c => c !== categoryToDelete));
+    setNewProjectCategory(prev => prev === categoryToDelete ? "" : prev);
+    toast.success(`Category "${categoryToDelete}" deleted.`);
   };
 
   const confirmDeleteProject = (project: Project) => {
@@ -481,13 +526,14 @@ export function Projects() {
       itemName: project.name,
       action: () => {
         moveToRecycleBin('Project', project.name, project, 'hrms_projects');
-        setProjects(projects.filter(p => p.id !== project.id));
-        setClients(clients.map(c => 
+        setProjects(prev => prev.filter(p => p.id !== project.id));
+        setClients(prev => prev.map(c => 
           c.id === project.clientId ? { ...c, activeProjects: Math.max(0, c.activeProjects - 1) } : c
         ));
         if (selectedProjectId === project.id) {
           setSelectedProjectId(null);
         }
+        toast.success(`Project "${project.name}" deleted.`);
       }
     });
   };
@@ -500,12 +546,13 @@ export function Projects() {
       itemName: client.name,
       action: () => {
         moveToRecycleBin('Client', client.name, client, 'hrms_clients');
-        setClients(clients.filter(c => c.id !== client.id));
-        setProjects(projects.filter(p => p.clientId !== client.id));
+        setClients(prev => prev.filter(c => c.id !== client.id));
+        setProjects(prev => prev.filter(p => p.clientId !== client.id));
         if (selectedClientId === client.id) {
           setSelectedClientId(null);
           setSelectedProjectId(null);
         }
+        toast.success(`Client "${client.name}" deleted.`);
       }
     });
   };
@@ -587,7 +634,8 @@ export function Projects() {
       if (!project) return null;
 
       return (
-        <div className="w-full space-y-8 animate-in fade-in duration-500">
+        <>
+          <div className="w-full space-y-8 animate-in fade-in duration-500">
           {/* Detail View Header */}
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div className="flex items-center gap-4">
@@ -747,7 +795,16 @@ export function Projects() {
           </div>
 
         </div>
-      );
+        <ConfirmModal 
+          isOpen={confirmModalState.isOpen}
+          onClose={() => setConfirmModalState(prev => ({ ...prev, isOpen: false }))}
+          onConfirm={confirmModalState.action}
+          title={confirmModalState.title}
+          description={confirmModalState.description}
+          itemName={confirmModalState.itemName}
+        />
+      </>
+    );
     }
 
     const clientProjects = projects.filter(p => {
@@ -758,7 +815,8 @@ export function Projects() {
     });
 
     return (
-      <div className="w-full space-y-8 animate-in fade-in duration-500">
+      <>
+        <div className="w-full space-y-8 animate-in fade-in duration-500">
         {/* Detail View Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div className="flex items-center gap-4">
@@ -1130,7 +1188,13 @@ export function Projects() {
             {clientProjects.map((project) => (
               <div 
                 key={project.id} 
-                onClick={() => setSelectedProjectId(project.id)}
+                onClick={(e) => {
+                  const target = e.target as HTMLElement;
+                  if (target.closest('button') || target.closest('[role="menuitem"]')) {
+                    return;
+                  }
+                  setSelectedProjectId(project.id);
+                }}
                 className="group bg-card border border-border/60 rounded-3xl p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 hover:border-primary/30 transition-all duration-300 relative overflow-hidden flex flex-col h-full cursor-pointer"
               >
                 {/* Background Accent */}
@@ -1146,26 +1210,38 @@ export function Projects() {
                       <Briefcase className="w-3 h-3" /> {project.category || "General"}
                     </span>
                   </div>
-                  
                   <DropdownMenu>
-                    <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                    <DropdownMenuTrigger asChild>
                       <button className="p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground rounded-lg transition-colors outline-none focus:ring-2 focus:ring-primary/20">
                         <MoreHorizontal className="w-5 h-5" />
                       </button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-48 rounded-2xl p-2 border-border/60 shadow-xl bg-background/95 backdrop-blur-md">
+                    <DropdownMenuContent 
+                      align="end" 
+                      className="w-48 rounded-2xl p-2 border-border/60 shadow-xl bg-background/95 backdrop-blur-md"
+                    >
                       <DropdownMenuItem 
-                        onClick={(e) => { e.stopPropagation(); openEditModal(project); }}
+                        onSelect={() => {
+                          setTimeout(() => {
+                            openEditModal(project);
+                          }, 100);
+                        }}
                         className="rounded-xl cursor-pointer py-2.5 focus:bg-primary/10 focus:text-primary font-medium transition-colors"
                       >
                         <Edit2 className="w-4 h-4 mr-2" /> Edit Project
                       </DropdownMenuItem>
                       <DropdownMenuSeparator className="bg-border/50" />
-                      <DropdownMenuItem className="rounded-xl cursor-pointer py-2.5 focus:bg-amber-500/10 focus:text-amber-600 font-medium text-amber-600 transition-colors">
+                      <DropdownMenuItem 
+                        className="rounded-xl cursor-pointer py-2.5 focus:bg-amber-500/10 focus:text-amber-600 font-medium text-amber-600 transition-colors"
+                      >
                         <Archive className="w-4 h-4 mr-2" /> Archive
                       </DropdownMenuItem>
                       <DropdownMenuItem 
-                        onClick={(e) => { e.stopPropagation(); confirmDeleteProject(project); }}
+                        onSelect={() => {
+                          setTimeout(() => {
+                            confirmDeleteProject(project);
+                          }, 100);
+                        }}
                         className="rounded-xl cursor-pointer py-2.5 focus:bg-rose-500/10 focus:text-rose-600 font-medium text-rose-600 transition-colors"
                       >
                         <Trash2 className="w-4 h-4 mr-2" /> Delete
@@ -1230,103 +1306,156 @@ export function Projects() {
           </div>
         </div>
         {/* New Project Modal */}
-        <Dialog open={isNewProjectModalOpen} onOpenChange={setIsNewProjectModalOpen}>
-          <DialogContent className="sm:max-w-[425px] md:max-w-[500px] p-0 overflow-hidden rounded-[2rem] gap-0 border-border/60 shadow-2xl [&>button]:hidden bg-card">
-            <div className="p-6 pb-4">
-              <div className="flex items-center justify-between px-6 md:px-8 py-6 border-b border-border/50 bg-muted/30">
-          <div>
-            <h2 className="text-xl md:text-2xl font-black tracking-tight">New Project</h2>
-            
-          </div>
-          <DialogClose asChild>
-            <button className="p-2 text-muted-foreground hover:text-foreground/80 hover:bg-muted rounded-full transition-colors">
-              <X className="w-5 h-5" />
-            </button>
-          </DialogClose>
-        </div>
+        <Dialog open={isNewProjectModalOpen} onOpenChange={(open) => { setIsNewProjectModalOpen(open); if (!open) { setActiveProjectTab('general'); setShowNewProjectErrors(false); } }}>
+          <DialogContent className="sm:max-w-[700px] p-0 overflow-hidden rounded-[2rem] gap-0 border-border/60 shadow-2xl [&>button]:hidden bg-card max-h-[90vh]">
+            {/* Header */}
+            <div className="flex items-center justify-between px-6 md:px-8 py-5 border-b border-border/50 bg-muted/30 shrink-0">
+              <div>
+                <h2 className="text-xl md:text-2xl font-black tracking-tight">New Project</h2>
+                <p className="text-sm text-muted-foreground mt-0.5">Fill in the details to create a new project.</p>
+              </div>
+              <DialogClose asChild>
+                <button className="p-2 text-muted-foreground hover:text-foreground/80 hover:bg-muted rounded-full transition-colors">
+                  <X className="w-5 h-5" />
+                </button>
+              </DialogClose>
             </div>
-            <div className="p-6 md:p-8 space-y-6 overflow-y-auto max-h-[70vh]">
-              <div>
-                <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Project Name <span className="text-red-500">*</span></label>
-                <input 
-                  type="text" 
-                  value={newProjectName}
-                  onChange={(e) => setNewProjectName(e.target.value)}
-                  placeholder="e.g. Website Redesign"
-                  className={"w-full px-4 py-3 bg-muted/50 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium " + (showNewProjectErrors && !newProjectName.trim() ? "border-red-500 ring-1 ring-red-500" : "border-border/50")}
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Start Date <span className="text-red-500">*</span></label>
-                  <input 
-                    type="date" 
-                    value={newProjectStartDate}
-                    onChange={(e) => {
-                      const newStart = e.target.value;
-                      setNewProjectStartDate(newStart);
-                      if (newProjectEndDate < newStart) {
-                        setNewProjectEndDate(newStart);
-                      }
-                    }}
-                    className={"w-full px-4 py-3 bg-muted/50 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium " + (showNewProjectErrors && !newProjectStartDate ? "border-red-500 ring-1 ring-red-500" : "border-border/50")}
-                  />
-                </div>
-                <div>
-                  <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">End Date <span className="text-red-500">*</span></label>
-                  <input 
-                    type="date" 
-                    value={newProjectEndDate}
-                    min={newProjectStartDate}
-                    onChange={(e) => setNewProjectEndDate(e.target.value)}
-                    className={"w-full px-4 py-3 bg-muted/50 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium " + (showNewProjectErrors && !newProjectEndDate ? "border-red-500 ring-1 ring-red-500" : "border-border/50")}
-                  />
-                </div>
-              </div>
-              <div>
-                <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Budget (Optional)</label>
-                <input 
-                  type="text" 
-                  value={newProjectBudget}
-                  onChange={(e) => setNewProjectBudget(e.target.value)}
-                  placeholder="e.g. ₹10,000"
-                  className="w-full px-4 py-3 bg-muted/50 border border-border/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium"
-                />
-              </div>
-              <div>
-                <div className="flex items-center justify-between mb-1.5">
-                  <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest block">Category <span className="text-red-500">*</span></label>
-                  <button 
-                    type="button"
-                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); setIsManageCategoriesModalOpen(true); }}
-                    className="text-xs font-bold text-primary hover:underline flex items-center gap-1"
+            {/* Body: sidebar + content */}
+            <div className="flex flex-row overflow-hidden" style={{ maxHeight: 'calc(90vh - 130px)' }}>
+              {/* Sidebar Tabs */}
+              <div className="w-44 shrink-0 border-r border-border/50 bg-muted/20 p-3 flex flex-col gap-1 overflow-y-auto">
+                {([
+                  { id: 'general', label: 'General', icon: <FolderGit2 className="w-4 h-4" /> },
+                  { id: 'creative', label: 'Creative', icon: <Star className="w-4 h-4" /> },
+                  { id: 'finance', label: 'Finance', icon: <IndianRupee className="w-4 h-4" /> },
+                ] as const).map(tab => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveProjectTab(tab.id)}
+                    className={cn(
+                      "flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-bold transition-all text-left w-full",
+                      activeProjectTab === tab.id
+                        ? "bg-primary text-primary-foreground shadow-sm shadow-primary/20"
+                        : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                    )}
                   >
-                    <Settings2 className="w-3 h-3" /> Manage Categories
+                    {tab.icon}
+                    {tab.label}
                   </button>
-                </div>
-                <SearchableSelect 
-                  value={newProjectCategory}
-                  onChange={(val) => setNewProjectCategory(val)}
-                  options={categories.map(cat => ({ label: cat, value: cat }))}
-                  placeholder="Select Category"
-                  className={cn(
-                    "w-full h-[46px] px-4 bg-muted/50 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium",
-                    showNewProjectErrors && !newProjectCategory ? "border-red-500 ring-1 ring-red-500" : "border-border/50"
-                  )}
-                />
+                ))}
+              </div>
+              {/* Tab Content */}
+              <div className="flex-1 overflow-y-auto p-6 md:p-8 space-y-5">
+                {activeProjectTab === 'general' && (
+                  <>
+                    <div className="space-y-2">
+                      <label className="text-[12px] font-bold text-foreground/80 uppercase tracking-wider">Project Name <span className="text-red-500">*</span></label>
+                      <input
+                        type="text"
+                        value={newProjectName}
+                        onChange={(e) => setNewProjectName(e.target.value)}
+                        placeholder="e.g. Website Redesign"
+                        className={cn("w-full px-4 h-[42px] bg-muted/50 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all", showNewProjectErrors && !newProjectName.trim() ? "border-red-500 ring-1 ring-red-500" : "border-border")}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[12px] font-bold text-foreground/80 uppercase tracking-wider">Description</label>
+                      <textarea
+                        value={newProjectDescription}
+                        onChange={(e) => setNewProjectDescription(e.target.value)}
+                        placeholder="Brief project description..."
+                        rows={3}
+                        className="w-full px-4 py-3 bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all resize-none"
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <label className="text-[12px] font-bold text-foreground/80 uppercase tracking-wider">Category <span className="text-red-500">*</span></label>
+                          <button type="button" onClick={(e) => { e.preventDefault(); e.stopPropagation(); setIsManageCategoriesModalOpen(true); }} className="text-[10px] font-bold text-primary hover:underline flex items-center gap-1">
+                            <Settings2 className="w-3 h-3" /> Manage
+                          </button>
+                        </div>
+                        <SearchableSelect
+                          value={newProjectCategory}
+                          onChange={(val) => setNewProjectCategory(val)}
+                          options={categories.map(cat => ({ label: cat, value: cat }))}
+                          placeholder="Select Category"
+                          className={cn("w-full h-[42px] px-4 bg-muted/50 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all", showNewProjectErrors && !newProjectCategory ? "border-red-500 ring-1 ring-red-500" : "border-border")}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-[12px] font-bold text-foreground/80 uppercase tracking-wider">Priority</label>
+                        <select value={newProjectPriority} onChange={(e) => setNewProjectPriority(e.target.value as "Low" | "Medium" | "High" | "Critical")} className="w-full h-[42px] px-4 bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all">
+                          {["Low", "Medium", "High", "Critical"].map(p => <option key={p} value={p}>{p}</option>)}
+                        </select>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <label className="text-[12px] font-bold text-foreground/80 uppercase tracking-wider">Start Date <span className="text-red-500">*</span></label>
+                        <input type="date" value={newProjectStartDate} onChange={(e) => { const v = e.target.value; setNewProjectStartDate(v); if (newProjectEndDate < v) setNewProjectEndDate(v); }} className={cn("w-full px-4 h-[42px] bg-muted/50 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all", showNewProjectErrors && !newProjectStartDate ? "border-red-500" : "border-border")} />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-[12px] font-bold text-foreground/80 uppercase tracking-wider">End Date <span className="text-red-500">*</span></label>
+                        <input type="date" value={newProjectEndDate} min={newProjectStartDate} onChange={(e) => setNewProjectEndDate(e.target.value)} className={cn("w-full px-4 h-[42px] bg-muted/50 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all", showNewProjectErrors && !newProjectEndDate ? "border-red-500" : "border-border")} />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[12px] font-bold text-foreground/80 uppercase tracking-wider">Team Deadline (Internal)</label>
+                      <input type="date" value={newProjectTeamDeadline} onChange={(e) => setNewProjectTeamDeadline(e.target.value)} className="w-full px-4 h-[42px] bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all" />
+                    </div>
+                  </>
+                )}
+                {activeProjectTab === 'creative' && (
+                  <>
+                    <div className="space-y-2">
+                      <label className="text-[12px] font-bold text-foreground/80 uppercase tracking-wider">Services</label>
+                      <input type="text" value={newProjectServices} onChange={(e) => setNewProjectServices(e.target.value)} placeholder="e.g. Social Media, SEO, Content" className="w-full px-4 h-[42px] bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all" />
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <label className="text-[12px] font-bold text-foreground/80 uppercase tracking-wider">Posts / Month</label>
+                        <input type="number" value={newProjectPost} onChange={(e) => setNewProjectPost(e.target.value)} placeholder="0" className="w-full px-4 h-[42px] bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all" />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-[12px] font-bold text-foreground/80 uppercase tracking-wider">Reels / Month</label>
+                        <input type="number" value={newProjectReel} onChange={(e) => setNewProjectReel(e.target.value)} placeholder="0" className="w-full px-4 h-[42px] bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all" />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[12px] font-bold text-foreground/80 uppercase tracking-wider">Festival Posts</label>
+                      <select value={newProjectFestivalPost} onChange={(e) => setNewProjectFestivalPost(e.target.value)} className="w-full h-[42px] px-4 bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all">
+                        <option value="No">No</option>
+                        <option value="Yes">Yes</option>
+                      </select>
+                    </div>
+                  </>
+                )}
+                {activeProjectTab === 'finance' && (
+                  <>
+                    <div className="space-y-2">
+                      <label className="text-[12px] font-bold text-foreground/80 uppercase tracking-wider">Project Budget</label>
+                      <input type="text" value={newProjectBudget} onChange={(e) => setNewProjectBudget(e.target.value)} placeholder="e.g. ₹10,000" className="w-full px-4 h-[42px] bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all" />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[12px] font-bold text-foreground/80 uppercase tracking-wider">Amount Received</label>
+                      <input type="text" value={newProjectAmountReceived} onChange={(e) => setNewProjectAmountReceived(e.target.value)} placeholder="e.g. ₹5,000" className="w-full px-4 h-[42px] bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all" />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[12px] font-bold text-foreground/80 uppercase tracking-wider">Next Payment Date</label>
+                      <input type="date" value={newProjectNextPaymentDate} onChange={(e) => setNewProjectNextPaymentDate(e.target.value)} className="w-full px-4 h-[42px] bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all" />
+                    </div>
+                  </>
+                )}
               </div>
             </div>
-            <div className="px-6 md:px-8 py-4 md:py-6 bg-muted/30 border-t border-border/50 flex justify-end gap-3 mt-auto shrink-0">
-              <button 
-                onClick={() => setIsNewProjectModalOpen(false)}
-                className="px-5 py-2.5 rounded-xl font-bold text-muted-foreground hover:bg-muted transition-colors"
-              >
+            {/* Footer */}
+            <div className="px-6 md:px-8 py-4 bg-muted/30 border-t border-border/50 flex justify-end gap-3 shrink-0">
+              <button onClick={() => { setIsNewProjectModalOpen(false); setActiveProjectTab('general'); setShowNewProjectErrors(false); }} className="px-5 py-2.5 rounded-xl font-bold text-muted-foreground hover:bg-muted transition-colors">
                 Cancel
               </button>
-              <button 
-                onClick={handleCreateProject}
-                className="px-6 py-2.5 bg-primary text-primary-foreground font-bold rounded-xl shadow-md hover:bg-primary/90 transition-all disabled:opacity-50"
-              >
+              <button onClick={handleCreateProject} className="px-6 py-2.5 bg-primary text-primary-foreground font-bold rounded-xl shadow-md hover:bg-primary/90 transition-all">
                 Create Project
               </button>
             </div>
@@ -1369,17 +1498,36 @@ export function Projects() {
                   </div>
                   
                   <div className="space-y-2 mt-4 max-h-[250px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-muted">
-                    {categories.map(cat => (
-                      <div key={cat} className="flex items-center justify-between p-3 bg-muted/30 border border-border/50 rounded-xl">
-                        <span className="font-bold text-sm">{cat}</span>
-                        <button 
-                          onClick={() => confirmDeleteCategory(cat)}
-                          className="p-1.5 text-muted-foreground hover:text-rose-500 hover:bg-rose-500/10 rounded-lg transition-colors"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                    ))}
+                    {categories.map(cat => {
+                      const isLocked = LOCKED_CATEGORIES.includes(cat);
+                      const isPending = categoryPendingDelete === cat;
+                      return (
+                        <div key={cat} className={cn("flex flex-col border rounded-xl overflow-hidden transition-all", isLocked ? "bg-primary/5 border-primary/20" : isPending ? "bg-rose-50 border-rose-300" : "bg-muted/30 border-border/50")}>
+                          <div className="flex items-center justify-between p-3">
+                            <div className="flex items-center gap-2">
+                              {isLocked && <span className="text-[10px] font-bold text-primary bg-primary/10 px-1.5 py-0.5 rounded-md uppercase tracking-wider">Fixed</span>}
+                              <span className="font-bold text-sm">{cat}</span>
+                            </div>
+                            {isLocked ? (
+                              <span className="text-[10px] text-muted-foreground font-medium italic">System</span>
+                            ) : (
+                              <button onClick={() => setCategoryPendingDelete(isPending ? null : cat)} className={cn("p-1.5 rounded-lg transition-colors", isPending ? "text-rose-500 bg-rose-100" : "text-muted-foreground hover:text-rose-500 hover:bg-rose-500/10")}>
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            )}
+                          </div>
+                          {isPending && (
+                            <div className="flex items-center justify-between px-3 py-2 bg-rose-50 border-t border-rose-200 gap-2">
+                              <span className="text-xs font-bold text-rose-600">Delete "{cat}"?</span>
+                              <div className="flex gap-2">
+                                <button onClick={() => setCategoryPendingDelete(null)} className="px-3 py-1 text-xs font-bold text-muted-foreground bg-white border border-border/50 rounded-lg hover:bg-muted transition-colors">Cancel</button>
+                                <button onClick={() => { confirmDeleteCategory(cat); setCategoryPendingDelete(null); }} className="px-3 py-1 text-xs font-bold text-white bg-rose-500 rounded-lg hover:bg-rose-600 transition-colors">Delete</button>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
                 
@@ -1561,17 +1709,36 @@ export function Projects() {
                   </div>
                   
                   <div className="space-y-2 mt-4 max-h-[250px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-muted">
-                    {categories.map(cat => (
-                      <div key={cat} className="flex items-center justify-between p-3 bg-muted/30 border border-border/50 rounded-xl">
-                        <span className="font-bold text-sm">{cat}</span>
-                        <button 
-                          onClick={() => confirmDeleteCategory(cat)}
-                          className="p-1.5 text-muted-foreground hover:text-rose-500 hover:bg-rose-500/10 rounded-lg transition-colors"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                    ))}
+                    {categories.map(cat => {
+                      const isLocked = LOCKED_CATEGORIES.includes(cat);
+                      const isPending = categoryPendingDelete === cat;
+                      return (
+                        <div key={cat} className={cn("flex flex-col border rounded-xl overflow-hidden transition-all", isLocked ? "bg-primary/5 border-primary/20" : isPending ? "bg-rose-50 border-rose-300" : "bg-muted/30 border-border/50")}>
+                          <div className="flex items-center justify-between p-3">
+                            <div className="flex items-center gap-2">
+                              {isLocked && <span className="text-[10px] font-bold text-primary bg-primary/10 px-1.5 py-0.5 rounded-md uppercase tracking-wider">Fixed</span>}
+                              <span className="font-bold text-sm">{cat}</span>
+                            </div>
+                            {isLocked ? (
+                              <span className="text-[10px] text-muted-foreground font-medium italic">System</span>
+                            ) : (
+                              <button onClick={() => setCategoryPendingDelete(isPending ? null : cat)} className={cn("p-1.5 rounded-lg transition-colors", isPending ? "text-rose-500 bg-rose-100" : "text-muted-foreground hover:text-rose-500 hover:bg-rose-500/10")}>
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            )}
+                          </div>
+                          {isPending && (
+                            <div className="flex items-center justify-between px-3 py-2 bg-rose-50 border-t border-rose-200 gap-2">
+                              <span className="text-xs font-bold text-rose-600">Delete "{cat}"?</span>
+                              <div className="flex gap-2">
+                                <button onClick={() => setCategoryPendingDelete(null)} className="px-3 py-1 text-xs font-bold text-muted-foreground bg-white border border-border/50 rounded-lg hover:bg-muted transition-colors">Cancel</button>
+                                <button onClick={() => { confirmDeleteCategory(cat); setCategoryPendingDelete(null); }} className="px-3 py-1 text-xs font-bold text-white bg-rose-500 rounded-lg hover:bg-rose-600 transition-colors">Delete</button>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
                 
@@ -1589,8 +1756,17 @@ export function Projects() {
           </DialogContent>
         </Dialog>
       </div>
-    );
-  }
+      <ConfirmModal 
+        isOpen={confirmModalState.isOpen}
+        onClose={() => setConfirmModalState(prev => ({ ...prev, isOpen: false }))}
+        onConfirm={confirmModalState.action}
+        title={confirmModalState.title}
+        description={confirmModalState.description}
+        itemName={confirmModalState.itemName}
+      />
+    </>
+  );
+}
 
   return (
     <div className="w-full space-y-6 animate-in fade-in duration-500">
@@ -1754,7 +1930,14 @@ export function Projects() {
         {filteredClients.map((client) => (
           <div 
             key={client.id} 
-            onClick={() => { setSelectedClientId(client.id); setSelectedProjectId(null); }}
+            onClick={(e) => {
+              const target = e.target as HTMLElement;
+              if (target.closest('button') || target.closest('[role="menuitem"]')) {
+                return;
+              }
+              setSelectedClientId(client.id);
+              setSelectedProjectId(null);
+            }}
             className="group bg-white border border-border/40 rounded-[2rem] p-6 shadow-sm hover:shadow-2xl hover:shadow-primary/5 hover:-translate-y-1 hover:border-primary/30 transition-all duration-300 relative flex flex-col cursor-pointer"
           >
             {/* Background Accent */}
@@ -1766,24 +1949,38 @@ export function Projects() {
               </div>
               
               <DropdownMenu>
-                <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                <DropdownMenuTrigger asChild>
                   <button className="p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground rounded-lg transition-colors outline-none focus:ring-2 focus:ring-primary/20 bg-background/50 backdrop-blur-sm">
                     <MoreHorizontal className="w-5 h-5" />
                   </button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48 rounded-2xl p-2 border-border/60 shadow-xl bg-background/95 backdrop-blur-md">
+                 <DropdownMenuContent 
+                  align="end" 
+                  className="w-48 rounded-2xl p-2 border-border/60 shadow-xl bg-background/95 backdrop-blur-md"
+                >
                   <DropdownMenuItem 
-                    onClick={(e) => { e.stopPropagation(); setEditingClient(client); setIsEditClientModalOpen(true); }}
+                    onSelect={() => {
+                      setTimeout(() => {
+                        setEditingClient(client);
+                        setIsEditClientModalOpen(true);
+                      }, 100);
+                    }}
                     className="rounded-xl cursor-pointer py-2.5 focus:bg-primary/10 focus:text-primary font-medium transition-colors"
                   >
                     <Edit2 className="w-4 h-4 mr-2" /> Edit Client
                   </DropdownMenuItem>
                   <DropdownMenuSeparator className="bg-border/50" />
-                  <DropdownMenuItem className="rounded-xl cursor-pointer py-2.5 focus:bg-amber-500/10 focus:text-amber-600 font-medium text-amber-600 transition-colors">
+                  <DropdownMenuItem 
+                    className="rounded-xl cursor-pointer py-2.5 focus:bg-amber-500/10 focus:text-amber-600 font-medium text-amber-600 transition-colors"
+                  >
                     <Archive className="w-4 h-4 mr-2" /> Archive Client
                   </DropdownMenuItem>
                   <DropdownMenuItem 
-                    onClick={(e) => { e.stopPropagation(); confirmDeleteClient(client); }}
+                    onSelect={() => {
+                      setTimeout(() => {
+                        confirmDeleteClient(client);
+                      }, 100);
+                    }}
                     className="rounded-xl cursor-pointer py-2.5 focus:bg-rose-500/10 focus:text-rose-600 font-medium text-rose-600 transition-colors"
                   >
                     <Trash2 className="w-4 h-4 mr-2" /> Delete
