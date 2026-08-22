@@ -423,7 +423,6 @@ export function EmployeeFormModal({ isOpen, onClose, onSubmit, initialData, isSe
                         options={[
                           { label: 'Active', value: 'Active' },
                           { label: 'Remote', value: 'Remote' },
-                          { label: 'On Leave', value: 'On Leave' },
                           { label: 'Inactive', value: 'Inactive' }
                         ]}
                         className="w-full px-4 h-[42px] bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all"
