@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { X,  Search, Plus, Filter, MoreHorizontal, LayoutGrid, List, Briefcase, Calendar, Clock, Star, Circle, Trash2, Edit2, Archive, ArchiveRestore, ArrowLeft, Users, IndianRupee, FolderGit2, CheckCircle2, Settings2, TrendingUp, MousePointerClick, Target, BarChart3, ChevronDown, User, Building2, CreditCard, FileText, ChevronRight, Video, Instagram  } from "lucide-react";
+import { X,  Search, Plus, Filter, MoreHorizontal, LayoutGrid, List, Briefcase, Calendar, Clock, Star, Circle, Trash2, Edit2, Archive, ArchiveRestore, ArrowLeft, Users, IndianRupee, FolderGit2, CheckCircle2, Settings2, TrendingUp, MousePointerClick, Target, BarChart3, ChevronDown, User, Building2, CreditCard, FileText, ChevronRight, Video, Instagram, Layers  } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -479,6 +479,15 @@ export function Projects() {
   const [expandedRowId, setExpandedRowId] = useState<string | null>(null);
   const [inlineEdit, setInlineEdit] = useState<{ id: string; field: string; value: string } | null>(null);
   
+  // Bulk Add States
+  const [isBulkAddModalOpen, setIsBulkAddModalOpen] = useState(false);
+  const [bulkAddTab, setBulkAddTab] = useState<'range' | 'visual'>('range');
+  const [bulkStartDate, setBulkStartDate] = useState("");
+  const [bulkEndDate, setBulkEndDate] = useState("");
+  const [bulkSelectedDays, setBulkSelectedDays] = useState<number[]>([1, 3, 5]); // default Mon, Wed, Fri
+  const [bulkFormatType, setBulkFormatType] = useState("Post");
+  const [visualSelectedDates, setVisualSelectedDates] = useState<Date[] | undefined>([]);
+  
   const defaultCalendarForm = {
     postingDate: new Date().toISOString().split('T')[0],
     postingDay: "",
@@ -921,6 +930,23 @@ export function Projects() {
                       <button 
                         onClick={(e) => {
                           e.stopPropagation();
+                          const today = new Date().toISOString().split('T')[0] || "";
+                          const future = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] || "";
+                          setBulkStartDate(today);
+                          setBulkEndDate(future);
+                          setBulkSelectedDays([1, 3, 5]); // default Mon, Wed, Fri
+                          setBulkFormatType("Post");
+                          setBulkAddTab('range');
+                          setVisualSelectedDates([]);
+                          setIsBulkAddModalOpen(true);
+                        }}
+                        className="flex items-center gap-1.5 px-3.5 py-2 border border-border/40 text-muted-foreground hover:text-foreground font-bold text-xs rounded-xl hover:bg-muted/50 transition-all shadow-sm"
+                      >
+                        <Layers className="w-3.5 h-3.5" /> Bulk Add Slots
+                      </button>
+                      <button 
+                        onClick={(e) => {
+                          e.stopPropagation();
                           setEditingCalendarItem(null);
                           setCalendarForm({ ...defaultCalendarForm });
                           setIsAddCalendarItemModalOpen(true);
@@ -1189,7 +1215,24 @@ export function Projects() {
                                       <button onClick={(e) => { e.stopPropagation(); setEditingCalendarItem(item); setCalendarForm({ ...item }); setIsAddCalendarItemModalOpen(true); }} className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors border border-border/30 shadow-sm bg-card" title="Full edit">
                                         <Edit2 className="w-3.5 h-3.5" />
                                       </button>
-                                      <button onClick={(e) => { e.stopPropagation(); const updated = projectCalendar.filter((x: any) => x.id !== item.id); setProjects(projects.map(p => p.id === project.id ? { ...p, contentCalendar: updated } : p)); toast.success("Calendar item deleted"); }} className="p-1.5 text-muted-foreground hover:text-rose-600 hover:bg-rose-500/10 rounded-lg transition-colors border border-border/30 shadow-sm bg-card">
+                                      <button 
+                                        onClick={(e) => { 
+                                          e.stopPropagation(); 
+                                          setConfirmModalState({
+                                            isOpen: true,
+                                            title: "Delete Content Idea",
+                                            description: "Are you sure you want to delete this content idea? This action cannot be undone.",
+                                            itemName: item.topic || "Untitled Idea",
+                                            action: () => {
+                                              const updated = projectCalendar.filter((x: any) => x.id !== item.id);
+                                              setProjects(projects.map(p => p.id === project.id ? { ...p, contentCalendar: updated } : p));
+                                              toast.success("Content idea deleted successfully");
+                                              setConfirmModalState(prev => ({ ...prev, isOpen: false }));
+                                            }
+                                          });
+                                        }} 
+                                        className="p-1.5 text-muted-foreground hover:text-rose-600 hover:bg-rose-500/10 rounded-lg transition-colors border border-border/30 shadow-sm bg-card"
+                                      >
                                         <Trash2 className="w-3.5 h-3.5" />
                                       </button>
                                     </div>
@@ -1745,6 +1788,264 @@ export function Projects() {
                     className="px-5 py-2 bg-primary text-primary-foreground font-bold rounded-xl shadow-md hover:bg-primary/90 transition-all text-sm"
                   >
                     {editingCalendarItem ? "Save Changes" : "Create Idea"}
+                  </button>
+                </div>
+              </div>
+            </div>
+          );
+        })()}
+
+        {/* Bulk Add Calendar Slots Modal */}
+        {isBulkAddModalOpen && (() => {
+          const currentSelectedProject = projects.find(p => p.id === selectedProjectId);
+          
+          const handleGenerateBulkSlots = () => {
+            if (!bulkStartDate || !bulkEndDate) {
+              toast.error("Please select start and end dates");
+              return;
+            }
+            if (bulkSelectedDays.length === 0) {
+              toast.error("Please select at least one day of the week");
+              return;
+            }
+            if (!currentSelectedProject) return;
+
+            const start = new Date(bulkStartDate);
+            const end = new Date(bulkEndDate);
+            
+            if (end < start) {
+              toast.error("End date cannot be before start date");
+              return;
+            }
+
+            const generated: CalendarItem[] = [];
+            const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+            for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+              const dayIndex = d.getDay();
+              if (bulkSelectedDays.includes(dayIndex)) {
+                const dateStr = d.toISOString().split('T')[0] || "";
+                generated.push({
+                  id: `cal-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                  postingDate: dateStr,
+                  postingDay: dayNames[dayIndex],
+                  type: bulkFormatType,
+                  topic: "",
+                  status: "To Do"
+                });
+              }
+            }
+
+            if (generated.length === 0) {
+              toast.error("No slots generated matching the chosen days and date range.");
+              return;
+            }
+
+            const existingCalendar = currentSelectedProject.contentCalendar || [];
+            const updated = [...existingCalendar, ...generated].sort((a, b) => new Date(a.postingDate).getTime() - new Date(b.postingDate).getTime());
+            
+            setProjects(projects.map(p => p.id === currentSelectedProject.id ? { ...p, contentCalendar: updated } : p));
+            setIsBulkAddModalOpen(false);
+            toast.success(`Generated ${generated.length} calendar slots successfully!`);
+          };
+
+          const handleSyncVisualDates = () => {
+            if (!currentSelectedProject) return;
+            const existingCalendar = currentSelectedProject.contentCalendar || [];
+            
+            const selectedStrings = (visualSelectedDates || []).map(date => {
+              const year = date.getFullYear();
+              const month = String(date.getMonth() + 1).padStart(2, '0');
+              const day = String(date.getDate()).padStart(2, '0');
+              return `${year}-${month}-${day}`;
+            });
+
+            // Add newly selected dates (always add new slots for each selected date)
+            const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+            const newlyAdded: CalendarItem[] = [];
+
+            selectedStrings.forEach(dateStr => {
+              const d = new Date(dateStr);
+              newlyAdded.push({
+                id: `cal-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                postingDate: dateStr,
+                postingDay: dayNames[d.getDay()],
+                type: bulkFormatType,
+                topic: "",
+                status: "To Do"
+              });
+            });
+
+            const updated = [...existingCalendar, ...newlyAdded].sort((a, b) => new Date(a.postingDate || 0).getTime() - new Date(b.postingDate || 0).getTime());
+            setProjects(projects.map(p => p.id === currentSelectedProject.id ? { ...p, contentCalendar: updated } : p));
+            setIsBulkAddModalOpen(false);
+
+            toast.success(`Successfully added ${newlyAdded.length} new content slots!`);
+          };
+
+
+          const toggleDay = (dayIndex: number) => {
+            if (bulkSelectedDays.includes(dayIndex)) {
+              setBulkSelectedDays(bulkSelectedDays.filter(d => d !== dayIndex));
+            } else {
+              setBulkSelectedDays([...bulkSelectedDays, dayIndex]);
+            }
+          };
+
+          const daysConfig = [
+            { label: "M", index: 1, name: "Monday" },
+            { label: "T", index: 2, name: "Tuesday" },
+            { label: "W", index: 3, name: "Wednesday" },
+            { label: "T", index: 4, name: "Thursday" },
+            { label: "F", index: 5, name: "Friday" },
+            { label: "S", index: 6, name: "Saturday" },
+            { label: "S", index: 0, name: "Sunday" },
+          ];
+
+          return (
+            <div
+              className="fixed inset-0 z-[200] flex items-center justify-center animate-in fade-in duration-200"
+              onClick={() => setIsBulkAddModalOpen(false)}
+            >
+              {/* Backdrop */}
+              <div className="absolute inset-0 bg-black/80" />
+              {/* Modal Panel */}
+              <div
+                className="relative z-10 w-[calc(100%-2rem)] max-w-[550px] bg-card border border-border/60 rounded-[2.5rem] shadow-2xl flex flex-col overflow-hidden"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {/* Header */}
+                <div className="flex items-center justify-between px-8 py-6 border-b border-border/50 bg-muted/30 shrink-0">
+                  <div>
+                    <h2 className="text-xl font-black tracking-tight">Bulk Add Options</h2>
+                    <p className="text-xs text-muted-foreground mt-1">Select dates visually or generate using a range</p>
+                  </div>
+                  <button
+                    onClick={() => setIsBulkAddModalOpen(false)}
+                    className="p-2 text-muted-foreground hover:text-foreground/80 hover:bg-muted rounded-full transition-colors"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+
+                {/* Tab Switcher */}
+                <div className="flex border-b border-border/30 bg-muted/10 p-2 gap-2 shrink-0">
+                  <button
+                    onClick={() => setBulkAddTab('range')}
+                    className={cn(
+                      "flex-1 py-2 text-xs font-bold rounded-xl transition-all",
+                      bulkAddTab === 'range'
+                        ? "bg-primary text-primary-foreground shadow-sm"
+                        : "text-muted-foreground hover:bg-muted"
+                    )}
+                  >
+                    📅 Date Range &amp; Weekdays
+                  </button>
+                  <button
+                    onClick={() => setBulkAddTab('visual')}
+                    className={cn(
+                      "flex-1 py-2 text-xs font-bold rounded-xl transition-all",
+                      bulkAddTab === 'visual'
+                        ? "bg-primary text-primary-foreground shadow-sm"
+                        : "text-muted-foreground hover:bg-muted"
+                    )}
+                  >
+                    ✨ Visual Calendar Sync
+                  </button>
+                </div>
+
+                {/* Body */}
+                <div className="p-8 space-y-6 overflow-y-auto max-h-[60vh] flex flex-col items-center">
+                  {bulkAddTab === 'range' ? (
+                    <div className="w-full space-y-6">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">Start Date</label>
+                          <input 
+                            type="date" 
+                            value={bulkStartDate} 
+                            onChange={(e) => setBulkStartDate(e.target.value)} 
+                            className="w-full px-3 py-2 bg-muted/50 border border-border/50 rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-primary font-bold text-center" 
+                          />
+                        </div>
+                        <div>
+                          <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">End Date</label>
+                          <input 
+                            type="date" 
+                            value={bulkEndDate} 
+                            onChange={(e) => setBulkEndDate(e.target.value)} 
+                            className="w-full px-3 py-2 bg-muted/50 border border-border/50 rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-primary font-bold text-center" 
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block mb-2">Days of the Week</label>
+                        <div className="flex justify-between items-center gap-1.5 bg-muted/20 p-2 rounded-xl border border-border/30">
+                          {daysConfig.map((day) => {
+                            const isSelected = bulkSelectedDays.includes(day.index);
+                            return (
+                              <button
+                                key={day.index}
+                                type="button"
+                                onClick={() => toggleDay(day.index)}
+                                title={day.name}
+                                className={cn(
+                                  "w-9 h-9 rounded-lg text-xs font-black transition-all flex items-center justify-center border shadow-sm",
+                                  isSelected 
+                                    ? "bg-primary text-primary-foreground border-primary" 
+                                    : "bg-card text-muted-foreground border-border/50 hover:bg-muted"
+                                )}
+                              >
+                                {day.label}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center w-full space-y-4">
+                      <p className="text-[11px] text-muted-foreground text-center font-medium max-w-[400px]">
+                        Click on dates in the calendar below to toggle slots. Syncing will add slots for newly selected dates and delete slots for unselected dates.
+                      </p>
+                      <div className="border border-border/50 rounded-2xl p-4 bg-muted/10 shadow-inner flex justify-center">
+                        <CalendarUI
+                          mode="multiple"
+                          selected={visualSelectedDates}
+                          onSelect={setVisualSelectedDates}
+                          className="rounded-md border-0 bg-transparent font-medium"
+                          {...({ required: false } as any)}
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="w-full">
+                    <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block mb-1.5">Default Format Type</label>
+                    <select 
+                      value={bulkFormatType} 
+                      onChange={(e) => setBulkFormatType(e.target.value)}
+                      className="w-full px-3 py-2 bg-muted/50 border border-border/50 rounded-xl text-xs focus:outline-none font-bold"
+                    >
+                      {["Post", "Reel", "Story", "Carousel"].map(t => <option key={t} value={t}>{t}</option>)}
+                    </select>
+                  </div>
+                </div>
+
+                {/* Footer */}
+                <div className="px-8 py-4 bg-muted/30 border-t border-border/50 flex justify-end gap-3 shrink-0">
+                  <button 
+                    onClick={() => setIsBulkAddModalOpen(false)} 
+                    className="px-4 py-2 rounded-xl font-bold text-sm text-muted-foreground hover:bg-muted transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={bulkAddTab === 'range' ? handleGenerateBulkSlots : handleSyncVisualDates}
+                    className="px-5 py-2 bg-primary text-primary-foreground font-bold rounded-xl shadow-md hover:bg-primary/90 transition-all text-sm"
+                  >
+                    {bulkAddTab === 'range' ? "Generate Slots" : "Add Selected Dates"}
                   </button>
                 </div>
               </div>
