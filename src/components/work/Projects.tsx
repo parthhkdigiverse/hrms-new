@@ -65,6 +65,25 @@ interface Project {
   campaigns?: any[];
   contentCalendar?: CalendarItem[];
   team: { name: string; avatar: string }[];
+  modules?: {
+    id: string;
+    name: string;
+    assignedToName?: string;
+    status?: "todo" | "in-progress" | "bugs" | "onhold" | "pending" | "completed";
+    priority?: "low" | "medium" | "high" | "urgent";
+    estimatedHours?: number;
+    dueDate?: string;
+    tasks: {
+      id: string;
+      title: string;
+      status: "todo" | "in-progress" | "bugs" | "onhold" | "pending" | "completed";
+      dueDate?: string;
+      assignedToName?: string;
+      assignedToAvatar?: string;
+      reasonForPending?: string;
+      phase?: string;
+    }[];
+  }[];
 }
 
 interface CalendarItem {
@@ -253,6 +272,32 @@ const INITIAL_PROJECTS: Project[] = [
       { name: "Sarah", avatar: "https://i.pravatar.cc/150?u=sarah" },
       { name: "Alex", avatar: "https://i.pravatar.cc/150?u=alex" },
       { name: "John", avatar: "https://i.pravatar.cc/150?u=john" }
+    ],
+    modules: [
+      {
+        id: "m1",
+        name: "User Authentication",
+        tasks: [
+          { id: "t1", title: "Setup Apple & Google OAuth login flow", status: "in-progress" },
+          { id: "t2", title: "Add biometric touch/face ID authentication", status: "todo" }
+        ]
+      },
+      {
+        id: "m2",
+        name: "Push Notifications",
+        tasks: [
+          { id: "t3", title: "Setup APNs certificates & FCM service", status: "completed" },
+          { id: "t4", title: "Implement foreground notification handler", status: "completed" },
+          { id: "t5", title: "Create scheduled local alert reminders", status: "todo" }
+        ]
+      },
+      {
+        id: "m3",
+        name: "Settings & Profiles",
+        tasks: [
+          { id: "t6", title: "Upload & compress user profile avatar photo", status: "todo" }
+        ]
+      }
     ]
   },
   {
@@ -282,6 +327,23 @@ const INITIAL_PROJECTS: Project[] = [
     team: [
       { name: "Mike", avatar: "https://i.pravatar.cc/150?u=mike" },
       { name: "David", avatar: "https://i.pravatar.cc/150?u=david" }
+    ],
+    modules: [
+      {
+        id: "m1",
+        name: "Database Schema",
+        tasks: [
+          { id: "t1", title: "Export raw legacy data from MS SQL Server", status: "completed" },
+          { id: "t2", title: "Map schemas & define target database indexes", status: "in-progress" }
+        ]
+      },
+      {
+        id: "m2",
+        name: "API Refactoring",
+        tasks: [
+          { id: "t3", title: "Rewrite core legacy endpoints in Go/Fiber", status: "todo" }
+        ]
+      }
     ]
   },
   {
@@ -298,6 +360,24 @@ const INITIAL_PROJECTS: Project[] = [
       { name: "Sarah", avatar: "https://i.pravatar.cc/150?u=sarah" },
       { name: "John", avatar: "https://i.pravatar.cc/150?u=john" },
       { name: "Alex", avatar: "https://i.pravatar.cc/150?u=alex" }
+    ],
+    modules: [
+      {
+        id: "m1",
+        name: "Shopping Cart",
+        tasks: [
+          { id: "t1", title: "Implement cart persistence in local storage", status: "completed" },
+          { id: "t2", title: "Create API sync handler for guest items transition", status: "in-progress" }
+        ]
+      },
+      {
+        id: "m2",
+        name: "Payment Gateway Integration",
+        tasks: [
+          { id: "t3", title: "Stripe webhooks configuration & signature verify", status: "todo" },
+          { id: "t4", title: "Apple Pay merchant verification certificates", status: "todo" }
+        ]
+      }
     ]
   }
 ];
@@ -390,7 +470,131 @@ export function Projects() {
   useEffect(() => { localStorage.setItem('hrms_projects', JSON.stringify(projects)); }, [projects]);
   useEffect(() => { localStorage.setItem('hrms_categories', JSON.stringify(categories)); }, [categories]);
   const [isKanbanView, setIsKanbanView] = useState(false);
+  const [selectedModuleId, setSelectedModuleId] = useState<string | null>(null);
+  const [addModuleForm, setAddModuleForm] = useState({
+    name: "",
+    assignedToName: "",
+    status: "todo" as "todo" | "in-progress" | "bugs" | "onhold" | "pending" | "completed",
+    priority: "medium" as "low" | "medium" | "high" | "urgent",
+    estimatedHours: 0,
+    dueDate: ""
+  });
+  const [newModuleTaskTitle, setNewModuleTaskTitle] = useState("");
+  const [isAddModuleModalOpen, setIsAddModuleModalOpen] = useState(false);
+  const [isEditModuleModalOpen, setIsEditModuleModalOpen] = useState(false);
+  const [editModuleForm, setEditModuleForm] = useState({
+    id: "",
+    name: "",
+    assignedToName: "",
+    status: "todo" as "todo" | "in-progress" | "bugs" | "onhold" | "pending" | "completed",
+    priority: "medium" as "low" | "medium" | "high" | "urgent",
+    estimatedHours: 0,
+    dueDate: ""
+  });
+  const [editingModuleTask, setEditingModuleTask] = useState<any>(null);
+  const [isModuleTaskModalOpen, setIsModuleTaskModalOpen] = useState(false);
+  const [isAddTaskModalOpen, setIsAddTaskModalOpen] = useState(false);
+  const [isPresetsModalOpen, setIsPresetsModalOpen] = useState(false);
+  const [presets, setPresets] = useState<any[]>(() => {
+    if (typeof window !== "undefined") {
+      const local = localStorage.getItem("hrms_module_presets");
+      if (local) return JSON.parse(local);
+    }
+    return [
+      {
+        name: "User Authentication Setup",
+        description: "Ready-to-use template for user login, OAuth, and biometric verification components.",
+        modules: [
+          {
+            name: "User Authentication",
+            assignedToName: "",
+            status: "todo",
+            priority: "medium",
+            estimatedHours: 8,
+            dueDate: "",
+            tasks: [
+              { id: "t-p1", title: "Setup Apple & Google OAuth login flow", status: "todo" },
+              { id: "t-p2", title: "Add biometric touch/face ID authentication", status: "todo" },
+              { id: "t-p3", title: "Setup SMTP credentials & password reset email flow", status: "todo" }
+            ]
+          }
+        ]
+      },
+      {
+        name: "E-Commerce Core Modules",
+        description: "Standard checkout, shopping cart, and Stripe payment gateway components.",
+        modules: [
+          {
+            name: "Shopping Cart",
+            assignedToName: "",
+            status: "todo",
+            priority: "medium",
+            estimatedHours: 12,
+            dueDate: "",
+            tasks: [
+              { id: "t-p4", title: "Implement cart persistence in local storage", status: "todo" },
+              { id: "t-p5", title: "Create API sync handler for guest items transition", status: "todo" }
+            ]
+          },
+          {
+            name: "Payment Gateway Integration",
+            assignedToName: "",
+            status: "todo",
+            priority: "high",
+            estimatedHours: 16,
+            dueDate: "",
+            tasks: [
+              { id: "t-p6", title: "Configure Stripe webhooks and signature verification", status: "todo" },
+              { id: "t-p7", title: "Request Apple Pay merchant verification certificates", status: "todo" }
+            ]
+          }
+        ]
+      },
+      {
+        name: "Media Upload & Compression",
+        description: "Assets uploading, CDN distribution, and video/image transcode processing.",
+        modules: [
+          {
+            name: "Media Management",
+            assignedToName: "",
+            status: "todo",
+            priority: "medium",
+            estimatedHours: 10,
+            dueDate: "",
+            tasks: [
+              { id: "t-p8", title: "Configure AWS S3 bucket for assets uploading", status: "todo" },
+              { id: "t-p9", title: "Setup CloudFront CDN caching policy distribution", status: "todo" },
+              { id: "t-p10", title: "Implement Sharp/FFmpeg media compression handler", status: "todo" }
+            ]
+          }
+        ]
+      }
+    ];
+  });
+  
+  const [isCreatePresetModalOpen, setIsCreatePresetModalOpen] = useState(false);
+  const [newPresetForm, setNewPresetForm] = useState({
+    name: "",
+    description: "",
+    modules: [
+      {
+        name: "",
+        tasks: [""]
+      }
+    ]
+  });
 
+  useEffect(() => {
+    localStorage.setItem("hrms_module_presets", JSON.stringify(presets));
+  }, [presets]);
+  const [addTaskForm, setAddTaskForm] = useState({
+    title: "",
+    phase: "",
+    dueDate: "",
+    assignedToName: "",
+    status: "todo" as "todo" | "in-progress" | "bugs" | "onhold" | "pending" | "completed",
+    reasonForPending: ""
+  });
   const [isNewClientModalOpen, setIsNewClientModalOpen] = useState(false);
   const [activeClientTab, setActiveClientTab] = useState<ClientTab>('general');
   const clientTabs = [
@@ -1462,75 +1666,377 @@ export function Projects() {
               );
             })() : (
               <>
-                {/* Left Col: Tasks */}
+                {/* Left Col: Tasks / Kanban */}
                 <div className="lg:col-span-2 space-y-6">
-                  <div className="flex items-center justify-between">
-                    <h2 className="text-xl font-bold tracking-tight">Milestones & Tasks</h2>
-                    <button 
-                      onClick={() => setIsKanbanView(!isKanbanView)}
-                      className="text-sm font-bold text-primary hover:underline"
-                    >
-                      {isKanbanView ? "View List" : "View Kanban"}
-                    </button>
-                  </div>
-                  
-                  {isKanbanView ? (
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                       <div className="space-y-3 bg-muted/20 p-4 rounded-3xl border border-border/40">
-                          <h4 className="font-bold text-xs text-muted-foreground uppercase tracking-widest mb-4 flex items-center justify-between">
-                            To Do <span className="bg-background px-2 py-0.5 rounded-md">2</span>
-                          </h4>
-                          {["Development Sprint 1", "QA & Testing"].map((task, i) => (
-                            <div key={i} className="bg-card border border-border/60 p-4 rounded-2xl shadow-sm hover:border-primary/30 hover:shadow-md transition-all cursor-pointer">
-                               <p className="font-bold text-sm text-foreground">{task}</p>
-                               <p className="text-xs font-medium text-muted-foreground mt-3 flex items-center gap-1.5"><Calendar className="w-3 h-3" /> Due in {i + 2} weeks</p>
-                            </div>
-                          ))}
-                          <button className="w-full py-2 border-2 border-dashed border-border/60 rounded-xl text-xs font-bold text-muted-foreground hover:bg-muted/50 transition-colors flex items-center justify-center gap-1">
-                            <Plus className="w-3 h-3" /> Add Task
-                          </button>
-                       </div>
-                       
-                       <div className="space-y-3 bg-muted/20 p-4 rounded-3xl border border-border/40">
-                          <h4 className="font-bold text-xs text-primary uppercase tracking-widest mb-4 flex items-center justify-between">
-                            In Progress <span className="bg-primary/10 text-primary px-2 py-0.5 rounded-md">0</span>
-                          </h4>
-                          <div className="p-4 rounded-2xl border-2 border-border/40 border-dashed text-center py-8">
-                            <p className="text-xs font-bold text-muted-foreground">No tasks</p>
+                  {project.category === "App Dev" || project.category === "Web Dev" ? (() => {
+                    const projectModules: NonNullable<Project['modules']> = project.modules || [];
+                    const activeModule = projectModules.find(m => m.id === selectedModuleId) || projectModules[0];
+                    
+                    const handleAddModule = (e: React.FormEvent) => {
+                      e.preventDefault();
+                      if (!addModuleForm.name.trim()) return;
+                      const newModule: any = {
+                        id: `mod-${Date.now()}`,
+                        name: addModuleForm.name.trim(),
+                        assignedToName: addModuleForm.assignedToName || undefined,
+                        status: addModuleForm.status,
+                        priority: addModuleForm.priority,
+                        estimatedHours: addModuleForm.estimatedHours || undefined,
+                        dueDate: addModuleForm.dueDate || undefined,
+                        tasks: []
+                      };
+                      const updatedModules: any = [...projectModules, newModule];
+                      setProjects(projects.map(p => p.id === project.id ? { ...p, modules: updatedModules } : p));
+                      setSelectedModuleId(newModule.id);
+                      setAddModuleForm({
+                        name: "",
+                        assignedToName: "",
+                        status: "todo",
+                        priority: "medium",
+                        estimatedHours: 0,
+                        dueDate: ""
+                      });
+                      toast.success(`Module "${newModule.name}" created!`);
+                    };
+
+                    const handleAddModuleTask = (columnStatus: "todo" | "in-progress" | "bugs" | "onhold" | "pending" | "completed") => {
+                      if (!newModuleTaskTitle.trim() || !activeModule) return;
+                      const newTask = {
+                        id: `task-${Date.now()}`,
+                        title: newModuleTaskTitle.trim(),
+                        status: columnStatus
+                      };
+                      const updatedTasks = [...activeModule.tasks, newTask];
+                      const updatedModules: NonNullable<Project['modules']> = projectModules.map(m => m.id === activeModule.id ? { ...m, tasks: updatedTasks } : m);
+                      setProjects(projects.map(p => p.id === project.id ? { ...p, modules: updatedModules } : p));
+                      setNewModuleTaskTitle("");
+                      setInlineEdit(null); // Close task input
+                      toast.success("Task added successfully!");
+                    };
+
+                    const handleDeleteTask = (taskId: string) => {
+                      if (!activeModule) return;
+                      const updatedTasks = activeModule.tasks.filter(t => t.id !== taskId);
+                      const updatedModules: NonNullable<Project['modules']> = projectModules.map(m => m.id === activeModule.id ? { ...m, tasks: updatedTasks } : m);
+                      setProjects(projects.map(p => p.id === project.id ? { ...p, modules: updatedModules } : p));
+                      toast.success("Task deleted");
+                    };
+
+                    const handleMoveTask = (taskId: string, direction: 'left' | 'right') => {
+                      if (!activeModule) return;
+                      const task = activeModule.tasks.find(t => t.id === taskId);
+                      if (!task) return;
+                      
+                      const statusFlow: ("todo" | "in-progress" | "bugs" | "onhold" | "pending" | "completed")[] = ["todo", "in-progress", "bugs", "onhold", "pending", "completed"];
+                      const currIdx = statusFlow.indexOf(task.status);
+                      let nextIdx = currIdx + (direction === 'right' ? 1 : -1);
+                      if (nextIdx < 0 || nextIdx >= statusFlow.length) return;
+                      
+                      const updatedTasks = activeModule.tasks.map(t => t.id === taskId ? { ...t, status: statusFlow[nextIdx] as any } : t);
+                      const updatedModules: NonNullable<Project['modules']> = projectModules.map(m => m.id === activeModule.id ? { ...m, tasks: updatedTasks } : m);
+                      setProjects(projects.map(p => p.id === project.id ? { ...p, modules: updatedModules } : p));
+                    };
+
+                    return (
+                      <div className="space-y-6 animate-in fade-in duration-300">
+                        {/* Modules Header */}
+                        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                          <div>
+                            <h2 className="text-xl font-bold tracking-tight">Module-wise Kanban</h2>
+                            <p className="text-xs text-muted-foreground mt-1">Manage project components and developer boards</p>
                           </div>
-                       </div>
-                       
-                       <div className="space-y-3 bg-muted/20 p-4 rounded-3xl border border-border/40">
-                          <h4 className="font-bold text-xs text-emerald-500 uppercase tracking-widest mb-4 flex items-center justify-between">
-                            Done <span className="bg-emerald-500/10 text-emerald-500 px-2 py-0.5 rounded-md">2</span>
-                          </h4>
-                          {["Requirement Analysis", "Design Phase"].map((task, i) => (
-                            <div key={i} className="bg-muted/40 border border-border/40 p-4 rounded-2xl">
-                               <p className="font-bold text-sm text-muted-foreground line-through decoration-muted-foreground/50">{task}</p>
-                               <p className="text-xs font-medium text-muted-foreground/70 mt-3 flex items-center gap-1.5"><CheckCircle2 className="w-3 h-3" /> Completed</p>
-                            </div>
-                          ))}
-                       </div>
-                    </div>
-                  ) : (
-                    <div className="bg-card border border-border/60 rounded-3xl p-6 shadow-sm space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                      {/* Mock Tasks */}
-                      {["Requirement Analysis", "Design Phase", "Development Sprint 1", "QA & Testing"].map((task, i) => (
-                        <div key={i} className="flex items-center gap-4 p-4 rounded-2xl border border-border/40 hover:bg-muted/30 transition-colors">
-                           <div className={cn("w-6 h-6 rounded-full border-2 flex items-center justify-center", i < 2 ? "border-primary bg-primary/10 text-primary" : "border-muted-foreground text-transparent")}>
-                              {i < 2 && <CheckCircle2 className="w-4 h-4" />}
+
+                          <div className="flex gap-2 shrink-0">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setIsPresetsModalOpen(true);
+                              }}
+                              className="px-3 py-1.5 bg-muted text-muted-foreground hover:text-foreground hover:bg-muted/80 text-xs font-bold rounded-xl flex items-center gap-1.5 border border-border/60 transition-colors shadow-sm"
+                            >
+                              ⚙️ Load from Presets
+                            </button>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setAddModuleForm({
+                                  name: "",
+                                  assignedToName: "",
+                                  status: "todo",
+                                  priority: "medium",
+                                  estimatedHours: 0,
+                                  dueDate: ""
+                                });
+                                setIsAddModuleModalOpen(true);
+                              }}
+                              className="px-3 py-1.5 bg-primary text-primary-foreground text-xs font-bold rounded-xl hover:bg-primary/90 flex items-center gap-1 shrink-0 shadow-sm"
+                            >
+                              <Plus className="w-3.5 h-3.5" /> Add Module
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Modules List Tabs */}
+                        {projectModules.length === 0 ? (
+                          <div className="bg-card border border-border/40 rounded-[2rem] p-12 text-center">
+                            <Layers className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" />
+                            <h3 className="font-bold text-foreground text-sm">No modules added yet</h3>
+                            <p className="text-xs text-muted-foreground mt-1">Create your first development module above to start tracking tasks.</p>
+                          </div>
+                        ) : (
+                          <>
+                             <div className="flex flex-wrap gap-2 pb-2 border-b border-border/20 items-center">
+                               {projectModules.map(m => {
+                                 const isActive = activeModule?.id === m.id;
+                                 return (
+                                   <div key={m.id} className="flex items-center gap-1 bg-muted/30 p-1.5 rounded-2xl border border-border/10">
+                                     <button
+                                       onClick={() => setSelectedModuleId(m.id)}
+                                       className={cn(
+                                         "px-3.5 py-1.5 text-xs font-bold rounded-xl transition-all flex items-center gap-1.5",
+                                         isActive
+                                           ? "bg-primary text-primary-foreground shadow-sm shadow-primary/10"
+                                           : "text-muted-foreground hover:bg-muted"
+                                       )}
+                                     >
+                                       📦 {m.name}
+                                     </button>
+                                     {isActive && (
+                                       <div className="flex gap-0.5 ml-1">
+                                         <button
+                                            onClick={() => {
+                                              setEditModuleForm({
+                                                id: m.id,
+                                                name: m.name,
+                                                assignedToName: m.assignedToName || "",
+                                                status: m.status || "todo",
+                                                priority: m.priority || "medium",
+                                                estimatedHours: m.estimatedHours || 0,
+                                                dueDate: m.dueDate || ""
+                                              });
+                                              setIsEditModuleModalOpen(true);
+                                            }}
+                                           className="p-1 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors"
+                                           title="Rename module"
+                                         >
+                                           <Edit2 className="w-3.5 h-3.5" />
+                                         </button>
+                                         <button
+                                           onClick={() => {
+                                             setConfirmModalState({
+                                               isOpen: true,
+                                               title: "Delete Module",
+                                               description: "Are you sure you want to delete this module and all its tasks? This action cannot be undone.",
+                                               itemName: m.name,
+                                               action: () => {
+                                                 const updatedModules = projectModules.filter(pm => pm.id !== m.id);
+                                                 setProjects(projects.map(p => p.id === project.id ? { ...p, modules: updatedModules } : p));
+                                                 setSelectedModuleId(updatedModules[0]?.id || null);
+                                                 toast.success(`Module "${m.name}" deleted successfully!`);
+                                               }
+                                             });
+                                           }}
+                                           className="p-1 text-rose-500 hover:text-rose-600 hover:bg-rose-500/10 rounded-lg transition-colors"
+                                           title="Delete module"
+                                         >
+                                           <Trash2 className="w-3.5 h-3.5" />
+                                         </button>
+                                       </div>
+                                     )}
+                                   </div>
+                                 );
+                               })}
+                             </div>
+
+                            {/* Kanban Grid */}
+                            {activeModule && (
+                              <div className="flex gap-4 overflow-x-auto pb-4 w-full snap-x">
+                                {([
+                                  { status: "todo" as const, title: "To Do", color: "text-slate-500", bg: "bg-slate-500/5" },
+                                  { status: "in-progress" as const, title: "In Progress", color: "text-blue-500", bg: "bg-blue-500/5" },
+                                  { status: "bugs" as const, title: "Bugs", color: "text-rose-500", bg: "bg-rose-500/5" },
+                                  { status: "onhold" as const, title: "On Hold", color: "text-amber-500", bg: "bg-amber-500/5" },
+                                  { status: "pending" as const, title: "Pending", color: "text-purple-500", bg: "bg-purple-500/5" },
+                                  { status: "completed" as const, title: "Completed", color: "text-emerald-500", bg: "bg-emerald-500/5" },
+                                ]).map((col) => {
+                                  const colTasks = activeModule.tasks.filter(t => t.status === col.status);
+                                  const isAdding = inlineEdit?.id === activeModule!.id && inlineEdit?.field === col.status;
+                                  
+                                  return (
+                                    <div key={col.status} className={cn("space-y-3 p-4 rounded-[2rem] border border-border/40 flex flex-col min-w-[280px] max-w-[300px] w-full shrink-0 snap-align-start", col.bg)}>
+                                      <h4 className={cn("font-extrabold text-xs uppercase tracking-widest mb-4 flex items-center justify-between", col.color)}>
+                                        {col.title} <span className="bg-background border border-border/20 px-2 py-0.5 rounded-md text-foreground font-mono text-[10px]">{colTasks.length}</span>
+                                      </h4>
+
+                                      <div className="space-y-2.5 flex-1 overflow-y-auto max-h-[350px]">
+                                        {colTasks.map((t) => (
+                                          <div
+                                            key={t.id}
+                                            onClick={() => {
+                                              setEditingModuleTask({ ...t });
+                                              setIsModuleTaskModalOpen(true);
+                                            }}
+                                            className="bg-card border border-border/60 p-4 rounded-2xl shadow-sm hover:shadow-md hover:border-primary/20 transition-all group relative flex flex-col justify-between min-h-[110px] cursor-pointer"
+                                          >
+                                            <div>
+                                              <div className="flex flex-wrap gap-1 mb-2">
+                                                {t.phase && (
+                                                  <span className="text-[9px] font-bold text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200 uppercase tracking-wide">
+                                                    {t.phase}
+                                                  </span>
+                                                )}
+                                                {t.dueDate && (
+                                                  <span className="text-[9px] font-black text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200">
+                                                    📅 {t.dueDate}
+                                                  </span>
+                                                )}
+                                              </div>
+                                              
+                                              <p className="font-bold text-sm text-foreground break-words pr-6 leading-snug">{t.title}</p>
+                                              
+                                              {/* Pending Reason Alert */}
+                                              {(t.status === 'onhold' || t.status === 'pending') && t.reasonForPending && (
+                                                <div className="mt-2 flex items-start gap-1 bg-amber-500/10 border border-amber-500/20 rounded-lg p-1.5">
+                                                  <span className="text-[9px] font-medium text-amber-700 leading-normal break-words">
+                                                    ⚠️ {t.reasonForPending}
+                                                  </span>
+                                                </div>
+                                              )}
+                                            </div>
+                                            
+                                            <div className="flex justify-between items-center mt-4 pt-3 border-t border-border/20">
+                                              <div className="flex items-center gap-1.5 max-w-[120px] truncate">
+                                                <div className="w-5 h-5 rounded-full bg-primary/10 text-primary flex items-center justify-center text-[10px] font-black shrink-0 border border-primary/20">
+                                                  {(t.assignedToName || "U").charAt(0).toUpperCase()}
+                                                </div>
+                                                <span className="text-[11px] font-bold text-muted-foreground truncate">{t.assignedToName || "Unassigned"}</span>
+                                              </div>
+
+                                              <div className="flex gap-1 items-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <div className="flex gap-0.5 mr-1">
+                                                  {col.status !== "todo" && (
+                                                    <button onClick={(e) => { e.stopPropagation(); handleMoveTask(t.id, 'left'); }} className="p-1 rounded bg-muted hover:bg-muted/80 text-muted-foreground text-[9px] font-bold">←</button>
+                                                  )}
+                                                  {col.status !== "completed" && (
+                                                    <button onClick={(e) => { e.stopPropagation(); handleMoveTask(t.id, 'right'); }} className="p-1 rounded bg-muted hover:bg-muted/80 text-muted-foreground text-[9px] font-bold">→</button>
+                                                  )}
+                                                </div>
+
+                                                <button
+                                                  onClick={(e) => { e.stopPropagation(); handleDeleteTask(t.id); }}
+                                                  className="text-rose-500 hover:text-rose-600 transition-colors p-1 rounded hover:bg-rose-500/10"
+                                                  title="Delete task"
+                                                >
+                                                  <Trash2 className="w-3.5 h-3.5" />
+                                                </button>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        ))}
+
+                                        {colTasks.length === 0 && (
+                                          <div className="py-8 text-center text-xs font-semibold text-muted-foreground/40 border-2 border-dashed border-border/20 rounded-2xl">
+                                            No tasks
+                                          </div>
+                                        )}
+                                      </div>
+
+                                      {/* Add Task Control */}
+                                      <button
+                                        onClick={() => {
+                                          setAddTaskForm({
+                                            title: "",
+                                            phase: "",
+                                            dueDate: "",
+                                            assignedToName: "",
+                                            status: col.status,
+                                            reasonForPending: ""
+                                          });
+                                          setIsAddTaskModalOpen(true);
+                                        }}
+                                        className="w-full py-2 border-2 border-dashed border-border/50 hover:border-primary/30 rounded-xl text-xs font-extrabold text-muted-foreground/60 hover:text-primary transition-all flex items-center justify-center gap-1 bg-card/40"
+                                      >
+                                        <Plus className="w-3 h-3" /> Add Task
+                                      </button>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            )}
+                          </>
+                        )}
+                      </div>
+                    );
+                  })() : (
+                    <>
+                      {/* Standard Tasks View */}
+                      <div className="flex items-center justify-between">
+                        <h2 className="text-xl font-bold tracking-tight">Milestones &amp; Tasks</h2>
+                        <button 
+                          onClick={() => setIsKanbanView(!isKanbanView)}
+                          className="text-sm font-bold text-primary hover:underline"
+                        >
+                          {isKanbanView ? "View List" : "View Kanban"}
+                        </button>
+                      </div>
+                      
+                      {isKanbanView ? (
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                           <div className="space-y-3 bg-muted/20 p-4 rounded-3xl border border-border/40">
+                              <h4 className="font-bold text-xs text-muted-foreground uppercase tracking-widest mb-4 flex items-center justify-between">
+                                To Do <span className="bg-background px-2 py-0.5 rounded-md">2</span>
+                              </h4>
+                              {["Development Sprint 1", "QA & Testing"].map((task, i) => (
+                                <div key={i} className="bg-card border border-border/60 p-4 rounded-2xl shadow-sm hover:border-primary/30 hover:shadow-md transition-all cursor-pointer">
+                                   <p className="font-bold text-sm text-foreground">{task}</p>
+                                   <p className="text-xs font-medium text-muted-foreground mt-3 flex items-center gap-1.5"><Calendar className="w-3 h-3" /> Due in {i + 2} weeks</p>
+                                </div>
+                              ))}
+                              <button className="w-full py-2 border-2 border-dashed border-border/60 rounded-xl text-xs font-bold text-muted-foreground hover:bg-muted/50 transition-colors flex items-center justify-center gap-1">
+                                <Plus className="w-3 h-3" /> Add Task
+                              </button>
                            </div>
-                           <div>
-                             <p className={cn("font-bold", i < 2 ? "line-through text-muted-foreground" : "text-foreground")}>{task}</p>
-                             <p className="text-xs font-medium text-muted-foreground mt-0.5">Due {format(new Date(Date.now() + i * 7 * 24 * 60 * 60 * 1000), "dd/MM/yyyy")}</p>
+                           
+                           <div className="space-y-3 bg-muted/20 p-4 rounded-3xl border border-border/40">
+                              <h4 className="font-bold text-xs text-primary uppercase tracking-widest mb-4 flex items-center justify-between">
+                                In Progress <span className="bg-primary/10 text-primary px-2 py-0.5 rounded-md">0</span>
+                              </h4>
+                              <div className="p-4 rounded-2xl border-2 border-border/40 border-dashed text-center py-8">
+                                <p className="text-xs font-bold text-muted-foreground">No tasks</p>
+                              </div>
+                           </div>
+                           
+                           <div className="space-y-3 bg-muted/20 p-4 rounded-3xl border border-border/40">
+                              <h4 className="font-bold text-xs text-emerald-500 uppercase tracking-widest mb-4 flex items-center justify-between">
+                                Done <span className="bg-emerald-500/10 text-emerald-500 px-2 py-0.5 rounded-md">2</span>
+                              </h4>
+                              {["Requirement Analysis", "Design Phase"].map((task, i) => (
+                                <div key={i} className="bg-muted/40 border border-border/40 p-4 rounded-2xl">
+                                   <p className="font-bold text-sm text-muted-foreground line-through decoration-muted-foreground/50">{task}</p>
+                                   <p className="text-xs font-medium text-muted-foreground/70 mt-3 flex items-center gap-1.5"><CheckCircle2 className="w-3 h-3" /> Completed</p>
+                                </div>
+                              ))}
                            </div>
                         </div>
-                      ))}
-                    </div>
+                      ) : (
+                        <div className="bg-card border border-border/60 rounded-3xl p-6 shadow-sm space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                          {/* Mock Tasks */}
+                          {["Requirement Analysis", "Design Phase", "Development Sprint 1", "QA & Testing"].map((task, i) => (
+                            <div key={i} className="flex items-center gap-4 p-4 rounded-2xl border border-border/40 hover:bg-muted/30 transition-colors">
+                               <div className={cn("w-6 h-6 rounded-full border-2 flex items-center justify-center", i < 2 ? "border-primary bg-primary/10 text-primary" : "border-muted-foreground text-transparent")}>
+                                  {i < 2 && <CheckCircle2 className="w-4 h-4" />}
+                               </div>
+                               <div>
+                                 <p className={cn("font-bold", i < 2 ? "line-through text-muted-foreground" : "text-foreground")}>{task}</p>
+                                 <p className="text-xs font-medium text-muted-foreground mt-0.5">Due {format(new Date(Date.now() + i * 7 * 24 * 60 * 60 * 1000), "dd/MM/yyyy")}</p>
+                               </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </>
                   )}
                 </div>
-
-                {/* Right Col: Team & Client */}
                 <div className="space-y-6">
                   <h2 className="text-xl font-bold tracking-tight">Team Members</h2>
                   <div className="bg-card border border-border/60 rounded-3xl p-6 shadow-sm space-y-4">
@@ -2048,6 +2554,1013 @@ export function Projects() {
                     {bulkAddTab === 'range' ? "Generate Slots" : "Add Selected Dates"}
                   </button>
                 </div>
+              </div>
+            </div>
+          );
+        })()}
+
+        {/* Add Module Modal - plain overlay */}
+        {isAddModuleModalOpen && (() => {
+          const currentSelectedProject = projects.find(p => p.id === selectedProjectId);
+          if (!currentSelectedProject) return null;
+
+          const handleSaveNewModule = (e: React.FormEvent) => {
+            e.preventDefault();
+            if (!addModuleForm.name.trim()) return;
+            const projectModules = currentSelectedProject.modules || [];
+            const newModule: any = {
+              id: `mod-${Date.now()}`,
+              name: addModuleForm.name.trim(),
+              assignedToName: addModuleForm.assignedToName || undefined,
+              status: addModuleForm.status,
+              priority: addModuleForm.priority,
+              estimatedHours: addModuleForm.estimatedHours || undefined,
+              dueDate: addModuleForm.dueDate || undefined,
+              tasks: []
+            };
+            const updatedModules: any = [...projectModules, newModule];
+            setProjects(projects.map(p => p.id === currentSelectedProject.id ? { ...p, modules: updatedModules } : p));
+            setSelectedModuleId(newModule.id);
+            setAddModuleForm({
+              name: "",
+              assignedToName: "",
+              status: "todo",
+              priority: "medium",
+              estimatedHours: 0,
+              dueDate: ""
+            });
+            setIsAddModuleModalOpen(false);
+            toast.success(`Module "${newModule.name}" created successfully!`);
+          };
+
+          return (
+            <div
+              className="fixed inset-0 z-[200] flex items-center justify-center animate-in fade-in duration-200"
+              onClick={() => setIsAddModuleModalOpen(false)}
+            >
+              {/* Backdrop */}
+              <div className="absolute inset-0 bg-black/80" />
+              {/* Modal Panel */}
+              <div
+                className="relative z-10 w-[calc(100%-2rem)] max-w-[450px] bg-card border border-border/60 rounded-[2.5rem] shadow-2xl flex flex-col overflow-hidden"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {/* Header */}
+                <div className="flex items-center justify-between px-8 py-6 border-b border-border/50 bg-muted/30 shrink-0">
+                  <div>
+                    <h2 className="text-lg font-black tracking-tight">Add New Module</h2>
+                    <p className="text-xs text-muted-foreground mt-1">Configure and assign a new development module component</p>
+                  </div>
+                  <button
+                    onClick={() => setIsAddModuleModalOpen(false)}
+                    className="p-2 text-muted-foreground hover:text-foreground/80 hover:bg-muted rounded-full transition-colors"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+                {/* Body */}
+                <form onSubmit={handleSaveNewModule}>
+                  <div className="p-8 space-y-4 max-h-[60vh] overflow-y-auto">
+                    <div>
+                      <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">Module Name <span className="text-rose-500">*</span></label>
+                      <input 
+                        type="text" 
+                        required
+                        autoFocus
+                        placeholder="e.g. User Authentication, Shopping Cart"
+                        value={addModuleForm.name} 
+                        onChange={(e) => setAddModuleForm({ ...addModuleForm, name: e.target.value })} 
+                        className="w-full px-3 py-2 bg-muted/50 border border-border/50 rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-primary font-semibold" 
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">Assign To</label>
+                        <select 
+                          value={addModuleForm.assignedToName} 
+                          onChange={(e) => setAddModuleForm({ ...addModuleForm, assignedToName: e.target.value })}
+                          className="w-full px-3 py-2 bg-muted/50 border border-border/50 rounded-xl text-xs focus:outline-none font-bold"
+                        >
+                          <option value="">Unassigned</option>
+                          {currentSelectedProject.team.map(m => (
+                            <option key={m.name} value={m.name}>{m.name}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div>
+                        <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">Stage Status</label>
+                        <select 
+                          value={addModuleForm.status} 
+                          onChange={(e) => setAddModuleForm({ ...addModuleForm, status: e.target.value as any })}
+                          className="w-full px-3 py-2 bg-muted/50 border border-border/50 rounded-xl text-xs focus:outline-none font-bold"
+                        >
+                          {["todo", "in-progress", "bugs", "onhold", "pending", "completed"].map(st => (
+                            <option key={st} value={st}>{st === "todo" ? "To Do" : st === "in-progress" ? "In Progress" : st.charAt(0).toUpperCase() + st.slice(1)}</option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">Priority</label>
+                        <select 
+                          value={addModuleForm.priority} 
+                          onChange={(e) => setAddModuleForm({ ...addModuleForm, priority: e.target.value as any })}
+                          className="w-full px-3 py-2 bg-muted/50 border border-border/50 rounded-xl text-xs focus:outline-none font-bold"
+                        >
+                          {["low", "medium", "high", "urgent"].map(pr => (
+                            <option key={pr} value={pr}>{pr.charAt(0).toUpperCase() + pr.slice(1)}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div>
+                        <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">Estimated Hours</label>
+                        <input 
+                          type="number" 
+                          min="0"
+                          step="0.5"
+                          placeholder="e.g. 12"
+                          value={addModuleForm.estimatedHours || ""} 
+                          onChange={(e) => setAddModuleForm({ ...addModuleForm, estimatedHours: parseFloat(e.target.value) || 0 })} 
+                          className="w-full px-3 py-2 bg-muted/50 border border-border/50 rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-primary font-bold text-center" 
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">Module Deadline</label>
+                      <input 
+                        type="date" 
+                        value={addModuleForm.dueDate} 
+                        onChange={(e) => setAddModuleForm({ ...addModuleForm, dueDate: e.target.value })} 
+                        className="w-full px-3 py-2 bg-muted/50 border border-border/50 rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-primary font-bold text-center" 
+                      />
+                    </div>
+                  </div>
+
+                  {/* Footer */}
+                  <div className="px-8 py-4 bg-muted/30 border-t border-border/50 flex justify-end gap-3 shrink-0">
+                    <button 
+                      type="button"
+                      onClick={() => setIsAddModuleModalOpen(false)} 
+                      className="px-4 py-2 rounded-xl font-bold text-sm text-muted-foreground hover:bg-muted transition-colors"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-5 py-2 bg-primary text-primary-foreground font-bold rounded-xl shadow-md hover:bg-primary/90 transition-all text-sm"
+                    >
+                      Create Module
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          );
+        })()}
+
+        {/* Edit Module Modal - plain overlay */}
+        {isEditModuleModalOpen && editModuleForm.id && (() => {
+          const currentSelectedProject = projects.find(p => p.id === selectedProjectId);
+          if (!currentSelectedProject) return null;
+
+          const handleEditModuleSubmit = (e: React.FormEvent) => {
+            e.preventDefault();
+            if (!editModuleForm.name.trim()) return;
+            const projectModules = currentSelectedProject.modules || [];
+            
+            const updatedModules: any = projectModules.map(m => {
+              if (m.id === editModuleForm.id) {
+                return {
+                  ...m,
+                  name: editModuleForm.name.trim(),
+                  assignedToName: editModuleForm.assignedToName || undefined,
+                  status: editModuleForm.status,
+                  priority: editModuleForm.priority,
+                  estimatedHours: editModuleForm.estimatedHours || undefined,
+                  dueDate: editModuleForm.dueDate || undefined
+                };
+              }
+              return m;
+            });
+
+            setProjects(projects.map(p => p.id === currentSelectedProject.id ? { ...p, modules: updatedModules } : p));
+            setIsEditModuleModalOpen(false);
+            toast.success("Module updated successfully!");
+          };
+
+          return (
+            <div
+              className="fixed inset-0 z-[200] flex items-center justify-center animate-in fade-in duration-200"
+              onClick={() => setIsEditModuleModalOpen(false)}
+            >
+              {/* Backdrop */}
+              <div className="absolute inset-0 bg-black/80" />
+              {/* Modal Panel */}
+              <div
+                className="relative z-10 w-[calc(100%-2rem)] max-w-[450px] bg-card border border-border/60 rounded-[2.5rem] shadow-2xl flex flex-col overflow-hidden"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {/* Header */}
+                <div className="flex items-center justify-between px-8 py-6 border-b border-border/50 bg-muted/30 shrink-0">
+                  <div>
+                    <h2 className="text-lg font-black tracking-tight">Edit Module Details</h2>
+                    <p className="text-xs text-muted-foreground mt-1">Modify metadata and developer assignment details</p>
+                  </div>
+                  <button
+                    onClick={() => setIsEditModuleModalOpen(false)}
+                    className="p-2 text-muted-foreground hover:text-foreground/80 hover:bg-muted rounded-full transition-colors"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+                {/* Body */}
+                <form onSubmit={handleEditModuleSubmit}>
+                  <div className="p-8 space-y-4 max-h-[60vh] overflow-y-auto">
+                    <div>
+                      <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">Module Name <span className="text-rose-500">*</span></label>
+                      <input 
+                        type="text" 
+                        required
+                        autoFocus
+                        value={editModuleForm.name} 
+                        onChange={(e) => setEditModuleForm({ ...editModuleForm, name: e.target.value })} 
+                        className="w-full px-3 py-2 bg-muted/50 border border-border/50 rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-primary font-semibold" 
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">Assign To</label>
+                        <select 
+                          value={editModuleForm.assignedToName} 
+                          onChange={(e) => setEditModuleForm({ ...editModuleForm, assignedToName: e.target.value })}
+                          className="w-full px-3 py-2 bg-muted/50 border border-border/50 rounded-xl text-xs focus:outline-none font-bold"
+                        >
+                          <option value="">Unassigned</option>
+                          {currentSelectedProject.team.map(m => (
+                            <option key={m.name} value={m.name}>{m.name}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div>
+                        <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">Stage Status</label>
+                        <select 
+                          value={editModuleForm.status} 
+                          onChange={(e) => setEditModuleForm({ ...editModuleForm, status: e.target.value as any })}
+                          className="w-full px-3 py-2 bg-muted/50 border border-border/50 rounded-xl text-xs focus:outline-none font-bold"
+                        >
+                          {["todo", "in-progress", "bugs", "onhold", "pending", "completed"].map(st => (
+                            <option key={st} value={st}>{st === "todo" ? "To Do" : st === "in-progress" ? "In Progress" : st.charAt(0).toUpperCase() + st.slice(1)}</option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">Priority</label>
+                        <select 
+                          value={editModuleForm.priority} 
+                          onChange={(e) => setEditModuleForm({ ...editModuleForm, priority: e.target.value as any })}
+                          className="w-full px-3 py-2 bg-muted/50 border border-border/50 rounded-xl text-xs focus:outline-none font-bold"
+                        >
+                          {["low", "medium", "high", "urgent"].map(pr => (
+                            <option key={pr} value={pr}>{pr.charAt(0).toUpperCase() + pr.slice(1)}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div>
+                        <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">Estimated Hours</label>
+                        <input 
+                          type="number" 
+                          min="0"
+                          step="0.5"
+                          placeholder="e.g. 12"
+                          value={editModuleForm.estimatedHours || ""} 
+                          onChange={(e) => setEditModuleForm({ ...editModuleForm, estimatedHours: parseFloat(e.target.value) || 0 })} 
+                          className="w-full px-3 py-2 bg-muted/50 border border-border/50 rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-primary font-bold text-center" 
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">Module Deadline</label>
+                      <input 
+                        type="date" 
+                        value={editModuleForm.dueDate} 
+                        onChange={(e) => setEditModuleForm({ ...editModuleForm, dueDate: e.target.value })} 
+                        className="w-full px-3 py-2 bg-muted/50 border border-border/50 rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-primary font-bold text-center" 
+                      />
+                    </div>
+                  </div>
+
+                  {/* Footer */}
+                  <div className="px-8 py-4 bg-muted/30 border-t border-border/50 flex justify-end gap-3 shrink-0">
+                    <button 
+                      type="button"
+                      onClick={() => setIsEditModuleModalOpen(false)} 
+                      className="px-4 py-2 rounded-xl font-bold text-sm text-muted-foreground hover:bg-muted transition-colors"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-5 py-2 bg-primary text-primary-foreground font-bold rounded-xl shadow-md hover:bg-primary/90 transition-all text-sm"
+                    >
+                      Save Changes
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          );
+        })()}
+
+        {/* Presets Selection Modal - plain overlay */}
+        {isPresetsModalOpen && (() => {
+          const currentSelectedProject = projects.find(p => p.id === selectedProjectId);
+          if (!currentSelectedProject) return null;
+
+          const handleApplyPreset = (preset: any) => {
+            const projectModules = currentSelectedProject.modules || [];
+            
+            const newModulesMapped: any[] = preset.modules.map((m: any) => ({
+              id: `mod-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
+              name: m.name,
+              assignedToName: m.assignedToName || undefined,
+              status: m.status || "todo",
+              priority: m.priority || "medium",
+              estimatedHours: m.estimatedHours,
+              dueDate: m.dueDate || undefined,
+              tasks: (m.tasks || []).map((t: any) => ({
+                id: `task-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
+                title: t.title,
+                status: t.status || "todo"
+              }))
+            }));
+
+            const updatedModules: any = [...projectModules, ...newModulesMapped];
+            setProjects(projects.map(p => p.id === currentSelectedProject.id ? { ...p, modules: updatedModules } : p));
+            if (newModulesMapped[0]) {
+              setSelectedModuleId(newModulesMapped[0].id);
+            }
+            setIsPresetsModalOpen(false);
+            toast.success(`Successfully loaded preset "${preset.name}"!`);
+          };
+
+          return (
+            <div
+              className="fixed inset-0 z-[200] flex items-center justify-center animate-in fade-in duration-200"
+              onClick={() => setIsPresetsModalOpen(false)}
+            >
+              {/* Backdrop */}
+              <div className="absolute inset-0 bg-black/80" />
+              {/* Modal Panel */}
+              <div
+                className="relative z-10 w-[calc(100%-2rem)] max-w-[500px] bg-card border border-border/60 rounded-[2.5rem] shadow-2xl flex flex-col overflow-hidden"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {/* Header */}
+                <div className="flex items-center justify-between px-8 py-6 border-b border-border/50 bg-muted/30 shrink-0">
+                  <div>
+                    <h2 className="text-lg font-black tracking-tight">Load Modules from Preset</h2>
+                    <p className="text-xs text-muted-foreground mt-1">Select a development template checklist to append</p>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={() => {
+                        setNewPresetForm({
+                          name: "",
+                          description: "",
+                          modules: [{ name: "", tasks: [""] }]
+                        });
+                        setIsCreatePresetModalOpen(true);
+                      }}
+                      className="px-3 py-1.5 bg-primary text-primary-foreground text-xs font-bold rounded-xl shadow-md hover:bg-primary/90 flex items-center gap-1"
+                    >
+                      <Plus className="w-3.5 h-3.5" /> Create Template
+                    </button>
+                    <button
+                      onClick={() => setIsPresetsModalOpen(false)}
+                      className="p-2 text-muted-foreground hover:text-foreground/80 hover:bg-muted rounded-full transition-colors"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
+                </div>
+                {/* Body */}
+                <div className="p-8 space-y-4 max-h-[60vh] overflow-y-auto">
+                  {presets.map((preset, index) => (
+                    <div 
+                      key={index}
+                      className="p-5 border border-border/50 rounded-[2rem] hover:border-primary/30 bg-muted/20 hover:bg-muted/30 transition-all flex flex-col justify-between gap-4"
+                    >
+                      <div>
+                        <h3 className="text-sm font-bold text-foreground">⚙️ {preset.name}</h3>
+                        <p className="text-xs text-muted-foreground mt-1 leading-normal">{preset.description}</p>
+                        
+                        <div className="mt-3 flex flex-wrap gap-1.5">
+                          {preset.modules.map((m: any, idx: number) => (
+                            <span key={idx} className="text-[10px] font-bold bg-primary/10 text-primary border border-primary/20 px-2 py-0.5 rounded-lg">
+                              📦 {m.name} ({m.tasks.length} tasks)
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                      
+                      <div className="flex justify-between items-center mt-2">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setConfirmModalState({
+                              isOpen: true,
+                              title: "Delete Preset Template",
+                              description: `Are you sure you want to delete the preset template "${preset.name}"? This action cannot be undone.`,
+                              itemName: preset.name,
+                              action: () => {
+                                setPresets(presets.filter((_, i) => i !== index));
+                                toast.success(`Preset "${preset.name}" deleted successfully!`);
+                              }
+                            });
+                          }}
+                          className="text-xs font-bold text-rose-500 hover:text-rose-600 px-3 py-1.5 rounded-xl hover:bg-rose-500/10 transition-all"
+                        >
+                          Delete Template
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleApplyPreset(preset)}
+                          className="px-4 py-2 bg-primary text-primary-foreground text-xs font-bold rounded-xl shadow-md hover:bg-primary/90 transition-all"
+                        >
+                          Apply Template
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Footer */}
+                <div className="px-8 py-4 bg-muted/30 border-t border-border/50 flex justify-end shrink-0">
+                  <button 
+                    type="button"
+                    onClick={() => setIsPresetsModalOpen(false)} 
+                    className="px-4 py-2 rounded-xl font-bold text-sm text-muted-foreground hover:bg-muted transition-colors"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          );
+        })()}
+
+        {/* Create Preset Template Modal - plain overlay */}
+        {isCreatePresetModalOpen && (() => {
+          const handleSavePresetTemplate = (e: React.FormEvent) => {
+            e.preventDefault();
+            if (!newPresetForm.name.trim()) return;
+
+            // Validate modules and tasks are filled
+            const validModules = newPresetForm.modules
+              .filter(m => m.name.trim() !== "")
+              .map(m => ({
+                name: m.name.trim(),
+                assignedToName: "",
+                status: "todo",
+                priority: "medium",
+                estimatedHours: 4,
+                dueDate: "",
+                tasks: m.tasks
+                  .filter(t => t.trim() !== "")
+                  .map((t, idx) => ({
+                    id: `t-preset-${Date.now()}-${idx}-${Math.random().toString(36).substr(2,3)}`,
+                    title: t.trim(),
+                    status: "todo"
+                  }))
+              }));
+
+            if (validModules.length === 0) {
+              toast.error("Template must contain at least one module with name!");
+              return;
+            }
+
+            const newPreset = {
+              name: newPresetForm.name.trim(),
+              description: newPresetForm.description.trim() || "Custom project module template",
+              modules: validModules
+            };
+
+            setPresets([newPreset, ...presets]);
+            setIsCreatePresetModalOpen(false);
+            toast.success(`Preset Template "${newPreset.name}" created successfully!`);
+          };
+
+          const addModule = () => {
+            setNewPresetForm({
+              ...newPresetForm,
+              modules: [...newPresetForm.modules, { name: "", tasks: [""] }]
+            });
+          };
+
+          const removeModule = (mIdx: number) => {
+            setNewPresetForm({
+              ...newPresetForm,
+              modules: newPresetForm.modules.filter((_, idx) => idx !== mIdx)
+            });
+          };
+
+          const updateModuleName = (mIdx: number, val: string) => {
+            setNewPresetForm({
+              ...newPresetForm,
+              modules: newPresetForm.modules.map((m, idx) => idx === mIdx ? { ...m, name: val } : m)
+            });
+          };
+
+          const addTask = (mIdx: number) => {
+            setNewPresetForm({
+              ...newPresetForm,
+              modules: newPresetForm.modules.map((m, idx) => idx === mIdx ? { ...m, tasks: [...m.tasks, ""] } : m)
+            });
+          };
+
+          const removeTask = (mIdx: number, tIdx: number) => {
+            setNewPresetForm({
+              ...newPresetForm,
+              modules: newPresetForm.modules.map((m, idx) => {
+                if (idx === mIdx) {
+                  return { ...m, tasks: m.tasks.filter((_, idx2) => idx2 !== tIdx) };
+                }
+                return m;
+              })
+            });
+          };
+
+          const updateTaskVal = (mIdx: number, tIdx: number, val: string) => {
+            setNewPresetForm({
+              ...newPresetForm,
+              modules: newPresetForm.modules.map((m, idx) => {
+                if (idx === mIdx) {
+                  return { ...m, tasks: m.tasks.map((t, idx2) => idx2 === tIdx ? val : t) };
+                }
+                return m;
+              })
+            });
+          };
+
+          return (
+            <div
+              className="fixed inset-0 z-[210] flex items-center justify-center animate-in fade-in duration-200"
+              onClick={() => setIsCreatePresetModalOpen(false)}
+            >
+              {/* Backdrop */}
+              <div className="absolute inset-0 bg-black/80" />
+              {/* Modal Panel */}
+              <div
+                className="relative z-10 w-[calc(100%-2rem)] max-w-[500px] bg-card border border-border/60 rounded-[2.5rem] shadow-2xl flex flex-col overflow-hidden"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {/* Header */}
+                <div className="flex items-center justify-between px-8 py-6 border-b border-border/50 bg-muted/30 shrink-0">
+                  <div>
+                    <h2 className="text-lg font-black tracking-tight">Create Preset Template</h2>
+                    <p className="text-xs text-muted-foreground mt-1">Define custom reusable project modules & tasks checklist</p>
+                  </div>
+                  <button
+                    onClick={() => setIsCreatePresetModalOpen(false)}
+                    className="p-2 text-muted-foreground hover:text-foreground/80 hover:bg-muted rounded-full transition-colors"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+                {/* Body */}
+                <form onSubmit={handleSavePresetTemplate}>
+                  <div className="p-8 space-y-4 max-h-[60vh] overflow-y-auto">
+                    <div>
+                      <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">Template Name <span className="text-rose-500">*</span></label>
+                      <input 
+                        type="text" 
+                        required
+                        autoFocus
+                        placeholder="e.g. Core App Modules, Landing Page Setup"
+                        value={newPresetForm.name} 
+                        onChange={(e) => setNewPresetForm({ ...newPresetForm, name: e.target.value })} 
+                        className="w-full px-3 py-2 bg-muted/50 border border-border/50 rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-primary font-semibold" 
+                      />
+                    </div>
+
+                    <div>
+                      <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">Description</label>
+                      <input 
+                        type="text" 
+                        placeholder="Provide details on what this template covers..."
+                        value={newPresetForm.description} 
+                        onChange={(e) => setNewPresetForm({ ...newPresetForm, description: e.target.value })} 
+                        className="w-full px-3 py-2 bg-muted/50 border border-border/50 rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-primary font-semibold" 
+                      />
+                    </div>
+
+                    <div className="border-t border-border/30 pt-4 space-y-4">
+                      <div className="flex justify-between items-center">
+                        <span className="text-xs font-bold text-foreground">📦 Modules List</span>
+                        <button
+                          type="button"
+                          onClick={addModule}
+                          className="text-[10px] font-bold text-primary hover:underline flex items-center gap-0.5"
+                        >
+                          + Add Module
+                        </button>
+                      </div>
+
+                      {newPresetForm.modules.map((m, mIdx) => (
+                        <div key={mIdx} className="p-4 border border-border/50 rounded-2xl bg-muted/10 space-y-3">
+                          <div className="flex justify-between items-center gap-2">
+                            <input 
+                              type="text" 
+                              required
+                              placeholder="Module Name (e.g. Profile Setup)"
+                              value={m.name} 
+                              onChange={(e) => updateModuleName(mIdx, e.target.value)} 
+                              className="px-2.5 py-1.5 bg-card border border-border/50 rounded-xl text-xs focus:outline-none font-bold flex-1" 
+                            />
+                            {newPresetForm.modules.length > 1 && (
+                              <button
+                                type="button"
+                                onClick={() => removeModule(mIdx)}
+                                className="text-xs text-rose-500 hover:text-rose-600 font-bold px-1.5"
+                              >
+                                Remove
+                              </button>
+                            )}
+                          </div>
+
+                          <div className="space-y-2 pl-4 border-l-2 border-border/30">
+                            <div className="flex justify-between items-center">
+                              <span className="text-[10px] font-bold text-muted-foreground">Tasks</span>
+                              <button
+                                type="button"
+                                onClick={() => addTask(mIdx)}
+                                className="text-[9px] font-bold text-primary hover:underline"
+                              >
+                                + Add Task
+                              </button>
+                            </div>
+
+                            {m.tasks.map((t, tIdx) => (
+                              <div key={tIdx} className="flex items-center gap-1">
+                                <input 
+                                  type="text" 
+                                  required
+                                  placeholder={`Task #${tIdx + 1} title`}
+                                  value={t} 
+                                  onChange={(e) => updateTaskVal(mIdx, tIdx, e.target.value)} 
+                                  className="px-2.5 py-1 bg-card border border-border/30 rounded-lg text-xs focus:outline-none font-semibold flex-1" 
+                                />
+                                {m.tasks.length > 1 && (
+                                  <button
+                                    type="button"
+                                    onClick={() => removeTask(mIdx, tIdx)}
+                                    className="text-xs text-rose-500 hover:text-rose-600 font-bold px-1"
+                                  >
+                                    &times;
+                                  </button>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Footer */}
+                  <div className="px-8 py-4 bg-muted/30 border-t border-border/50 flex justify-end gap-3 shrink-0">
+                    <button 
+                      type="button"
+                      onClick={() => setIsCreatePresetModalOpen(false)} 
+                      className="px-4 py-2 rounded-xl font-bold text-sm text-muted-foreground hover:bg-muted transition-colors"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-5 py-2 bg-primary text-primary-foreground font-bold rounded-xl shadow-md hover:bg-primary/90 transition-all text-sm"
+                    >
+                      Save Template
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          );
+        })()}
+
+        {/* Module Task Details Modal - plain overlay */}
+        {isModuleTaskModalOpen && editingModuleTask && (() => {
+          const currentSelectedProject = projects.find(p => p.id === selectedProjectId);
+          if (!currentSelectedProject) return null;
+          const projectModules: NonNullable<Project['modules']> = currentSelectedProject.modules || [];
+          const activeModule = projectModules.find(m => m.id === selectedModuleId) || projectModules[0];
+          if (!activeModule) return null;
+
+          const handleSaveTaskDetails = (e: React.FormEvent) => {
+            e.preventDefault();
+            const updatedTasks = activeModule.tasks.map(t => t.id === editingModuleTask.id ? editingModuleTask : t);
+            const updatedModules: NonNullable<Project['modules']> = projectModules.map(m => m.id === activeModule.id ? { ...m, tasks: updatedTasks } : m);
+            setProjects(projects.map(p => p.id === currentSelectedProject.id ? { ...p, modules: updatedModules } : p));
+            setIsModuleTaskModalOpen(false);
+            setEditingModuleTask(null);
+            toast.success("Task details saved successfully!");
+          };
+
+          return (
+            <div
+              className="fixed inset-0 z-[200] flex items-center justify-center animate-in fade-in duration-200"
+              onClick={() => {
+                setIsModuleTaskModalOpen(false);
+                setEditingModuleTask(null);
+              }}
+            >
+              {/* Backdrop */}
+              <div className="absolute inset-0 bg-black/80" />
+              {/* Modal Panel */}
+              <div
+                className="relative z-10 w-[calc(100%-2rem)] max-w-[450px] bg-card border border-border/60 rounded-[2.5rem] shadow-2xl flex flex-col overflow-hidden"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {/* Header */}
+                <div className="flex items-center justify-between px-8 py-6 border-b border-border/50 bg-muted/30 shrink-0">
+                  <div>
+                    <h2 className="text-lg font-black tracking-tight">Edit Task Details</h2>
+                    <p className="text-xs text-muted-foreground mt-1">Modify task metadata, assignment and status</p>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setIsModuleTaskModalOpen(false);
+                      setEditingModuleTask(null);
+                    }}
+                    className="p-2 text-muted-foreground hover:text-foreground/80 hover:bg-muted rounded-full transition-colors"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+                {/* Body */}
+                <form onSubmit={handleSaveTaskDetails}>
+                  <div className="p-8 space-y-4 max-h-[50vh] overflow-y-auto">
+                    <div>
+                      <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">Task Title</label>
+                      <input 
+                        type="text" 
+                        required
+                        value={editingModuleTask.title} 
+                        onChange={(e) => setEditingModuleTask({ ...editingModuleTask, title: e.target.value })} 
+                        className="w-full px-3 py-2 bg-muted/50 border border-border/50 rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-primary font-semibold" 
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">Phase</label>
+                        <input 
+                          type="text" 
+                          placeholder="e.g. Phase 1, Sprint A"
+                          value={editingModuleTask.phase || ""} 
+                          onChange={(e) => setEditingModuleTask({ ...editingModuleTask, phase: e.target.value })} 
+                          className="w-full px-3 py-2 bg-muted/50 border border-border/50 rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-primary font-semibold" 
+                        />
+                      </div>
+                      <div>
+                        <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">Due Date</label>
+                        <input 
+                          type="date" 
+                          value={editingModuleTask.dueDate || ""} 
+                          onChange={(e) => setEditingModuleTask({ ...editingModuleTask, dueDate: e.target.value })} 
+                          className="w-full px-3 py-2 bg-muted/50 border border-border/50 rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-primary font-bold text-center" 
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">Assigned Developer</label>
+                        <select 
+                          value={editingModuleTask.assignedToName || ""} 
+                          onChange={(e) => setEditingModuleTask({ ...editingModuleTask, assignedToName: e.target.value })}
+                          className="w-full px-3 py-2 bg-muted/50 border border-border/50 rounded-xl text-xs focus:outline-none font-bold"
+                        >
+                          <option value="">Unassigned</option>
+                          {currentSelectedProject.team.map(m => (
+                            <option key={m.name} value={m.name}>{m.name}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div>
+                        <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">Status</label>
+                        <select 
+                          value={editingModuleTask.status} 
+                          onChange={(e) => setEditingModuleTask({ ...editingModuleTask, status: e.target.value as any })}
+                          className="w-full px-3 py-2 bg-muted/50 border border-border/50 rounded-xl text-xs focus:outline-none font-bold"
+                        >
+                          {["todo", "in-progress", "bugs", "onhold", "pending", "completed"].map(st => (
+                            <option key={st} value={st}>{st === "todo" ? "To Do" : st === "in-progress" ? "In Progress" : st.charAt(0).toUpperCase() + st.slice(1)}</option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+
+                    {(editingModuleTask.status === "onhold" || editingModuleTask.status === "pending") && (
+                      <div>
+                        <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">Pending/Hold Reason</label>
+                        <textarea 
+                          placeholder="Provide details on why this task is pending or on hold..."
+                          value={editingModuleTask.reasonForPending || ""} 
+                          onChange={(e) => setEditingModuleTask({ ...editingModuleTask, reasonForPending: e.target.value })} 
+                          rows={3}
+                          className="w-full px-3 py-2 bg-muted/50 border border-border/50 rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-primary font-semibold" 
+                        />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Footer */}
+                  <div className="px-8 py-4 bg-muted/30 border-t border-border/50 flex justify-end gap-3 shrink-0">
+                    <button 
+                      type="button"
+                      onClick={() => {
+                        setIsModuleTaskModalOpen(false);
+                        setEditingModuleTask(null);
+                      }} 
+                      className="px-4 py-2 rounded-xl font-bold text-sm text-muted-foreground hover:bg-muted transition-colors"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-5 py-2 bg-primary text-primary-foreground font-bold rounded-xl shadow-md hover:bg-primary/90 transition-all text-sm"
+                    >
+                      Save Details
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          );
+        })()}
+
+        {/* Add Module Task Modal - plain overlay */}
+        {isAddTaskModalOpen && (() => {
+          const currentSelectedProject = projects.find(p => p.id === selectedProjectId);
+          if (!currentSelectedProject) return null;
+          const projectModules: NonNullable<Project['modules']> = currentSelectedProject.modules || [];
+          const activeModule = projectModules.find(m => m.id === selectedModuleId) || projectModules[0];
+          if (!activeModule) return null;
+
+          const handleCreateNewTask = (e: React.FormEvent) => {
+            e.preventDefault();
+            if (!addTaskForm.title.trim()) return;
+
+            const newTask: any = {
+              id: `task-${Date.now()}`,
+              title: addTaskForm.title.trim(),
+              status: addTaskForm.status,
+              phase: addTaskForm.phase.trim() || undefined,
+              dueDate: addTaskForm.dueDate || undefined,
+              assignedToName: addTaskForm.assignedToName || undefined,
+              reasonForPending: (addTaskForm.status === "onhold" || addTaskForm.status === "pending") ? addTaskForm.reasonForPending.trim() : undefined
+            };
+
+            const updatedTasks = [...activeModule.tasks, newTask];
+            const updatedModules: NonNullable<Project['modules']> = projectModules.map(m => m.id === activeModule.id ? { ...m, tasks: updatedTasks } : m);
+            setProjects(projects.map(p => p.id === currentSelectedProject.id ? { ...p, modules: updatedModules } : p));
+            setIsAddTaskModalOpen(false);
+            toast.success("New task created successfully!");
+          };
+
+          return (
+            <div
+              className="fixed inset-0 z-[200] flex items-center justify-center animate-in fade-in duration-200"
+              onClick={() => setIsAddTaskModalOpen(false)}
+            >
+              {/* Backdrop */}
+              <div className="absolute inset-0 bg-black/80" />
+              {/* Modal Panel */}
+              <div
+                className="relative z-10 w-[calc(100%-2rem)] max-w-[450px] bg-card border border-border/60 rounded-[2.5rem] shadow-2xl flex flex-col overflow-hidden"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {/* Header */}
+                <div className="flex items-center justify-between px-8 py-6 border-b border-border/50 bg-muted/30 shrink-0">
+                  <div>
+                    <h2 className="text-lg font-black tracking-tight">Add New Task</h2>
+                    <p className="text-xs text-muted-foreground mt-1">Create a new task inside "{activeModule.name}"</p>
+                  </div>
+                  <button
+                    onClick={() => setIsAddTaskModalOpen(false)}
+                    className="p-2 text-muted-foreground hover:text-foreground/80 hover:bg-muted rounded-full transition-colors"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+                {/* Body */}
+                <form onSubmit={handleCreateNewTask}>
+                  <div className="p-8 space-y-4 max-h-[50vh] overflow-y-auto">
+                    <div>
+                      <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">Task Title</label>
+                      <input 
+                        type="text" 
+                        required
+                        autoFocus
+                        placeholder="Enter task title..."
+                        value={addTaskForm.title} 
+                        onChange={(e) => setAddTaskForm({ ...addTaskForm, title: e.target.value })} 
+                        className="w-full px-3 py-2 bg-muted/50 border border-border/50 rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-primary font-semibold" 
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">Phase</label>
+                        <input 
+                          type="text" 
+                          placeholder="e.g. Phase 1, Sprint A"
+                          value={addTaskForm.phase} 
+                          onChange={(e) => setAddTaskForm({ ...addTaskForm, phase: e.target.value })} 
+                          className="w-full px-3 py-2 bg-muted/50 border border-border/50 rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-primary font-semibold" 
+                        />
+                      </div>
+                      <div>
+                        <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">Due Date</label>
+                        <input 
+                          type="date" 
+                          value={addTaskForm.dueDate} 
+                          onChange={(e) => setAddTaskForm({ ...addTaskForm, dueDate: e.target.value })} 
+                          className="w-full px-3 py-2 bg-muted/50 border border-border/50 rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-primary font-bold text-center" 
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">Assigned Developer</label>
+                        <select 
+                          value={addTaskForm.assignedToName} 
+                          onChange={(e) => setAddTaskForm({ ...addTaskForm, assignedToName: e.target.value })}
+                          className="w-full px-3 py-2 bg-muted/50 border border-border/50 rounded-xl text-xs focus:outline-none font-bold"
+                        >
+                          <option value="">Unassigned</option>
+                          {currentSelectedProject.team.map(m => (
+                            <option key={m.name} value={m.name}>{m.name}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div>
+                        <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">Status</label>
+                        <select 
+                          value={addTaskForm.status} 
+                          onChange={(e) => setAddTaskForm({ ...addTaskForm, status: e.target.value as any })}
+                          className="w-full px-3 py-2 bg-muted/50 border border-border/50 rounded-xl text-xs focus:outline-none font-bold"
+                        >
+                          {["todo", "in-progress", "bugs", "onhold", "pending", "completed"].map(st => (
+                            <option key={st} value={st}>{st === "todo" ? "To Do" : st === "in-progress" ? "In Progress" : st.charAt(0).toUpperCase() + st.slice(1)}</option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+
+                    {(addTaskForm.status === "onhold" || addTaskForm.status === "pending") && (
+                      <div>
+                        <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">Pending/Hold Reason</label>
+                        <textarea 
+                          placeholder="Provide details on why this task is pending or on hold..."
+                          value={addTaskForm.reasonForPending} 
+                          onChange={(e) => setAddTaskForm({ ...addTaskForm, reasonForPending: e.target.value })} 
+                          rows={3}
+                          className="w-full px-3 py-2 bg-muted/50 border border-border/50 rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-primary font-semibold" 
+                        />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Footer */}
+                  <div className="px-8 py-4 bg-muted/30 border-t border-border/50 flex justify-end gap-3 shrink-0">
+                    <button 
+                      type="button"
+                      onClick={() => setIsAddTaskModalOpen(false)} 
+                      className="px-4 py-2 rounded-xl font-bold text-sm text-muted-foreground hover:bg-muted transition-colors"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-5 py-2 bg-primary text-primary-foreground font-bold rounded-xl shadow-md hover:bg-primary/90 transition-all text-sm"
+                    >
+                      Create Task
+                    </button>
+                  </div>
+                </form>
               </div>
             </div>
           );
