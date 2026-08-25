@@ -27,7 +27,6 @@ interface Client {
   gstin?: string;
   department?: string;
   salesFocused?: string;
-
   remarks?: string;
   dailyFollowup?: string;
   assignedEmployeeId?: string;
@@ -65,6 +64,14 @@ interface Project {
   campaigns?: any[];
   contentCalendar?: CalendarItem[];
   team: { name: string; avatar: string }[];
+  dailyStats?: {
+    id: string;
+    date: string;
+    campaignName: string;
+    reach: number;
+    leads: number;
+    spend: number;
+  }[];
   modules?: {
     id: string;
     name: string;
@@ -255,6 +262,13 @@ const INITIAL_PROJECTS: Project[] = [
     team: [
       { name: "Emma", avatar: "https://i.pravatar.cc/150?u=emma" },
       { name: "James", avatar: "https://i.pravatar.cc/150?u=james" }
+    ],
+    dailyStats: [
+      { id: "ds-1", date: "2026-08-24", campaignName: "Q4 Retargeting Ads", reach: 15000, leads: 45, spend: 8100 },
+      { id: "ds-2", date: "2026-08-24", campaignName: "Holiday Social Push", reach: 28000, leads: 92, spend: 15600 },
+      { id: "ds-3", date: "2026-08-23", campaignName: "Q4 Retargeting Ads", reach: 14200, leads: 38, spend: 7800 },
+      { id: "ds-4", date: "2026-08-23", campaignName: "Holiday Social Push", reach: 25400, leads: 81, spend: 14500 },
+      { id: "ds-5", date: "2026-08-22", campaignName: "B2B Email Drip", reach: 4100, leads: 12, spend: 3200 }
     ]
   },
   {
@@ -384,6 +398,86 @@ const INITIAL_PROJECTS: Project[] = [
 
 const TABS = ["Active Clients", "Archived Clients"];
 
+const syncSocialMediaTasksForProject = (project: any, calendarItems: any[]) => {
+  const modules = project.modules || [];
+  let socialModule = modules.find((m: any) => m.id === "social-media-tasks");
+  if (!socialModule) {
+    socialModule = {
+      id: "social-media-tasks",
+      name: "Social Media Production Pipeline",
+      tasks: []
+    };
+  }
+
+  const otherTasks = socialModule.tasks.filter((t: any) => !t.id.startsWith("sm-cal-"));
+  const newGeneratedTasks: any[] = [];
+  
+  calendarItems.forEach(item => {
+    const topicText = item.topic || "Untitled Idea";
+    const typeLabel = item.type || "Content";
+    const assigned = item.assignedTo || undefined;
+    
+    if (item.scriptDate) {
+      newGeneratedTasks.push({
+        id: `sm-cal-script-${item.id}`,
+        title: `📝 Script: ${typeLabel} - ${topicText}`,
+        status: "todo",
+        phase: "Scripting",
+        dueDate: item.scriptDate,
+        assignedToName: assigned
+      });
+    }
+    if (item.shootDate) {
+      newGeneratedTasks.push({
+        id: `sm-cal-shoot-${item.id}`,
+        title: `🎥 Shoot: ${typeLabel} - ${topicText}`,
+        status: "todo",
+        phase: "Filming",
+        dueDate: item.shootDate,
+        assignedToName: assigned
+      });
+    }
+    if (item.editingStart) {
+      newGeneratedTasks.push({
+        id: `sm-cal-edit-${item.id}`,
+        title: `🎬 Edit: ${typeLabel} - ${topicText}`,
+        status: "todo",
+        phase: "Editing",
+        dueDate: item.editingStart,
+        assignedToName: assigned
+      });
+    }
+    if (item.captionDate) {
+      newGeneratedTasks.push({
+        id: `sm-cal-approve-${item.id}`,
+        title: `✅ Approve: ${typeLabel} - ${topicText}`,
+        status: "todo",
+        phase: "Approval",
+        dueDate: item.captionDate,
+        assignedToName: assigned
+      });
+    }
+    if (item.thumbnailDate) {
+      newGeneratedTasks.push({
+        id: `sm-cal-thumb-${item.id}`,
+        title: `🖼️ Thumbnail: ${typeLabel} - ${topicText}`,
+        status: "todo",
+        phase: "Graphics",
+        dueDate: item.thumbnailDate,
+        assignedToName: assigned
+      });
+    }
+  });
+
+  const updatedSocialModule = {
+    ...socialModule,
+    tasks: [...otherTasks, ...newGeneratedTasks]
+  };
+
+  const otherModules = modules.filter((m: any) => m.id !== "social-media-tasks");
+  return [...otherModules, updatedSocialModule];
+};
+
 export function Projects() {
   // One-time migration: clear old localStorage if version mismatch
   const STORAGE_VERSION = 'v3';
@@ -415,17 +509,90 @@ export function Projects() {
 
   const [projects, setProjects] = useState<Project[]>(() => {
     const saved = localStorage.getItem('hrms_projects');
+    let loadedProjects: Project[] = INITIAL_PROJECTS;
     if (saved) {
       try { 
         const parsed = JSON.parse(saved);
-        if (JSON.stringify(parsed).includes('$')) return INITIAL_PROJECTS; // Force update to ₹
-        if (!parsed.some((p: any) => p.id === "smm-dummy-project")) {
-          parsed.unshift(SMM_DUMMY_PROJECT);
+        if (JSON.stringify(parsed).includes('$')) loadedProjects = INITIAL_PROJECTS; // Force update to ₹
+        else {
+          if (!parsed.some((p: any) => p.id === "smm-dummy-project")) {
+            parsed.unshift(SMM_DUMMY_PROJECT);
+          }
+          // Migration: Add default dailyStats if missing
+          parsed.forEach((p: any) => {
+            if (p.id === "2" && !p.dailyStats) {
+              p.dailyStats = [
+                { id: "ds-1", date: "2026-08-24", campaignName: "Q4 Retargeting Ads", reach: 15000, leads: 45, spend: 8100 },
+                { id: "ds-2", date: "2026-08-24", campaignName: "Holiday Social Push", reach: 28000, leads: 92, spend: 15600 },
+                { id: "ds-3", date: "2026-08-23", campaignName: "Q4 Retargeting Ads", reach: 14200, leads: 38, spend: 7800 },
+                { id: "ds-4", date: "2026-08-23", campaignName: "Holiday Social Push", reach: 25400, leads: 81, spend: 14500 },
+                { id: "ds-5", date: "2026-08-22", campaignName: "B2B Email Drip", reach: 4100, leads: 12, spend: 3200 }
+              ];
+            }
+          });
+          loadedProjects = parsed;
         }
-        return parsed;
       } catch (e) {}
     }
-    return INITIAL_PROJECTS;
+
+    // Auto-generate daily tasks for Digital Marketing projects
+    let updated = false;
+    const d = new Date();
+    d.setDate(d.getDate() - 1);
+    const prevDate = format(d, "yyyy-MM-dd");
+
+    const processedProjects = loadedProjects.map((project: Project) => {
+      if (project.category === "Digital Marketing") {
+        const modules = [...(project.modules || [])];
+        let dailyModule = modules.find((m: any) => m.id === "daily-data-entry");
+        if (!dailyModule) {
+          dailyModule = {
+            id: "daily-data-entry",
+            name: "Daily Data Entry",
+            status: "todo",
+            priority: "medium",
+            tasks: []
+          };
+          modules.push(dailyModule);
+          updated = true;
+        }
+
+        const tasks = [...(dailyModule.tasks || [])];
+        const campaignList = (project.campaigns && project.campaigns.length > 0) 
+          ? project.campaigns.map(c => typeof c === 'string' ? c : (c.name || "")) 
+          : ["Q4 Retargeting Ads", "Holiday Social Push", "B2B Email Drip"];
+        
+        let hasNewTasks = false;
+        campaignList.forEach((campaignName) => {
+          const taskId = `daily-task-${project.id}-${prevDate}-${campaignName.replace(/\s+/g, '-').toLowerCase()}`;
+          const taskExists = tasks.some((t: any) => t.id === taskId);
+          if (!taskExists) {
+            const newTask = {
+              id: taskId,
+              title: `Add ${campaignName} data (${prevDate})`,
+              status: "todo" as const,
+              dueDate: prevDate,
+              assignedToName: project.team[0]?.name || "Emma",
+              assignedToAvatar: project.team[0]?.avatar || `https://api.dicebear.com/7.x/adventurer/svg?seed=${project.team[0]?.name || "Emma"}`
+            };
+            tasks.push(newTask);
+            hasNewTasks = true;
+          }
+        });
+
+        if (hasNewTasks) {
+          const updatedModules = modules.map((m: any) => m.id === "daily-data-entry" ? { ...m, tasks: tasks } : m);
+          updated = true;
+          return { ...project, modules: updatedModules };
+        }
+      }
+      return project;
+    });
+
+    if (updated && typeof window !== "undefined") {
+      localStorage.setItem('hrms_projects', JSON.stringify(processedProjects));
+    }
+    return processedProjects;
   });
 
   const [categories, setCategories] = useState<string[]>(() => {
@@ -456,8 +623,36 @@ export function Projects() {
   const [projectFilterStatuses, setProjectFilterStatuses] = useState<ProjectStatus[]>([]);
   const [projectFilterCategories, setProjectFilterCategories] = useState<string[]>([]);
   
-  const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
-  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
+  const [selectedClientId, setSelectedClientId] = useState<string | null>(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("hrms_selected_client_id");
+      if (saved) return saved;
+    }
+    return null;
+  });
+
+  useEffect(() => {
+    if (selectedClientId) {
+      localStorage.setItem("hrms_selected_client_id", selectedClientId);
+    } else {
+      localStorage.removeItem("hrms_selected_client_id");
+    }
+  }, [selectedClientId]);
+  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("hrms_selected_project_id");
+      if (saved) return saved;
+    }
+    return null;
+  });
+
+  useEffect(() => {
+    if (selectedProjectId) {
+      localStorage.setItem("hrms_selected_project_id", selectedProjectId);
+    } else {
+      localStorage.removeItem("hrms_selected_project_id");
+    }
+  }, [selectedProjectId]);
   
   const [campaignDateRange, setCampaignDateRange] = useState("Last 30 Days");
   const [customDateRange, setCustomDateRange] = useState<DateRange | undefined>({
@@ -465,12 +660,88 @@ export function Projects() {
     to: new Date(),
   });
   const [selectedCampaignForStats, setSelectedCampaignForStats] = useState("All Campaigns");
+  const [isLogDailyStatsOpen, setIsLogDailyStatsOpen] = useState(false);
+  const [dailyStatsForm, setDailyStatsForm] = useState({
+    date: format(new Date(), "yyyy-MM-dd"),
+    campaignName: "Q4 Retargeting Ads",
+    reach: "",
+    leads: "",
+    spend: ""
+  });
+
+  const handleLogDailyStats = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedProjectId) return;
+    const project = projects.find(p => p.id === selectedProjectId);
+    if (!project) return;
+
+    const reachVal = parseInt(dailyStatsForm.reach);
+    const leadsVal = parseInt(dailyStatsForm.leads);
+    const spendVal = parseInt(dailyStatsForm.spend);
+
+    if (!dailyStatsForm.date) {
+      toast.error("Please select a date");
+      return;
+    }
+    if (isNaN(reachVal) || reachVal < 0) {
+      toast.error("Please enter a valid reach number");
+      return;
+    }
+    if (isNaN(leadsVal) || leadsVal < 0) {
+      toast.error("Please enter a valid leads number");
+      return;
+    }
+    if (isNaN(spendVal) || spendVal < 0) {
+      toast.error("Please enter a valid spend amount");
+      return;
+    }
+
+    const newStat = {
+      id: `ds-${Date.now()}`,
+      date: dailyStatsForm.date,
+      campaignName: dailyStatsForm.campaignName,
+      reach: reachVal,
+      leads: leadsVal,
+      spend: spendVal
+    };
+
+    const updatedStats = [newStat, ...(project.dailyStats || [])];
+    const newProjects = projects.map(p => p.id === selectedProjectId ? { ...p, dailyStats: updatedStats } : p);
+
+    setProjects(newProjects);
+    localStorage.setItem("hrms_projects", JSON.stringify(newProjects));
+    window.dispatchEvent(new Event("storage"));
+    
+    setIsLogDailyStatsOpen(false);
+    setDailyStatsForm({
+      date: format(new Date(), "yyyy-MM-dd"),
+      campaignName: "Q4 Retargeting Ads",
+      reach: "",
+      leads: "",
+      spend: ""
+    });
+    toast.success("Daily stats logged successfully!");
+  };
 
   useEffect(() => { localStorage.setItem('hrms_clients', JSON.stringify(clients)); }, [clients]);
   useEffect(() => { localStorage.setItem('hrms_projects', JSON.stringify(projects)); }, [projects]);
   useEffect(() => { localStorage.setItem('hrms_categories', JSON.stringify(categories)); }, [categories]);
   const [isKanbanView, setIsKanbanView] = useState(false);
-  const [selectedModuleId, setSelectedModuleId] = useState<string | null>(null);
+  const [selectedModuleId, setSelectedModuleId] = useState<string | null>(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("hrms_selected_module_id");
+      if (saved) return saved;
+    }
+    return null;
+  });
+
+  useEffect(() => {
+    if (selectedModuleId) {
+      localStorage.setItem("hrms_selected_module_id", selectedModuleId);
+    } else {
+      localStorage.removeItem("hrms_selected_module_id");
+    }
+  }, [selectedModuleId]);
   const [addModuleForm, setAddModuleForm] = useState({
     name: "",
     assignedToName: "",
@@ -1194,7 +1465,7 @@ export function Projects() {
                                 const updated = projectCalendar.map((x: any) =>
                                   x.id === item.id ? { ...x, [field]: value, ...(field === 'postingDate' ? { postingDay: new Date(value).toLocaleDateString("en-US", { weekday: "long" }) } : {}) } : x
                                 );
-                                setProjects(projects.map(p => p.id === project.id ? { ...p, contentCalendar: updated } : p));
+                                setProjects(projects.map(p => p.id === project.id ? { ...p, contentCalendar: updated, modules: syncSocialMediaTasksForProject(p, updated) } : p));
                                 setInlineEdit(null);
                               };
 
@@ -1429,7 +1700,7 @@ export function Projects() {
                                             itemName: item.topic || "Untitled Idea",
                                             action: () => {
                                               const updated = projectCalendar.filter((x: any) => x.id !== item.id);
-                                              setProjects(projects.map(p => p.id === project.id ? { ...p, contentCalendar: updated } : p));
+                                              setProjects(projects.map(p => p.id === project.id ? { ...p, contentCalendar: updated, modules: syncSocialMediaTasksForProject(p, updated) } : p));
                                               toast.success("Content idea deleted successfully");
                                               setConfirmModalState(prev => ({ ...prev, isOpen: false }));
                                             }
@@ -1452,30 +1723,68 @@ export function Projects() {
                 </div>
               );
             })() : project.category === "Digital Marketing" ? (() => {
-              let reach = project.reach || "1.2M", leads = project.leads || "3,240", cpl = project.cpl || "250", amountSpent = "8,10,000";
+              const dailyStatsList = project.dailyStats || [];
+              
+              // Filter by campaign
+              const campaignFiltered = dailyStatsList.filter((s: any) => {
+                if (selectedCampaignForStats === "All Campaigns") return true;
+                return s.campaignName === selectedCampaignForStats;
+              });
+
+              // Filter by date range
+              const dateFiltered = campaignFiltered.filter((s: any) => {
+                if (!customDateRange?.from) return true;
+                const statDate = new Date(s.date);
+                const fromDate = new Date(customDateRange.from);
+                const toDate = customDateRange.to ? new Date(customDateRange.to) : fromDate;
+                
+                statDate.setHours(0,0,0,0);
+                fromDate.setHours(0,0,0,0);
+                toDate.setHours(0,0,0,0);
+                
+                return statDate >= fromDate && statDate <= toDate;
+              });
+
+              const totalReach = dateFiltered.reduce((sum: number, s: any) => sum + Number(s.reach || 0), 0);
+              const totalLeads = dateFiltered.reduce((sum: number, s: any) => sum + Number(s.leads || 0), 0);
+              const totalSpent = dateFiltered.reduce((sum: number, s: any) => sum + Number(s.spend || 0), 0);
+              const computedCPL = totalLeads > 0 ? Math.round(totalSpent / totalLeads) : 0;
+
+              let reach = totalReach > 0 ? (totalReach >= 1000000 ? `${(totalReach / 1000000).toFixed(1)}M` : `${Math.round(totalReach / 1000)}K`) : "0";
+              let leads = totalLeads.toLocaleString("en-IN");
+              let cpl = computedCPL.toString();
+              let amountSpent = totalSpent.toLocaleString("en-IN");
+              
               let reachTrend = "+14.2%", leadsTrend = "+8.1%", cplTrend = "-5.4%", amountSpentTrend = "+12.2%";
 
-              if (selectedCampaignForStats === "Q4 Retargeting Ads") {
-                reach = "450K"; leads = "1,400"; cpl = "180"; amountSpent = "2,52,000";
-                reachTrend = "+5.1%"; leadsTrend = "+12.0%"; cplTrend = "-2.5%"; amountSpentTrend = "+8.4%";
-              } else if (selectedCampaignForStats === "Holiday Social Push") {
-                reach = "850K"; leads = "1,600"; cpl = "320"; amountSpent = "5,12,000";
-                reachTrend = "+22.4%"; leadsTrend = "+4.2%"; cplTrend = "+1.1%"; amountSpentTrend = "+2.1%";
-              } else if (selectedCampaignForStats === "B2B Email Drip") {
-                reach = "120K"; leads = "240"; cpl = "450"; amountSpent = "1,08,000";
-                reachTrend = "+2.0%"; leadsTrend = "+1.1%"; cplTrend = "-8.5%"; amountSpentTrend = "+1.0%";
-              }
+              if (totalReach === 0) {
+                reach = project.reach || "1.2M";
+                leads = project.leads || "3,240";
+                cpl = project.cpl || "250";
+                amountSpent = "8,10,000";
 
-              let days = 30;
-              if (customDateRange?.from && customDateRange?.to) {
-                days = differenceInDays(customDateRange.to, customDateRange.from) || 1;
-              }
+                if (selectedCampaignForStats === "Q4 Retargeting Ads") {
+                  reach = "450K"; leads = "1,400"; cpl = "180"; amountSpent = "2,52,000";
+                  reachTrend = "+5.1%"; leadsTrend = "+12.0%"; cplTrend = "-2.5%"; amountSpentTrend = "+8.4%";
+                } else if (selectedCampaignForStats === "Holiday Social Push") {
+                  reach = "850K"; leads = "1,600"; cpl = "320"; amountSpent = "5,12,000";
+                  reachTrend = "+22.4%"; leadsTrend = "+4.2%"; cplTrend = "+1.1%"; amountSpentTrend = "+2.1%";
+                } else if (selectedCampaignForStats === "B2B Email Drip") {
+                  reach = "120K"; leads = "240"; cpl = "450"; amountSpent = "1,08,000";
+                  reachTrend = "+2.0%"; leadsTrend = "+1.1%"; cplTrend = "-8.5%"; amountSpentTrend = "+1.0%";
+                }
 
-              if (days !== 30) {
-                const ratio = days / 30;
-                reach = (parseFloat(reach) * ratio).toFixed(1) + (reach.includes("M") ? "M" : "K");
-                leads = Math.floor(parseInt(leads.replace(/,/g, "")) * ratio).toLocaleString("en-IN");
-                amountSpent = Math.floor(parseInt(amountSpent.replace(/,/g, "")) * ratio).toLocaleString("en-IN");
+                let days = 30;
+                if (customDateRange?.from && customDateRange?.to) {
+                  days = differenceInDays(customDateRange.to, customDateRange.from) || 1;
+                }
+
+                if (days !== 30) {
+                  const ratio = days / 30;
+                  reach = (parseFloat(reach) * ratio).toFixed(1) + (reach.includes("M") ? "M" : "K");
+                  leads = Math.floor(parseInt(leads.replace(/,/g, "")) * ratio).toLocaleString("en-IN");
+                  amountSpent = Math.floor(parseInt(amountSpent.replace(/,/g, "")) * ratio).toLocaleString("en-IN");
+                }
               }
 
               return (
@@ -1489,6 +1798,12 @@ export function Projects() {
                       <p className="text-xs text-muted-foreground mt-0.5 font-medium">Reach, leads, and conversion analytics</p>
                     </div>
                     <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => setIsLogDailyStatsOpen(true)}
+                        className="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-primary-foreground font-bold text-xs rounded-lg hover:bg-primary/90 transition-all shadow-sm whitespace-nowrap"
+                      >
+                        <Plus className="w-3.5 h-3.5" /> Log Stats
+                      </button>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <button className="flex items-center gap-2 px-3 py-1.5 bg-card border border-border/60 text-foreground font-bold text-xs rounded-lg hover:bg-muted/80 transition-all shadow-sm">
@@ -1638,28 +1953,175 @@ export function Projects() {
                     </div>
                   </div>
 
-                  <div className="bg-card border border-border/60 rounded-3xl p-6 shadow-sm">
-                    <div className="flex items-center justify-between mb-6">
-                      <h3 className="text-sm font-bold text-foreground">Top Performing Campaigns</h3>
-                    </div>
-                    <div className="space-y-4">
-                      {[
-                        { name: "Q4 Retargeting Ads", budget: "₹45,000", leads: 450, status: "Active", progress: 75 },
-                        { name: "Holiday Social Push", budget: "₹20,000", leads: 180, status: "Active", progress: 40 },
-                        { name: "B2B Email Drip", budget: "₹15,000", leads: 85, status: "Completed", progress: 100 }
-                      ].map((camp, i) => (
-                        <div key={i} className="flex items-center gap-4">
-                          <div className="flex-1">
-                            <div className="flex justify-between items-center mb-1">
-                              <span className="text-sm font-bold text-foreground">{camp.name}</span>
-                              <span className="text-xs font-bold text-muted-foreground font-mono">{camp.leads} leads</span>
-                            </div>
-                            <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden">
-                              <div className={cn("h-full rounded-full transition-all duration-1000", camp.progress === 100 ? "bg-emerald-500" : "bg-primary")} style={{ width: `${camp.progress}%` }}></div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Top Performing Campaigns */}
+                    <div className="bg-card border border-border/60 rounded-3xl p-6 shadow-sm">
+                      <div className="flex items-center justify-between mb-6">
+                        <h3 className="text-sm font-bold text-foreground">Top Performing Campaigns</h3>
+                      </div>
+                      <div className="space-y-4">
+                        {[
+                          { name: "Q4 Retargeting Ads", budget: "₹45,000", leads: 450, status: "Active", progress: 75 },
+                          { name: "Holiday Social Push", budget: "₹20,000", leads: 180, status: "Active", progress: 40 },
+                          { name: "B2B Email Drip", budget: "₹15,000", leads: 85, status: "Completed", progress: 100 }
+                        ].map((camp, i) => (
+                          <div key={i} className="flex items-center gap-4">
+                            <div className="flex-1">
+                              <div className="flex justify-between items-center mb-1">
+                                <span className="text-sm font-bold text-foreground">{camp.name}</span>
+                                <span className="text-xs font-bold text-muted-foreground font-mono">{camp.leads} leads</span>
+                              </div>
+                              <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden">
+                                <div className={cn("h-full rounded-full transition-all duration-1000", camp.progress === 100 ? "bg-emerald-500" : "bg-primary")} style={{ width: `${camp.progress}%` }}></div>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      ))}
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Daily Data Entry Tasks */}
+                    <div className="bg-card border border-border/60 rounded-3xl p-6 shadow-sm">
+                      <div className="flex items-center justify-between mb-6">
+                        <h3 className="text-sm font-bold text-foreground">Daily Data Entry Tasks</h3>
+                      </div>
+                      <div className="space-y-3 max-h-[220px] overflow-y-auto pr-1">
+                        {(() => {
+                          const dailyModule = (project.modules || []).find((m: any) => m.id === "daily-data-entry");
+                          const dailyTasks = dailyModule ? dailyModule.tasks || [] : [];
+                          if (dailyTasks.length === 0) {
+                            return (
+                              <div className="text-center py-8 text-xs font-semibold text-muted-foreground/40 border border-dashed border-border/20 rounded-2xl bg-muted/5">
+                                No daily tasks yet.
+                              </div>
+                            );
+                          }
+                          return dailyTasks.map((t: any) => {
+                            const isCompleted = t.status === "completed";
+                            return (
+                              <div key={t.id} className="flex items-center justify-between p-3 rounded-2xl border border-border/40 hover:bg-muted/30 transition-colors">
+                                <div className="flex items-center gap-3">
+                                  <button
+                                    onClick={() => {
+                                      const nextStatus = isCompleted ? "todo" : "completed";
+                                      const updatedModules = (project.modules || []).map((m: any) => {
+                                        if (m.id === "daily-data-entry") {
+                                          return {
+                                            ...m,
+                                            tasks: m.tasks.map((task: any) => task.id === t.id ? { ...task, status: nextStatus } : task)
+                                          };
+                                        }
+                                        return m;
+                                      });
+                                      const newProjects = projects.map(p => p.id === project.id ? { ...p, modules: updatedModules } : p);
+                                      setProjects(newProjects);
+                                      localStorage.setItem("hrms_projects", JSON.stringify(newProjects));
+                                      window.dispatchEvent(new Event("storage"));
+                                      toast.success(isCompleted ? "Task marked incomplete" : "Task completed!");
+                                    }}
+                                    className={cn(
+                                      "w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors shrink-0",
+                                      isCompleted ? "border-emerald-500 bg-emerald-500/10 text-emerald-500" : "border-muted-foreground hover:border-primary text-transparent"
+                                    )}
+                                  >
+                                    {isCompleted && <CheckCircle2 className="w-3.5 h-3.5" />}
+                                  </button>
+                                  <div className="flex flex-col">
+                                    <span className={cn("text-xs font-bold", isCompleted ? "text-muted-foreground line-through decoration-muted-foreground/50" : "text-foreground")}>
+                                      {t.title}
+                                    </span>
+                                    <span className="text-[10px] text-muted-foreground mt-0.5">
+                                      Due: {t.dueDate} • Assigned: {t.assignedToName || "Emma"}
+                                    </span>
+                                  </div>
+                                </div>
+                                <span className={cn(
+                                  "px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider border",
+                                  isCompleted ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" : "bg-amber-500/10 text-amber-600 border-amber-500/20"
+                                )}>
+                                  {isCompleted ? "Done" : "Pending"}
+                                </span>
+                              </div>
+                            );
+                          });
+                        })()}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-card border border-border/60 rounded-3xl p-6 shadow-sm">
+                    <div className="flex items-center justify-between mb-6">
+                      <div>
+                        <h3 className="text-sm font-bold text-foreground">Recent Marketing Stats Logs</h3>
+                        <p className="text-xs text-muted-foreground mt-0.5 font-medium">Daily log history for active campaigns</p>
+                      </div>
+                    </div>
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-left border-collapse">
+                        <thead>
+                          <tr className="border-b border-border/40 text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+                            <th className="pb-3 pl-4">Date</th>
+                            <th className="pb-3">Campaign</th>
+                            <th className="pb-3 text-right">Reach</th>
+                            <th className="pb-3 text-right">Leads</th>
+                            <th className="pb-3 text-right">Spend</th>
+                            <th className="pb-3 text-right">CPL</th>
+                            <th className="pb-3 text-right pr-4">Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-border/20 text-xs font-semibold text-foreground">
+                          {(() => {
+                            const dailyStats = dateFiltered || [];
+                            if (dailyStats.length === 0) {
+                              return (
+                                <tr>
+                                  <td colSpan={7} className="py-8 text-center text-xs font-semibold text-muted-foreground/40">
+                                    No stats logged yet matching the filters.
+                                  </td>
+                                </tr>
+                              );
+                            }
+                            return dailyStats.slice(0, 10).map((stat: any) => {
+                              const cpl = stat.leads > 0 ? Math.round(stat.spend / stat.leads) : 0;
+                              return (
+                                <tr key={stat.id} className="hover:bg-muted/10 transition-colors">
+                                  <td className="py-3.5 pl-4 font-mono">{stat.date}</td>
+                                  <td className="py-3.5 font-bold">{stat.campaignName}</td>
+                                  <td className="py-3.5 text-right font-mono">{Number(stat.reach || 0).toLocaleString()}</td>
+                                  <td className="py-3.5 text-right font-mono">{Number(stat.leads || 0).toLocaleString()}</td>
+                                  <td className="py-3.5 text-right font-mono">₹{Number(stat.spend || 0).toLocaleString()}</td>
+                                  <td className="py-3.5 text-right font-mono text-primary">₹{cpl}</td>
+                                  <td className="py-3.5 text-right pr-4">
+                                    <button
+                                      onClick={() => {
+                                        setConfirmModalState({
+                                          isOpen: true,
+                                          title: "Delete Daily Stats Log",
+                                          description: `Are you sure you want to delete this daily stat log for "${stat.campaignName}" on ${stat.date}? This action cannot be undone.`,
+                                          itemName: `${stat.campaignName} (${stat.date})`,
+                                          action: () => {
+                                            const updatedStats = (project.dailyStats || []).filter((s: any) => s.id !== stat.id);
+                                            const newProjects = projects.map(p => p.id === project.id ? { ...p, dailyStats: updatedStats } : p);
+                                            setProjects(newProjects);
+                                            localStorage.setItem("hrms_projects", JSON.stringify(newProjects));
+                                            window.dispatchEvent(new Event("storage"));
+                                            toast.success("Daily stats log deleted successfully!");
+                                            setConfirmModalState(prev => ({ ...prev, isOpen: false }));
+                                          }
+                                        });
+                                      }}
+                                      className="p-1 text-muted-foreground hover:text-rose-600 hover:bg-rose-500/10 rounded-lg transition-colors border border-border/30 shadow-sm bg-card inline-flex items-center justify-center"
+                                      title="Delete stats log"
+                                    >
+                                      <Trash2 className="w-3.5 h-3.5" />
+                                    </button>
+                                  </td>
+                                </tr>
+                              );
+                            });
+                          })()}
+                        </tbody>
+                      </table>
                     </div>
                   </div>
                 </div>
@@ -1857,7 +2319,7 @@ export function Projects() {
                                   { status: "bugs" as const, title: "Bugs", color: "text-rose-500", bg: "bg-rose-500/5" },
                                   { status: "onhold" as const, title: "On Hold", color: "text-amber-500", bg: "bg-amber-500/5" },
                                   { status: "pending" as const, title: "Pending", color: "text-purple-500", bg: "bg-purple-500/5" },
-                                  { status: "completed" as const, title: "Completed", color: "text-emerald-500", bg: "bg-emerald-500/5" },
+                                  { status: "completed" as any, title: "Completed", color: "text-emerald-500", bg: "bg-emerald-500/5" },
                                 ]).map((col) => {
                                   const colTasks = activeModule.tasks.filter(t => t.status === col.status);
                                   const isAdding = inlineEdit?.id === activeModule!.id && inlineEdit?.field === col.status;
@@ -2287,7 +2749,7 @@ export function Projects() {
                         updated = [...targetProjCalendar, completeItem];
                         toast.success("Content Idea added to calendar!");
                       }
-                      setProjects(projects.map(p => p.id === currentSelectedProject.id ? { ...p, contentCalendar: updated } : p));
+                      setProjects(projects.map(p => p.id === currentSelectedProject.id ? { ...p, contentCalendar: updated, modules: syncSocialMediaTasksForProject(p, updated) } : p));
                       setIsAddCalendarItemModalOpen(false);
                       setEditingCalendarItem(null);
                     }}
@@ -2350,7 +2812,7 @@ export function Projects() {
             const existingCalendar = currentSelectedProject.contentCalendar || [];
             const updated = [...existingCalendar, ...generated].sort((a, b) => new Date(a.postingDate).getTime() - new Date(b.postingDate).getTime());
             
-            setProjects(projects.map(p => p.id === currentSelectedProject.id ? { ...p, contentCalendar: updated } : p));
+            setProjects(projects.map(p => p.id === currentSelectedProject.id ? { ...p, contentCalendar: updated, modules: syncSocialMediaTasksForProject(p, updated) } : p));
             setIsBulkAddModalOpen(false);
             toast.success(`Generated ${generated.length} calendar slots successfully!`);
           };
@@ -2383,7 +2845,7 @@ export function Projects() {
             });
 
             const updated = [...existingCalendar, ...newlyAdded].sort((a, b) => new Date(a.postingDate || 0).getTime() - new Date(b.postingDate || 0).getTime());
-            setProjects(projects.map(p => p.id === currentSelectedProject.id ? { ...p, contentCalendar: updated } : p));
+            setProjects(projects.map(p => p.id === currentSelectedProject.id ? { ...p, contentCalendar: updated, modules: syncSocialMediaTasksForProject(p, updated) } : p));
             setIsBulkAddModalOpen(false);
 
             toast.success(`Successfully added ${newlyAdded.length} new content slots!`);
@@ -3567,16 +4029,105 @@ export function Projects() {
         })()}
 
       <ConfirmModal 
-          isOpen={confirmModalState.isOpen}
-          onClose={() => setConfirmModalState(prev => ({ ...prev, isOpen: false }))}
-          onConfirm={confirmModalState.action}
-          title={confirmModalState.title}
-          description={confirmModalState.description}
-          itemName={confirmModalState.itemName}
-        />
-      </>
+        isOpen={confirmModalState.isOpen}
+        onClose={() => setConfirmModalState(prev => ({ ...prev, isOpen: false }))}
+        onConfirm={confirmModalState.action}
+        title={confirmModalState.title}
+        description={confirmModalState.description}
+        itemName={confirmModalState.itemName}
+      />
+
+      <Dialog open={isLogDailyStatsOpen} onOpenChange={setIsLogDailyStatsOpen}>
+        <DialogContent className="sm:max-w-[450px] p-0 overflow-hidden rounded-[2rem] gap-0 border-border/60 shadow-2xl bg-card z-50">
+          <div className="p-6 md:p-8 border-b border-border/40">
+            <h2 className="text-lg font-black tracking-tight text-foreground flex items-center gap-2">
+              📈 Log Daily Marketing Stats
+            </h2>
+            <p className="text-xs text-muted-foreground mt-1 font-medium">Enter performance metrics for the selected campaign and date.</p>
+          </div>
+
+          <form onSubmit={handleLogDailyStats} className="p-6 md:p-8 space-y-4">
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest block">Date</label>
+              <input
+                type="date"
+                required
+                value={dailyStatsForm.date}
+                onChange={(e) => setDailyStatsForm({ ...dailyStatsForm, date: e.target.value })}
+                className="w-full px-4 h-[42px] bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest block">Campaign</label>
+              <select
+                value={dailyStatsForm.campaignName}
+                onChange={(e) => setDailyStatsForm({ ...dailyStatsForm, campaignName: e.target.value })}
+                className="w-full px-4 h-[42px] bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium"
+              >
+                {["Q4 Retargeting Ads", "Holiday Social Push", "B2B Email Drip"].map(opt => (
+                  <option key={opt} value={opt}>{opt}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest block">Reach</label>
+                <input
+                  type="number"
+                  required
+                  placeholder="e.g. 15000"
+                  value={dailyStatsForm.reach}
+                  onChange={(e) => setDailyStatsForm({ ...dailyStatsForm, reach: e.target.value })}
+                  className="w-full px-4 h-[42px] bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest block">Leads</label>
+                <input
+                  type="number"
+                  required
+                  placeholder="e.g. 42"
+                  value={dailyStatsForm.leads}
+                  onChange={(e) => setDailyStatsForm({ ...dailyStatsForm, leads: e.target.value })}
+                  className="w-full px-4 h-[42px] bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest block">Spend (₹)</label>
+              <input
+                type="number"
+                required
+                placeholder="e.g. 5000"
+                value={dailyStatsForm.spend}
+                onChange={(e) => setDailyStatsForm({ ...dailyStatsForm, spend: e.target.value })}
+                className="w-full px-4 h-[42px] bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium"
+              />
+            </div>
+
+            <div className="flex items-center justify-end gap-3 pt-2">
+              <DialogClose asChild>
+                <button type="button" className="px-4 py-2.5 rounded-xl font-bold text-sm text-muted-foreground hover:bg-muted transition-colors">
+                  Cancel
+                </button>
+              </DialogClose>
+              <button
+                type="submit"
+                className="px-6 py-2.5 bg-primary text-primary-foreground font-bold rounded-xl shadow-md hover:bg-primary/90 transition-all text-xs"
+              >
+                Submit Stats
+              </button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
+    </>
     );
     }
+
 
     const clientProjects = projects.filter(p => {
       if (p.clientId !== client.id) return false;

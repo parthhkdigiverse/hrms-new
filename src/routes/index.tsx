@@ -213,7 +213,7 @@ function Index() {
         {/* Work */}
         {active === "/work/logs" && <WorkLogs />}
         {active === "/work/projects" && <Projects />}
-        {active === "/tasks" && <Tasks />}
+        {active === "/tasks" && <Tasks setActive={setActive} />}
         {active === "/chat" && <Chat />}
         {active === "/work/research" && <Research />}
 
