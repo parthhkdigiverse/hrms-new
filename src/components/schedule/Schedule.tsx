@@ -96,7 +96,7 @@ export function Schedule() {
           </div>
           
           <h2 className="text-xl font-medium text-foreground/80 w-64">
-            {view === "Day" ? format(currentDate, "d MMMM yyyy") : format(currentDate, "MMMM yyyy")}
+            {view === "Day" ? format(currentDate, "dd/MM/yyyy") : format(currentDate, "MMMM yyyy")}
           </h2>
         </div>
         

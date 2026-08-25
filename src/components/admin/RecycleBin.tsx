@@ -114,7 +114,7 @@ export function RecycleBin() {
                         </p>
                       </td>
                       <td className="p-4">
-                        <p className="text-sm font-medium text-foreground">{format(deletedDate, 'MMM d, yyyy')}</p>
+                        <p className="text-sm font-medium text-foreground">{format(deletedDate, 'dd/MM/yyyy')}</p>
                         <p className="text-xs text-muted-foreground">{formatDistanceToNow(deletedDate, { addSuffix: true })}</p>
                       </td>
                       <td className="p-4">

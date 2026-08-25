@@ -210,7 +210,7 @@ export function SearchableSelect({
           <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </button>
       </PopoverTrigger>
-      <PopoverContentPrimitive className="w-[var(--radix-popover-trigger-width)] p-0" align="start">
+      <PopoverContentPrimitive className="w-[var(--radix-popover-trigger-width)] min-w-[200px] p-0 z-50" align="start">
         <Command>
           <CommandInput placeholder={`Search ${placeholder.toLowerCase()}...`} />
           <CommandList>

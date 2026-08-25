@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
-import { X, Search, Plus, Filter, LayoutGrid, List as ListIcon, MoreHorizontal, Calendar, Clock, CheckCircle2, MessageSquare, Paperclip, FileText } from "lucide-react";
+import { X, Search, Plus, Filter, LayoutGrid, List as ListIcon, MoreHorizontal, Calendar, Clock, CheckCircle2, MessageSquare, Paperclip, FileText, ChevronDown } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { DialogClose, Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { SearchableSelect } from "@/components/ui/select";
@@ -55,6 +56,21 @@ export function Tasks({ setActive }: { setActive?: (route: string) => void }) {
   const [newTaskDesc, setNewTaskDesc] = useState("");
   const [newTaskPriority, setNewTaskPriority] = useState<Priority>("Medium");
   const [newTaskDueDate, setNewTaskDueDate] = useState("");
+  const [newTaskAssignees, setNewTaskAssignees] = useState<string[]>([]);
+  const [employees, setEmployees] = useState<any[]>([]);
+  const [assigneeSearchQuery, setAssigneeSearchQuery] = useState("");
+  const [inlineAssigneeSearchQuery, setInlineAssigneeSearchQuery] = useState("");
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem('hrms_employees');
+      if (saved) {
+        try {
+          setEmployees(JSON.parse(saved));
+        } catch (e) {}
+      }
+    }
+  }, []);
 
   const [inlineEditingTaskId, setInlineEditingTaskId] = useState<string | null>(null);
   const [inlineTaskTitle, setInlineTaskTitle] = useState("");
@@ -62,6 +78,7 @@ export function Tasks({ setActive }: { setActive?: (route: string) => void }) {
   const [inlineTaskStatus, setInlineTaskStatus] = useState<TaskStatus>("Todo");
   const [inlineTaskPriority, setInlineTaskPriority] = useState<Priority>("Medium");
   const [inlineTaskDueDate, setInlineTaskDueDate] = useState("");
+  const [inlineTaskAssignees, setInlineTaskAssignees] = useState<string[]>([]);
 
   // Load from local storage
   useEffect(() => {
@@ -188,7 +205,11 @@ export function Tasks({ setActive }: { setActive?: (route: string) => void }) {
             status: mappedStatus,
             priority: mappedPriority,
             dueDate: t.dueDate || mod.dueDate || format(new Date(), "yyyy-MM-dd"),
-            assignees: t.assignedToName ? [{ name: t.assignedToName, avatar: `https://api.dicebear.com/7.x/adventurer/svg?seed=${t.assignedToName}` }] : (mod.assignedToName ? [{ name: mod.assignedToName, avatar: `https://api.dicebear.com/7.x/adventurer/svg?seed=${mod.assignedToName}` }] : []),
+            assignees: t.assignedToName 
+              ? t.assignedToName.split(", ").map((name: string) => ({ name, avatar: `https://api.dicebear.com/7.x/adventurer/svg?seed=${name}` }))
+              : (mod.assignedToName 
+                  ? mod.assignedToName.split(", ").map((name: string) => ({ name, avatar: `https://api.dicebear.com/7.x/adventurer/svg?seed=${name}` }))
+                  : []),
             commentsCount: 0,
             attachmentsCount: 0,
             isProjectTask: true,
@@ -256,6 +277,11 @@ export function Tasks({ setActive }: { setActive?: (route: string) => void }) {
 
     if (editingTaskId) {
       const task = allTasks.find(t => t.id === editingTaskId);
+      const assigneesList = newTaskAssignees.map(name => {
+        const emp = employees.find(e => e.name === name);
+        return { name, avatar: emp?.avatar || `https://api.dicebear.com/7.x/adventurer/svg?seed=${name}` };
+      });
+
       if (task?.isProjectTask && task.projectId && task.moduleId) {
         const newProjects = projects.map(p => {
           if (p.id === task.projectId) {
@@ -264,7 +290,7 @@ export function Tasks({ setActive }: { setActive?: (route: string) => void }) {
               if (m.id === task.moduleId) {
                 const updatedTasks = m.tasks.map((t: any) => {
                   if (t.id === editingTaskId) {
-                    return { ...t, title: newTaskTitle, dueDate: newTaskDueDate || t.dueDate };
+                    return { ...t, title: newTaskTitle, dueDate: newTaskDueDate || t.dueDate, assignedToName: newTaskAssignees.join(", ") || undefined };
                   }
                   return t;
                 });
@@ -283,12 +309,20 @@ export function Tasks({ setActive }: { setActive?: (route: string) => void }) {
           title: newTaskTitle,
           description: newTaskDesc,
           priority: newTaskPriority,
-          dueDate: newTaskDueDate || t.dueDate
+          dueDate: newTaskDueDate || t.dueDate,
+          assignees: assigneesList
         } : t);
         saveIndependentTasks(updated);
       }
       toast.success("Task updated successfully!");
     } else {
+      const assigneesList = newTaskAssignees.length > 0 
+        ? newTaskAssignees.map(name => {
+            const emp = employees.find(e => e.name === name);
+            return { name, avatar: emp?.avatar || `https://api.dicebear.com/7.x/adventurer/svg?seed=${name}` };
+          })
+        : [{ name: "Alex (You)", avatar: "https://i.pravatar.cc/150?u=alex" }];
+
       const newTask: Task = {
         id: Math.random().toString(36).substr(2, 9),
         title: newTaskTitle,
@@ -296,7 +330,7 @@ export function Tasks({ setActive }: { setActive?: (route: string) => void }) {
         status: "Todo",
         priority: newTaskPriority,
         dueDate: newTaskDueDate || format(new Date(), "yyyy-MM-dd"),
-        assignees: [{ name: "Alex (You)", avatar: "https://i.pravatar.cc/150?u=alex" }],
+        assignees: assigneesList,
         commentsCount: 0,
         attachmentsCount: 0,
       };
@@ -310,6 +344,7 @@ export function Tasks({ setActive }: { setActive?: (route: string) => void }) {
     setNewTaskDesc("");
     setNewTaskPriority("Medium");
     setNewTaskDueDate("");
+    setNewTaskAssignees([]);
   };
 
   const openEditTask = (task: Task) => {
@@ -318,6 +353,7 @@ export function Tasks({ setActive }: { setActive?: (route: string) => void }) {
     setNewTaskDesc(task.description);
     setNewTaskPriority(task.priority);
     setNewTaskDueDate(task.dueDate);
+    setNewTaskAssignees(task.assignees.map(a => a.name));
     setIsNewTaskOpen(true);
   };
 
@@ -328,12 +364,18 @@ export function Tasks({ setActive }: { setActive?: (route: string) => void }) {
     setInlineTaskStatus(task.status);
     setInlineTaskPriority(task.priority);
     setInlineTaskDueDate(task.dueDate);
+    setInlineTaskAssignees(task.assignees.map(a => a.name));
   };
 
   const saveInlineEdit = () => {
     if (!inlineEditingTaskId) return;
 
     const task = allTasks.find(t => t.id === inlineEditingTaskId);
+    const assigneesList = inlineTaskAssignees.map(name => {
+      const emp = employees.find(e => e.name === name);
+      return { name, avatar: emp?.avatar || `https://api.dicebear.com/7.x/adventurer/svg?seed=${name}` };
+    });
+
     if (task?.isProjectTask && task.projectId && task.moduleId) {
       let originalStatus = "todo";
       if (inlineTaskStatus === "Done") originalStatus = "completed";
@@ -347,7 +389,7 @@ export function Tasks({ setActive }: { setActive?: (route: string) => void }) {
             if (m.id === task.moduleId) {
               const updatedTasks = m.tasks.map((t: any) => {
                 if (t.id === inlineEditingTaskId) {
-                  return { ...t, title: inlineTaskTitle, status: originalStatus };
+                  return { ...t, title: inlineTaskTitle, status: originalStatus, assignedToName: inlineTaskAssignees.join(", ") || undefined };
                 }
                 return t;
               });
@@ -367,7 +409,8 @@ export function Tasks({ setActive }: { setActive?: (route: string) => void }) {
         description: inlineTaskDesc,
         status: inlineTaskStatus,
         priority: inlineTaskPriority,
-        dueDate: inlineTaskDueDate
+        dueDate: inlineTaskDueDate,
+        assignees: assigneesList
       } : t);
       saveIndependentTasks(updated);
     }
@@ -499,6 +542,55 @@ export function Tasks({ setActive }: { setActive?: (route: string) => void }) {
                         className="w-full px-3 py-2 bg-muted/50 border border-border/50 rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-primary font-bold text-center"
                       />
                     </div>
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest block">Assignee</label>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <button
+                          type="button"
+                          className="flex h-[38px] w-full items-center justify-between whitespace-nowrap rounded-xl border border-border/50 bg-muted/50 px-3 py-2 text-xs font-bold focus:outline-none"
+                        >
+                          <span className="truncate">
+                            {newTaskAssignees.length > 0 ? newTaskAssignees.join(", ") : "Select Assignees..."}
+                          </span>
+                          <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                        </button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-[220px] p-2 bg-card border border-border rounded-xl shadow-xl z-[250]" align="start">
+                        <div className="px-1 py-1 border-b border-border/40 mb-1">
+                          <input
+                            type="text"
+                            placeholder="Search employee..."
+                            value={assigneeSearchQuery}
+                            onChange={(e) => setAssigneeSearchQuery(e.target.value)}
+                            className="w-full px-2 py-1 text-xs border border-border rounded-lg bg-muted/30 focus:outline-none"
+                          />
+                        </div>
+                        <div className="space-y-1 max-h-[200px] overflow-y-auto">
+                          {employees.filter(emp => emp.name.toLowerCase().includes(assigneeSearchQuery.toLowerCase())).map((emp) => {
+                            const isChecked = newTaskAssignees.includes(emp.name);
+                            return (
+                              <label key={emp.id} className="flex items-center gap-2 px-2 py-1.5 hover:bg-muted rounded-lg cursor-pointer text-xs font-bold select-none text-foreground">
+                                <input
+                                  type="checkbox"
+                                  checked={isChecked}
+                                  onChange={() => {
+                                    if (isChecked) {
+                                      setNewTaskAssignees(newTaskAssignees.filter(n => n !== emp.name));
+                                    } else {
+                                      setNewTaskAssignees([...newTaskAssignees, emp.name]);
+                                    }
+                                  }}
+                                  className="rounded border-border text-primary focus:ring-primary/20 w-3.5 h-3.5"
+                                />
+                                {emp.name}
+                              </label>
+                            );
+                          })}
+                        </div>
+                      </PopoverContent>
+                    </Popover>
                   </div>
                 </div>
                 <div className="px-6 md:px-8 py-4 md:py-6 bg-muted/30 border-t border-border/50 flex justify-end gap-3 mt-auto shrink-0">
@@ -665,10 +757,53 @@ export function Tasks({ setActive }: { setActive?: (route: string) => void }) {
                             className="px-2 py-1 text-xs text-foreground/80 border border-border rounded-xl bg-card focus:outline-none font-bold" 
                           />
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-xs font-bold text-foreground">
-                            {task.assignees.map(a => a.name).join(", ") || "Unassigned"}
-                          </div>
+                        <td className="px-6 py-4 whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <button
+                                type="button"
+                                className="flex h-[30px] w-[140px] items-center justify-between whitespace-nowrap rounded-xl border border-border bg-card px-2 py-1 text-xs font-bold focus:outline-none"
+                              >
+                                <span className="truncate">
+                                  {inlineTaskAssignees.length > 0 ? inlineTaskAssignees.join(", ") : "Unassigned"}
+                                </span>
+                                <ChevronDown className="ml-1 h-3.5 w-3.5 shrink-0 opacity-50" />
+                              </button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-[200px] p-2 bg-card border border-border rounded-xl shadow-xl z-50" align="start">
+                              <div className="px-1 py-1 border-b border-border/40 mb-1">
+                                <input
+                                  type="text"
+                                  placeholder="Search employee..."
+                                  value={inlineAssigneeSearchQuery}
+                                  onChange={(e) => setInlineAssigneeSearchQuery(e.target.value)}
+                                  className="w-full px-2 py-1 text-xs border border-border rounded-lg bg-muted/30 focus:outline-none"
+                                />
+                              </div>
+                              <div className="space-y-1 max-h-[200px] overflow-y-auto">
+                                {employees.filter(emp => emp.name.toLowerCase().includes(inlineAssigneeSearchQuery.toLowerCase())).map((emp) => {
+                                  const isChecked = inlineTaskAssignees.includes(emp.name);
+                                  return (
+                                    <label key={emp.id} className="flex items-center gap-2 px-2 py-1.5 hover:bg-muted rounded-lg cursor-pointer text-xs font-bold select-none text-foreground">
+                                      <input
+                                        type="checkbox"
+                                        checked={isChecked}
+                                        onChange={() => {
+                                          if (isChecked) {
+                                            setInlineTaskAssignees(inlineTaskAssignees.filter(n => n !== emp.name));
+                                          } else {
+                                            setInlineTaskAssignees([...inlineTaskAssignees, emp.name]);
+                                          }
+                                        }}
+                                        className="rounded border-border text-primary focus:ring-primary/20 w-3.5 h-3.5"
+                                      />
+                                      {emp.name}
+                                    </label>
+                                  );
+                                })}
+                              </div>
+                            </PopoverContent>
+                          </Popover>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right" onClick={(e) => e.stopPropagation()}>
                           <div className="flex items-center justify-end gap-2">

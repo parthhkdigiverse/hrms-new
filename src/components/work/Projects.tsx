@@ -72,6 +72,13 @@ interface Project {
     leads: number;
     spend: number;
   }[];
+  activityLogs?: {
+    id: string;
+    action: string;
+    performedBy: string;
+    timestamp: string;
+    details?: string;
+  }[];
   modules?: {
     id: string;
     name: string;
@@ -118,6 +125,7 @@ interface CalendarItem {
   postingLinkOfIg?: string | undefined;
   actualPostingDate?: string | undefined;
   remark?: string | undefined;
+  issues?: { id: string; text: string; timestamp: string }[] | undefined;
 }
 
 const LOCKED_CATEGORIES = ["Digital Marketing", "Social Media Management", "Web Dev", "App Dev"];
@@ -478,7 +486,143 @@ const syncSocialMediaTasksForProject = (project: any, calendarItems: any[]) => {
   return [...otherModules, updatedSocialModule];
 };
 
+const CalendarIssuesCell = ({ 
+  item, 
+  projectCalendar, 
+  project, 
+  projects, 
+  setProjects,
+  onLogActivity
+}: { 
+  item: CalendarItem; 
+  projectCalendar: CalendarItem[]; 
+  project: any; 
+  projects: any[]; 
+  setProjects: (projs: any[]) => void;
+  onLogActivity: (action: string, details?: string) => void;
+}) => {
+  const [newIssueText, setNewIssueText] = useState("");
+  const issuesList = item.issues || [];
+
+  const handleAddIssue = () => {
+    if (!newIssueText.trim()) return;
+    const now = new Date();
+    const dateStr = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    
+    const newIssue = {
+      id: `issue-${Date.now()}`,
+      text: newIssueText.trim(),
+      timestamp: dateStr
+    };
+
+    const updatedIssues = [...issuesList, newIssue];
+    const updatedCalendar = projectCalendar.map((x: any) => 
+      x.id === item.id ? { ...x, issues: updatedIssues } : x
+    );
+    setProjects(projects.map(p => p.id === project.id ? { ...p, contentCalendar: updatedCalendar } : p));
+    onLogActivity("Logged Issue", `Added issue "${newIssueText.trim()}" on content idea "${item.topic || 'Untitled'}"`);
+    setNewIssueText("");
+  };
+
+  const handleRemoveIssue = (issueId: string) => {
+    const issueObj = issuesList.find(i => i.id === issueId);
+    const updatedIssues = issuesList.filter(i => i.id !== issueId);
+    const updatedCalendar = projectCalendar.map((x: any) => 
+      x.id === item.id ? { ...x, issues: updatedIssues } : x
+    );
+    setProjects(projects.map(p => p.id === project.id ? { ...p, contentCalendar: updatedCalendar } : p));
+    if (issueObj) {
+      onLogActivity("Resolved Issue", `Resolved issue "${issueObj.text}" on content idea "${item.topic || 'Untitled'}"`);
+    }
+  };
+
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <button className={cn(
+          "mx-auto px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider block text-center cursor-pointer transition-all border shadow-sm",
+          issuesList.length > 0 ? "bg-rose-500/10 text-rose-600 border-rose-500/25 hover:bg-rose-500/20" : "bg-muted text-muted-foreground hover:bg-muted/80 border-border/40"
+        )}>
+          {issuesList.length > 0 ? `⚠️ ${issuesList.length} Issues` : "+ Log Issue"}
+        </button>
+      </PopoverTrigger>
+      <PopoverContent className="w-[280px] p-4 bg-card border border-border rounded-2xl shadow-xl z-50 text-left" align="center">
+        <div className="space-y-3">
+          <div className="flex justify-between items-center border-b border-border/40 pb-2">
+            <h4 className="text-xs font-black uppercase tracking-wider text-foreground">Logged Issues ({issuesList.length})</h4>
+          </div>
+          
+          <div className="space-y-2 max-h-[160px] overflow-y-auto pr-1">
+            {issuesList.length === 0 ? (
+              <p className="text-[10px] text-muted-foreground italic font-medium">No active issues logged.</p>
+            ) : (
+              issuesList.map((issue) => (
+                <div key={issue.id} className="p-2 bg-rose-500/5 rounded-xl border border-rose-500/10 flex justify-between items-start gap-2 group/issue">
+                  <div className="space-y-0.5">
+                    <p className="text-[11px] font-bold text-rose-700 leading-normal">{issue.text}</p>
+                    <span className="text-[9px] text-rose-400 font-mono block">{issue.timestamp}</span>
+                  </div>
+                  <button 
+                    onClick={() => handleRemoveIssue(issue.id)}
+                    className="text-[9px] text-rose-500 hover:text-rose-700 font-black"
+                    title="Resolve/Delete Issue"
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))
+            )}
+          </div>
+
+          <div className="pt-2 border-t border-border/40 space-y-1.5">
+            <textarea
+              placeholder="Type issue details..."
+              value={newIssueText}
+              onChange={(e) => setNewIssueText(e.target.value)}
+              rows={2}
+              className="w-full px-2.5 py-1.5 bg-muted/30 border border-border/50 rounded-xl text-xs focus:outline-none resize-none font-medium text-foreground"
+            />
+            <button
+              onClick={handleAddIssue}
+              className="w-full py-1.5 bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs rounded-xl transition-colors shadow-sm"
+            >
+              Add Issue
+            </button>
+          </div>
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
+};
+
 export function Projects() {
+  const [projectSubTab, setProjectSubTab] = useState<"workspace" | "logs">("workspace");
+
+  const logProjectActivity = (projectId: string, action: string, details?: string) => {
+    const now = new Date();
+    const dateStr = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    const newLog: any = {
+      id: `log-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
+      action,
+      performedBy: "Alex (You)",
+      timestamp: dateStr,
+      details: details || undefined
+    };
+    
+    setProjects(prevProjects => {
+      const updated = prevProjects.map(p => {
+        if (p.id === projectId) {
+          return {
+            ...p,
+            activityLogs: [...(p.activityLogs || []), newLog]
+          };
+        }
+        return p;
+      });
+      localStorage.setItem("hrms_projects", JSON.stringify(updated));
+      return updated;
+    });
+  };
   // One-time migration: clear old localStorage if version mismatch
   const STORAGE_VERSION = 'v3';
   if (localStorage.getItem('hrms_storage_version') !== STORAGE_VERSION) {
@@ -534,6 +678,23 @@ export function Projects() {
         }
       } catch (e) {}
     }
+
+    // Normalize issues field on contentCalendar items
+    loadedProjects = loadedProjects.map((p: any) => {
+      if (p.contentCalendar) {
+        const normalizedCal = p.contentCalendar.map((item: any) => {
+          if (item.issues && typeof item.issues === 'string') {
+            return {
+              ...item,
+              issues: [{ id: 'migrated-1', text: item.issues, timestamp: '25/08/2026 12:00' }]
+            };
+          }
+          return item;
+        });
+        return { ...p, contentCalendar: normalizedCal };
+      }
+      return p;
+    });
 
     // Auto-generate daily tasks for Digital Marketing projects
     let updated = false;
@@ -652,6 +813,7 @@ export function Projects() {
     } else {
       localStorage.removeItem("hrms_selected_project_id");
     }
+    setProjectSubTab("workspace");
   }, [selectedProjectId]);
   
   const [campaignDateRange, setCampaignDateRange] = useState("Last 30 Days");
@@ -706,7 +868,20 @@ export function Projects() {
     };
 
     const updatedStats = [newStat, ...(project.dailyStats || [])];
-    const newProjects = projects.map(p => p.id === selectedProjectId ? { ...p, dailyStats: updatedStats } : p);
+    
+    const nowLog = {
+      id: `log-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
+      action: "Logged Daily Stats",
+      performedBy: "Alex (You)",
+      timestamp: `${String(new Date().getDate()).padStart(2, '0')}/${String(new Date().getMonth() + 1).padStart(2, '0')}/${new Date().getFullYear()} ${String(new Date().getHours()).padStart(2, '0')}:${String(new Date().getMinutes()).padStart(2, '0')}`,
+      details: `Added stats for ${dailyStatsForm.campaignName} on ${dailyStatsForm.date} (Reach: ${reachVal}, Leads: ${leadsVal}, Spend: ₹${spendVal})`
+    };
+
+    const newProjects = projects.map(p => p.id === selectedProjectId ? { 
+      ...p, 
+      dailyStats: updatedStats,
+      activityLogs: [...(p.activityLogs || []), nowLog]
+    } : p);
 
     setProjects(newProjects);
     localStorage.setItem("hrms_projects", JSON.stringify(newProjects));
@@ -1340,8 +1515,68 @@ export function Projects() {
             </div>
           </div>
 
-          {/* Main Content Columns */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Sub-tab Bar */}
+          <div className="flex gap-2 border-b border-border/40 pb-2 overflow-x-auto hide-scrollbar">
+            <button
+              onClick={() => setProjectSubTab("workspace")}
+              className={cn(
+                "px-5 py-2 rounded-full text-xs font-black uppercase tracking-wider transition-all duration-300",
+                projectSubTab === "workspace" 
+                  ? "bg-primary text-primary-foreground shadow-md shadow-primary/20" 
+                  : "bg-card text-foreground/70 hover:bg-muted/80 border border-border/40"
+              )}
+            >
+              💼 Workspace
+            </button>
+            <button
+              onClick={() => setProjectSubTab("logs")}
+              className={cn(
+                "px-5 py-2 rounded-full text-xs font-black uppercase tracking-wider transition-all duration-300",
+                projectSubTab === "logs" 
+                  ? "bg-primary text-primary-foreground shadow-md shadow-primary/20" 
+                  : "bg-card text-foreground/70 hover:bg-muted/80 border border-border/40"
+              )}
+            >
+              📋 Activity Logs
+            </button>
+          </div>
+
+          {projectSubTab === "logs" ? (
+            <div className="bg-card border border-border/60 rounded-[2.5rem] p-6 md:p-8 shadow-sm space-y-6">
+              <div className="flex justify-between items-center border-b border-border/40 pb-4">
+                <div>
+                  <h3 className="text-lg font-black tracking-tight text-foreground">Project Activity Logs</h3>
+                  <p className="text-xs text-muted-foreground mt-0.5">Chronological record of all actions performed inside this project</p>
+                </div>
+              </div>
+              <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-1">
+                {(!project.activityLogs || project.activityLogs.length === 0) ? (
+                  <div className="text-center py-16 text-sm text-muted-foreground/60 font-semibold italic">
+                    No activity logs recorded yet.
+                  </div>
+                ) : (
+                  [...project.activityLogs].reverse().map((log: any) => (
+                    <div key={log.id} className="flex gap-4 p-4 bg-muted/20 hover:bg-muted/30 rounded-2xl border border-border/40 transition-colors">
+                      <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0 font-bold text-sm">
+                        ⚙️
+                      </div>
+                      <div className="flex-1 space-y-1 text-left">
+                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-1">
+                          <h4 className="text-sm font-black text-foreground">{log.action}</h4>
+                          <span className="text-[10px] text-muted-foreground font-mono bg-background px-2.5 py-0.5 rounded-lg border border-border/40">{log.timestamp}</span>
+                        </div>
+                        {log.details && (
+                          <p className="text-xs font-semibold text-muted-foreground leading-relaxed">{log.details}</p>
+                        )}
+                        <p className="text-[10px] font-bold text-primary/80">Performed by: {log.performedBy}</p>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {project.category === "Social Media Management" ? (() => {
               const projectCalendar: CalendarItem[] = project.contentCalendar || [];
               const filteredCalendar = projectCalendar.filter(item => {
@@ -1453,6 +1688,7 @@ export function Projects() {
                               <th className="py-4 px-5 text-center whitespace-nowrap">Thumbnail</th>
                               <th className="py-4 px-5 text-center whitespace-nowrap">Caption</th>
                               <th className="py-4 px-5 text-center whitespace-nowrap">Instagram Status</th>
+                              <th className="py-4 px-5 text-center whitespace-nowrap">Issues</th>
                               <th className="py-4 px-5 text-center whitespace-nowrap">Approval & Status</th>
                               <th className="py-4 px-5 text-center whitespace-nowrap">Actions</th>
                             </tr>
@@ -1509,7 +1745,7 @@ export function Projects() {
                                   />
                                 ) : (
                                   <span onClick={e => startEdit(e, field, value || '')} className="cursor-text hover:bg-primary/5 rounded px-1 py-0.5 transition-colors inline-flex items-center gap-1 group/dc" title="Click to edit date">
-                                    {value ? (<><Calendar className="w-2.5 h-2.5 text-muted-foreground" /><span className="text-[11px] font-extrabold text-foreground">{safeFormat(value, "dd MMM")}</span></>) : <span className="text-muted-foreground/30 text-[10px] italic">-</span>}
+                                    {value ? (<><Calendar className="w-2.5 h-2.5 text-muted-foreground" /><span className="text-[11px] font-extrabold text-foreground">{safeFormat(value, "dd/MM/yyyy")}</span></>) : <span className="text-muted-foreground/30 text-[10px] italic">-</span>}
                                     <span className="opacity-0 group-hover/dc:opacity-50 transition-opacity text-[9px]">✏️</span>
                                   </span>
                                 );
@@ -1536,7 +1772,7 @@ export function Projects() {
                                         <input autoFocus type="date" value={inlineEdit!.value} onChange={e => setInlineEdit({ ...inlineEdit!, value: e.target.value })} onBlur={() => saveInlineEdit('postingDate', inlineEdit!.value)} onKeyDown={e => { if (e.key === 'Escape') setInlineEdit(null); }} onClick={e => e.stopPropagation()} className="px-2 py-1 bg-primary/5 border border-primary/40 rounded-lg text-xs font-bold focus:outline-none focus:ring-1 focus:ring-primary" />
                                       ) : (
                                         <span onClick={e => startEdit(e, 'postingDate', item.postingDate)} className="font-extrabold text-foreground block text-sm cursor-text hover:bg-primary/5 rounded px-1 py-0.5 transition-colors group/pd" title="Click to edit">
-                                          {safeFormat(item.postingDate, "dd MMM yyyy")}
+                                          {safeFormat(item.postingDate, "dd/MM/yyyy")}
                                           <span className="ml-1 opacity-0 group-hover/pd:opacity-50 transition-opacity text-[9px]">✏️</span>
                                         </span>
                                       )}
@@ -1670,6 +1906,18 @@ export function Projects() {
                                       <InlineDate field="actualPostingDate" value={item.actualPostingDate} />
                                       <InlineLink field="postingLinkOfIg" value={item.postingLinkOfIg} label="🔗 IG Post" cc="bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 border-rose-500/20" />
                                     </div>
+                                  </td>
+
+                                  {/* Issues */}
+                                  <td className="py-2 px-5 text-center whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
+                                    <CalendarIssuesCell
+                                      item={item}
+                                      projectCalendar={projectCalendar}
+                                      project={project}
+                                      projects={projects}
+                                      setProjects={setProjects}
+                                      onLogActivity={(act, det) => logProjectActivity(project.id, act, det)}
+                                    />
                                   </td>
 
                                   {/* Approval & Status */}
@@ -2085,7 +2333,7 @@ export function Projects() {
                               const cpl = stat.leads > 0 ? Math.round(stat.spend / stat.leads) : 0;
                               return (
                                 <tr key={stat.id} className="hover:bg-muted/10 transition-colors">
-                                  <td className="py-3.5 pl-4 font-mono">{stat.date}</td>
+                                  <td className="py-3.5 pl-4 font-mono">{safeFormat(stat.date, "dd/MM/yyyy")}</td>
                                   <td className="py-3.5 font-bold">{stat.campaignName}</td>
                                   <td className="py-3.5 text-right font-mono">{Number(stat.reach || 0).toLocaleString()}</td>
                                   <td className="py-3.5 text-right font-mono">{Number(stat.leads || 0).toLocaleString()}</td>
@@ -2518,6 +2766,7 @@ export function Projects() {
               </>
             )}
           </div>
+          )}
 
         </div>
         {/* SMM Content Calendar Modal - plain overlay */}
@@ -2597,6 +2846,56 @@ export function Projects() {
                           <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">Concept Details &amp; Notes</label>
                           <textarea value={calendarForm.concept || ""} onChange={(e) => setCalendarForm({ ...calendarForm, concept: e.target.value })} placeholder="Brief storyboard or visual concepts..." rows={2} className="w-full px-3 py-2 bg-muted/50 border border-border/50 rounded-xl text-xs focus:outline-none resize-none font-medium" />
                         </div>
+                        {/* Issues List inside Full Edit Modal */}
+                        {editingCalendarItem && currentSelectedProject && (
+                          <div className="space-y-2 p-4 bg-rose-500/5 rounded-2xl border border-rose-500/20">
+                            <h4 className="text-[10px] font-bold text-rose-600 uppercase tracking-wider block mb-1">Active Issues ({(calendarForm.issues || []).length})</h4>
+                            <div className="space-y-1.5 max-h-[100px] overflow-y-auto pr-1">
+                              {((calendarForm.issues || [])).map((issue: any) => (
+                                <div key={issue.id} className="flex justify-between items-start text-[11px] font-bold text-rose-700 bg-white/50 p-1.5 rounded-lg border border-rose-500/10">
+                                  <span className="text-left">{issue.text} <span className="text-[9px] text-rose-400 font-mono">({issue.timestamp})</span></span>
+                                  <button type="button" onClick={() => {
+                                    const updated = (calendarForm.issues || []).filter((i: any) => i.id !== issue.id);
+                                    setCalendarForm({ ...calendarForm, issues: updated });
+                                    logProjectActivity(currentSelectedProject.id, "Resolved Issue", `Resolved issue "${issue.text}" on content idea "${calendarForm.topic}"`);
+                                  }} className="text-[9px] text-rose-500 hover:text-rose-700 ml-1">✕</button>
+                                </div>
+                              ))}
+                            </div>
+                            <div className="flex gap-2 mt-2">
+                              <input 
+                                type="text"
+                                placeholder="Log a new issue..."
+                                id="modal_new_issue_input"
+                                className="flex-1 px-3 py-1.5 bg-background border border-border/50 rounded-xl text-xs focus:outline-none font-semibold text-foreground"
+                              />
+                              <button 
+                                type="button"
+                                onClick={() => {
+                                  const input = document.getElementById("modal_new_issue_input") as HTMLInputElement;
+                                  if (input && input.value.trim()) {
+                                    const now = new Date();
+                                    const dateStr = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+                                    const newIssue = {
+                                      id: `issue-${Date.now()}`,
+                                      text: input.value.trim(),
+                                      timestamp: dateStr
+                                    };
+                                    setCalendarForm({
+                                      ...calendarForm,
+                                      issues: [...(calendarForm.issues || []), newIssue]
+                                    });
+                                    logProjectActivity(currentSelectedProject.id, "Logged Issue", `Added issue "${input.value.trim()}" on content idea "${calendarForm.topic}"`);
+                                    input.value = "";
+                                  }
+                                }}
+                                className="px-3 py-1.5 bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs rounded-xl transition-colors shadow-sm"
+                              >
+                                Log
+                              </button>
+                            </div>
+                          </div>
+                        )}
                         <div>
                           <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">Reference / Inspiration Link</label>
                           <input type="text" value={calendarForm.reference || ""} onChange={(e) => setCalendarForm({ ...calendarForm, reference: e.target.value })} placeholder="Inspiration URL or references" className="w-full px-3 py-2 bg-muted/50 border border-border/50 rounded-xl text-xs focus:outline-none" />
@@ -2741,6 +3040,7 @@ export function Projects() {
                         postingLinkOfIg: calendarForm.postingLinkOfIg || undefined,
                         actualPostingDate: calendarForm.actualPostingDate || undefined,
                         remark: calendarForm.remark || undefined,
+                        issues: calendarForm.issues || undefined,
                       };
                       if (editingCalendarItem) {
                         updated = targetProjCalendar.map((item: any) => item.id === editingCalendarItem.id ? completeItem : item);
@@ -3896,7 +4196,20 @@ export function Projects() {
 
             const updatedTasks = [...activeModule.tasks, newTask];
             const updatedModules: NonNullable<Project['modules']> = projectModules.map(m => m.id === activeModule.id ? { ...m, tasks: updatedTasks } : m);
-            setProjects(projects.map(p => p.id === currentSelectedProject.id ? { ...p, modules: updatedModules } : p));
+            
+            const nowLog = {
+              id: `log-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
+              action: "Created Task",
+              performedBy: "Alex (You)",
+              timestamp: `${String(new Date().getDate()).padStart(2, '0')}/${String(new Date().getMonth() + 1).padStart(2, '0')}/${new Date().getFullYear()} ${String(new Date().getHours()).padStart(2, '0')}:${String(new Date().getMinutes()).padStart(2, '0')}`,
+              details: `Added new task "${addTaskForm.title.trim()}" inside module "${activeModule.name}"`
+            };
+
+            setProjects(projects.map(p => p.id === currentSelectedProject.id ? { 
+              ...p, 
+              modules: updatedModules,
+              activityLogs: [...(p.activityLogs || []), nowLog]
+            } : p));
             setIsAddTaskModalOpen(false);
             toast.success("New task created successfully!");
           };
@@ -4270,7 +4583,7 @@ export function Projects() {
               </div>
               <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Onboarded</p>
             </div>
-            <h3 className="text-2xl font-black text-foreground font-mono">{safeFormat(client.onboardingDate, "dd MMM yyyy")}</h3>
+            <h3 className="text-2xl font-black text-foreground font-mono">{safeFormat(client.onboardingDate, "dd/MM/yyyy")}</h3>
           </div>
           <div className="bg-card border border-border/60 rounded-3xl p-5 flex flex-col justify-center shadow-sm">
             <div className="flex items-center gap-3 mb-2">
@@ -5241,7 +5554,7 @@ export function Projects() {
                   <Briefcase className="w-3.5 h-3.5" /> {projects.filter(p => p.clientId === client.id).length} Active Projects
                 </span>
                 <span className="inline-flex items-center gap-1.5 text-[11px] font-bold px-2 py-1 bg-muted rounded-md text-muted-foreground">
-                  <Calendar className="w-3.5 h-3.5" /> {safeFormat(client.onboardingDate, "MMM yyyy")}
+                  <Calendar className="w-3.5 h-3.5" /> {safeFormat(client.onboardingDate, "MM/yyyy")}
                 </span>
               </div>
             </div>
