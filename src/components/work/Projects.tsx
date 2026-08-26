@@ -597,6 +597,8 @@ const CalendarIssuesCell = ({
 
 export function Projects() {
   const [projectSubTab, setProjectSubTab] = useState<"workspace" | "logs">("workspace");
+  const [isBulkAdd, setIsBulkAdd] = useState(false);
+  const [bulkStatsEntries, setBulkStatsEntries] = useState<{ [campaignName: string]: { reach: string, leads: string, spend: string } }>({});
 
   const logProjectActivity = (projectId: string, action: string, details?: string) => {
     const now = new Date();
@@ -831,20 +833,108 @@ export function Projects() {
     spend: ""
   });
 
+  useEffect(() => {
+    if (isLogDailyStatsOpen && selectedProjectId) {
+      const project = projects.find(p => p.id === selectedProjectId);
+      const campaignList = (project?.campaigns && project.campaigns.length > 0)
+        ? project.campaigns
+            .map(c => typeof c === 'string' ? { name: c, status: 'Active' } : { name: c.name || "", status: c.status || 'Active' })
+            .filter(c => c.status === 'Active')
+            .map(c => c.name)
+        : ["Q4 Retargeting Ads", "Holiday Social Push", "B2B Email Drip"];
+      
+      const dailyStats = project?.dailyStats || [];
+      const initial: any = {};
+      campaignList.forEach(name => {
+        const match = dailyStats.find((s: any) => s.campaignName === name && s.date === dailyStatsForm.date);
+        if (match) {
+          initial[name] = {
+            reach: match.reach !== undefined ? String(match.reach) : "",
+            leads: match.leads !== undefined ? String(match.leads) : "",
+            spend: match.spend !== undefined ? String(match.spend) : ""
+          };
+        } else {
+          initial[name] = { reach: "", leads: "", spend: "" };
+        }
+      });
+      setBulkStatsEntries(initial);
+    }
+  }, [isLogDailyStatsOpen, selectedProjectId, dailyStatsForm.date]);
+
   const handleLogDailyStats = (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedProjectId) return;
     const project = projects.find(p => p.id === selectedProjectId);
     if (!project) return;
 
-    const reachVal = parseInt(dailyStatsForm.reach);
-    const leadsVal = parseInt(dailyStatsForm.leads);
-    const spendVal = parseInt(dailyStatsForm.spend);
-
     if (!dailyStatsForm.date) {
       toast.error("Please select a date");
       return;
     }
+
+    if (isBulkAdd) {
+      const newStatsList: any[] = [];
+      const logDetails: string[] = [];
+      
+      for (const [campaignName, entry] of Object.entries(bulkStatsEntries)) {
+        if (!entry.reach && !entry.leads && !entry.spend) continue;
+        
+        const reachVal = entry.reach ? parseInt(entry.reach) : 0;
+        const leadsVal = entry.leads ? parseInt(entry.leads) : 0;
+        const spendVal = entry.spend ? parseInt(entry.spend) : 0;
+        
+        if (isNaN(reachVal) || reachVal < 0 || isNaN(leadsVal) || leadsVal < 0 || isNaN(spendVal) || spendVal < 0) {
+          toast.error(`Please enter valid positive numbers for ${campaignName}`);
+          return;
+        }
+        
+        newStatsList.push({
+          id: `ds-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
+          date: dailyStatsForm.date,
+          campaignName,
+          reach: reachVal,
+          leads: leadsVal,
+          spend: spendVal
+        });
+        
+        logDetails.push(`${campaignName} (Reach: ${reachVal}, Leads: ${leadsVal}, Spend: ₹${spendVal})`);
+      }
+      
+      if (newStatsList.length === 0) {
+        toast.error("Please enter stats for at least one campaign.");
+        return;
+      }
+      
+      const loggedCampaignNames = newStatsList.map(s => s.campaignName);
+      const remainingStats = (project.dailyStats || []).filter((s: any) => 
+        !(s.date === dailyStatsForm.date && loggedCampaignNames.includes(s.campaignName))
+      );
+      const updatedStats = [...newStatsList, ...remainingStats];
+      
+      const nowLog = {
+        id: `log-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
+        action: "Logged Bulk Daily Stats",
+        performedBy: "Alex (You)",
+        timestamp: `${String(new Date().getDate()).padStart(2, '0')}/${String(new Date().getMonth() + 1).padStart(2, '0')}/${new Date().getFullYear()} ${String(new Date().getHours()).padStart(2, '0')}:${String(new Date().getMinutes()).padStart(2, '0')}`,
+        details: `Logged stats for ${newStatsList.length} campaigns on ${dailyStatsForm.date}: ${logDetails.join("; ")}`
+      };
+      
+      const newProjects = projects.map(p => p.id === selectedProjectId ? { 
+        ...p, 
+        dailyStats: updatedStats,
+        activityLogs: [...(p.activityLogs || []), nowLog]
+      } : p);
+      
+      setProjects(newProjects);
+      localStorage.setItem("hrms_projects", JSON.stringify(newProjects));
+      setIsLogDailyStatsOpen(false);
+      toast.success("Bulk stats logged successfully!");
+      return;
+    }
+
+    const reachVal = parseInt(dailyStatsForm.reach);
+    const leadsVal = parseInt(dailyStatsForm.leads);
+    const spendVal = parseInt(dailyStatsForm.spend);
     if (isNaN(reachVal) || reachVal < 0) {
       toast.error("Please enter a valid reach number");
       return;
@@ -867,7 +957,10 @@ export function Projects() {
       spend: spendVal
     };
 
-    const updatedStats = [newStat, ...(project.dailyStats || [])];
+    const remainingStats = (project.dailyStats || []).filter((s: any) => 
+      !(s.date === dailyStatsForm.date && s.campaignName === dailyStatsForm.campaignName)
+    );
+    const updatedStats = [newStat, ...remainingStats];
     
     const nowLog = {
       id: `log-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
@@ -1101,7 +1194,7 @@ export function Projects() {
   const [newProjectReach, setNewProjectReach] = useState("");
   const [newProjectLeads, setNewProjectLeads] = useState("");
   const [newProjectCpl, setNewProjectCpl] = useState("");
-  const [activeProjectTab, setActiveProjectTab] = useState<'general' | 'finance'>('general');
+  const [activeProjectTab, setActiveProjectTab] = useState<'general' | 'finance' | 'campaigns'>('general');
   const [isManageCategoriesModalOpen, setIsManageCategoriesModalOpen] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState("");
   const [showNewProjectErrors, setShowNewProjectErrors] = useState(false);
@@ -1976,7 +2069,8 @@ export function Projects() {
               // Filter by campaign
               const campaignFiltered = dailyStatsList.filter((s: any) => {
                 if (selectedCampaignForStats === "All Campaigns") return true;
-                return s.campaignName === selectedCampaignForStats;
+                const cleanSelected = selectedCampaignForStats.replace(" (Inactive)", "");
+                return s.campaignName === cleanSelected;
               });
 
               // Filter by date range
@@ -2061,7 +2155,16 @@ export function Projects() {
                           </button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-48 rounded-xl p-1.5 border-border/60 shadow-xl bg-background/95 backdrop-blur-md z-50">
-                          {["All Campaigns", "Q4 Retargeting Ads", "Holiday Social Push", "B2B Email Drip"].map(opt => (
+                          {(() => {
+                            const campaignList = (project.campaigns && project.campaigns.length > 0)
+                              ? project.campaigns.map(c => {
+                                  const name = typeof c === 'string' ? c : (c.name || "");
+                                  const status = typeof c === 'string' ? 'Active' : (c.status || 'Active');
+                                  return status === 'Inactive' ? `${name} (Inactive)` : name;
+                                })
+                              : ["Q4 Retargeting Ads", "Holiday Social Push", "B2B Email Drip"];
+                            return ["All Campaigns", ...campaignList];
+                          })().map(opt => (
                             <DropdownMenuItem 
                               key={opt}
                               onSelect={() => setSelectedCampaignForStats(opt)}
@@ -4351,7 +4454,7 @@ export function Projects() {
       />
 
       <Dialog open={isLogDailyStatsOpen} onOpenChange={setIsLogDailyStatsOpen}>
-        <DialogContent className="sm:max-w-[450px] p-0 overflow-hidden rounded-[2rem] gap-0 border-border/60 shadow-2xl bg-card z-50">
+        <DialogContent className={cn("p-0 overflow-hidden rounded-[2rem] gap-0 border-border/60 shadow-2xl bg-card z-50 transition-all duration-300", isBulkAdd ? "sm:max-w-[700px]" : "sm:max-w-[450px]")}>
           <div className="p-6 md:p-8 border-b border-border/40">
             <h2 className="text-lg font-black tracking-tight text-foreground flex items-center gap-2">
               📈 Log Daily Marketing Stats
@@ -4359,7 +4462,28 @@ export function Projects() {
             <p className="text-xs text-muted-foreground mt-1 font-medium">Enter performance metrics for the selected campaign and date.</p>
           </div>
 
-          <form onSubmit={handleLogDailyStats} className="p-6 md:p-8 space-y-4">
+          <form onSubmit={handleLogDailyStats} className="p-6 md:p-8 space-y-5">
+            {/* Mode Switcher */}
+            <div className="flex items-center justify-between border-b border-border/40 pb-3">
+              <span className="text-xs font-black uppercase tracking-wider text-foreground">Entry Mode</span>
+              <div className="flex bg-muted/60 p-0.5 rounded-lg border border-border/50 text-[10px] font-bold">
+                <button
+                  type="button"
+                  onClick={() => setIsBulkAdd(false)}
+                  className={cn("px-2.5 py-1 rounded-md transition-all", !isBulkAdd ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:text-foreground")}
+                >
+                  Single
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsBulkAdd(true)}
+                  className={cn("px-2.5 py-1 rounded-md transition-all", isBulkAdd ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:text-foreground")}
+                >
+                  Bulk Add
+                </button>
+              </div>
+            </div>
+
             <div className="space-y-1.5">
               <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest block">Date</label>
               <input
@@ -4367,59 +4491,124 @@ export function Projects() {
                 required
                 value={dailyStatsForm.date}
                 onChange={(e) => setDailyStatsForm({ ...dailyStatsForm, date: e.target.value })}
-                className="w-full px-4 h-[42px] bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium"
+                className="w-full px-4 h-[42px] bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-semibold text-foreground"
               />
             </div>
 
-            <div className="space-y-1.5">
-              <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest block">Campaign</label>
-              <select
-                value={dailyStatsForm.campaignName}
-                onChange={(e) => setDailyStatsForm({ ...dailyStatsForm, campaignName: e.target.value })}
-                className="w-full px-4 h-[42px] bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium"
-              >
-                {["Q4 Retargeting Ads", "Holiday Social Push", "B2B Email Drip"].map(opt => (
-                  <option key={opt} value={opt}>{opt}</option>
-                ))}
-              </select>
-            </div>
+            {!isBulkAdd ? (
+              <>
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest block">Campaign</label>
+                  <select
+                    value={dailyStatsForm.campaignName}
+                    onChange={(e) => setDailyStatsForm({ ...dailyStatsForm, campaignName: e.target.value })}
+                    className="w-full px-4 h-[42px] bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-semibold text-foreground"
+                  >
+                    {(() => {
+                      const project = projects.find(p => p.id === selectedProjectId);
+                      const campaignList = (project?.campaigns && project.campaigns.length > 0)
+                        ? project.campaigns
+                            .map(c => typeof c === 'string' ? { name: c, status: 'Active' } : { name: c.name || "", status: c.status || 'Active' })
+                            .filter(c => c.status === 'Active')
+                            .map(c => c.name)
+                        : ["Q4 Retargeting Ads", "Holiday Social Push", "B2B Email Drip"];
+                      return campaignList.map(opt => (
+                        <option key={opt} value={opt}>{opt}</option>
+                      ));
+                    })()}
+                  </select>
+                </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest block">Reach</label>
-                <input
-                  type="number"
-                  required
-                  placeholder="e.g. 15000"
-                  value={dailyStatsForm.reach}
-                  onChange={(e) => setDailyStatsForm({ ...dailyStatsForm, reach: e.target.value })}
-                  className="w-full px-4 h-[42px] bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium"
-                />
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest block">Leads</label>
-                <input
-                  type="number"
-                  required
-                  placeholder="e.g. 42"
-                  value={dailyStatsForm.leads}
-                  onChange={(e) => setDailyStatsForm({ ...dailyStatsForm, leads: e.target.value })}
-                  className="w-full px-4 h-[42px] bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium"
-                />
-              </div>
-            </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest block">Reach</label>
+                    <input
+                      type="number"
+                      required={!isBulkAdd}
+                      placeholder="e.g. 15000"
+                      value={dailyStatsForm.reach}
+                      onChange={(e) => setDailyStatsForm({ ...dailyStatsForm, reach: e.target.value })}
+                      className="w-full px-4 h-[42px] bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-semibold"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest block">Leads</label>
+                    <input
+                      type="number"
+                      required={!isBulkAdd}
+                      placeholder="e.g. 42"
+                      value={dailyStatsForm.leads}
+                      onChange={(e) => setDailyStatsForm({ ...dailyStatsForm, leads: e.target.value })}
+                      className="w-full px-4 h-[42px] bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-semibold"
+                    />
+                  </div>
+                </div>
 
-            <div className="space-y-1.5">
-              <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest block">Spend (₹)</label>
-              <input
-                type="number"
-                required
-                placeholder="e.g. 5000"
-                value={dailyStatsForm.spend}
-                onChange={(e) => setDailyStatsForm({ ...dailyStatsForm, spend: e.target.value })}
-                className="w-full px-4 h-[42px] bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium"
-              />
-            </div>
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest block">Spend (₹)</label>
+                  <input
+                    type="number"
+                    required={!isBulkAdd}
+                    placeholder="e.g. 5000"
+                    value={dailyStatsForm.spend}
+                    onChange={(e) => setDailyStatsForm({ ...dailyStatsForm, spend: e.target.value })}
+                    className="w-full px-4 h-[42px] bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-semibold"
+                  />
+                </div>
+              </>
+            ) : (
+              <div className="space-y-4 max-h-[300px] overflow-y-auto pr-1">
+                {Object.keys(bulkStatsEntries).map((campaignName) => {
+                  const entry = bulkStatsEntries[campaignName] || { reach: "", leads: "", spend: "" };
+                  return (
+                    <div key={campaignName} className="p-4 bg-muted/20 border border-border/40 rounded-2xl space-y-3">
+                      <p className="text-xs font-black text-foreground">{campaignName}</p>
+                      <div className="grid grid-cols-3 gap-2">
+                        <div>
+                          <label className="text-[9px] font-bold text-muted-foreground uppercase mb-1 block">Reach</label>
+                          <input
+                            type="number"
+                            placeholder="e.g. 12000"
+                            value={entry.reach}
+                            onChange={(e) => setBulkStatsEntries({
+                              ...bulkStatsEntries,
+                              [campaignName]: { ...entry, reach: e.target.value }
+                            })}
+                            className="w-full px-2.5 h-[34px] bg-background border border-border rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-primary font-semibold"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-[9px] font-bold text-muted-foreground uppercase mb-1 block">Leads</label>
+                          <input
+                            type="number"
+                            placeholder="e.g. 35"
+                            value={entry.leads}
+                            onChange={(e) => setBulkStatsEntries({
+                              ...bulkStatsEntries,
+                              [campaignName]: { ...entry, leads: e.target.value }
+                            })}
+                            className="w-full px-2.5 h-[34px] bg-background border border-border rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-primary font-semibold"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-[9px] font-bold text-muted-foreground uppercase mb-1 block">Spend (₹)</label>
+                          <input
+                            type="number"
+                            placeholder="e.g. 3000"
+                            value={entry.spend}
+                            onChange={(e) => setBulkStatsEntries({
+                              ...bulkStatsEntries,
+                              [campaignName]: { ...entry, spend: e.target.value }
+                            })}
+                            className="w-full px-2.5 h-[34px] bg-background border border-border rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-primary font-semibold"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
 
             <div className="flex items-center justify-end gap-3 pt-2">
               <DialogClose asChild>
@@ -4437,6 +4626,427 @@ export function Projects() {
           </form>
         </DialogContent>
       </Dialog>
+        <Dialog open={isEditProjectModalOpen} onOpenChange={setIsEditProjectModalOpen}>
+          <DialogContent className="max-w-[90vw] md:max-w-[700px] p-0 overflow-hidden rounded-[2.5rem] border-border/60 shadow-2xl [&>button]:hidden bg-card flex flex-col h-[90vh] md:h-[550px] gap-0">
+            <div className="p-6 pb-4">
+              <div className="flex items-center justify-between px-6 md:px-8 py-6 border-b border-border/50 bg-muted/30">
+                <div>
+                  <h2 className="text-xl md:text-2xl font-black tracking-tight">Edit Project</h2>
+                  <p className="text-xs text-muted-foreground mt-1">Modify project details, stats targets, and budgets</p>
+                </div>
+                <DialogClose asChild>
+                  <button className="p-2 text-muted-foreground hover:text-foreground/80 hover:bg-muted rounded-full transition-colors">
+                    <X className="w-5 h-5" />
+                  </button>
+                </DialogClose>
+              </div>
+            </div>
+            {editingProject && (
+              <div className="flex flex-row overflow-hidden flex-1" style={{ maxHeight: 'calc(90vh - 130px)' }}>
+                {/* Sidebar Tabs */}
+                <div className="w-44 shrink-0 border-r border-border/50 bg-muted/20 p-3 flex flex-col gap-1 overflow-y-auto">
+                  {([
+                    { id: 'general', label: 'General', icon: <FolderGit2 className="w-4 h-4" /> },
+                    { id: 'finance', label: 'Finance', icon: <IndianRupee className="w-4 h-4" /> },
+                    ...(editingProject.category === "Digital Marketing" ? [{ id: 'campaigns' as const, label: 'Campaigns', icon: <TrendingUp className="w-4 h-4" /> }] : []),
+                  ] as const).map(tab => (
+                    <button
+                      key={tab.id}
+                      onClick={() => setActiveProjectTab(tab.id)}
+                      className={cn(
+                        "flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-bold transition-all text-left w-full",
+                        activeProjectTab === tab.id
+                          ? "bg-primary text-primary-foreground shadow-sm shadow-primary/20"
+                          : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                      )}
+                    >
+                      {tab.icon}
+                      {tab.label}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Tab Content */}
+                <div className="flex-1 overflow-y-auto p-6 md:p-8 space-y-5">
+                  {activeProjectTab === 'general' && (
+                    <>
+                      <div className="space-y-2">
+                        <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Project Name <span className="text-red-500">*</span></label>
+                        <input 
+                          type="text" 
+                          value={editingProject.name}
+                          onChange={(e) => setEditingProject({...editingProject, name: e.target.value})}
+                          className={"w-full px-4 py-3 bg-muted/50 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium " + (showEditProjectErrors && !editingProject.name.trim() ? "border-red-500 ring-1 ring-red-500" : "border-border/50")}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Description</label>
+                        <textarea 
+                          value={editingProject.description || ""}
+                          onChange={(e) => setEditingProject({...editingProject, description: e.target.value})}
+                          placeholder="Brief project description..."
+                          rows={2}
+                          className="w-full px-4 py-3 bg-muted/50 border border-border/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium resize-none"
+                        />
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Start Date <span className="text-red-500">*</span></label>
+                          <input 
+                            type="date" 
+                            value={editingProject.startDate}
+                            onChange={(e) => {
+                              const newStart = e.target.value;
+                              setEditingProject({
+                                ...editingProject, 
+                                startDate: newStart,
+                                endDate: editingProject.endDate < newStart ? newStart : editingProject.endDate
+                              });
+                            }}
+                            className={"w-full px-4 py-3 bg-muted/50 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium " + (showEditProjectErrors && !editingProject.startDate ? "border-red-500 ring-1 ring-red-500" : "border-border/50")}
+                          />
+                        </div>
+                        <div>
+                          <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">End Date <span className="text-red-500">*</span></label>
+                          <input 
+                            type="date" 
+                            value={editingProject.endDate}
+                            min={editingProject.startDate}
+                            onChange={(e) => setEditingProject({...editingProject, endDate: e.target.value})}
+                            className={"w-full px-4 py-3 bg-muted/50 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium " + (showEditProjectErrors && !editingProject.endDate ? "border-red-500 ring-1 ring-red-500" : "border-border/50")}
+                          />
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <div className="flex items-center justify-between mb-1.5">
+                            <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest block">Category <span className="text-red-500">*</span></label>
+                            <button 
+                              type="button"
+                              onClick={(e) => { e.preventDefault(); e.stopPropagation(); setIsManageCategoriesModalOpen(true); }}
+                              className="text-xs font-bold text-primary hover:underline flex items-center gap-1"
+                            >
+                              <Settings2 className="w-3 h-3" /> Manage
+                            </button>
+                          </div>
+                          <SearchableSelect 
+                            value={editingProject.category}
+                            onChange={(val) => setEditingProject({...editingProject, category: val})}
+                            options={categories.map(cat => ({ label: cat, value: cat }))}
+                            className={"w-full h-[46px] px-4 bg-muted/50 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium " + (showEditProjectErrors && !editingProject.category ? "border-red-500 ring-1 ring-red-500" : "border-border/50")}
+                          />
+                        </div>
+                        <div>
+                          <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Status <span className="text-red-500">*</span></label>
+                          <SearchableSelect 
+                            value={editingProject.status}
+                            onChange={(val) => setEditingProject({...editingProject, status: val as ProjectStatus})}
+                            options={[
+                              { label: "In Progress", value: "In Progress" },
+                              { label: "In Review", value: "In Review" },
+                              { label: "Completed", value: "Completed" },
+                              { label: "On Hold", value: "On Hold" }
+                            ]}
+                            className="w-full h-[46px] px-4 bg-muted/50 border border-border/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium"
+                          />
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 block">Priority</label>
+                          <select 
+                            value={editingProject.priority || "Medium"} 
+                            onChange={(e) => setEditingProject({...editingProject, priority: e.target.value as any})} 
+                            className="w-full h-[46px] px-4 bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium"
+                          >
+                            {["Low", "Medium", "High", "Critical"].map(p => <option key={p} value={p}>{p}</option>)}
+                          </select>
+                        </div>
+                        <div>
+                          <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 flex justify-between">
+                            <span>Progress</span>
+                            <span className="text-foreground">{editingProject.progress}%</span>
+                          </label>
+                          <input 
+                            type="range" 
+                            min="0" max="100" 
+                            value={editingProject.progress}
+                            onChange={(e) => setEditingProject({...editingProject, progress: parseInt(e.target.value)})}
+                            className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-primary mt-3"
+                          />
+                        </div>
+                      </div>
+                      {editingProject.category === "Digital Marketing" && (
+                        <div className="space-y-4 pt-4 border-t border-border/40 mt-4">
+                          <h4 className="text-xs font-bold text-foreground uppercase tracking-widest">Digital Marketing Stats</h4>
+                          <div className="grid grid-cols-3 gap-3">
+                            <div className="space-y-2">
+                              <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Reach Target</label>
+                              <input 
+                                type="text" 
+                                value={editingProject.reach || ""} 
+                                onChange={(e) => setEditingProject({...editingProject, reach: e.target.value})} 
+                                placeholder="e.g. 1.2M" 
+                                className="w-full px-3 h-[38px] bg-muted/50 border border-border rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-primary/20" 
+                              />
+                            </div>
+                            <div className="space-y-2">
+                              <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Leads Target</label>
+                              <input 
+                                type="text" 
+                                value={editingProject.leads || ""} 
+                                onChange={(e) => setEditingProject({...editingProject, leads: e.target.value})} 
+                                placeholder="e.g. 3,240" 
+                                className="w-full px-3 h-[38px] bg-muted/50 border border-border rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-primary/20" 
+                              />
+                            </div>
+                            <div className="space-y-2">
+                              <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">CPL (₹)</label>
+                              <input 
+                                type="text" 
+                                value={editingProject.cpl || ""} 
+                                onChange={(e) => setEditingProject({...editingProject, cpl: e.target.value})} 
+                                placeholder="e.g. 250" 
+                                className="w-full px-3 h-[38px] bg-muted/50 border border-border rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-primary/20" 
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </>
+                  )}
+                  {activeProjectTab === 'finance' && (
+                    <>
+                      <div className="space-y-2">
+                        <label className="text-[12px] font-bold text-muted-foreground uppercase tracking-wider">Project Budget</label>
+                        <input type="text" value={editingProject.budget || ""} onChange={(e) => setEditingProject({...editingProject, budget: e.target.value})} placeholder="e.g. ₹10,000" className="w-full px-4 h-[42px] bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium" />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-[12px] font-bold text-muted-foreground uppercase tracking-wider">Amount Received</label>
+                        <input type="text" value={editingProject.amountReceived || ""} onChange={(e) => setEditingProject({...editingProject, amountReceived: e.target.value})} placeholder="e.g. ₹5,000" className="w-full px-4 h-[42px] bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium" />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-[12px] font-bold text-muted-foreground uppercase tracking-wider">Next Payment Date</label>
+                        <input type="date" value={editingProject.nextPaymentDate || ""} onChange={(e) => setEditingProject({...editingProject, nextPaymentDate: e.target.value})} className="w-full px-4 h-[42px] bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium" />
+                      </div>
+                    </>
+                  )}
+                  {activeProjectTab === 'campaigns' && (
+                    <div className="space-y-4 text-left">
+                      <div>
+                        <h4 className="text-xs font-black uppercase tracking-wider text-foreground mb-1">Marketing Campaigns</h4>
+                        <p className="text-[10px] text-muted-foreground font-semibold">Manage active ad campaigns and performance targets</p>
+                      </div>
+
+                      <div className="space-y-2 max-h-[200px] overflow-y-auto pr-1">
+                        {(editingProject.campaigns || []).map((c: any, index: number) => {
+                          const campaignObj = typeof c === 'string' ? { name: c, status: 'Active' } : { name: c.name || "", status: c.status || 'Active' };
+                          return (
+                            <div key={index} className="flex justify-between items-center p-3 bg-muted/20 border border-border/40 rounded-2xl group/campaign">
+                              <div className="flex items-center gap-2">
+                                <span className="text-xs font-bold text-foreground">{campaignObj.name}</span>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const nextStatus = campaignObj.status === 'Active' ? 'Inactive' : 'Active';
+                                    const updated = [...(editingProject.campaigns || [])];
+                                    updated[index] = { name: campaignObj.name, status: nextStatus };
+                                    setEditingProject({ ...editingProject, campaigns: updated });
+                                    toast.success(`Campaign marked ${nextStatus}`);
+                                  }}
+                                  className={cn("px-2 py-0.5 text-[9px] font-black rounded-lg uppercase tracking-wider transition-colors", 
+                                    campaignObj.status === 'Active' ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-200" : "bg-muted text-muted-foreground hover:bg-muted-foreground/20")}
+                                >
+                                  {campaignObj.status}
+                                </button>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setConfirmModalState({
+                                    isOpen: true,
+                                    title: "Remove Campaign",
+                                    description: "Are you sure you want to remove this campaign?",
+                                    itemName: campaignObj.name,
+                                    action: () => {
+                                      const updated = (editingProject.campaigns || []).filter((_: any, i: number) => i !== index);
+                                      setEditingProject({ ...editingProject, campaigns: updated });
+                                      setConfirmModalState(prev => ({ ...prev, isOpen: false }));
+                                      toast.success("Campaign removed");
+                                    }
+                                  });
+                                }}
+                                className="text-xs text-rose-500 hover:text-rose-700 font-extrabold opacity-0 group-hover/campaign:opacity-100 transition-opacity"
+                              >
+                                Remove
+                              </button>
+                            </div>
+                          );
+                        })}
+                        {(editingProject.campaigns || []).length === 0 && (
+                          <p className="text-xs text-muted-foreground italic font-medium py-4 text-center">No campaigns created yet.</p>
+                        )}
+                      </div>
+
+                      <div className="flex gap-2 pt-2 border-t border-border/40">
+                        <input
+                          type="text"
+                          placeholder="Campaign name (e.g. Winter Sales Ads)..."
+                          id="edit_project_new_campaign_input"
+                          className="flex-1 px-4 py-2.5 bg-muted/50 border border-border/50 rounded-xl text-xs focus:outline-none font-semibold text-foreground"
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                              e.preventDefault();
+                              const btn = document.getElementById("add_campaign_edit_modal_btn");
+                              if (btn) btn.click();
+                            }
+                          }}
+                        />
+                        <button
+                          type="button"
+                          id="add_campaign_edit_modal_btn"
+                          onClick={() => {
+                            const input = document.getElementById("edit_project_new_campaign_input") as HTMLInputElement;
+                            if (input && input.value.trim()) {
+                              const newCampaignName = input.value.trim();
+                              const currentList = editingProject.campaigns || [];
+                              const exists = currentList.some((c: any) => {
+                                const name = typeof c === 'string' ? c : (c.name || "");
+                                return name.toLowerCase() === newCampaignName.toLowerCase();
+                              });
+                              if (exists) {
+                                toast.error("Campaign name already exists");
+                                return;
+                              }
+                              setEditingProject({
+                                ...editingProject,
+                                campaigns: [...currentList, newCampaignName]
+                              });
+                              input.value = "";
+                              toast.success("Campaign added!");
+                            }
+                          }}
+                          className="px-4 py-2.5 bg-primary text-primary-foreground font-bold text-xs rounded-xl hover:bg-primary/95 transition-all shadow-sm flex items-center justify-center shrink-0"
+                        >
+                          Add
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+            <div className="px-6 md:px-8 py-4 bg-muted/30 border-t border-border/50 flex justify-end gap-3 mt-auto shrink-0">
+              <button 
+                onClick={() => { setIsEditProjectModalOpen(false); setEditingProject(null); }}
+                className="px-5 py-2.5 rounded-xl font-bold text-muted-foreground hover:bg-muted transition-colors"
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={handleUpdateProject}
+                className="px-6 py-2.5 bg-primary text-primary-foreground font-bold rounded-xl shadow-md hover:bg-primary/90 transition-all disabled:opacity-50"
+              >
+                Save Changes
+              </button>
+            </div>
+            
+            {/* Nested Manage Categories Modal for Edit */}
+            <Dialog open={isManageCategoriesModalOpen} onOpenChange={setIsManageCategoriesModalOpen}>
+              <DialogContent className="sm:max-w-[400px] p-0 overflow-hidden rounded-[2rem] gap-0 border-border/60 shadow-2xl [&>button]:hidden bg-card">
+                <div className="p-6 pb-4">
+                  <div className="flex items-center justify-between px-6 md:px-8 py-6 border-b border-border/50 bg-muted/30">
+          <div>
+            <h2 className="text-xl md:text-2xl font-black tracking-tight">Manage Categories</h2>
+            
+          </div>
+          <DialogClose asChild>
+            <button className="p-2 text-muted-foreground hover:text-foreground/80 hover:bg-muted rounded-full transition-colors">
+              <X className="w-5 h-5" />
+            </button>
+          </DialogClose>
+        </div>
+                </div>
+                
+                <div className="p-6 md:p-8 space-y-6 overflow-y-auto max-h-[70vh]">
+                  <div className="flex gap-2">
+                    <input 
+                      type="text" 
+                      value={newCategoryName}
+                      onChange={(e) => setNewCategoryName(e.target.value)}
+                      placeholder="e.g. E-Commerce"
+                      className={"flex-1 px-4 py-2.5 bg-muted/50 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium " + (showCategoryErrors && !newCategoryName.trim() ? "border-red-500 ring-1 ring-red-500" : "border-border/50")}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') handleAddCategory();
+                      }}
+                    />
+                    <button 
+                      onClick={handleAddCategory}
+                      className="px-4 py-2.5 bg-foreground text-background font-bold rounded-xl shadow-md hover:bg-foreground/90 transition-all disabled:opacity-50"
+                    >
+                      Add
+                    </button>
+                  </div>
+                  
+                  <div className="space-y-2 mt-4 max-h-[250px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-muted">
+                    {categories.map(cat => {
+                      const isLocked = LOCKED_CATEGORIES.includes(cat);
+                      const isPending = categoryPendingDelete === cat;
+                      return (
+                        <div key={cat} className={cn("flex flex-col border rounded-xl overflow-hidden transition-all", isLocked ? "bg-primary/5 border-primary/20" : isPending ? "bg-rose-50 border-rose-300" : "bg-muted/30 border-border/50")}>
+                          <div className="flex items-center justify-between p-3">
+                            <div className="flex items-center gap-2">
+                              {isLocked && <span className="text-[10px] font-bold text-primary bg-primary/10 px-1.5 py-0.5 rounded-md uppercase tracking-wider">Fixed</span>}
+                              <span className="font-bold text-sm">{cat}</span>
+                            </div>
+                            {isLocked ? (
+                              <span className="text-[10px] text-muted-foreground font-medium italic">System</span>
+                            ) : (
+                              <button onClick={() => setCategoryPendingDelete(isPending ? null : cat)} className={cn("p-1.5 rounded-lg transition-colors", isPending ? "text-rose-500 bg-rose-100" : "text-muted-foreground hover:text-rose-500 hover:bg-rose-500/10")}>
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            )}
+                          </div>
+                          {isPending && (
+                            <div className="flex items-center justify-between px-3 py-2 bg-rose-50 border-t border-rose-200 gap-2">
+                              <span className="text-xs font-bold text-rose-600">Delete "{cat}"?</span>
+                              <div className="flex gap-2">
+                                <button onClick={() => setCategoryPendingDelete(null)} className="px-3 py-1 text-xs font-bold text-muted-foreground bg-white border border-border/50 rounded-lg hover:bg-muted transition-colors">Cancel</button>
+                                <button onClick={() => { confirmDeleteCategory(cat); setCategoryPendingDelete(null); }} className="px-3 py-1 text-xs font-bold text-white bg-rose-500 rounded-lg hover:bg-rose-600 transition-colors">Delete</button>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+                
+                <div className="px-6 md:px-8 py-4 md:py-6 bg-muted/30 border-t border-border/50 flex justify-end gap-3 mt-auto shrink-0">
+                  <button 
+                    onClick={() => setIsManageCategoriesModalOpen(false)}
+                    className="px-5 py-2.5 bg-foreground text-background font-bold rounded-xl hover:bg-foreground/90 transition-colors"
+                  >
+                    Done
+                  </button>
+                </div>
+              </DialogContent>
+            </Dialog>
+
+          </DialogContent>
+        </Dialog>
+
+
+
+      <ConfirmModal 
+        isOpen={confirmModalState.isOpen}
+        onClose={() => setConfirmModalState(prev => ({ ...prev, isOpen: false }))}
+        onConfirm={confirmModalState.action}
+        title={confirmModalState.title}
+        description={confirmModalState.description}
+        itemName={confirmModalState.itemName}
+      />
+
     </>
     );
     }
@@ -5007,6 +5617,7 @@ export function Projects() {
                   {([
                     { id: 'general', label: 'General', icon: <FolderGit2 className="w-4 h-4" /> },
                     { id: 'finance', label: 'Finance', icon: <IndianRupee className="w-4 h-4" /> },
+                    ...(editingProject.category === "Digital Marketing" ? [{ id: 'campaigns' as const, label: 'Campaigns', icon: <TrendingUp className="w-4 h-4" /> }] : []),
                   ] as const).map(tab => (
                     <button
                       key={tab.id}
@@ -5188,6 +5799,108 @@ export function Projects() {
                         <input type="date" value={editingProject.nextPaymentDate || ""} onChange={(e) => setEditingProject({...editingProject, nextPaymentDate: e.target.value})} className="w-full px-4 h-[42px] bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium" />
                       </div>
                     </>
+                  )}
+                  {activeProjectTab === 'campaigns' && (
+                    <div className="space-y-4 text-left">
+                      <div>
+                        <h4 className="text-xs font-black uppercase tracking-wider text-foreground mb-1">Marketing Campaigns</h4>
+                        <p className="text-[10px] text-muted-foreground font-semibold">Manage active ad campaigns and performance targets</p>
+                      </div>
+
+                      <div className="space-y-2 max-h-[200px] overflow-y-auto pr-1">
+                        {(editingProject.campaigns || []).map((c: any, index: number) => {
+                          const campaignObj = typeof c === 'string' ? { name: c, status: 'Active' } : { name: c.name || "", status: c.status || 'Active' };
+                          return (
+                            <div key={index} className="flex justify-between items-center p-3 bg-muted/20 border border-border/40 rounded-2xl group/campaign">
+                              <div className="flex items-center gap-2">
+                                <span className="text-xs font-bold text-foreground">{campaignObj.name}</span>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const nextStatus = campaignObj.status === 'Active' ? 'Inactive' : 'Active';
+                                    const updated = [...(editingProject.campaigns || [])];
+                                    updated[index] = { name: campaignObj.name, status: nextStatus };
+                                    setEditingProject({ ...editingProject, campaigns: updated });
+                                    toast.success(`Campaign marked ${nextStatus}`);
+                                  }}
+                                  className={cn("px-2 py-0.5 text-[9px] font-black rounded-lg uppercase tracking-wider transition-colors", 
+                                    campaignObj.status === 'Active' ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-200" : "bg-muted text-muted-foreground hover:bg-muted-foreground/20")}
+                                >
+                                  {campaignObj.status}
+                                </button>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setConfirmModalState({
+                                    isOpen: true,
+                                    title: "Remove Campaign",
+                                    description: "Are you sure you want to remove this campaign?",
+                                    itemName: campaignObj.name,
+                                    action: () => {
+                                      const updated = (editingProject.campaigns || []).filter((_: any, i: number) => i !== index);
+                                      setEditingProject({ ...editingProject, campaigns: updated });
+                                      setConfirmModalState(prev => ({ ...prev, isOpen: false }));
+                                      toast.success("Campaign removed");
+                                    }
+                                  });
+                                }}
+                                className="text-xs text-rose-500 hover:text-rose-700 font-extrabold opacity-0 group-hover/campaign:opacity-100 transition-opacity"
+                              >
+                                Remove
+                              </button>
+                            </div>
+                          );
+                        })}
+                        {(editingProject.campaigns || []).length === 0 && (
+                          <p className="text-xs text-muted-foreground italic font-medium py-4 text-center">No campaigns created yet.</p>
+                        )}
+                      </div>
+
+                      <div className="flex gap-2 pt-2 border-t border-border/40">
+                        <input
+                          type="text"
+                          placeholder="Campaign name (e.g. Winter Sales Ads)..."
+                          id="edit_project_new_campaign_input"
+                          className="flex-1 px-4 py-2.5 bg-muted/50 border border-border/50 rounded-xl text-xs focus:outline-none font-semibold text-foreground"
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                              e.preventDefault();
+                              const btn = document.getElementById("add_campaign_edit_modal_btn");
+                              if (btn) btn.click();
+                            }
+                          }}
+                        />
+                        <button
+                          type="button"
+                          id="add_campaign_edit_modal_btn"
+                          onClick={() => {
+                            const input = document.getElementById("edit_project_new_campaign_input") as HTMLInputElement;
+                            if (input && input.value.trim()) {
+                              const newCampaignName = input.value.trim();
+                              const currentList = editingProject.campaigns || [];
+                              const exists = currentList.some((c: any) => {
+                                const name = typeof c === 'string' ? c : (c.name || "");
+                                return name.toLowerCase() === newCampaignName.toLowerCase();
+                              });
+                              if (exists) {
+                                toast.error("Campaign name already exists");
+                                return;
+                              }
+                              setEditingProject({
+                                ...editingProject,
+                                campaigns: [...currentList, newCampaignName]
+                              });
+                              input.value = "";
+                              toast.success("Campaign added!");
+                            }
+                          }}
+                          className="px-4 py-2.5 bg-primary text-primary-foreground font-bold text-xs rounded-xl hover:bg-primary/95 transition-all shadow-sm flex items-center justify-center shrink-0"
+                        >
+                          Add
+                        </button>
+                      </div>
+                    </div>
                   )}
                 </div>
               </div>
