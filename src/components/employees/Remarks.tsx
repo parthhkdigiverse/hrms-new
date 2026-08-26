@@ -80,7 +80,6 @@ const renderStars = (score: number) => {
 
 export function Remarks() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedMonth, setSelectedMonth] = useState("August 2026");
   const [feedback, setFeedback] = useState<FeedbackRecord[]>(MOCK_FEEDBACK);
 
   // New Remark State
@@ -208,19 +207,6 @@ export function Remarks() {
             </p>
             
             <div className="mt-4 flex items-center gap-3">
-              <div className="flex items-center gap-2 bg-muted/50 border border-border px-3 py-1.5 rounded-lg">
-                <Calendar className="w-4 h-4 text-muted-foreground" />
-                <SearchableSelect 
-                  value={selectedMonth}
-                  onChange={setSelectedMonth}
-                  options={[
-                    { label: "August 2026", value: "August 2026" },
-                    { label: "July 2026", value: "July 2026" },
-                    { label: "June 2026", value: "June 2026" }
-                  ]}
-                  className="bg-transparent text-sm font-bold text-foreground/80 outline-none w-[130px] h-[24px]"
-                />
-              </div>
             </div>
           </div>
           

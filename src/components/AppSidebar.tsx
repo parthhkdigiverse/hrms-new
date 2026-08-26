@@ -12,14 +12,24 @@ import {
   Clock,
   Lock,
   Unlock,
+  Settings,
+  ReceiptText,
+  ListPlus,
+  UserPlus,
+  CalendarPlus,
+  Briefcase,
+  Target,
+  MonitorPlay,
+  FileText
 } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import {
   mobileBarItems,
   navItems,
-  quickCreateActions,
   sectionOrder,
   type NavItem,
+  type QuickAction
 } from "./nav-data";
 import { useTheme } from "./ThemeProvider";
 
@@ -33,17 +43,56 @@ function Badge({ count }: { count: number }) {
   );
 }
 
+const ALL_CREATE_ACTIONS: QuickAction[] = [
+  { title: "New Invoice", url: "/invoice/create", icon: ReceiptText, hint: "Finance" },
+  { title: "New Task", url: "/tasks?new=1", icon: ListPlus, hint: "Work" },
+  { title: "Add Employee", url: "/employees/list?new=1", icon: UserPlus, hint: "People" },
+  { title: "Apply Leave", url: "/leave?new=1", icon: CalendarPlus, hint: "Work" },
+  { title: "New Project", url: "/work/projects?new=1", icon: Briefcase, hint: "Work" },
+  { title: "New Lead", url: "/work/sales/leads?new=1", icon: Target, hint: "Sales" },
+  { title: "New Meeting", url: "/meetings?new=1", icon: MonitorPlay, hint: "Collaboration" },
+  { title: "Add Document", url: "/employees/documents?new=1", icon: FileText, hint: "People" },
+];
+
 function CreateMenu({ collapsed, onNavigate }: { collapsed: boolean; onNavigate: (url: string) => void }) {
   const [open, setOpen] = useState(false);
+  const [isCustomizeOpen, setIsCustomizeOpen] = useState(false);
+  
+  const [selectedUrls, setSelectedUrls] = useState<string[]>(() => {
+    if (typeof window !== "undefined") {
+      const stored = localStorage.getItem("hrms_custom_create_actions");
+      if (stored) return JSON.parse(stored);
+    }
+    return ["/invoice/create", "/tasks?new=1", "/employees/list?new=1", "/leave?new=1"];
+  });
+
+  const activeActions = useMemo(() => {
+    return ALL_CREATE_ACTIONS.filter(a => selectedUrls.includes(a.url));
+  }, [selectedUrls]);
+
+  const toggleAction = (url: string) => {
+    setSelectedUrls(prev => {
+      const next = prev.includes(url) ? prev.filter(u => u !== url) : [...prev, url];
+      if (typeof window !== "undefined") {
+        localStorage.setItem("hrms_custom_create_actions", JSON.stringify(next));
+      }
+      return next;
+    });
+  };
 
   useEffect(() => {
     if (!open) return;
-    const close = () => setOpen(false);
-    window.addEventListener("click", close);
-    return () => window.removeEventListener("click", close);
+    const close = (e: MouseEvent) => {
+      // Don't close if clicking inside the customize dialog
+      if ((e.target as Element).closest('[role="dialog"]')) return;
+      setOpen(false);
+    };
+    window.addEventListener("click", close, false);
+    return () => window.removeEventListener("click", close, false);
   }, [open]);
 
   return (
+    <>
     <div className="relative" onClick={(e) => e.stopPropagation()}>
       <button
         onClick={() => setOpen((o) => !o)}
@@ -66,23 +115,90 @@ function CreateMenu({ collapsed, onNavigate }: { collapsed: boolean; onNavigate:
             collapsed ? "left-full top-0 ml-2" : "left-0 right-0",
           )}
         >
-          {quickCreateActions.map((a) => (
-            <button
-              key={a.url}
-              onClick={() => {
-                onNavigate(a.url);
-                setOpen(false);
-              }}
-              className="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-sm hover:bg-sidebar-accent"
-            >
-              <a.icon className="h-4 w-4 shrink-0 text-sidebar-muted" />
-              <span className="flex-1 truncate">{a.title}</span>
-              {a.hint && <span className="text-[10px] uppercase text-sidebar-muted">{a.hint}</span>}
-            </button>
-          ))}
+          {activeActions.length > 0 ? (
+            activeActions.map((a) => (
+              <button
+                key={a.url}
+                onClick={() => {
+                  onNavigate(a.url);
+                  setOpen(false);
+                }}
+                className="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-sm hover:bg-sidebar-accent"
+              >
+                <a.icon className="h-4 w-4 shrink-0 text-sidebar-muted" />
+                <span className="flex-1 truncate">{a.title}</span>
+                {a.hint && <span className="text-[10px] uppercase text-sidebar-muted">{a.hint}</span>}
+              </button>
+            ))
+          ) : (
+            <div className="px-3 py-4 text-center text-xs text-sidebar-muted">No actions selected</div>
+          )}
+          <div className="h-px bg-sidebar-border my-1" />
+          <button
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setOpen(false);
+              setIsCustomizeOpen(true);
+            }}
+            className="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-sm text-sidebar-muted hover:bg-sidebar-accent hover:text-sidebar-foreground transition-colors"
+          >
+            <Settings className="h-4 w-4 shrink-0" />
+            <span className="flex-1 truncate">Customize Menu</span>
+          </button>
         </div>
       )}
     </div>
+
+    <Dialog open={isCustomizeOpen} onOpenChange={setIsCustomizeOpen}>
+      <DialogContent className="max-w-[425px] p-0 overflow-hidden rounded-[2rem] gap-0 border-border/60 shadow-2xl [&>button]:hidden bg-card z-[9999]">
+        <div className="flex items-center justify-between px-6 py-5 border-b border-border/50 bg-muted/30">
+          <div>
+            <h2 className="text-lg font-black tracking-tight">Customize Create Menu</h2>
+            <p className="text-xs text-muted-foreground mt-0.5">Select which shortcuts appear in the Create menu</p>
+          </div>
+          <DialogClose asChild>
+            <button className="p-2 text-muted-foreground hover:text-foreground/80 hover:bg-muted rounded-full transition-colors">
+              <X className="w-5 h-5" />
+            </button>
+          </DialogClose>
+        </div>
+        <div className="p-4 max-h-[60vh] overflow-y-auto space-y-1 bg-white">
+          {ALL_CREATE_ACTIONS.map((a) => {
+            const isSelected = selectedUrls.includes(a.url);
+            return (
+              <label key={a.url} className="flex items-center gap-3 p-3 rounded-xl hover:bg-muted/50 cursor-pointer transition-colors border border-transparent hover:border-border/50">
+                <div className={cn("w-5 h-5 rounded flex items-center justify-center border transition-colors", isSelected ? "bg-primary border-primary text-primary-foreground" : "border-input bg-background")}>
+                  {isSelected && <Plus className="w-3.5 h-3.5 rotate-45" />}
+                </div>
+                <input 
+                  type="checkbox" 
+                  className="hidden" 
+                  checked={isSelected}
+                  onChange={() => toggleAction(a.url)}
+                />
+                <div className="flex items-center gap-2.5 flex-1">
+                  <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center">
+                    <a.icon className="w-4 h-4 text-muted-foreground" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold text-foreground">{a.title}</p>
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-semibold">{a.hint}</p>
+                  </div>
+                </div>
+              </label>
+            );
+          })}
+        </div>
+        <div className="px-6 py-4 border-t border-border/50 bg-muted/30">
+          <button onClick={() => setIsCustomizeOpen(false)} className="w-full px-4 py-2 bg-primary text-primary-foreground font-bold rounded-xl text-sm hover:bg-primary/95 transition-colors">
+            Done
+          </button>
+        </div>
+      </DialogContent>
+    </Dialog>
+    </>
   );
 }
 

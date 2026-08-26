@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { X, Search, Plus, Filter, LayoutGrid, List as ListIcon, MoreHorizontal, Calendar, Clock, CheckCircle2, MessageSquare, Paperclip, FileText, ChevronDown } from "lucide-react";
+import { X, Search, Plus, Filter, LayoutGrid, List as ListIcon, MoreHorizontal, Calendar, Clock, CheckCircle2, MessageSquare, Paperclip, FileText, ChevronDown, Zap, Trash2 } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { DialogClose, Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -61,6 +61,77 @@ export function Tasks({ setActive }: { setActive?: (route: string) => void }) {
   const [employees, setEmployees] = useState<any[]>([]);
   const [assigneeSearchQuery, setAssigneeSearchQuery] = useState("");
   const [inlineAssigneeSearchQuery, setInlineAssigneeSearchQuery] = useState("");
+
+  // Quick Assign state
+  const [showQuickAssign, setShowQuickAssign] = useState(false);
+  const [isQuickSubmitting, setIsQuickSubmitting] = useState(false);
+  const [quickTasks, setQuickTasks] = useState<Array<{ title: string; assignee: string; dueDate: string }>>([{ title: "", assignee: "", dueDate: "" }]);
+
+  const addQuickRow = () => {
+    setQuickTasks(prev => {
+      const last = prev[prev.length - 1];
+      return [...prev, { title: "", assignee: last?.assignee ?? "", dueDate: last?.dueDate ?? "" }];
+    });
+  };
+
+  const updateQuickField = (idx: number, field: "title" | "assignee" | "dueDate", value: string) => {
+    setQuickTasks(prev => {
+      const updated = prev.map(t => ({ ...t }));
+      if (field === "title") {
+        updated[idx]!.title = value;
+      } else {
+        // propagate assignee/dueDate downwards
+        for (let i = idx; i < updated.length; i++) {
+          updated[i]![field] = value;
+        }
+      }
+      return updated;
+    });
+  };
+
+  const removeQuickRow = (idx: number) => {
+    setQuickTasks(prev => prev.length <= 1 ? [{ title: "", assignee: "", dueDate: "" }] : prev.filter((_, i) => i !== idx));
+  };
+
+  const handleQuickTitleKeyDown = (e: React.KeyboardEvent, idx: number) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      if (idx === quickTasks.length - 1) addQuickRow();
+      setTimeout(() => {
+        const next = document.getElementById(`qt-title-${idx + 1}`);
+        if (next) next.focus();
+      }, 50);
+    }
+  };
+
+  const handleBulkQuickAssign = () => {
+    const valid = quickTasks.filter(t => t.title.trim());
+    if (valid.length === 0) {
+      toast.error("Please add at least one task title.");
+      return;
+    }
+    setIsQuickSubmitting(true);
+    const newTasks: Task[] = valid.map(t => ({
+      id: `task-qa-${Date.now()}-${Math.random()}`,
+      title: t.title.trim(),
+      description: "",
+      status: "Todo",
+      priority: "Medium",
+      dueDate: t.dueDate,
+      assignees: t.assignee
+        ? [{ name: t.assignee, avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(t.assignee)}&background=random` }]
+        : [],
+      commentsCount: 0,
+      attachmentsCount: 0,
+    }));
+    setTimeout(() => {
+      setIndependentTasks(prev => [...newTasks, ...prev]);
+      setIsQuickSubmitting(false);
+      setShowQuickAssign(false);
+      setQuickTasks([{ title: "", assignee: "", dueDate: "" }]);
+      toast.success(`${valid.length} task(s) created successfully!`);
+    }, 600);
+  };
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -482,6 +553,130 @@ export function Tasks({ setActive }: { setActive?: (route: string) => void }) {
               <ListIcon className="w-4 h-4" />
             </button>
           </div>
+
+          {/* Quick Assign Button + Dialog */}
+          <Dialog open={showQuickAssign} onOpenChange={(open) => {
+            setShowQuickAssign(open);
+            if (!open) setQuickTasks([{ title: "", assignee: "", dueDate: "" }]);
+          }}>
+            <DialogTrigger asChild>
+              <button className="px-4 py-2 bg-muted/60 border border-border hover:bg-muted text-foreground text-xs font-bold rounded-xl flex items-center gap-2 transition-colors shadow-sm shrink-0">
+                <Zap className="w-4 h-4" />
+                <span>Quick Assign</span>
+              </button>
+            </DialogTrigger>
+            <DialogContent className="max-w-[820px] w-[95vw] p-0 overflow-hidden rounded-[2rem] gap-0 border-border/60 shadow-2xl [&>button]:hidden bg-card">
+              <div className="flex items-center justify-between px-6 md:px-8 py-5 border-b border-border/50 bg-muted/30">
+                <div>
+                  <h2 className="text-lg font-black tracking-tight">Quick Assign Tasks</h2>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    Press <kbd className="bg-muted px-1 py-0.5 rounded border text-[10px] font-bold">Enter</kbd> in a title field to add a new row. Assignee &amp; date propagate down.
+                  </p>
+                </div>
+                <DialogClose asChild>
+                  <button className="p-2 text-muted-foreground hover:text-foreground/80 hover:bg-muted rounded-full transition-colors">
+                    <X className="w-5 h-5" />
+                  </button>
+                </DialogClose>
+              </div>
+
+              <div className="flex flex-col max-h-[65vh] overflow-hidden">
+                {/* Column Headers */}
+                <div className="grid grid-cols-12 gap-3 px-6 md:px-8 py-3 border-b border-border/40 bg-muted/10">
+                  <div className="col-span-5 text-[10px] font-black text-muted-foreground uppercase tracking-wider">Task Title *</div>
+                  <div className="col-span-4 text-[10px] font-black text-muted-foreground uppercase tracking-wider">Assignee</div>
+                  <div className="col-span-2 text-[10px] font-black text-muted-foreground uppercase tracking-wider">Due Date</div>
+                  <div className="col-span-1 text-center text-[10px] font-black text-muted-foreground uppercase tracking-wider">Del</div>
+                </div>
+
+                {/* Task Rows */}
+                <div className="p-4 md:px-8 space-y-2 overflow-y-auto flex-1">
+                  {quickTasks.map((task, idx) => (
+                    <div key={idx} className="grid grid-cols-12 gap-2 items-center p-1.5 rounded-xl hover:bg-muted/30 border border-transparent hover:border-border/40 transition-all">
+                      <div className="col-span-5">
+                        <input
+                          id={`qt-title-${idx}`}
+                          type="text"
+                          placeholder="Enter task name..."
+                          value={task.title}
+                          onChange={e => updateQuickField(idx, "title", e.target.value)}
+                          onKeyDown={e => handleQuickTitleKeyDown(e, idx)}
+                          className="w-full px-3 py-2 bg-muted/40 border border-border/60 rounded-xl text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary/50 transition-all"
+                        />
+                      </div>
+                      <div className="col-span-4">
+                        <SearchableSelect
+                          value={task.assignee}
+                          onChange={val => updateQuickField(idx, "assignee", val)}
+                          options={[
+                            { label: "Unassigned", value: "" },
+                            ...(employees.length > 0
+                              ? employees.map((e: any) => ({ label: e.name || `${e.firstName} ${e.lastName}`.trim(), value: e.name || `${e.firstName} ${e.lastName}`.trim() }))
+                              : [{label: "Alex Johnson", value: "Alex Johnson"}, {label: "Sarah Connor", value: "Sarah Connor"}, {label: "Mike Peters", value: "Mike Peters"}]
+                            )
+                          ]}
+                          placeholder="Select assignee"
+                          className="w-full h-[34px] px-3 bg-muted/40 border border-border/60 rounded-xl text-xs font-semibold focus:outline-none"
+                        />
+                      </div>
+                      <div className="col-span-2">
+                        <input
+                          type="date"
+                          value={task.dueDate}
+                          onChange={e => updateQuickField(idx, "dueDate", e.target.value)}
+                          className="w-full px-2 py-2 bg-muted/40 border border-border/60 rounded-xl text-xs font-bold focus:outline-none focus:ring-1 focus:ring-primary transition-all"
+                        />
+                      </div>
+                      <div className="col-span-1 flex justify-center">
+                        <button
+                          type="button"
+                          onClick={() => removeQuickRow(idx)}
+                          className="p-1.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-colors"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+
+                  {/* Add Row Button */}
+                  <button
+                    type="button"
+                    onClick={addQuickRow}
+                    className="w-full border border-dashed border-border hover:border-primary/40 hover:bg-primary/5 text-muted-foreground hover:text-primary text-xs font-bold py-2.5 rounded-xl flex items-center justify-center gap-2 transition-all mt-1"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    Add Row
+                  </button>
+                </div>
+              </div>
+
+              {/* Footer */}
+              <div className="px-6 md:px-8 py-4 border-t border-border/50 bg-muted/30 flex items-center justify-between gap-3">
+                <p className="text-xs text-muted-foreground font-semibold">
+                  {quickTasks.filter(t => t.title.trim()).length} task(s) ready to create
+                </p>
+                <div className="flex gap-3">
+                  <button
+                    type="button"
+                    onClick={() => { setShowQuickAssign(false); setQuickTasks([{ title: "", assignee: "", dueDate: "" }]); }}
+                    className="px-4 py-2 bg-card border border-border text-foreground/80 hover:bg-muted font-bold text-xs rounded-xl transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleBulkQuickAssign}
+                    disabled={isQuickSubmitting || quickTasks.filter(t => t.title.trim()).length === 0}
+                    className="px-4 py-2 bg-primary hover:bg-primary/95 text-primary-foreground font-bold text-xs rounded-xl transition-colors disabled:opacity-50 flex items-center gap-2"
+                  >
+                    <Zap className="w-3.5 h-3.5" />
+                    {isQuickSubmitting ? "Creating..." : `Assign ${quickTasks.filter(t => t.title.trim()).length} Task(s)`}
+                  </button>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
 
           <Dialog open={isNewTaskOpen} onOpenChange={(open) => {
             setIsNewTaskOpen(open);
