@@ -435,7 +435,7 @@ export function Tasks({ setActive }: { setActive?: (route: string) => void }) {
   };
 
   return (
-    <div className="space-y-6 h-[calc(100vh-8rem)] flex flex-col animate-in fade-in duration-300">
+    <div className="space-y-5 h-[calc(100vh-4rem)] flex flex-col pb-0 animate-in fade-in duration-300">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shrink-0">
         <div>
           <h1 className="text-2xl font-black text-foreground tracking-tight">Tasks</h1>

@@ -69,7 +69,7 @@ export function Schedule() {
   };
   
   return (
-    <div className="flex flex-col h-[calc(100vh-6rem)] bg-white rounded-2xl border border-border overflow-hidden shadow-sm">
+    <div className="flex flex-col h-[calc(100vh-4rem)] bg-white rounded-2xl border border-border overflow-hidden shadow-sm">
       {/* Header */}
       <header className="flex items-center justify-between px-6 py-4 border-b border-border">
         <div className="flex items-center gap-4">

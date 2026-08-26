@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { X, Search, AlertTriangle, MessageSquareWarning, ThumbsUp, ShieldAlert, Plus, IndianRupee, CheckCircle2, XCircle, Filter, FileText, ChevronDown } from "lucide-react";
+import { X, Search, AlertTriangle, MessageSquareWarning, ThumbsUp, ShieldAlert, Plus, IndianRupee, CheckCircle2, XCircle, Filter, FileText, ChevronDown, Trophy } from "lucide-react";
 import { DialogClose, Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { EMPLOYEES } from "@/components/employees/employee-data";
@@ -65,6 +65,8 @@ export function Penalties() {
   const [records, setRecords] = useState<DisciplinaryRecord[]>(MOCK_RECORDS);
   const [activeTab, setActiveTab] = useState<"All" | RecordType>("All");
   const [searchQuery, setSearchQuery] = useState("");
+  const [leaderboardSort, setLeaderboardSort] = useState<"violations" | "amount">("violations");
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
 
   // New Record State
   const [isNewOpen, setIsNewOpen] = useState(false);
@@ -214,8 +216,25 @@ export function Penalties() {
     }
   });
 
+  const leaderboardData = Object.entries(employeeStats).map(([name, stats]) => {
+    const record = records.find(r => r.employee.name === name);
+    return {
+      name,
+      role: record?.employee.role || "Team Member",
+      avatar: record?.employee.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}`,
+      violations: stats.violations,
+      penaltyAmount: stats.penaltyAmount
+    };
+  }).sort((a, b) => {
+    if (leaderboardSort === "violations") {
+      return b.violations - a.violations || b.penaltyAmount - a.penaltyAmount;
+    } else {
+      return b.penaltyAmount - a.penaltyAmount || b.violations - a.violations;
+    }
+  });
+
   return (
-    <div className="space-y-8 h-[calc(100vh-8rem)] flex flex-col overflow-hidden pb-4">
+    <div className="space-y-5 h-[calc(100vh-4rem)] flex flex-col overflow-hidden pb-0">
       {/* Header/Stats */}
       <div className="shrink-0 bg-card border border-border rounded-3xl p-6 shadow-sm relative overflow-hidden">
         <div className="absolute top-0 right-0 p-12 opacity-5 pointer-events-none">
@@ -275,8 +294,10 @@ export function Penalties() {
       </div>
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-h-0 bg-card border border-border rounded-3xl shadow-sm overflow-hidden">
-        {/* Toolbar */}
+      <div className="flex-1 flex flex-col lg:flex-row min-h-0 gap-6">
+        {/* Left Column: Records List */}
+        <div className="flex-1 flex flex-col min-h-0 bg-card border border-border rounded-3xl shadow-sm overflow-hidden">
+          {/* Toolbar */}
         <div className="p-4 border-b border-border flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-muted/30 shrink-0">
           <div className="flex items-center gap-2 overflow-x-auto pb-2 sm:pb-0 scrollbar-hide">
             {(["All", "Penalty", "Warning"] as const).map(tab => (
@@ -306,6 +327,15 @@ export function Penalties() {
                 className="w-full sm:w-64 pl-9 pr-4 py-2.5 bg-background border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
               />
             </div>
+            
+            <button 
+              onClick={() => setShowLeaderboard(!showLeaderboard)}
+              className={cn("px-4 py-2.5 rounded-xl border border-border bg-white text-foreground hover:bg-muted font-bold text-sm transition-all flex items-center gap-2 shadow-sm shrink-0", 
+                showLeaderboard && "bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100")}
+            >
+              <Trophy className="w-4 h-4" />
+              <span className="hidden sm:inline">Leaderboard</span>
+            </button>
             
             <Dialog open={isNewOpen} onOpenChange={setIsNewOpen}>
               <DialogTrigger asChild>
@@ -623,6 +653,80 @@ export function Penalties() {
           </div>
         </div>
       </div>
+
+      {/* Right Column: Leaderboard Card */}
+      {showLeaderboard && (
+        <div className="w-full lg:w-80 bg-card border border-border rounded-3xl shadow-sm flex flex-col overflow-hidden shrink-0 animate-in slide-in-from-right duration-300">
+        <div className="p-5 border-b border-border bg-muted/30 shrink-0 text-left">
+          <div className="flex items-center gap-2">
+            <Trophy className="w-5 h-5 text-amber-500" />
+            <h2 className="text-base font-black text-foreground tracking-tight">Disciplinary Leaderboard</h2>
+          </div>
+          <p className="text-[11px] text-muted-foreground mt-0.5">Top infractions and penalty totals</p>
+          
+          {/* Sorting Switcher */}
+          <div className="flex p-0.5 bg-muted rounded-xl border border-border/40 mt-3.5">
+            <button 
+              onClick={() => setLeaderboardSort("violations")}
+              className={cn("flex-1 py-1 text-[10px] font-bold rounded-lg transition-all", 
+                leaderboardSort === "violations" ? "bg-white text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground")}
+            >
+              Violations
+            </button>
+            <button 
+              onClick={() => setLeaderboardSort("amount")}
+              className={cn("flex-1 py-1 text-[10px] font-bold rounded-lg transition-all", 
+                leaderboardSort === "amount" ? "bg-white text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground")}
+            >
+              Penalty Amt
+            </button>
+          </div>
+        </div>
+
+        <div className="flex-1 overflow-y-auto p-4 space-y-3.5 text-left">
+          {leaderboardData.length > 0 ? leaderboardData.map((item, idx) => {
+            const rank = idx + 1;
+            return (
+              <div key={item.name} className="flex items-center justify-between gap-3 p-2 hover:bg-muted/30 rounded-2xl transition-all border border-transparent hover:border-border/40">
+                <div className="flex items-center gap-3 min-w-0">
+                  {/* Rank Badge */}
+                  <span className={cn("grid h-6 w-6 place-items-center rounded-lg text-[10px] font-black border",
+                    rank === 1 ? "bg-amber-500/10 text-amber-600 border-amber-500/20" :
+                    rank === 2 ? "bg-slate-400/10 text-slate-500 border-slate-400/20" :
+                    rank === 3 ? "bg-orange-700/10 text-orange-700 border-orange-700/20" :
+                    "bg-muted text-muted-foreground border-border/50"
+                  )}>
+                    {rank}
+                  </span>
+                  
+                  {/* Avatar */}
+                  <img src={item.avatar} alt={item.name} className="w-8 h-8 rounded-full border border-border shadow-sm shrink-0" />
+                  
+                  <div className="min-w-0">
+                    <p className="text-xs font-black text-foreground truncate leading-snug">{item.name}</p>
+                    <p className="text-[10px] text-muted-foreground truncate leading-none mt-0.5">{item.role}</p>
+                  </div>
+                </div>
+
+                {/* Value Pill */}
+                <span className={cn("px-2.5 py-1 text-[10px] font-black rounded-xl shrink-0 uppercase tracking-wider", 
+                  leaderboardSort === "violations" 
+                    ? "bg-amber-50 text-amber-700 border border-amber-100" 
+                    : "bg-rose-50 text-rose-700 border border-rose-100"
+                )}>
+                  {leaderboardSort === "violations" ? `${item.violations} Violations` : `₹${item.penaltyAmount}`}
+                </span>
+              </div>
+            );
+          }) : (
+            <div className="flex flex-col items-center justify-center py-12 text-center">
+              <p className="text-xs text-muted-foreground">No disciplinary data available.</p>
+            </div>
+          )}
+        </div>
+        </div>
+      )}
     </div>
+  </div>
   );
 }

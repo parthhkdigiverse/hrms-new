@@ -133,7 +133,7 @@ export function Remarks() {
   };
 
   return (
-    <div className="space-y-8 h-[calc(100vh-8rem)] flex flex-col overflow-hidden pb-4">
+    <div className="space-y-5 h-[calc(100vh-4rem)] flex flex-col overflow-hidden pb-0">
       {/* Header/Stats */}
       <div className="shrink-0 bg-white border border-border rounded-3xl p-6 shadow-sm relative overflow-hidden">
         <div className="absolute -top-12 -right-12 p-12 opacity-5 pointer-events-none rotate-12">

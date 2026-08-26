@@ -52,7 +52,7 @@ export function Chat() {
   };
 
   return (
-    <div className="flex h-[calc(100vh-8rem)] bg-card rounded-2xl border border-border overflow-hidden shadow-sm">
+    <div className="flex h-[calc(100vh-4rem)] bg-card rounded-2xl border border-border overflow-hidden shadow-sm">
       {/* Sidebar */}
       <div className="w-64 border-r border-border bg-muted/10 flex flex-col hidden md:flex">
         <div className="p-4 border-b border-border flex items-center justify-between">

@@ -41,7 +41,7 @@ export function CEODashboard({ active = "/ceo-dashboard" }: { active?: string })
   if (active !== "/ceo-dashboard") {
     const sectionName = active.split("/").pop()?.replace("-", " ") || "Section";
     return (
-      <div className="flex flex-col items-center justify-center h-[calc(100vh-8rem)] text-center space-y-4">
+      <div className="flex flex-col items-center justify-center h-[calc(100vh-4rem)] text-center space-y-4">
         <Activity className="w-16 h-16 text-muted-foreground/20" />
         <h2 className="text-2xl font-black capitalize">{sectionName} Module</h2>
         <p className="text-muted-foreground max-w-md">

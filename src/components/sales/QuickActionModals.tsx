@@ -1,4 +1,6 @@
+import { useSales } from "./SalesContext";
 import { useState, useEffect } from "react";
+import { type SalesTask } from "./sales-data";
 import { DialogClose,  Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter  } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,6 +11,12 @@ import { X,  UploadCloud, CheckCircle2  } from "lucide-react";
 import { toast } from "sonner";
 
 export function QuickActionModals({ activeAction, onClose }: { activeAction: string | null; onClose: () => void }) {
+  const { tasks, setTasks } = useSales();
+  
+  // Create Task Form States
+  const [taskDescription, setTaskDescription] = useState("");
+  const [taskPriority, setTaskPriority] = useState("medium");
+  const [taskDueDate, setTaskDueDate] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -28,10 +36,42 @@ export function QuickActionModals({ activeAction, onClose }: { activeAction: str
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    
+    if (activeAction === "Create Task") {
+      const dateParts = new Date().toISOString().split('T');
+      const todayStr = dateParts[0] || "";
+      let status: "overdue" | "today" | "upcoming" | "completed" = "upcoming";
+      if (taskDueDate === todayStr) {
+        status = "today";
+      } else if (taskDueDate < todayStr) {
+        status = "overdue";
+      }
+      
+      const type = taskDescription.toLowerCase().includes("proposal") ? "Proposal" :
+                   taskDescription.toLowerCase().includes("meeting") ? "Meeting" :
+                   taskDescription.toLowerCase().includes("demo") ? "Demo" : "Call Client";
+                   
+      const newTask: SalesTask = {
+        id: `task-${Date.now()}`,
+        type,
+        company: taskDescription.split(" for ")[1] || "Apex Industries",
+        assignee: "Riya Mehta",
+        dueDate: taskDueDate,
+        status,
+        priority: (taskPriority.charAt(0).toUpperCase() + taskPriority.slice(1)) as "High" | "Medium" | "Low"
+      };
+      
+      setTasks([newTask, ...tasks]);
+    }
+
     setTimeout(() => {
       setIsSubmitting(false);
       handleClose();
       toast.success(`${activeAction} successful!`, { description: "The system has been updated." });
+      // Reset form states
+      setTaskDescription("");
+      setTaskPriority("medium");
+      setTaskDueDate("");
     }, 1000);
   };
 

@@ -7,7 +7,7 @@ import {
   Pencil, Trash2, Settings, Plus, Shuffle, Bell, Shield, History,
   Check, X, Gem, UtensilsCrossed, Stethoscope, GraduationCap,
   HeartPulse, Factory, Shirt, Landmark, Car, Plane, Cpu,
-  Scissors, Dumbbell, HardHat, Shapes
+  Scissors, Dumbbell, HardHat, Shapes, ChevronUp, ChevronDown, ChevronRight
 } from "lucide-react";
 import { toast } from "sonner";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
@@ -52,6 +52,11 @@ const AVAILABLE_ICONS = [
   { name: "Scissors", icon: Scissors }, { name: "Dumbbell", icon: Dumbbell }, 
   { name: "HardHat", icon: HardHat }, { name: "Shapes", icon: Shapes },
 ];
+
+const getIconComponent = (iconName: string) => {
+  const match = AVAILABLE_ICONS.find(i => i.name === iconName);
+  return match ? match.icon : Shapes;
+};
 
 const COLORS = [
   "bg-amber-500", "bg-orange-500", "bg-emerald-600", "bg-blue-500", 
@@ -130,6 +135,22 @@ function ToggleSwitch({ active }: { active: boolean }) {
 export function SalesSettings() {
   const { stages, setStages } = useSales();
   const [activeTab, setActiveTab] = useState<Tab>("Lead Categories");
+
+  const moveStage = (index: number, direction: 'up' | 'down') => {
+    const nextIndex = direction === 'up' ? index - 1 : index + 1;
+    if (nextIndex < 0 || nextIndex >= stages.length) return;
+    
+    const updated = [...stages];
+    const temp = updated[index];
+    const nextVal = updated[nextIndex];
+    
+    if (temp !== undefined && nextVal !== undefined) {
+      updated[index] = nextVal;
+      updated[nextIndex] = temp;
+      setStages(updated);
+      toast.success("Pipeline stages reordered!");
+    }
+  };
   
   const [categories, setCategories] = useState(() => {
     const saved = localStorage.getItem('hrms_sales_categories');
@@ -386,45 +407,114 @@ export function SalesSettings() {
         
         {/* Pipeline Stages Tab */}
         {activeTab === "Pipeline Stages" && (
-          <div className="animate-in fade-in slide-in-from-bottom-2">
-            <div className="mb-8 flex flex-col sm:flex-row items-center gap-4">
+          <div className="animate-in fade-in slide-in-from-bottom-2 space-y-6 text-left">
+            <div className="flex flex-col sm:flex-row items-center gap-4">
               <input 
                 type="text" 
-                placeholder="New pipeline stage" 
+                placeholder="e.g. Contract Signed" 
                 value={newStageName}
                 onChange={(e) => setNewStageName(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleAddStage()}
-                className="w-full sm:w-80 rounded-full border border-border bg-white px-5 py-2.5 text-sm outline-none focus:ring-2 focus:ring-emerald-500/30"
+                className="w-full sm:w-80 rounded-xl border border-border bg-white px-4 py-2.5 text-xs outline-none focus:ring-2 focus:ring-emerald-500/20 font-semibold text-foreground"
               />
               <button 
                 onClick={handleAddStage}
-                className="flex w-full sm:w-auto items-center justify-center gap-2 rounded-full bg-emerald-700 px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-emerald-800"
+                className="flex w-full sm:w-auto items-center justify-center gap-1.5 rounded-xl bg-emerald-700 px-5 py-2.5 text-xs font-bold text-white transition-all hover:bg-emerald-800 shadow-sm"
               >
                 <Plus className="h-4 w-4" /> Add Stage
               </button>
             </div>
 
-            <div className="flex flex-col gap-2 w-full max-w-sm">
-              {stages.map((stage, i) => (
-                <div key={i} className="flex items-center justify-between rounded-xl border border-border bg-white px-4 py-3 shadow-sm transition-colors hover:bg-muted/30">
+            {/* Visual Pathway Preview */}
+            <div>
+              <p className="text-[10px] font-black uppercase tracking-wider text-muted-foreground mb-3">Pathway Preview</p>
+              <div className="overflow-x-auto pb-3 pt-1 scrollbar-none">
+                <div className="flex items-center gap-2 min-w-max p-1.5 bg-muted/40 rounded-2xl border border-border/50">
+                  {stages.map((stage: string, idx: number) => (
+                    <div 
+                      key={idx} 
+                      className="flex items-center gap-2 px-3 py-1.5 bg-white border border-border/60 rounded-xl shadow-sm text-xs font-bold text-foreground"
+                    >
+                      <span className="grid h-4.5 w-4.5 place-items-center rounded bg-emerald-100 text-emerald-700 border border-emerald-200 text-[9px] font-black">
+                        {idx + 1}
+                      </span>
+                      <span>{stage}</span>
+                      {idx < stages.length - 1 && (
+                        <ChevronRight className="w-3 h-3 text-muted-foreground/40 ml-1" />
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* List and Actions */}
+            <div className="space-y-3 max-w-2xl">
+              <p className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">Manage Pipeline Sequence</p>
+              {stages.map((stage: string, i: number) => (
+                <div 
+                  key={i} 
+                  className="flex items-center justify-between rounded-2xl border border-border bg-white p-4 shadow-sm hover:shadow-md hover:border-emerald-600/20 transition-all group"
+                >
                   {editingStageIdx === i ? (
-                    <div className="flex items-center gap-2 w-full">
+                    <div className="flex items-center gap-2.5 w-full">
                       <input 
                         value={editStageName} 
                         onChange={(e) => setEditStageName(e.target.value)} 
                         onKeyDown={(e) => e.key === 'Enter' && saveEditStage()}
-                        className="flex-1 rounded-md border border-border px-2 py-1 text-sm outline-none focus:ring-2 focus:ring-emerald-500/30"
+                        className="flex-1 rounded-xl border border-border px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500/20 font-semibold text-foreground bg-muted/20"
                         autoFocus
                       />
-                      <button onClick={saveEditStage} className="text-emerald-600 hover:text-emerald-700" title="Save"><Check className="h-4 w-4" /></button>
-                      <button onClick={() => setEditingStageIdx(null)} className="text-muted-foreground hover:text-foreground" title="Cancel"><X className="h-4 w-4" /></button>
+                      <button onClick={saveEditStage} className="p-2 text-emerald-600 hover:bg-emerald-50 rounded-xl transition-colors" title="Save"><Check className="h-4 w-4" /></button>
+                      <button onClick={() => setEditingStageIdx(null)} className="p-2 text-muted-foreground hover:bg-muted rounded-xl transition-colors" title="Cancel"><X className="h-4 w-4" /></button>
                     </div>
                   ) : (
                     <>
-                      <span className="text-sm font-bold text-emerald-800">{i + 1}. {stage}</span>
-                      <div className="flex items-center gap-2">
-                        <button onClick={() => startEditStage(i)} className="text-muted-foreground hover:text-foreground"><Pencil className="h-4 w-4" /></button>
-                        <button onClick={() => confirmDeleteStage(i, stage)} className="text-rose-400 hover:text-rose-600"><Trash2 className="h-4 w-4" /></button>
+                      <div className="flex items-center gap-3">
+                        <span className="grid h-6 w-6 place-items-center rounded-lg text-[10px] font-black bg-emerald-50 text-emerald-700 border border-emerald-100 shadow-inner">
+                          {i + 1}
+                        </span>
+                        <span className="text-sm font-black text-foreground tracking-tight">{stage}</span>
+                      </div>
+                      
+                      <div className="flex items-center gap-1">
+                        <button 
+                          type="button"
+                          disabled={i === 0}
+                          onClick={() => moveStage(i, 'up')}
+                          className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg disabled:opacity-30 disabled:pointer-events-none transition-all"
+                          title="Move Up"
+                        >
+                          <ChevronUp className="h-4 w-4" />
+                        </button>
+                        <button 
+                          type="button"
+                          disabled={i === stages.length - 1}
+                          onClick={() => moveStage(i, 'down')}
+                          className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg disabled:opacity-30 disabled:pointer-events-none transition-all"
+                          title="Move Down"
+                        >
+                          <ChevronDown className="h-4 w-4" />
+                        </button>
+
+                        <div className="w-[1px] h-4 bg-border/60 mx-1"></div>
+
+                        <button 
+                          type="button"
+                          onClick={() => startEditStage(i)} 
+                          className="p-1.5 text-muted-foreground hover:text-emerald-700 hover:bg-emerald-50 rounded-lg transition-colors"
+                          title="Edit Stage"
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </button>
+                        <button 
+                          type="button"
+                          onClick={() => confirmDeleteStage(i, stage)} 
+                          className="p-1.5 text-rose-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
+                          title="Delete Stage"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
                       </div>
                     </>
                   )}
@@ -547,7 +637,10 @@ export function SalesSettings() {
                     <>
                       <div className="flex items-center gap-4">
                         <div className={cn("grid h-10 w-10 shrink-0 place-items-center rounded-full text-white", cat.color)}>
-                          <cat.icon className="h-5 w-5" />
+                          {(() => {
+                            const IconComponent = getIconComponent(cat.iconName);
+                            return <IconComponent className="h-5 w-5" />;
+                          })()}
                         </div>
                         <div>
                           <p className="font-bold text-sm">{cat.name}</p>

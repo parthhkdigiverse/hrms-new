@@ -179,7 +179,7 @@ export function Research() {
   };
 
   return (
-    <div className="space-y-6 h-[calc(100vh-8rem)] flex flex-col overflow-hidden pb-4 animate-in fade-in duration-300">
+    <div className="space-y-5 h-[calc(100vh-4rem)] flex flex-col overflow-hidden pb-0 animate-in fade-in duration-300">
       {/* Clean Header Section */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shrink-0">
         <div>

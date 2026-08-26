@@ -146,14 +146,14 @@ function Index() {
     <SettingsProvider>
       <DepartmentProvider>
         <EmployeeProvider>
-          <div className="flex h-screen overflow-hidden bg-gradient-to-br from-background via-background to-primary/5">
-        <AppSidebar active={active} setActive={setActive} />
-      <main className="min-w-0 flex-1 overflow-x-hidden px-6 pb-24 pt-20 sm:px-10 md:pb-8 md:pt-8">
-        {/* Main Dashboard */}
-        {active === "/dashboard" && <Dashboard />}
+          <SalesProvider>
+            <div className="flex h-screen overflow-hidden bg-gradient-to-br from-background via-background to-primary/5">
+          <AppSidebar active={active} setActive={setActive} />
+        <main className="min-w-0 flex-1 overflow-x-hidden px-6 pb-24 pt-20 sm:px-10 md:pb-8 md:pt-8">
+          {/* Main Dashboard */}
+          {active === "/dashboard" && <Dashboard />}
 
-        {/* Render the appropriate sales page based on state */}
-        <SalesProvider>
+          {/* Render the appropriate sales page based on state */}
           {active === "/work/sales/dashboard" && <SalesDashboard setActive={setActive} onAction={handleQuickAction} />}
           {active === "/work/sales/pipeline" && <SalesPipeline onAction={handleQuickAction} />}
           {active === "/work/sales/leads" && <SalesLeads onAction={handleQuickAction} />}
@@ -162,7 +162,6 @@ function Index() {
           {active === "/work/sales/team" && <SalesTeamPerformance onAction={handleQuickAction} />}
           {active === "/work/sales/reports" && <SalesReports onAction={handleQuickAction} />}
           {active === "/work/sales/settings" && <SalesSettings />}
-        </SalesProvider>
 
         {/* Render Payroll pages */}
         {active === "/payroll/dashboard" && <PayrollDashboard />}
@@ -286,6 +285,7 @@ function Index() {
       </main>
         <QuickActionModals activeAction={activeAction} onClose={() => setActiveAction(null)} />
       </div>
+          </SalesProvider>
         </EmployeeProvider>
       </DepartmentProvider>
     </SettingsProvider>

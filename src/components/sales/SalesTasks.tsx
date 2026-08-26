@@ -5,7 +5,8 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { salesTasks, type SalesTask } from "./sales-data";
+import { type SalesTask } from "./sales-data";
+import { useSales } from "./SalesContext";
 
 const typeIcons: Record<string, typeof Phone> = {
   "Call Client": Phone,
@@ -71,6 +72,7 @@ function TaskRow({ task }: { task: SalesTask }) {
 }
 
 export function SalesTasks({ onAction }: { onAction?: (action: string) => void }) {
+  const { tasks: salesTasks } = useSales();
   const [filter, setFilter] = useState<"all" | "overdue" | "today" | "upcoming" | "completed">("all");
 
   const counts = useMemo(() => {
