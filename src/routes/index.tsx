@@ -49,8 +49,8 @@ import { CollaborationModule } from "@/components/admin/collaboration/Collaborat
 import { FranchiseModule } from "@/components/admin/franchise/FranchiseModule";
 import { ReportsModule } from "@/components/admin/reports/ReportsModule";
 import { SettingsModule } from "@/components/admin/settings/SettingsModule";
-import { SeatingArrangement } from "@/components/workspace/SeatingArrangement";
-import { ResourceManagement } from "@/components/workspace/ResourceManagement";
+import SeatingArrangementPage from "@/components/workspace/Seating";
+import ResourceManagementPage from "@/components/workspace/Resource";
 import { Gallery } from "@/components/workspace/Gallery";
 import { Documents } from "@/components/documents/Documents";
 import { DocumentGenerator } from "@/components/documents/DocumentGenerator";
@@ -217,8 +217,8 @@ function Index() {
         {active === "/work/research" && <Research />}
 
         {/* Workspace */}
-        {active === "/workspace/seating" && <SeatingArrangement />}
-        {active === "/workspace/resources" && <ResourceManagement />}
+        {active === "/workspace/seating" && <SeatingArrangementPage />}
+        {active === "/workspace/resource" && <ResourceManagementPage />}
         {active === "/workspace/gallery" && <Gallery />}
 
         {/* Training & Learning */}

@@ -43,6 +43,8 @@ import {
   BarChart2,
   Bell,
   Trash2,
+  Package,
+  Map,
   type LucideIcon,
 } from "lucide-react";
 
@@ -180,7 +182,7 @@ export const navItems: NavItem[] = [
     section: "Workplace",
     children: [
       { title: "Seating Arrangement", url: "/workspace/seating" },
-      { title: "Resource Management", url: "/workspace/resources" },
+      { title: "Resource Management", url: "/workspace/resource" },
       { title: "Gallery", url: "/workspace/gallery" },
     ],
   },
