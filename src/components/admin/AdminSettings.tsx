@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Settings, Save, Palette, Paintbrush, Type, Square, Image as ImageIcon, Briefcase, X, ShieldAlert, Plus, Trash2 } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Settings, Save, Palette, Paintbrush, Type, Square, Image as ImageIcon, Briefcase, X, ShieldAlert, Plus, Trash2, MessageSquare } from "lucide-react";
 import { toast } from "sonner";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { useTheme } from "../ThemeProvider";
@@ -115,6 +116,28 @@ export function AdminSettings() {
   } = useTheme();
 
   const { penaltyTemplates, addPenaltyTemplate, removePenaltyTemplate } = useSettingsContext();
+  const [canCreateChannels, setCanCreateChannels] = useState(() => {
+    if (typeof window === "undefined") return true;
+    return localStorage.getItem("hrms_chat_can_create_channels") !== "false";
+  });
+  const [canDeleteMessages, setCanDeleteMessages] = useState(() => {
+    if (typeof window === "undefined") return true;
+    return localStorage.getItem("hrms_chat_can_delete_messages") !== "false";
+  });
+
+  const handleToggleCreateChannels = () => {
+    const newVal = !canCreateChannels;
+    setCanCreateChannels(newVal);
+    localStorage.setItem("hrms_chat_can_create_channels", String(newVal));
+    window.dispatchEvent(new Event("storage"));
+  };
+
+  const handleToggleDeleteMessages = () => {
+    const newVal = !canDeleteMessages;
+    setCanDeleteMessages(newVal);
+    localStorage.setItem("hrms_chat_can_delete_messages", String(newVal));
+    window.dispatchEvent(new Event("storage"));
+  };
   const [newTemplateLabel, setNewTemplateLabel] = useState("");
   const [newTemplateDesc, setNewTemplateDesc] = useState("");
   const [newTemplateType, setNewTemplateType] = useState<"Penalty" | "Warning">("Penalty");
@@ -374,6 +397,47 @@ export function AdminSettings() {
           </div>
         </div>
         
+      </div>
+
+      {/* Chat Permissions Card */}
+      <div className="bg-card border border-border/50 rounded-3xl p-6 shadow-sm">
+        <div className="flex items-center gap-2 mb-4">
+          <MessageSquare className="w-5 h-5 text-primary" />
+          <h3 className="text-lg font-black">Chat &amp; Permissions</h3>
+        </div>
+        <p className="text-sm text-muted-foreground mb-6">
+          Configure chat permissions. Restrict channel creation or message deletion for standard users.
+        </p>
+
+        <div className="flex flex-col gap-4">
+          {/* Toggle Channel Creation */}
+          <div className="flex items-center justify-between p-3 border border-border rounded-xl bg-muted/20">
+            <div className="flex flex-col text-left">
+              <span className="text-sm font-bold text-foreground">Allow Channel Creation</span>
+              <span className="text-[11px] text-muted-foreground mt-0.5">Users can create new channels in Chat</span>
+            </div>
+            <div
+              className={`w-10 h-6 rounded-full transition-colors relative cursor-pointer ${canCreateChannels ? "bg-primary" : "bg-muted border border-border/50"}`}
+              onClick={handleToggleCreateChannels}
+            >
+              <div className={`absolute top-1 left-1 w-4 h-4 rounded-full bg-white transition-transform ${canCreateChannels ? "translate-x-4" : ""}`} />
+            </div>
+          </div>
+
+          {/* Toggle Message Deletion */}
+          <div className="flex items-center justify-between p-3 border border-border rounded-xl bg-muted/20">
+            <div className="flex flex-col text-left">
+              <span className="text-sm font-bold text-foreground">Allow Message Deletion</span>
+              <span className="text-[11px] text-muted-foreground mt-0.5">Users can delete their own messages</span>
+            </div>
+            <div
+              className={`w-10 h-6 rounded-full transition-colors relative cursor-pointer ${canDeleteMessages ? "bg-primary" : "bg-muted border border-border/50"}`}
+              onClick={handleToggleDeleteMessages}
+            >
+              <div className={`absolute top-1 left-1 w-4 h-4 rounded-full bg-white transition-transform ${canDeleteMessages ? "translate-x-4" : ""}`} />
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Disciplinary Settings */}

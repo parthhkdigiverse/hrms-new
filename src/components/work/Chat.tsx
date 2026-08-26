@@ -1,5 +1,6 @@
-import { useState } from "react";
-import { Search, Plus, Hash, Settings, Bell, Info, Send, Smile, Paperclip, MoreVertical, Image as ImageIcon } from "lucide-react";
+import { useState, useEffect } from "react";
+import { toast } from "sonner";
+import { Search, Plus, Hash, Settings, Bell, Info, Send, Smile, Paperclip, MoreVertical, Image as ImageIcon, X, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface Message {
@@ -33,8 +34,55 @@ const MOCK_MESSAGES: Message[] = [
 
 export function Chat() {
   const [activeChannel, setActiveChannel] = useState("engineering");
+  const [channels, setChannels] = useState([
+    { id: "1", name: "general", unread: 0 },
+    { id: "2", name: "engineering", unread: 3 },
+    { id: "3", name: "marketing", unread: 0 },
+    { id: "4", name: "design", unread: 1 },
+  ]);
+  const [isNewChannelOpen, setIsNewChannelOpen] = useState(false);
+  const [newChannelName, setNewChannelName] = useState("");
+
+  const handleCreateChannel = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newChannelName.trim()) return;
+    const nameCleaned = newChannelName.trim().toLowerCase().replace(/\s+/g, "-");
+    if (channels.some(c => c.name === nameCleaned)) {
+      alert("Channel already exists");
+      return;
+    }
+    const newChan = { id: `chan-${Date.now()}`, name: nameCleaned, unread: 0 };
+    setChannels([...channels, newChan]);
+    setActiveChannel(nameCleaned);
+    setNewChannelName("");
+    setIsNewChannelOpen(false);
+  };
   const [messages, setMessages] = useState<Message[]>(MOCK_MESSAGES);
   const [newMessage, setNewMessage] = useState("");
+  const [canCreateChannels, setCanCreateChannels] = useState(() => {
+    if (typeof window === "undefined") return true;
+    return localStorage.getItem("hrms_chat_can_create_channels") !== "false";
+  });
+  const [canDeleteMessages, setCanDeleteMessages] = useState(() => {
+    if (typeof window === "undefined") return true;
+    return localStorage.getItem("hrms_chat_can_delete_messages") !== "false";
+  });
+
+  useEffect(() => {
+    const handleStorageChange = () => {
+      setCanCreateChannels(localStorage.getItem("hrms_chat_can_create_channels") !== "false");
+      setCanDeleteMessages(localStorage.getItem("hrms_chat_can_delete_messages") !== "false");
+    };
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, []);
+
+  const handleDeleteMessage = (id: string) => {
+    if (window.confirm("Delete this message?")) {
+      setMessages(prev => prev.filter(m => m.id !== id));
+      toast.success("Message deleted");
+    }
+  };
 
   const handleSend = (e: React.FormEvent) => {
     e.preventDefault();
@@ -78,10 +126,12 @@ export function Chat() {
           <div>
             <div className="px-2 mb-2 flex items-center justify-between text-xs font-bold text-muted-foreground uppercase tracking-wider">
               <span>Channels</span>
-              <Plus className="w-3.5 h-3.5 cursor-pointer hover:text-foreground" />
+              {canCreateChannels && (
+                <Plus className="w-3.5 h-3.5 cursor-pointer hover:text-foreground" onClick={() => setIsNewChannelOpen(true)} />
+              )}
             </div>
             <div className="space-y-0.5">
-              {CHANNELS.map(channel => (
+              {channels.map(channel => (
                 <button
                   key={channel.id}
                   onClick={() => setActiveChannel(channel.name)}
@@ -171,13 +221,24 @@ export function Chat() {
                   <span className="font-bold text-sm text-foreground">{msg.sender}</span>
                   <span className="text-xs font-medium text-muted-foreground">{msg.time}</span>
                 </div>
-                <div className={cn(
-                  "px-4 py-2.5 rounded-2xl text-sm leading-relaxed",
-                  msg.isMe 
-                    ? "bg-primary text-primary-foreground rounded-tr-none" 
-                    : "bg-muted text-foreground rounded-tl-none"
-                )}>
-                  {msg.content}
+                <div className="relative group flex items-center gap-2">
+                  <div className={cn(
+                    "px-4 py-2.5 rounded-2xl text-sm leading-relaxed",
+                    msg.isMe 
+                      ? "bg-primary text-primary-foreground rounded-tr-none" 
+                      : "bg-muted text-foreground rounded-tl-none"
+                  )}>
+                    {msg.content}
+                  </div>
+                  {canDeleteMessages && (
+                    <button
+                      onClick={() => handleDeleteMessage(msg.id)}
+                      title="Delete message"
+                      className="opacity-0 group-hover:opacity-100 p-1 text-muted-foreground hover:text-destructive transition-all rounded-lg"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
@@ -226,6 +287,50 @@ export function Chat() {
           </div>
         </div>
       </div>
+      {/* New Channel Dialog */}
+      {isNewChannelOpen && (
+        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-card border border-border rounded-3xl shadow-2xl w-full max-w-[400px] overflow-hidden animate-in zoom-in-95 duration-200">
+            <div className="p-6 border-b border-border flex items-center justify-between">
+              <h3 className="font-black text-foreground">Create New Channel</h3>
+              <button 
+                onClick={() => setIsNewChannelOpen(false)}
+                className="p-1.5 hover:bg-muted text-muted-foreground hover:text-foreground rounded-lg transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <form onSubmit={handleCreateChannel} className="p-6 space-y-4 text-left">
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest block">Channel Name</label>
+                <input 
+                  type="text" 
+                  required
+                  placeholder="e.g. general-discussions"
+                  value={newChannelName}
+                  onChange={e => setNewChannelName(e.target.value)}
+                  className="w-full px-3 py-2 bg-muted/50 border border-border rounded-xl text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-primary"
+                />
+              </div>
+              <div className="flex justify-end gap-3 pt-2">
+                <button 
+                  type="button" 
+                  onClick={() => setIsNewChannelOpen(false)}
+                  className="px-4 py-2 bg-card border border-border text-foreground/80 hover:bg-muted font-bold text-xs rounded-xl transition-colors"
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="submit"
+                  className="px-4 py-2 bg-primary hover:bg-primary/95 text-primary-foreground font-bold text-xs rounded-xl transition-colors"
+                >
+                  Create
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

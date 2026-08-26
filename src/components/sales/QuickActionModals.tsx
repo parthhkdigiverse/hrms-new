@@ -102,7 +102,8 @@ export function QuickActionModals({ activeAction, onClose }: { activeAction: str
           </DialogClose>
         </div>
 
-        <form onSubmit={handleSubmit} className="grid gap-4 py-4">
+        <form onSubmit={handleSubmit} className="flex flex-col max-h-[80vh] overflow-hidden">
+          <div className="p-6 md:p-8 space-y-4 overflow-y-auto text-left">
           {/* Add Lead Form */}
           {activeAction === "Add Lead" && (
             <>
@@ -179,11 +180,17 @@ export function QuickActionModals({ activeAction, onClose }: { activeAction: str
             <>
               <div className="grid gap-2">
                 <Label htmlFor="task">Task Description</Label>
-                <Input id="task" placeholder="e.g. Draft contract for Apex Industries" required />
+                <Input 
+                  id="task" 
+                  placeholder="e.g. Draft contract for Apex Industries" 
+                  value={taskDescription}
+                  onChange={(e) => setTaskDescription(e.target.value)}
+                  required 
+                />
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="priority">Priority</Label>
-                <Select defaultValue="medium">
+                <Select value={taskPriority} onValueChange={setTaskPriority}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select priority" />
                   </SelectTrigger>
@@ -196,7 +203,13 @@ export function QuickActionModals({ activeAction, onClose }: { activeAction: str
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="dueDate">Due Date</Label>
-                <Input id="dueDate" type="date" required />
+                <Input 
+                  id="dueDate" 
+                  type="date" 
+                  value={taskDueDate}
+                  onChange={(e) => setTaskDueDate(e.target.value)}
+                  required 
+                />
               </div>
             </>
           )}
@@ -306,6 +319,7 @@ export function QuickActionModals({ activeAction, onClose }: { activeAction: str
             </div>
           )}
 
+          </div>
           <div className="px-6 md:px-8 py-4 md:py-6 bg-muted/30 border-t border-border/50 flex justify-end gap-3 mt-auto shrink-0">
             <Button type="button" variant="outline" onClick={handleClose}>Cancel</Button>
             <Button type="submit" className="bg-emerald-600 hover:bg-emerald-700" disabled={isSubmitting}>

@@ -49,6 +49,7 @@ export function Tasks({ setActive }: { setActive?: (route: string) => void }) {
   };
   const [view, setView] = useState<"board" | "list">("list");
   const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState<"All" | TaskStatus>("All");
 
   const [isNewTaskOpen, setIsNewTaskOpen] = useState(false);
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
@@ -225,9 +226,22 @@ export function Tasks({ setActive }: { setActive?: (route: string) => void }) {
     return [...independentTasks, ...projectTasksList];
   }, [projects, independentTasks]);
 
+  const stats = useMemo(() => {
+    const total = allTasks.length;
+    const todo = allTasks.filter(t => t.status === "Todo").length;
+    const inProgress = allTasks.filter(t => t.status === "In Progress").length;
+    const inReview = allTasks.filter(t => t.status === "In Review").length;
+    const done = allTasks.filter(t => t.status === "Done").length;
+    return { total, todo, inProgress, inReview, done };
+  }, [allTasks]);
+
   const filteredTasks = useMemo(() => {
-    return allTasks.filter(t => t.title.toLowerCase().includes(searchQuery.toLowerCase()));
-  }, [allTasks, searchQuery]);
+    let result = allTasks.filter(t => t.title.toLowerCase().includes(searchQuery.toLowerCase()));
+    if (statusFilter !== "All") {
+      result = result.filter(t => t.status === statusFilter);
+    }
+    return result;
+  }, [allTasks, searchQuery, statusFilter]);
 
   const updateTaskStatus = (taskId: string, nextStatus: TaskStatus) => {
     const task = allTasks.find(t => t.id === taskId);
@@ -612,6 +626,33 @@ export function Tasks({ setActive }: { setActive?: (route: string) => void }) {
             </DialogContent>
           </Dialog>
         </div>
+      </div>
+
+      {/* KPI Cards / Filters */}
+      <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 shrink-0 text-left">
+        {[
+          { label: "Total Tasks", count: stats.total, filterVal: "All" as const, color: "bg-muted/10 border-border/80 text-foreground" },
+          { label: "To Do", count: stats.todo, filterVal: "Todo" as const, color: "bg-blue-500/10 border-blue-500/20 text-blue-700" },
+          { label: "In Progress", count: stats.inProgress, filterVal: "In Progress" as const, color: "bg-amber-500/10 border-amber-500/20 text-amber-700" },
+          { label: "In Review", count: stats.inReview, filterVal: "In Review" as const, color: "bg-purple-500/10 border-purple-500/20 text-purple-700" },
+          { label: "Completed", count: stats.done, filterVal: "Done" as const, color: "bg-emerald-500/10 border-emerald-500/20 text-emerald-700" },
+        ].map(kpi => (
+          <button
+            key={kpi.label}
+            type="button"
+            onClick={() => setStatusFilter(kpi.filterVal)}
+            className={cn(
+              "p-3 rounded-2xl border flex flex-col text-left transition-all duration-200 shadow-sm",
+              kpi.color,
+              statusFilter === kpi.filterVal 
+                ? "ring-2 ring-primary/40 border-transparent scale-[1.02] shadow-md font-black" 
+                : "opacity-75 hover:opacity-100 hover:scale-[1.01]"
+            )}
+          >
+            <span className="text-[10px] font-black uppercase tracking-wider opacity-85">{kpi.label}</span>
+            <span className="text-lg font-black mt-1 leading-none">{kpi.count}</span>
+          </button>
+        ))}
       </div>
 
       {view === "board" ? (
