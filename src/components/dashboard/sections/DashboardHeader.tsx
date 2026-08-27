@@ -1,4 +1,5 @@
 import { UserPlus, CheckSquare, Briefcase, Receipt, Clock } from "lucide-react";
+import { formatDate } from "@/lib/utils";
 
 export function DashboardHeader() {
   return (
@@ -37,7 +38,7 @@ export function DashboardHeader() {
         </div>
         <div className="bg-muted/50/40 rounded-2xl p-5 border border-border/40">
           <p className="text-[10px] font-bold text-muted-foreground mb-1">Today's Date</p>
-          <p className="text-[22px] font-black text-blue-500">11 Aug 2026</p>
+          <p className="text-[22px] font-black text-blue-500">{formatDate(new Date())}</p>
         </div>
         <div className="bg-muted/50/40 rounded-2xl p-5 border border-border/40">
           <p className="text-[10px] font-bold text-muted-foreground mb-1">Working Day</p>

@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { cn } from "@/lib/utils";
-import { Settings, Save, Palette, Paintbrush, Type, Square, Image as ImageIcon, Briefcase, X, ShieldAlert, Plus, Trash2, MessageSquare } from "lucide-react";
+import { Settings, Settings2, Save, Palette, Paintbrush, Type, Square, Image as ImageIcon, Briefcase, X, ShieldAlert, Plus, Trash2, MessageSquare } from "lucide-react";
 import { toast } from "sonner";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { useTheme } from "../ThemeProvider";
@@ -137,6 +137,18 @@ export function AdminSettings() {
     setCanDeleteMessages(newVal);
     localStorage.setItem("hrms_chat_can_delete_messages", String(newVal));
     window.dispatchEvent(new Event("storage"));
+  };
+
+  const [dateFormat, setDateFormat] = useState(() => {
+    if (typeof window === "undefined") return "MMM DD, YYYY";
+    return localStorage.getItem('hrms_date_format') || 'MMM DD, YYYY';
+  });
+
+  const handleDateFormatChange = (newFormat: string) => {
+    setDateFormat(newFormat);
+    localStorage.setItem('hrms_date_format', newFormat);
+    // Force a tiny delay so state sets, then reload to apply date format globally instantly
+    setTimeout(() => window.location.reload(), 100);
   };
   const [newTemplateLabel, setNewTemplateLabel] = useState("");
   const [newTemplateDesc, setNewTemplateDesc] = useState("");
@@ -305,6 +317,36 @@ export function AdminSettings() {
                 <div className="flex-1 h-8 rounded-md shadow-sm border border-border/50 transition-colors" style={{ backgroundColor: 'var(--chart-4)' }} title="Chart 4" />
                 <div className="flex-1 h-8 rounded-md shadow-sm border border-border/50 transition-colors" style={{ backgroundColor: 'var(--chart-5)' }} title="Chart 5" />
               </div>
+            </div>
+          </div>
+        </div>
+
+        {/* System Preferences Card */}
+        <div className="bg-card border border-border/50 rounded-3xl p-6 shadow-sm flex flex-col">
+          <div className="flex items-center gap-2 mb-4">
+            <Settings2 className="w-5 h-5 text-primary" />
+            <h3 className="text-lg font-black">System Preferences</h3>
+          </div>
+          <p className="text-sm text-muted-foreground mb-6">
+            Configure global platform behavior such as date formats and timezone defaults.
+          </p>
+          
+          <div className="flex flex-col gap-4 mt-auto">
+            <div>
+              <label className="block text-xs font-bold text-muted-foreground mb-1.5 uppercase tracking-wide">Date Format</label>
+              <SearchableSelect 
+                value={dateFormat}
+                onChange={(val) => handleDateFormatChange(val as string)}
+                options={[
+                  { label: "DD/MM/YYYY (31/12/2026)", value: "DD/MM/YYYY" },
+                  { label: "MM/DD/YYYY (12/31/2026)", value: "MM/DD/YYYY" },
+                  { label: "DD MMM YYYY (31 Dec 2026)", value: "DD MMM YYYY" },
+                  { label: "MMM DD, YYYY (Dec 31, 2026)", value: "MMM DD, YYYY" },
+                  { label: "YYYY-MM-DD (2026-12-31)", value: "YYYY-MM-DD" },
+                ]}
+                className="w-full h-11 px-4 rounded-xl border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm font-medium"
+              />
+              <p className="text-[10px] text-muted-foreground mt-2">Changing this will reload the application to apply the format globally.</p>
             </div>
           </div>
         </div>

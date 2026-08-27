@@ -4,9 +4,11 @@ import { format } from "date-fns";
 import { DateRange } from "react-day-picker";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { DialogClose,  Dialog, DialogContent, DialogHeader, DialogTitle  } from "@/components/ui/dialog";
-import { cn } from "@/lib/utils";
+import { cn, formatDate } from "@/lib/utils";
 import { useEmployeesContext } from "./EmployeeContext";
+import { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer } from "recharts";
 
 type AttendanceStatus = "Present" | "Absent" | "Late" | "On Leave";
 
@@ -185,10 +187,10 @@ export function AttendanceList() {
         </div>
       </div>
 
-      {/* Top Section: Stats & Calendar */}
+      {/* Top Section: KPIs & Calendar */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
         
-        {/* Left Column: KPI Cards & Table */}
+        {/* Left Column: KPI Cards */}
         <div className="xl:col-span-2 flex flex-col gap-6">
           {/* Overall Stats Cards */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -226,8 +228,53 @@ export function AttendanceList() {
             })}
           </div>
 
-          {/* Main Content Area */}
-          <div className="flex-1 bg-white border border-border rounded-3xl shadow-sm overflow-hidden flex flex-col min-h-[500px]">
+          {/* Weekly Trend Chart */}
+          <div className="bg-white border border-border/60 rounded-3xl shadow-sm p-5 h-[160px] flex flex-col relative overflow-hidden">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-sm font-bold text-foreground">Weekly Trend</h3>
+              <p className="text-xs text-muted-foreground">Past 7 Days</p>
+            </div>
+            <div className="flex-1 -mx-2">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={[
+                  { name: 'Mon', Present: 42, Absent: 5 },
+                  { name: 'Tue', Present: 45, Absent: 3 },
+                  { name: 'Wed', Present: 40, Absent: 6 },
+                  { name: 'Thu', Present: 46, Absent: 2 },
+                  { name: 'Fri', Present: 41, Absent: 8 },
+                  { name: 'Sat', Present: 15, Absent: 2 },
+                  { name: 'Sun', Present: 12, Absent: 1 },
+                ]}>
+                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#888888' }} dy={5} />
+                  <Tooltip 
+                    cursor={{ fill: 'transparent' }}
+                    contentStyle={{ borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                  />
+                  <Bar dataKey="Present" fill="#10b981" radius={[4, 4, 0, 0]} barSize={12} />
+                  <Bar dataKey="Absent" fill="#f43f5e" radius={[4, 4, 0, 0]} barSize={12} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        </div>
+
+        {/* Right Column: Calendar Preview */}
+        <div className="xl:col-span-1 flex flex-col gap-6">
+          <div className="bg-white border border-border/60 rounded-3xl shadow-sm p-6 flex flex-col relative overflow-hidden shrink-0 h-full">
+            <h3 className="text-lg font-black text-foreground mb-2">Schedule Preview</h3>
+            <div className="flex-1 flex items-center justify-center">
+              <Calendar
+                mode="single"
+                selected={new Date()}
+                className="bg-transparent p-0 [&_.rdp]:bg-transparent"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content Area */}
+      <div className="flex-1 bg-white border border-border rounded-3xl shadow-sm overflow-hidden flex flex-col min-h-[500px]">
         {/* Toolbar */}
         <div className="p-4 border-b border-border flex flex-col sm:flex-row justify-between items-center gap-4 bg-muted/50/50">
           <div className="relative w-full sm:w-72">
@@ -254,11 +301,11 @@ export function AttendanceList() {
                   {dateRange?.from ? (
                     dateRange.to ? (
                       <>
-                        {format(dateRange.from, "dd/MM/yyyy")} -{" "}
-                        {format(dateRange.to, "dd/MM/yyyy")}
+                        {formatDate(dateRange.from)} -{" "}
+                        {formatDate(dateRange.to)}
                       </>
                     ) : (
-                      format(dateRange.from, "dd/MM/yyyy")
+                      formatDate(dateRange.from)
                     )
                   ) : (
                     <span>Pick a date range</span>
@@ -400,24 +447,8 @@ export function AttendanceList() {
             </div>
           </div>
         )}
-          </div>
-        </div>
-        
-        {/* Right Column: Calendar Preview */}
-        <div className="xl:col-span-1 flex flex-col gap-6">
-          <div className="bg-white border border-border/60 rounded-3xl shadow-sm p-6 flex flex-col relative overflow-hidden shrink-0">
-            <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-emerald-400 to-teal-400" />
-            <h3 className="text-lg font-black text-foreground mb-2">Schedule Preview</h3>
-            <div className="flex-1 flex items-center justify-center">
-              <Calendar
-                mode="single"
-                selected={new Date()}
-                className="bg-transparent p-0 [&_.rdp]:bg-transparent"
-              />
-            </div>
-          </div>
-        </div>
       </div>
+
 
       <Dialog open={!!selectedRecord} onOpenChange={(open) => !open && setSelectedRecord(null)}>
         <DialogContent className="sm:max-w-[425px] md:max-w-[500px] p-0 overflow-hidden rounded-[2rem] gap-0 border-border/60 shadow-2xl [&>button]:hidden bg-card">

@@ -113,11 +113,12 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     const sidebarTint = `hsl(${hsl.h}, ${Math.min(hsl.s, 30)}%, 95%)`;
     root.style.setProperty("--sidebar", sidebarTint);
 
-    root.style.setProperty("--chart-1", primary);
-    root.style.setProperty("--chart-2", `hsl(${(hsl.h + 30) % 360}, ${hsl.s}%, ${hsl.l}%)`);
-    root.style.setProperty("--chart-3", `hsl(${(hsl.h + 60) % 360}, ${hsl.s}%, ${hsl.l}%)`);
-    root.style.setProperty("--chart-4", `hsl(${(hsl.h + 90) % 360}, ${hsl.s}%, ${hsl.l}%)`);
-    root.style.setProperty("--chart-5", `hsl(${(hsl.h + 120) % 360}, ${hsl.s}%, ${hsl.l}%)`);
+    // Set vibrant semantic chart colors (constant regardless of theme)
+    root.style.setProperty("--chart-1", "hsl(152, 69%, 31%)"); // Emerald-600
+    root.style.setProperty("--chart-2", "hsl(221, 83%, 53%)"); // Blue-500
+    root.style.setProperty("--chart-3", "hsl(38, 92%, 50%)");  // Amber-500
+    root.style.setProperty("--chart-4", "hsl(346, 87%, 53%)"); // Rose-500
+    root.style.setProperty("--chart-5", "hsl(262, 83%, 58%)"); // Violet-500
     
     // YIQ formula threshold is typically 128
     const primaryFg = hsl.luminance > 140 ? "#000000" : "#ffffff";
