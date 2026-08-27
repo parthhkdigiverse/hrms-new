@@ -228,7 +228,16 @@ export const navItems: NavItem[] = [
       { title: "Roles & Audit", url: "/learn/audit" },
     ],
   },
-  { title: "Elections", url: "/elections", icon: Vote, section: "Admin" },
+  {
+    title: "Elections & Recognition",
+    icon: Vote,
+    section: "Admin",
+    children: [
+      { title: "Employee of Month", url: "/recognitions" },
+      { title: "Team Leader of the Week", url: "/team-leader-of-the-week" },
+      { title: "Elections", url: "/elections" },
+    ],
+  },
   { title: "Settings", url: "/settings", icon: Settings, section: "Admin" },
   { title: "Restrictions", url: "/restrictions", icon: Shield, section: "Admin" },
   { title: "Activity Logs", url: "/activity-logs", icon: ScrollText, section: "Admin" },

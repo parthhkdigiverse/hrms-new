@@ -1,4 +1,4 @@
-import { X, AlertTriangle } from "lucide-react";
+import { X, AlertTriangle, RotateCcw, Info } from "lucide-react";
 import { DialogClose,  Dialog, DialogContent  } from "@/components/ui/dialog";
 
 interface ConfirmModalProps {
@@ -9,6 +9,7 @@ interface ConfirmModalProps {
   description: string;
   confirmText?: string | undefined;
   itemName?: string | undefined;
+  variant?: "destructive" | "restore" | "info";
 }
 
 export function ConfirmModal({ 
@@ -17,22 +18,40 @@ export function ConfirmModal({
   onConfirm, 
   title, 
   description,
-  confirmText = "Delete",
-  itemName
+  confirmText,
+  itemName,
+  variant = "destructive"
 }: ConfirmModalProps) {
   if (!isOpen) return null;
+
+  // Determine styles and text based on variant
+  const isRestore = variant === "restore";
+  const isInfo = variant === "info";
+  
+  const headerBgClass = isRestore ? "bg-emerald-50/50" : isInfo ? "bg-blue-50/50" : "bg-red-50/50";
+  const iconBgClass = isRestore ? "bg-emerald-100 text-emerald-600" : isInfo ? "bg-blue-100 text-blue-600" : "bg-red-100 text-red-600";
+  const buttonClass = isRestore 
+    ? "bg-emerald-500 hover:bg-emerald-600 shadow-emerald-500/20" 
+    : isInfo
+    ? "bg-blue-500 hover:bg-blue-600 shadow-blue-500/20"
+    : "bg-red-500 hover:bg-red-600 shadow-red-500/20";
+    
+  const defaultConfirmText = isRestore ? "Restore" : isInfo ? "Confirm" : "Delete";
+  const finalConfirmText = confirmText || defaultConfirmText;
+  
+  const actionNoun = isRestore ? "restoration" : isInfo ? "action" : "deletion";
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-md p-0 overflow-hidden rounded-[2rem] gap-0 border-border/60 shadow-2xl [&>button]:hidden bg-card">
-          <div className="flex items-center justify-between px-6 py-5 border-b border-border/50 bg-red-50/50">
+          <div className={`flex items-center justify-between px-6 py-5 border-b border-border/50 ${headerBgClass}`}>
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-red-100 text-red-600 rounded-xl">
-                <AlertTriangle className="w-5 h-5" />
+              <div className={`p-2 rounded-xl ${iconBgClass}`}>
+                {isRestore ? <RotateCcw className="w-5 h-5" /> : isInfo ? <Info className="w-5 h-5" /> : <AlertTriangle className="w-5 h-5" />}
               </div>
               <div>
                 <h2 className="text-xl font-black text-foreground">{title}</h2>
-                {itemName && <p className="text-sm text-muted-foreground mt-1">Confirm deletion of {itemName}</p>}
+                {itemName && <p className="text-sm text-muted-foreground mt-1">Confirm {actionNoun} of {itemName}</p>}
               </div>
             </div>
             <button 
@@ -60,9 +79,9 @@ export function ConfirmModal({
                   onConfirm();
                   onClose();
                 }}
-                className="px-6 py-2.5 text-sm font-bold text-white bg-red-500 hover:bg-red-600 rounded-xl transition-all shadow-sm shadow-red-500/20 active:scale-95"
+                className={`px-6 py-2.5 text-sm font-bold text-white rounded-xl transition-all shadow-sm active:scale-95 ${buttonClass}`}
               >
-                {confirmText}
+                {finalConfirmText}
               </button>
             </div>
           </div>

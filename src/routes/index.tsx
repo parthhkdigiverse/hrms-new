@@ -44,6 +44,9 @@ import { Restrictions } from "@/components/admin/Restrictions";
 import { AdminSettings } from "@/components/admin/AdminSettings";
 import { RecycleBin } from "@/components/admin/RecycleBin";
 import { CEODashboard } from "@/components/admin/CEODashboard";
+import { Elections } from "@/components/admin/Elections";
+import { Recognitions } from "@/components/admin/Recognitions";
+import { TeamLeaderOfWeek } from "@/components/admin/TeamLeaderOfWeek";
 import { B2BModule } from "@/components/admin/b2b/B2BModule";
 import { CollaborationModule } from "@/components/admin/collaboration/CollaborationModule";
 import { FranchiseModule } from "@/components/admin/franchise/FranchiseModule";
@@ -237,12 +240,15 @@ function Index() {
         {active === "/restrictions" && <Restrictions />}
         {active === "/settings" && <AdminSettings />}
         {active === "/recycle-bin" && <RecycleBin />}
+        {active === "/elections" && <Elections />}
+        {active === "/recognitions" && <Recognitions />}
+        {active === "/team-leader-of-the-week" && <TeamLeaderOfWeek />}
 
         {/* User Profile */}
         {active === "/profile" && <UserProfile />}
 
         {/* Fallback original content for all other items */}
-        {active !== "/dashboard" && active !== "/profile" && active !== "/schedule" && active !== "/work/logs" && active !== "/work/projects" && active !== "/tasks" && active !== "/chat" && active !== "/work/research" && active !== "/penalty" && active !== "/approvals/penalties" && active !== "/remarks" && active !== "/activity-logs" && active !== "/activity-tracker" && active !== "/restrictions" && active !== "/settings" && active !== "/recycle-bin" && !active.startsWith("/ceo-dashboard") && !active.startsWith("/work/sales") && !active.startsWith("/payroll") && !active.startsWith("/employees") && !active.startsWith("/recruitment") && !active.startsWith("/workspace") && !active.startsWith("/approvals") && !active.startsWith("/invoice") && !active.startsWith("/reports") && !active.startsWith("/finance") && !active.startsWith("/learn") && (
+        {active !== "/dashboard" && active !== "/profile" && active !== "/schedule" && active !== "/work/logs" && active !== "/work/projects" && active !== "/tasks" && active !== "/chat" && active !== "/work/research" && active !== "/penalty" && active !== "/approvals/penalties" && active !== "/remarks" && active !== "/activity-logs" && active !== "/activity-tracker" && active !== "/restrictions" && active !== "/settings" && active !== "/recycle-bin" && active !== "/elections" && active !== "/recognitions" && active !== "/team-leader-of-the-week" && !active.startsWith("/ceo-dashboard") && !active.startsWith("/work/sales") && !active.startsWith("/payroll") && !active.startsWith("/employees") && !active.startsWith("/recruitment") && !active.startsWith("/workspace") && !active.startsWith("/approvals") && !active.startsWith("/invoice") && !active.startsWith("/reports") && !active.startsWith("/finance") && !active.startsWith("/learn") && (
           <>
             <header className="mb-8 max-w-3xl">
               <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">

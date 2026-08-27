@@ -166,6 +166,7 @@ export function RecycleBin() {
         title={confirmModalState.title}
         description={confirmModalState.desc}
         itemName={confirmModalState.itemName}
+        variant={confirmModalState.action === 'restore' ? "restore" : "destructive"}
       />
     </div>
   );

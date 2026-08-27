@@ -595,6 +595,35 @@ const CalendarIssuesCell = ({
   );
 };
 
+const subtractDays = (startDate: Date, days: number) => {
+  const d = new Date(startDate);
+  d.setDate(d.getDate() - days);
+  return d.toISOString().split('T')[0];
+};
+
+const getPresetDates = (postingDateStr: string) => {
+  if (!postingDateStr) return {};
+  const d = new Date(postingDateStr);
+  if (isNaN(d.getTime())) return {};
+  
+  let offsets = { script: 14, shoot: 12, editing: 6, approval: 5 };
+  if (typeof window !== 'undefined') {
+    try {
+      const saved = localStorage.getItem('hrms_calendar_offsets');
+      if (saved) offsets = JSON.parse(saved);
+    } catch (e) {}
+  }
+
+  return {
+    scriptDate: subtractDays(d, offsets.script),
+    shootDate: subtractDays(d, offsets.shoot),
+    editingStart: subtractDays(d, offsets.editing),
+    captionDate: subtractDays(d, offsets.editing),
+    thumbnailDate: subtractDays(d, offsets.editing),
+    approval: subtractDays(d, offsets.approval)
+  };
+};
+
 export function Projects() {
   const [projectSubTab, setProjectSubTab] = useState<"workspace" | "logs">("workspace");
   const [isBulkAdd, setIsBulkAdd] = useState(false);
@@ -1231,6 +1260,18 @@ export function Projects() {
   const [bulkFormatType, setBulkFormatType] = useState("Post");
   const [visualSelectedDates, setVisualSelectedDates] = useState<Date[] | undefined>([]);
   
+  const [isCalendarSettingsOpen, setIsCalendarSettingsOpen] = useState(false);
+  const [calendarOffsets, setCalendarOffsets] = useState(() => {
+    let offsets = { script: 14, shoot: 12, editing: 6, approval: 5 };
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem('hrms_calendar_offsets');
+        if (saved) offsets = JSON.parse(saved);
+      } catch (e) {}
+    }
+    return offsets;
+  });
+  
   const defaultCalendarForm = {
     postingDate: new Date().toISOString().split('T')[0],
     postingDay: "",
@@ -1730,6 +1771,16 @@ export function Projects() {
                         <option value="Approved">Approved</option>
                         <option value="Published">Published</option>
                       </select>
+                      <button 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setIsCalendarSettingsOpen(true);
+                        }}
+                        className="px-3 py-1.5 bg-card hover:bg-muted border border-border/60 rounded-xl text-xs font-bold text-muted-foreground flex items-center gap-1.5 transition-colors"
+                      >
+                        <Settings2 className="w-3.5 h-3.5" />
+                        Settings
+                      </button>
                       <button 
                         onClick={(e) => {
                           e.stopPropagation();
@@ -2872,6 +2923,61 @@ export function Projects() {
           )}
 
         </div>
+        {/* SMM Content Calendar Settings Modal */}
+        {isCalendarSettingsOpen && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center bg-background/80 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+            <div className="bg-card w-full max-w-sm rounded-[2rem] border border-border/60 shadow-2xl overflow-hidden flex flex-col">
+              <div className="flex items-center justify-between px-6 py-5 border-b border-border/50">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-primary/10 text-primary rounded-xl">
+                    <Settings2 className="w-5 h-5" />
+                  </div>
+                  <h3 className="text-base font-black text-foreground">Calendar Settings</h3>
+                </div>
+                <button onClick={() => setIsCalendarSettingsOpen(false)} className="p-2 text-muted-foreground hover:bg-muted rounded-full transition-colors">
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+              <div className="p-6 space-y-4">
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  Set the default number of days *prior* to the posting date for each pipeline stage.
+                </p>
+                <div className="space-y-3">
+                  <div>
+                    <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">Script Date (Days Before)</label>
+                    <input type="number" min="0" value={calendarOffsets.script} onChange={(e) => setCalendarOffsets({ ...calendarOffsets, script: parseInt(e.target.value) || 0 })} className="w-full px-3 py-2 bg-muted/50 border border-border/50 rounded-xl text-xs focus:outline-none" />
+                  </div>
+                  <div>
+                    <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">Shoot Date (Days Before)</label>
+                    <input type="number" min="0" value={calendarOffsets.shoot} onChange={(e) => setCalendarOffsets({ ...calendarOffsets, shoot: parseInt(e.target.value) || 0 })} className="w-full px-3 py-2 bg-muted/50 border border-border/50 rounded-xl text-xs focus:outline-none" />
+                  </div>
+                  <div>
+                    <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">Editing/Graphics (Days Before)</label>
+                    <input type="number" min="0" value={calendarOffsets.editing} onChange={(e) => setCalendarOffsets({ ...calendarOffsets, editing: parseInt(e.target.value) || 0 })} className="w-full px-3 py-2 bg-muted/50 border border-border/50 rounded-xl text-xs focus:outline-none" />
+                  </div>
+                  <div>
+                    <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">Approval (Days Before)</label>
+                    <input type="number" min="0" value={calendarOffsets.approval} onChange={(e) => setCalendarOffsets({ ...calendarOffsets, approval: parseInt(e.target.value) || 0 })} className="w-full px-3 py-2 bg-muted/50 border border-border/50 rounded-xl text-xs focus:outline-none" />
+                  </div>
+                </div>
+              </div>
+              <div className="px-6 py-4 bg-muted/30 border-t border-border/50 flex justify-end gap-3 shrink-0">
+                <button onClick={() => setIsCalendarSettingsOpen(false)} className="px-4 py-2 rounded-xl font-bold text-sm text-muted-foreground hover:bg-muted transition-colors">Cancel</button>
+                <button
+                  onClick={() => {
+                    localStorage.setItem('hrms_calendar_offsets', JSON.stringify(calendarOffsets));
+                    setIsCalendarSettingsOpen(false);
+                    toast.success("Calendar offset presets saved!");
+                  }}
+                  className="px-5 py-2 bg-primary text-primary-foreground hover:bg-primary/90 font-bold text-sm rounded-xl transition-all shadow-sm"
+                >
+                  Save Presets
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* SMM Content Calendar Modal - plain overlay */}
         {isAddCalendarItemModalOpen && (() => {
           const currentSelectedProject = projects.find(p => p.id === selectedProjectId);
@@ -2932,7 +3038,20 @@ export function Projects() {
                         <div className="grid grid-cols-2 gap-4">
                           <div>
                             <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">Posting Date <span className="text-rose-500">*</span></label>
-                            <input type="date" value={calendarForm.postingDate || ""} onChange={(e) => setCalendarForm({ ...calendarForm, postingDate: e.target.value })} className="w-full px-3 py-2 bg-muted/50 border border-border/50 rounded-xl text-xs focus:outline-none" />
+                            <input type="date" value={calendarForm.postingDate || ""} onChange={(e) => {
+                              const newDate = e.target.value;
+                              const dates = getPresetDates(newDate);
+                              setCalendarForm({ 
+                                ...calendarForm, 
+                                postingDate: newDate,
+                                scriptDate: calendarForm.scriptDate || dates.scriptDate || "",
+                                shootDate: calendarForm.shootDate || dates.shootDate || "",
+                                editingStart: calendarForm.editingStart || dates.editingStart || "",
+                                captionDate: calendarForm.captionDate || dates.captionDate || "",
+                                thumbnailDate: calendarForm.thumbnailDate || dates.thumbnailDate || "",
+                                approval: calendarForm.approval || dates.approval || ""
+                              });
+                            }} className="w-full px-3 py-2 bg-muted/50 border border-border/50 rounded-xl text-xs focus:outline-none" />
                           </div>
                           <div>
                             <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">Format Type</label>
@@ -3202,7 +3321,8 @@ export function Projects() {
                   postingDay: dayNames[dayIndex],
                   type: bulkFormatType,
                   topic: "",
-                  status: "To Do"
+                  status: "To Do",
+                  ...getPresetDates(dateStr)
                 });
               }
             }
@@ -3243,7 +3363,8 @@ export function Projects() {
                 postingDay: dayNames[d.getDay()],
                 type: bulkFormatType,
                 topic: "",
-                status: "To Do"
+                status: "To Do",
+                ...getPresetDates(dateStr)
               });
             });
 
