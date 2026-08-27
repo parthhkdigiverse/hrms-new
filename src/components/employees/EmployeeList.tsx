@@ -6,10 +6,11 @@ import { EmployeeProfileModal } from "./EmployeeProfileModal";
 import { EmployeeFormModal } from "./EmployeeFormModal";
 import { toast } from "sonner";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
-import { cn } from "@/lib/utils";
+import { cn, formatDate } from "@/lib/utils";
 import { useEmployeesContext } from "./EmployeeContext";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuCheckboxItem, DropdownMenuLabel, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
-
+import { useSortableData } from "@/hooks/useSortableData";
+import { SortableHeader } from "@/components/ui/sortable-header";
 
 const COLUMN_OPTIONS = [
   { key: "employee", label: "Employee", default: true },
@@ -104,7 +105,7 @@ export function EmployeeList() {
           </div>
         );
       case "joined":
-        return <span className="text-[13px] font-medium text-foreground/80">{emp.joinDate}</span>;
+        return <span className="text-[13px] font-medium text-foreground/80">{formatDate(emp.joinDate)}</span>;
       case "actions":
         return (
           <div className="relative flex justify-end items-center h-8 w-full min-w-[140px]">
@@ -174,6 +175,8 @@ export function EmployeeList() {
     const matchesDept = selectedDept ? emp.department === selectedDept : true;
     return matchesSearch && matchesDept;
   });
+
+  const { items: sortedEmployees, requestSort, sortConfig } = useSortableData(filteredEmployees, { key: "joined", direction: "descending" });
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -324,7 +327,7 @@ export function EmployeeList() {
       {/* Grid View */}
       {viewMode === 'grid' && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {filteredEmployees.map((emp) => (
+          {sortedEmployees.map((emp) => (
             <div key={emp.id} className="group bg-white border border-border/50 rounded-3xl p-6 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 relative">
               <div className="absolute top-4 right-4 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                 <button 
@@ -386,13 +389,13 @@ export function EmployeeList() {
                     {emp.hasBond && (
                       <div className="flex items-center gap-2 text-[11px] font-medium text-amber-600 bg-amber-50 px-2.5 py-1.5 rounded-lg border border-amber-100">
                         <FileText className="w-3.5 h-3.5 flex-shrink-0" />
-                        <span className="truncate">Bond: {emp.bondEndDate ? `Until ${new Date(emp.bondEndDate).toLocaleDateString()}` : 'Active'}</span>
+                        <span className="truncate">Bond: {emp.bondEndDate ? `Until ${formatDate(emp.bondEndDate)}` : 'Active'}</span>
                       </div>
                     )}
                     {emp.hasResignation && (
                       <div className="flex items-center gap-2 text-[11px] font-medium text-rose-600 bg-rose-50 px-2.5 py-1.5 rounded-lg border border-rose-100">
                         <LogOut className="w-3.5 h-3.5 flex-shrink-0" />
-                        <span className="truncate">Exiting: {emp.resignationDate ? new Date(emp.resignationDate).toLocaleDateString() : 'Pending'}</span>
+                        <span className="truncate">Exiting: {emp.resignationDate ? formatDate(emp.resignationDate) : 'Pending'}</span>
                       </div>
                     )}
                     {emp.hasNoticePeriod && !emp.hasResignation && (
@@ -439,14 +442,30 @@ export function EmployeeList() {
               <thead>
                 <tr className="bg-muted/50/50 border-b border-border/50">
                   {COLUMN_OPTIONS.map(col => visibleColumns[col.key] && (
-                    <th key={col.key} className={cn("px-6 py-4 text-[11px] font-bold text-muted-foreground uppercase tracking-wider", col.key === 'actions' ? 'text-right w-[1%] whitespace-nowrap' : '')}>
-                      {col.label}
-                    </th>
+                    col.key === 'actions' ? (
+                      <th key={col.key} className="px-6 py-4 text-[11px] font-bold text-muted-foreground uppercase tracking-wider text-right w-[1%] whitespace-nowrap">
+                        {col.label}
+                      </th>
+                    ) : (
+                      <SortableHeader
+                        key={col.key}
+                        label={col.label}
+                        sortKey={
+                          col.key === 'employee' ? 'name' : 
+                          col.key === 'contact' ? 'email' : 
+                          col.key === 'joined' ? 'joinDate' : 
+                          col.key
+                        }
+                        currentSort={sortConfig}
+                        onSort={requestSort}
+                        className="px-6 py-4 text-[11px] font-bold uppercase tracking-wider"
+                      />
+                    )
                   ))}
                 </tr>
               </thead>
               <tbody>
-                {filteredEmployees.map((emp) => (
+                {sortedEmployees.map((emp) => (
                   <tr key={emp.id} className="border-b border-slate-50 hover:bg-muted/50/50 transition-colors group">
                     {COLUMN_OPTIONS.map(col => visibleColumns[col.key] && (
                       <td key={col.key} className={cn("px-6 py-4", col.key === 'actions' ? 'text-right w-[1%] whitespace-nowrap' : '')}>

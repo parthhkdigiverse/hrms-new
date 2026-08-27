@@ -4,7 +4,7 @@ import { DialogClose, Dialog, DialogContent, DialogHeader, DialogTitle, DialogTr
 import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { EMPLOYEES } from "@/components/employees/employee-data";
 import { toast } from "sonner";
-import { cn } from "@/lib/utils";
+import { cn, formatDate } from "@/lib/utils";
 import { useSettingsContext } from "../payroll/SettingsContext";
 import { SearchableSelect } from "@/components/ui/select";
 
@@ -154,7 +154,7 @@ export function Penalties() {
         avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(newEmpName)}&background=random`
       },
       type: newType,
-      date: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }),
+      date: formatDate(new Date()),
       description: newDesc,
       status: "Active",
       amount: newType === "Penalty" ? parseFloat(newAmount) || 0 : null,

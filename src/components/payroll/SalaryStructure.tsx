@@ -18,7 +18,7 @@ import {
   Download,
   RefreshCcw
 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, formatDate } from "@/lib/utils";
 import { SearchableSelect } from "@/components/ui/select";
 import { MOCK_EMPLOYEES, formatCurrency } from "./payroll-data";
 
@@ -62,7 +62,7 @@ export function SalaryStructure() {
       .reduce((sum: number, c: any) => sum + Number(c.amount), 0);
 
     const newHistoryEntry = {
-      date: new Date(editForm.date).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }),
+      date: formatDate(editForm.date),
       amount: newGross,
       reason: editForm.reason,
       actionBy: "HR Admin", 

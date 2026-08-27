@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { User, Briefcase, CreditCard, FileText, Mail, Phone, MapPin, Building, Calendar, Key, Shield, CheckCircle2, ChevronRight, Edit2 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, formatDate } from "@/lib/utils";
 import { useEmployeesContext } from "@/components/employees/EmployeeContext";
 import { EmployeeFormModal } from "@/components/employees/EmployeeFormModal";
 import { toast } from "sonner";
@@ -151,7 +151,7 @@ export function UserProfile() {
                   <div className="p-3 bg-purple-500/10 text-purple-600 rounded-xl"><Calendar className="w-5 h-5" /></div>
                   <div className="min-w-0 flex-1">
                     <p className="text-[11px] text-muted-foreground font-bold uppercase tracking-wider">Joined</p>
-                    <p className="text-sm font-semibold">{profileData.joinDate ? new Date(profileData.joinDate).toLocaleDateString('en-GB') : '-'}</p>
+                    <p className="text-sm font-semibold">{profileData.joinDate ? formatDate(profileData.joinDate) : '-'}</p>
                   </div>
                 </div>
               </div>
@@ -209,7 +209,7 @@ export function UserProfile() {
                 </div>
                 <div className="space-y-2">
                   <p className="text-[11px] text-muted-foreground font-bold uppercase tracking-wider">Date of Birth</p>
-                  <p className="text-sm font-semibold p-3 bg-muted/20 border border-border/50 rounded-xl">{profileData.dob ? new Date(profileData.dob).toLocaleDateString('en-GB') : '-'}</p>
+                  <p className="text-sm font-semibold p-3 bg-muted/20 border border-border/50 rounded-xl">{profileData.dob ? formatDate(profileData.dob) : '-'}</p>
                 </div>
                 <div className="space-y-2">
                   <p className="text-[11px] text-muted-foreground font-bold uppercase tracking-wider">Gender</p>
@@ -311,11 +311,11 @@ export function UserProfile() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div className="space-y-2">
                         <p className="text-[11px] text-muted-foreground font-bold uppercase tracking-wider">Start Date</p>
-                        <p className="text-sm font-semibold">{new Date(profileData.bondStartDate).toLocaleDateString('en-GB') || '-'}</p>
+                        <p className="text-sm font-semibold">{formatDate(profileData.bondStartDate) || '-'}</p>
                       </div>
                       <div className="space-y-2">
                         <p className="text-[11px] text-muted-foreground font-bold uppercase tracking-wider">End Date</p>
-                        <p className="text-sm font-semibold">{new Date(profileData.bondEndDate).toLocaleDateString('en-GB') || '-'}</p>
+                        <p className="text-sm font-semibold">{formatDate(profileData.bondEndDate) || '-'}</p>
                       </div>
                     </div>
                   ) : (
@@ -335,7 +335,7 @@ export function UserProfile() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div className="space-y-2">
                         <p className="text-[11px] text-muted-foreground font-bold uppercase tracking-wider">Resignation Date</p>
-                        <p className="text-sm font-semibold text-red-600">{profileData.resignationDate ? new Date(profileData.resignationDate).toLocaleDateString('en-GB') : '-'}</p>
+                        <p className="text-sm font-semibold text-red-600">{profileData.resignationDate ? formatDate(profileData.resignationDate) : '-'}</p>
                       </div>
                       <div className="space-y-2">
                         <p className="text-[11px] text-muted-foreground font-bold uppercase tracking-wider">Notice Period</p>

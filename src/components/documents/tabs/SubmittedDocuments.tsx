@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Search, Filter, FileText, CheckCircle2, Clock, AlertCircle, Eye, Download } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, formatDate } from "@/lib/utils";
 import { SearchableSelect } from "@/components/ui/select";
 
 type DocStatus = "Accepted" | "Pending Review" | "Pending Submission" | "Rejected";
@@ -128,7 +128,7 @@ export function SubmittedDocuments() {
                       </span>
                     </td>
                     <td className="p-4 text-sm text-muted-foreground font-medium">
-                      {doc.submittedAt ? new Date(doc.submittedAt).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }) : "-"}
+                      {doc.submittedAt ? formatDate(doc.submittedAt) : "-"}
                     </td>
                     <td className="p-4">
                       <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">

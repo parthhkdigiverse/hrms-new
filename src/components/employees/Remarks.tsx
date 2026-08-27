@@ -3,7 +3,7 @@ import { X, Search, Bell, Star, MessageSquareHeart, TrendingUp, Calendar, Chevro
 import { DialogClose,  Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger  } from "@/components/ui/dialog";
 import { EMPLOYEES } from "@/components/employees/employee-data";
 import { toast } from "sonner";
-import { cn } from "@/lib/utils";
+import { cn, formatDate } from "@/lib/utils";
 import { SearchableSelect } from "@/components/ui/select";
 
 interface FeedbackRecord {
@@ -154,7 +154,7 @@ export function Remarks() {
         role: "Team Member",
         avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(newEmpName)}&background=random`
       },
-      dateSubmitted: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }),
+      dateSubmitted: formatDate(new Date()),
       satisfactionScore: newScore,
       remark: newRemark,
       keyChallenges: newChallenges.trim() || null,

@@ -1,7 +1,7 @@
 import { X, Calendar, MapPin, Phone, Mail, Briefcase, Award, TrendingUp, Clock, CheckCircle2, FileText, LogOut } from "lucide-react";
 import { Employee } from "./employee-data";
 import { DialogClose,  Dialog, DialogContent  } from "@/components/ui/dialog";
-import { cn } from "@/lib/utils";
+import { cn, formatDate } from "@/lib/utils";
 
 interface EmployeeProfileModalProps {
   employee: Employee;
@@ -126,13 +126,13 @@ export function EmployeeProfileModal({ employee, onClose }: EmployeeProfileModal
                     {employee.hasBond && (
                       <div className="flex items-center gap-3 text-[13px] font-medium text-amber-600 bg-amber-50 p-2 rounded-xl border border-amber-100">
                         <div className="p-1.5 bg-amber-100 rounded-lg text-amber-600"><FileText className="w-4 h-4" /></div>
-                        <span className="truncate">Bond: {employee.bondEndDate ? `Until ${new Date(employee.bondEndDate).toLocaleDateString()}` : 'Active'}</span>
+                        <span className="truncate">Bond: {employee.bondEndDate ? `Until ${formatDate(employee.bondEndDate)}` : 'Active'}</span>
                       </div>
                     )}
                     {employee.hasResignation && (
                       <div className="flex items-center gap-3 text-[13px] font-medium text-rose-600 bg-rose-50 p-2 rounded-xl border border-rose-100">
                         <div className="p-1.5 bg-rose-100 rounded-lg text-rose-600"><LogOut className="w-4 h-4" /></div>
-                        <span className="truncate">Exiting: {employee.resignationDate ? new Date(employee.resignationDate).toLocaleDateString() : 'Pending'}</span>
+                        <span className="truncate">Exiting: {employee.resignationDate ? formatDate(employee.resignationDate) : 'Pending'}</span>
                       </div>
                     )}
                     {employee.hasNoticePeriod && !employee.hasResignation && (

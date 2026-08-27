@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Search, Filter, Stamp, CheckCircle2, AlertCircle, Clock, Eye, Download, FileText } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, formatDate } from "@/lib/utils";
 import { SearchableSelect } from "@/components/ui/select";
 
 type ContractStatus = "Pending" | "Verified" | "Rejected";
@@ -139,7 +139,7 @@ export function VerifyContracts() {
                       </span>
                     </td>
                     <td className="p-4 text-sm text-muted-foreground font-medium">
-                      {new Date(contract.uploadedAt).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })}
+                      {formatDate(contract.uploadedAt)}
                     </td>
                     <td className="p-4">
                       <div className="flex justify-end gap-2">
