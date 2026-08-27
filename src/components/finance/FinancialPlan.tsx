@@ -102,13 +102,13 @@ export function FinancialPlan() {
       <div className="bg-card border border-border/50 rounded-2xl shadow-sm flex flex-col overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left whitespace-nowrap">
-            <thead className="bg-rose-700 text-white font-extrabold uppercase tracking-widest text-[10px]">
+            <thead className="bg-primary text-primary-foreground font-extrabold uppercase tracking-widest text-[10px]">
               <tr>
-                <th className="p-4 border-r border-rose-800/50">Category</th>
-                <th className="p-4 border-r border-rose-800/50">Sub-Category</th>
-                <th className="p-4 border-r border-rose-800/50">Metric</th>
-                <th className="p-4 border-r border-rose-800/50">Unit</th>
-                <th className="p-4 w-[240px] text-right border-r border-rose-800/50">Plan Target Value</th>
+                <th className="p-4 border-r border-primary-foreground/20">Category</th>
+                <th className="p-4 border-r border-primary-foreground/20">Sub-Category</th>
+                <th className="p-4 border-r border-primary-foreground/20">Metric</th>
+                <th className="p-4 border-r border-primary-foreground/20">Unit</th>
+                <th className="p-4 w-[240px] text-right border-r border-primary-foreground/20">Plan Target Value</th>
                 <th className="p-4 w-[100px] text-center">Actions</th>
               </tr>
             </thead>

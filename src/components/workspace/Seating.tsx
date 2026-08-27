@@ -10,6 +10,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { toast } from "sonner";
 import { API_URL, getAvatarUrl } from "@/lib/config";
 import { DeleteConfirmDialog } from "@/components/hrms/delete-confirm-dialog";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 interface Seat {
   id: string;
@@ -27,6 +28,7 @@ interface PC {
 interface Desk {
   id: number;
   name: string;
+  floor?: string;
   x: number;
   y: number;
   width: number;
@@ -223,71 +225,6 @@ const getEmployeeAssets = (employeeName: string, assets: any[]) => {
   });
 };
 
-const isFutureJoiner = (emp: any) => {
-  if (!emp || !emp.joinDate) return false;
-  let joinTime = 0;
-  const dateStr = emp.joinDate;
-  if (dateStr.includes('-')) {
-    const parts = dateStr.split('-');
-    if (parts[0].length === 4) {
-      joinTime = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2])).getTime();
-    } else if (parts[2].length === 4) {
-      joinTime = new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0])).getTime();
-    }
-  } else if (dateStr.includes('/')) {
-    const parts = dateStr.split('/');
-    if (parts[0].length === 4) {
-      joinTime = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2])).getTime();
-    } else if (parts[2].length === 4) {
-      joinTime = new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0])).getTime();
-    }
-  } else {
-    joinTime = new Date(dateStr).getTime();
-  }
-  
-  if (isNaN(joinTime)) return false;
-  
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  return joinTime > today.getTime();
-};
-
-const formatJoinDate = (dateStr: string) => {
-  if (!dateStr) return '';
-  try {
-    let d = new Date(dateStr);
-    if (isNaN(d.getTime())) {
-      if (dateStr.includes('-')) {
-        const parts = dateStr.split('-');
-        if (parts.length === 3) {
-          const p0 = parts[0]!; const p1 = parts[1]!; const p2 = parts[2]!;
-          if (p0.length === 4) {
-            d = new Date(parseInt(p0), parseInt(p1) - 1, parseInt(p2));
-          } else if (p2.length === 4) {
-            d = new Date(parseInt(p2), parseInt(p1) - 1, parseInt(p0));
-          }
-        }
-      } else if (dateStr.includes('/')) {
-        const parts = dateStr.split('/');
-        if (parts.length === 3) {
-          const p0 = parts[0]!; const p1 = parts[1]!; const p2 = parts[2]!;
-          if (p0.length === 4) {
-            d = new Date(parseInt(p0), parseInt(p1) - 1, parseInt(p2));
-          } else if (p2.length === 4) {
-            d = new Date(parseInt(p2), parseInt(p1) - 1, parseInt(p0));
-          }
-        }
-      }
-    }
-    if (!isNaN(d.getTime())) {
-      const day = String(d.getDate()).padStart(2, '0');
-      const month = String(d.getMonth() + 1).padStart(2, '0');
-      const year = d.getFullYear();
-      return `${day}-${month}-${year}`;
-    }
-  } catch (e) {}
-  return dateStr;
-};
 
 const sanitizeDesks = (desks: any[]): Desk[] => {
   return desks.map(d => {
@@ -300,6 +237,7 @@ const sanitizeDesks = (desks: any[]): Desk[] => {
     }
     return {
       ...d,
+      floor: d.floor || "Floor 1",
       pcs
     };
   });
@@ -309,6 +247,10 @@ export default function SeatingArrangementPage() {
   const { data, isLoading } = useApi();
   const { user } = useUser();
   const [desksState, setDesksState] = useState<Desk[]>(sanitizeDesks(defaultDesks));
+  const [floors, setFloors] = useState<string[]>(['Floor 1']);
+  const [activeFloor, setActiveFloor] = useState<string>('Floor 1');
+  const [isAddFloorOpen, setIsAddFloorOpen] = useState(false);
+  const [newFloorName, setNewFloorName] = useState("");
 
   // Layout Editor states
   const [isLayoutEditMode, setIsLayoutEditMode] = useState(false);
@@ -428,6 +370,7 @@ export default function SeatingArrangementPage() {
     const newDesk = {
       id: newId,
       name: `Desk ${desksState.length + 1}`,
+      floor: activeFloor,
       x: 10,
       y: 10,
       width: 35,
@@ -702,6 +645,36 @@ export default function SeatingArrangementPage() {
 
   return (
     <div className="space-y-6 h-[calc(100vh-8rem)] flex flex-col">
+      <div className="flex flex-col gap-4">
+        {/* Floor Tabs */}
+        <div className="flex items-center gap-2 overflow-x-auto pb-1">
+          {floors.map(f => (
+            <button
+              key={f}
+              onClick={() => setActiveFloor(f)}
+              className={cn(
+                "px-4 py-2 rounded-lg font-bold text-sm whitespace-nowrap transition-colors",
+                activeFloor === f 
+                  ? "bg-primary text-primary-foreground" 
+                  : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+              )}
+            >
+              {f}
+            </button>
+          ))}
+          {isAdminOrHR && isLayoutEditMode && (
+            <button
+              onClick={() => {
+                setNewFloorName("");
+                setIsAddFloorOpen(true);
+              }}
+              className="px-4 py-2 rounded-lg font-bold text-sm whitespace-nowrap bg-white border border-dashed border-slate-300 text-slate-500 hover:border-brand-teal hover:text-brand-teal transition-colors flex items-center gap-2"
+            >
+              <Plus className="w-4 h-4" />
+              Add Floor
+            </button>
+          )}
+        </div>
       <div className="flex items-center justify-between flex-wrap gap-4">
         {isAdminOrHR && (
           <div className="flex items-center gap-3">
@@ -719,7 +692,7 @@ export default function SeatingArrangementPage() {
               className={cn(
                 "gap-2 font-bold",
                 isLayoutEditMode 
-                  ? "bg-slate-900 text-white hover:bg-slate-800" 
+                  ? "bg-primary text-primary-foreground hover:bg-primary/90" 
                   : "border-slate-300 text-slate-700 hover:bg-slate-50"
               )}
             >
@@ -751,6 +724,7 @@ export default function SeatingArrangementPage() {
             )}
           </div>
         )}
+      </div>
       </div>
 
       <div className="flex-1 bg-[#e4dfcd] rounded-xl overflow-hidden shadow-sm relative min-h-[600px] border border-border">
@@ -784,12 +758,8 @@ export default function SeatingArrangementPage() {
                 </span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-6 h-4 bg-slate-900 rounded-sm"></div>
+                <div className="w-6 h-4 bg-primary rounded-sm"></div>
                 <span>Allocated Seats</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-6 h-4 bg-emerald-700 rounded-sm ring-2 ring-yellow-400"></div>
-                <span>Future Joining</span>
               </div>
             </div>
 
@@ -803,7 +773,7 @@ export default function SeatingArrangementPage() {
                 className="min-w-[1000px] h-[800px] relative p-10 select-none"
               >
                 {/* Desks loop */}
-                {desksState.map(desk => (
+                {desksState.filter(d => (d.floor || 'Floor 1') === activeFloor).map(desk => (
                   <div 
                     key={desk.id}
                     id={`desk-container-${desk.id}`}
@@ -872,8 +842,7 @@ export default function SeatingArrangementPage() {
                       const employee = getSeatEmployee(seat, data?.employees || [], desk.id, desksState);
                       const empAssets = employee ? getEmployeeAssets(employee.name || `${employee.firstName} ${employee.lastName}`, data?.assets || []) : [];
                       const isMySeat = checkIsMySeat(employee);
-                      const isFutureJoin = isFutureJoiner(employee);
-
+                      
                       // Smart positioning to avoid boundary clipping
                       const isLeftEdge = seat.id === 't1';
                       const isRightEdge = seat.id === 't5';
@@ -917,8 +886,7 @@ export default function SeatingArrangementPage() {
                             "absolute w-[12%] h-[30%] -top-[35%] rounded-t-2xl shadow-sm transition-all hover:-translate-y-1 cursor-pointer group z-20 hover:z-50",
                             seat.available 
                               ? 'bg-emerald-700 hover:bg-emerald-600' 
-                              : (isFutureJoin ? 'bg-emerald-700 hover:bg-emerald-600' : 'bg-slate-900 hover:bg-slate-800'),
-                            isFutureJoin && "ring-2 ring-yellow-400 ring-offset-1"
+                              : 'bg-primary hover:bg-primary/90'
                           )}
                           style={{ left: `calc(${seat.x}% - 6%)` }}
                         >
@@ -960,12 +928,7 @@ export default function SeatingArrangementPage() {
                                     </p>
                                     <p className="text-[10px] font-bold text-brand-teal/80 uppercase tracking-wider truncate">{employee.designation}</p>
                                     <p className="text-[10px] text-muted-foreground truncate">{employee.department}</p>
-                                    {isFutureJoin && (
-                                      <p className="text-[10px] text-amber-600 font-extrabold flex items-center gap-1 mt-1 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200/50 w-fit">
-                                        <Calendar className="w-3.5 h-3.5" />
-                                        Joining: {formatJoinDate(employee.joinDate)}
-                                      </p>
-                                    )}
+                                    
                                   </div>
                                 </div>
                                 
@@ -1004,8 +967,7 @@ export default function SeatingArrangementPage() {
                       const employee = getSeatEmployee(seat, data?.employees || [], desk.id, desksState);
                       const empAssets = employee ? getEmployeeAssets(employee.name || `${employee.firstName} ${employee.lastName}`, data?.assets || []) : [];
                       const isMySeat = checkIsMySeat(employee);
-                      const isFutureJoin = isFutureJoiner(employee);
-
+                      
                       // Smart positioning to avoid boundary clipping
                       const isLeftEdge = seat.id === 'b1';
                       const isRightEdge = seat.id === 'b5';
@@ -1049,8 +1011,7 @@ export default function SeatingArrangementPage() {
                             "absolute w-[12%] h-[30%] -bottom-[35%] rounded-b-2xl shadow-sm transition-all hover:translate-y-1 cursor-pointer group z-20 hover:z-50",
                             seat.available 
                               ? 'bg-emerald-700 hover:bg-emerald-600' 
-                              : (isFutureJoin ? 'bg-emerald-700 hover:bg-emerald-600' : 'bg-slate-900 hover:bg-slate-800'),
-                            isFutureJoin && "ring-2 ring-yellow-400 ring-offset-1"
+                              : 'bg-primary hover:bg-primary/90'
                           )}
                           style={{ left: `calc(${seat.x}% - 6%)` }}
                         >
@@ -1092,12 +1053,7 @@ export default function SeatingArrangementPage() {
                                     </p>
                                     <p className="text-[10px] font-bold text-brand-teal/80 uppercase tracking-wider truncate">{employee.designation}</p>
                                     <p className="text-[10px] text-muted-foreground truncate">{employee.department}</p>
-                                    {isFutureJoin && (
-                                      <p className="text-[10px] text-amber-600 font-extrabold flex items-center gap-1 mt-1 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200/50 w-fit">
-                                        <Calendar className="w-3.5 h-3.5" />
-                                        Joining: {formatJoinDate(employee.joinDate)}
-                                      </p>
-                                    )}
+                                    
                                   </div>
                                 </div>
                                 
@@ -1183,11 +1139,11 @@ export default function SeatingArrangementPage() {
                     className={cn(
                       "py-3 px-4 rounded-xl border text-sm font-bold transition-all flex items-center justify-center gap-2",
                       modalStatus === "allocated"
-                        ? "bg-slate-900 border-slate-950 text-white shadow-sm"
+                        ? "bg-primary border-primary text-primary-foreground shadow-sm"
                         : "bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100"
                     )}
                   >
-                    <span className="w-2.5 h-2.5 bg-slate-400 rounded-full"></span>
+                    <span className="w-2.5 h-2.5 bg-primary-foreground/50 rounded-full"></span>
                     Allocated
                   </button>
                 </div>
@@ -1422,6 +1378,61 @@ export default function SeatingArrangementPage() {
         title={confirmTitle}
         description={confirmDescription}
       />
+
+      {/* Add Floor Modal */}
+      <Dialog open={isAddFloorOpen} onOpenChange={setIsAddFloorOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Add New Floor</DialogTitle>
+            <DialogDescription>
+              Enter a name for the new floor or section in your workspace.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <Input
+              id="floorName"
+              placeholder="e.g. Floor 2, Basement, Main Office"
+              value={newFloorName}
+              onChange={(e) => setNewFloorName(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && newFloorName.trim()) {
+                  e.preventDefault();
+                  if (!floors.includes(newFloorName.trim())) {
+                    setFloors([...floors, newFloorName.trim()]);
+                    setActiveFloor(newFloorName.trim());
+                    setIsAddFloorOpen(false);
+                  } else {
+                    toast.error("Floor name already exists");
+                  }
+                }
+              }}
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsAddFloorOpen(false)}>
+              Cancel
+            </Button>
+            <Button 
+              onClick={() => {
+                if (!newFloorName.trim()) {
+                  toast.error("Please enter a floor name");
+                  return;
+                }
+                if (!floors.includes(newFloorName.trim())) {
+                  setFloors([...floors, newFloorName.trim()]);
+                  setActiveFloor(newFloorName.trim());
+                  setIsAddFloorOpen(false);
+                } else {
+                  toast.error("Floor name already exists");
+                }
+              }}
+              className="bg-brand-teal hover:bg-brand-teal/90 text-white"
+            >
+              Add Floor
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

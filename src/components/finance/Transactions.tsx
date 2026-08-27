@@ -217,39 +217,39 @@ export function Transactions() {
         </div>
 
         {activeAccountTab === "bank" ? (
-          <div className="bg-slate-900 text-white rounded-2xl p-5 shadow-sm relative overflow-hidden">
-            <div className="absolute -right-12 -top-12 w-40 h-40 bg-slate-800 rounded-full blur-xl" />
-            <div className="absolute -right-4 -bottom-4 w-32 h-32 bg-slate-700/50 rounded-full blur-xl" />
+          <div className="bg-primary text-primary-foreground rounded-2xl p-5 shadow-sm relative overflow-hidden">
+            <div className="absolute -right-12 -top-12 w-40 h-40 bg-primary-foreground/20 rounded-full blur-xl" />
+            <div className="absolute -right-4 -bottom-4 w-32 h-32 bg-primary-foreground/10 rounded-full blur-xl" />
             <div className="relative z-10">
               <div className="flex justify-between items-start mb-3">
-                <div className="font-extrabold text-[10px] uppercase tracking-widest text-slate-300 flex items-center gap-1.5">
+                <div className="font-extrabold text-[10px] uppercase tracking-widest text-primary-foreground/80 flex items-center gap-1.5">
                   <span className="text-amber-300">✨</span> Closing Balance In Bank
                 </div>
-                <div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center border border-slate-700">
-                  <span className="text-sm font-bold">₹</span>
+                <div className="w-8 h-8 rounded-full bg-primary-foreground/20 flex items-center justify-center border border-primary-foreground/30">
+                  <span className="text-sm font-bold text-primary-foreground">₹</span>
                 </div>
               </div>
-              <div className="text-4xl font-black mb-3 text-white">₹973.045</div>
-              <div className="text-slate-400 font-medium text-[10px] leading-tight opacity-90 max-w-[180px]">
+              <div className="text-4xl font-black mb-3 text-primary-foreground">₹973.045</div>
+              <div className="text-primary-foreground/70 font-medium text-[10px] leading-tight opacity-90 max-w-[180px]">
                 Opening Balance + Total Credit - Total Debt
               </div>
             </div>
           </div>
         ) : (
-          <div className="bg-rose-700 text-white rounded-2xl p-5 shadow-sm relative overflow-hidden">
-            <div className="absolute -right-12 -top-12 w-40 h-40 bg-rose-800/50 rounded-full blur-xl" />
-            <div className="absolute -right-4 -bottom-4 w-32 h-32 bg-rose-600/50 rounded-full blur-xl" />
+          <div className="bg-primary text-primary-foreground rounded-2xl p-5 shadow-sm relative overflow-hidden">
+            <div className="absolute -right-12 -top-12 w-40 h-40 bg-primary-foreground/20 rounded-full blur-xl" />
+            <div className="absolute -right-4 -bottom-4 w-32 h-32 bg-primary-foreground/10 rounded-full blur-xl" />
             <div className="relative z-10">
               <div className="flex justify-between items-start mb-3">
-                <div className="font-extrabold text-[10px] uppercase tracking-widest text-rose-100 flex items-center gap-1.5">
+                <div className="font-extrabold text-[10px] uppercase tracking-widest text-primary-foreground/80 flex items-center gap-1.5">
                   <span className="text-amber-300">✨</span> Cash In Hand
                 </div>
-                <div className="w-8 h-8 rounded-full bg-rose-800/50 flex items-center justify-center border border-rose-600/30">
-                  <span className="text-sm font-bold">₹</span>
+                <div className="w-8 h-8 rounded-full bg-primary-foreground/20 flex items-center justify-center border border-primary-foreground/30">
+                  <span className="text-sm font-bold text-primary-foreground">₹</span>
                 </div>
               </div>
-              <div className="text-4xl font-black mb-3 text-white">₹-5.309</div>
-              <div className="text-rose-200 font-medium text-[10px] leading-tight opacity-90 max-w-[180px]">
+              <div className="text-4xl font-black mb-3 text-primary-foreground">₹-5.309</div>
+              <div className="text-primary-foreground/70 font-medium text-[10px] leading-tight opacity-90 max-w-[180px]">
                 Opening Balance + Total Credit - Total Debt
               </div>
             </div>
