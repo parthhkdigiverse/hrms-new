@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { AppSidebar } from "@/components/AppSidebar";
 
@@ -119,12 +119,17 @@ const suggestions = [
 ];
 
 function Index() {
+  const [isClient, setIsClient] = useState(false);
   const [active, setActiveState] = useState(() => {
     if (typeof window !== 'undefined') {
       return localStorage.getItem("activeSidebarTab") || "/dashboard";
     }
     return "/dashboard";
   });
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
   
   const setActive = (val: string) => {
     setActiveState(val);
@@ -144,6 +149,14 @@ function Index() {
       setActiveAction(label);
     }
   };
+
+  if (!isClient) {
+    return (
+      <div className="h-screen w-screen flex items-center justify-center bg-background">
+        <div className="w-8 h-8 rounded-full border-4 border-primary border-r-transparent animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <SettingsProvider>
