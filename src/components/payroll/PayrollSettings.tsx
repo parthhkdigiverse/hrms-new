@@ -41,6 +41,7 @@ export function PayrollSettings() {
   const [workingDays, setWorkingDays] = useState("26");
   const [calcMethod, setCalcMethod] = useState("Working Days");
   const [selectedOffs, setSelectedOffs] = useState<string[]>(["Sunday", "Alternate Saturday"]);
+  const [customOffText, setCustomOffText] = useState("");
 
   // Advanced Settings State
   const [settings, setSettings] = useState({
@@ -82,7 +83,7 @@ export function PayrollSettings() {
 
   const getSelectedText = () => {
     if (selectedOffs.length === 0) return "None";
-    return selectedOffs.join(" + ");
+    return selectedOffs.map(d => d === "Custom" && customOffText ? `${customOffText} (Custom)` : d).join(" + ");
   };
 
   return (
@@ -182,6 +183,18 @@ export function PayrollSettings() {
                   );
                 })}
               </div>
+              {selectedOffs.includes("Custom") && (
+                <div className="mb-5 animate-in fade-in slide-in-from-top-1 duration-200">
+                  <label className="text-[12px] font-bold text-muted-foreground uppercase tracking-wider mb-2 block">Define Custom Off Days</label>
+                  <input 
+                    type="text" 
+                    value={customOffText}
+                    onChange={(e) => setCustomOffText(e.target.value)}
+                    placeholder="e.g., Every 3rd Saturday, Last Friday..."
+                    className="w-full h-[40px] rounded-[10px] border border-border/80 px-3 text-[13px] font-medium text-foreground/80 outline-none focus:border-emerald-500 bg-white shadow-sm"
+                  />
+                </div>
+              )}
               <p className="text-[13px] text-muted-foreground">Selected: <span className="text-foreground/80">{getSelectedText()}</span></p>
             </div>
 
