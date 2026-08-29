@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { X,  Search, Filter, Download, MoreHorizontal, CheckCircle2, XCircle, Clock, ChevronLeft, ChevronRight, Calendar as CalendarIcon, Coffee, Briefcase } from "lucide-react";
+import { X,  Search, Filter, Download, MoreHorizontal, CheckCircle2, XCircle, Clock, ChevronLeft, ChevronRight, Calendar as CalendarIcon, Coffee, Briefcase, Award } from "lucide-react";
 import { format } from "date-fns";
 import { DateRange } from "react-day-picker";
 import { Calendar } from "@/components/ui/calendar";
@@ -232,32 +232,40 @@ export function AttendanceList() {
             })}
           </div>
 
-          {/* Weekly Trend Chart */}
+          {/* Top Punctual Employees / Hall of Fame */}
           <div className="bg-white border border-border/60 rounded-3xl shadow-sm p-5 h-[160px] flex flex-col relative overflow-hidden">
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="text-sm font-bold text-foreground">Weekly Trend</h3>
-              <p className="text-xs text-muted-foreground">Past 7 Days</p>
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
+                <Award className="w-4 h-4 text-emerald-600" /> 
+                Punctuality Hall of Fame
+              </h3>
+              <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">This Month</p>
             </div>
-            <div className="flex-1 -mx-2">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={[
-                  { name: 'Mon', Present: 42, Absent: 5 },
-                  { name: 'Tue', Present: 45, Absent: 3 },
-                  { name: 'Wed', Present: 40, Absent: 6 },
-                  { name: 'Thu', Present: 46, Absent: 2 },
-                  { name: 'Fri', Present: 41, Absent: 8 },
-                  { name: 'Sat', Present: 15, Absent: 2 },
-                  { name: 'Sun', Present: 12, Absent: 1 },
-                ]}>
-                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#888888' }} dy={5} />
-                  <Tooltip 
-                    cursor={{ fill: 'transparent' }}
-                    contentStyle={{ borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                  />
-                  <Bar dataKey="Present" fill="#10b981" radius={[4, 4, 0, 0]} barSize={12} />
-                  <Bar dataKey="Absent" fill="#f43f5e" radius={[4, 4, 0, 0]} barSize={12} />
-                </BarChart>
-              </ResponsiveContainer>
+            <div className="flex-1 overflow-y-auto pr-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+                {[
+                  { name: "Sneha Pillai", dept: "Operations", streak: "14 Days" },
+                  { name: "Rahul Sharma", dept: "Marketing", streak: "12 Days" },
+                  { name: "Meera Kapoor", dept: "Design", streak: "9 Days" },
+                  { name: "Vikram Iyer", dept: "Engineering", streak: "7 Days" },
+                  { name: "Aditi Desai", dept: "Sales", streak: "6 Days" },
+                ].map((emp, i) => (
+                  <div key={i} className="flex flex-col p-3 rounded-xl border border-border/50 bg-muted/20 hover:bg-muted/40 transition-colors">
+                    <div className="flex items-start justify-between mb-2">
+                      <div className="w-5 h-5 rounded-full bg-emerald-100 flex items-center justify-center text-[9px] font-black text-emerald-700">
+                        #{i + 1}
+                      </div>
+                      <div className="text-[10px] font-black text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">
+                        {emp.streak}
+                      </div>
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold text-foreground line-clamp-1">{emp.name}</p>
+                      <p className="text-[10px] text-muted-foreground line-clamp-1 mt-0.5">{emp.dept}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
