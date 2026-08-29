@@ -5,6 +5,8 @@ import { cn } from "@/lib/utils";
 import { formatCurrency, type Lead, type LeadStage } from "./sales-data";
 import { useSales } from "./SalesContext";
 import { SearchableSelect } from "@/components/ui/select";
+import { useSortableData } from "@/hooks/useSortableData";
+import { SortableHeader } from "@/components/ui/sortable-header";
 
 /* ─── Kanban Card ──────────────────────────────────────────────────────── */
 
@@ -84,21 +86,23 @@ function TableView({ data, onStageChange, activeStages }: { data: Lead[]; onStag
     Lost: "bg-rose-100 text-rose-700",
   };
 
+  const { items: sortedData, requestSort, sortConfig } = useSortableData(data);
+
   return (
     <div className="overflow-x-auto rounded-2xl border border-border">
       <table className="w-full text-sm">
         <thead>
           <tr className="border-b border-border bg-muted/50 text-xs font-bold uppercase tracking-wider text-muted-foreground">
-            <th className="px-4 py-3 text-left">Company</th>
-            <th className="px-4 py-3 text-left">Contact</th>
-            <th className="px-4 py-3 text-left">Stage</th>
-            <th className="px-4 py-3 text-left">Owner</th>
-            <th className="px-4 py-3 text-right">Budget</th>
-            <th className="px-4 py-3 text-center">AI Score</th>
+            <SortableHeader label="Company" sortKey="company" currentSort={sortConfig} onSort={requestSort} className="px-4 py-3" />
+            <SortableHeader label="Contact" sortKey="contact" currentSort={sortConfig} onSort={requestSort} className="px-4 py-3" />
+            <SortableHeader label="Stage" sortKey="stage" currentSort={sortConfig} onSort={requestSort} className="px-4 py-3" />
+            <SortableHeader label="Owner" sortKey="owner" currentSort={sortConfig} onSort={requestSort} className="px-4 py-3" />
+            <SortableHeader label="Budget" sortKey="budget" currentSort={sortConfig} onSort={requestSort} className="px-4 py-3 text-right" />
+            <SortableHeader label="AI Score" sortKey="aiScore" currentSort={sortConfig} onSort={requestSort} className="px-4 py-3 text-center" />
           </tr>
         </thead>
         <tbody>
-          {data.map((lead) => (
+          {sortedData.map((lead) => (
             <tr key={lead.id} className="border-b border-border transition-colors hover:bg-accent/50">
               <td className="px-4 py-3 font-medium">{lead.company}</td>
               <td className="px-4 py-3 text-muted-foreground">{lead.contact} · {lead.city}</td>

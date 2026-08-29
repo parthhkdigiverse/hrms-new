@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { Shield, ShieldAlert, CheckCircle, Monitor, Send, ShieldCheck, AlertTriangle, Search, Plus, Trash2, RefreshCw } from "lucide-react";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { moveToRecycleBin } from "@/lib/recycle-bin";
+import { useSortableData } from "@/hooks/useSortableData";
+import { SortableHeader } from "@/components/ui/sortable-header";
 
 const mockPcs = [
   { id: 1, hostname: 'DESKTOP-DEV-01', user: 'Sarah Jenkins', ip: '192.168.1.105', os: 'Windows 11', restricted: true },
@@ -56,6 +58,13 @@ export function Restrictions() {
     }
     setDeleteConfirm({ isOpen: false, idx: null, type: null, name: "" });
   };
+
+  const filteredPcs = mockPcs.filter(pc => 
+    pc.hostname.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    pc.ip.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const { items: sortedPcs, requestSort, sortConfig } = useSortableData(filteredPcs);
 
   return (
     <div className="w-full space-y-8 animate-in fade-in duration-500">
@@ -140,16 +149,16 @@ export function Restrictions() {
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="bg-muted/30 border-b border-border/50 text-muted-foreground font-bold text-xs uppercase tracking-wider">
-                    <th className="p-4 pl-6">Hostname</th>
-                    <th className="p-4">Active User</th>
-                    <th className="p-4">IP Address</th>
-                    <th className="p-4">OS</th>
-                    <th className="p-4">Status</th>
+                    <SortableHeader label="Hostname" sortKey="hostname" currentSort={sortConfig} onSort={requestSort} className="p-4 pl-6" />
+                    <SortableHeader label="Active User" sortKey="user" currentSort={sortConfig} onSort={requestSort} className="p-4" />
+                    <SortableHeader label="IP Address" sortKey="ip" currentSort={sortConfig} onSort={requestSort} className="p-4" />
+                    <SortableHeader label="OS" sortKey="os" currentSort={sortConfig} onSort={requestSort} className="p-4" />
+                    <SortableHeader label="Status" sortKey="restricted" currentSort={sortConfig} onSort={requestSort} className="p-4" />
                     <th className="p-4 pr-6 text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border/50">
-                  {mockPcs.map(pc => (
+                  {sortedPcs.map(pc => (
                     <tr key={pc.id} className="hover:bg-muted/20 transition-colors">
                       <td className="p-4 pl-6 font-mono font-bold text-sm text-foreground">{pc.hostname}</td>
                       <td className="p-4 font-bold text-sm text-muted-foreground">{pc.user}</td>

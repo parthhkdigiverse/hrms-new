@@ -2,6 +2,8 @@ import { useState } from "react";
 import { formatCurrency, MOCK_BONUS_DEDUCTIONS } from "./payroll-data";
 import { Search, Plus, Filter, Gift, MinusCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useSortableData } from "@/hooks/useSortableData";
+import { SortableHeader } from "@/components/ui/sortable-header";
 
 export function BonusDeductions() {
   const [activeTab, setActiveTab] = useState<"All" | "Bonuses" | "Deductions">("All");
@@ -20,6 +22,8 @@ export function BonusDeductions() {
       
     return matchesTab && matchesSearch;
   });
+
+  const { items: sortedEntries, requestSort, sortConfig } = useSortableData(filteredEntries);
 
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-[1400px]">
@@ -105,18 +109,18 @@ export function BonusDeductions() {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-border/60">
-                <th className="py-4 px-5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Ref</th>
-                <th className="py-4 px-5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Type</th>
-                <th className="py-4 px-5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Applied To</th>
-                <th className="py-4 px-5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Reason</th>
-                <th className="py-4 px-5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Created By</th>
-                <th className="py-4 px-5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Date</th>
-                <th className="py-4 px-5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest text-right">Amount</th>
-                <th className="py-4 px-5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest text-center">Approval</th>
+                <SortableHeader label="Ref" sortKey="ref" currentSort={sortConfig} onSort={requestSort} className="py-4 px-5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest" />
+                <SortableHeader label="Type" sortKey="typeLabel" currentSort={sortConfig} onSort={requestSort} className="py-4 px-5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest" />
+                <SortableHeader label="Applied To" sortKey="appliedTo" currentSort={sortConfig} onSort={requestSort} className="py-4 px-5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest" />
+                <SortableHeader label="Reason" sortKey="reason" currentSort={sortConfig} onSort={requestSort} className="py-4 px-5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest" />
+                <SortableHeader label="Created By" sortKey="creator" currentSort={sortConfig} onSort={requestSort} className="py-4 px-5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest" />
+                <SortableHeader label="Date" sortKey="date" currentSort={sortConfig} onSort={requestSort} className="py-4 px-5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest" />
+                <SortableHeader label="Amount" sortKey="amount" currentSort={sortConfig} onSort={requestSort} className="py-4 px-5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest text-right" />
+                <SortableHeader label="Approval" sortKey="state" currentSort={sortConfig} onSort={requestSort} className="py-4 px-5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest text-center" />
               </tr>
             </thead>
             <tbody className="divide-y divide-border/40">
-              {filteredEntries.map((entry: any) => (
+              {sortedEntries.map((entry: any) => (
                 <tr key={entry.ref} className="hover:bg-muted/50/50 transition-colors">
                   <td className="py-4 px-5">
                     <span className="text-[13px] font-bold text-foreground">{entry.ref}</span>

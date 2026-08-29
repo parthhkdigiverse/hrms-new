@@ -9,6 +9,8 @@ import { DialogClose,  Dialog, DialogContent, DialogHeader, DialogTitle  } from 
 import { cn, formatDate } from "@/lib/utils";
 import { useEmployeesContext } from "./EmployeeContext";
 import { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer } from "recharts";
+import { useSortableData } from "@/hooks/useSortableData";
+import { SortableHeader } from "@/components/ui/sortable-header";
 
 type AttendanceStatus = "Present" | "Absent" | "Late" | "On Leave";
 
@@ -146,11 +148,13 @@ export function AttendanceList() {
     });
   }, [attendanceData, searchQuery, statusFilter, dateRange]);
 
-  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+  const { items: sortedData, requestSort, sortConfig } = useSortableData(filteredData);
+
+  const totalPages = Math.ceil(sortedData.length / itemsPerPage);
   const paginatedData = useMemo(() => {
-    const start = (currentPage - 1) * itemsPerPage;
-    return filteredData.slice(start, start + itemsPerPage);
-  }, [filteredData, currentPage]);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return sortedData.slice(startIndex, startIndex + itemsPerPage);
+  }, [sortedData, currentPage]);
 
   // Reset page when filters change
   useMemo(() => setCurrentPage(1), [searchQuery, statusFilter, dateRange]);
@@ -348,13 +352,13 @@ export function AttendanceList() {
           <table className="w-full text-left border-collapse">
             <thead className="bg-muted/50/80 sticky top-0 z-10 backdrop-blur-sm">
               <tr>
-                <th className="px-6 py-4 text-xs font-black text-muted-foreground uppercase tracking-wider border-b border-border">Employee</th>
-                <th className="px-6 py-4 text-xs font-black text-muted-foreground uppercase tracking-wider border-b border-border">Date</th>
-                <th className="px-6 py-4 text-xs font-black text-muted-foreground uppercase tracking-wider border-b border-border">Status</th>
-                <th className="px-6 py-4 text-xs font-black text-muted-foreground uppercase tracking-wider border-b border-border">Check In</th>
-                <th className="px-6 py-4 text-xs font-black text-muted-foreground uppercase tracking-wider border-b border-border">Check Out</th>
-                <th className="px-6 py-4 text-xs font-black text-muted-foreground uppercase tracking-wider border-b border-border">Break Hours</th>
-                <th className="px-6 py-4 text-xs font-black text-muted-foreground uppercase tracking-wider border-b border-border">Total Hours</th>
+                <SortableHeader label="Employee" sortKey="employeeName" currentSort={sortConfig} onSort={requestSort} className="px-6 py-4 text-xs font-black text-muted-foreground uppercase tracking-wider border-b border-border" />
+                <SortableHeader label="Date" sortKey="date" currentSort={sortConfig} onSort={requestSort} className="px-6 py-4 text-xs font-black text-muted-foreground uppercase tracking-wider border-b border-border" />
+                <SortableHeader label="Status" sortKey="status" currentSort={sortConfig} onSort={requestSort} className="px-6 py-4 text-xs font-black text-muted-foreground uppercase tracking-wider border-b border-border" />
+                <SortableHeader label="Check In" sortKey="checkIn" currentSort={sortConfig} onSort={requestSort} className="px-6 py-4 text-xs font-black text-muted-foreground uppercase tracking-wider border-b border-border" />
+                <SortableHeader label="Check Out" sortKey="checkOut" currentSort={sortConfig} onSort={requestSort} className="px-6 py-4 text-xs font-black text-muted-foreground uppercase tracking-wider border-b border-border" />
+                <SortableHeader label="Break Hours" sortKey="breakHours" currentSort={sortConfig} onSort={requestSort} className="px-6 py-4 text-xs font-black text-muted-foreground uppercase tracking-wider border-b border-border" />
+                <SortableHeader label="Total Hours" sortKey="totalHours" currentSort={sortConfig} onSort={requestSort} className="px-6 py-4 text-xs font-black text-muted-foreground uppercase tracking-wider border-b border-border" />
                 <th className="px-6 py-4 border-b border-border"></th>
               </tr>
             </thead>

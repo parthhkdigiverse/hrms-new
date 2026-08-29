@@ -4,6 +4,8 @@ import { format } from "date-fns";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { useSortableData } from "@/hooks/useSortableData";
+import { SortableHeader } from "@/components/ui/sortable-header";
 
 type WorkLog = {
   id: string;
@@ -106,6 +108,8 @@ export function WorkLogs() {
       log.task.toLowerCase().includes(searchQuery.toLowerCase())
     );
   }, [logs, searchQuery]);
+
+  const { items: sortedLogs, requestSort, sortConfig } = useSortableData(filteredLogs);
 
   // Grouped Logs by Employee
   const employeeWiseGroups = useMemo(() => {
@@ -215,15 +219,14 @@ export function WorkLogs() {
             <table className="w-full text-left border-collapse">
               <thead className="bg-muted/30 border-b border-border/50">
                 <tr>
-                  <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase tracking-wider">Employee</th>
-                  <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase tracking-wider">Date & Timeline</th>
-                  <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase tracking-wider">Project / Task</th>
-                  <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase tracking-wider">Description</th>
-
+                  <SortableHeader label="Employee" sortKey="employee" currentSort={sortConfig} onSort={requestSort} className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase tracking-wider" />
+                  <SortableHeader label="Date & Timeline" sortKey="date" currentSort={sortConfig} onSort={requestSort} className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase tracking-wider" />
+                  <SortableHeader label="Project / Task" sortKey="project" currentSort={sortConfig} onSort={requestSort} className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase tracking-wider" />
+                  <SortableHeader label="Description" sortKey="description" currentSort={sortConfig} onSort={requestSort} className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase tracking-wider" />
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {filteredLogs.map((log) => (
+                {sortedLogs.map((log) => (
                   <tr key={log.id} className="hover:bg-muted/20 transition-colors group">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center gap-3">

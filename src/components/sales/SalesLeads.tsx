@@ -6,6 +6,8 @@ import { cn } from "@/lib/utils";
 import { formatCurrency, type Lead, type LeadStage } from "./sales-data";
 import { useSales } from "./SalesContext";
 import { SearchableSelect } from "@/components/ui/select";
+import { useSortableData } from "@/hooks/useSortableData";
+import { SortableHeader } from "@/components/ui/sortable-header";
 
 const stageColors: Record<string, string> = {
   "New Lead": "bg-primary/10 text-primary",
@@ -72,6 +74,8 @@ export function SalesLeads({ onAction }: { onAction?: (action: string) => void }
     for (const l of base) counts[l.stage] = (counts[l.stage] || 0) + 1;
     return counts;
   }, [tab, leads, activeStages]);
+
+  const { items: sortedLeads, requestSort, sortConfig } = useSortableData(filtered);
 
   return (
     <div className="space-y-5">
@@ -149,19 +153,19 @@ export function SalesLeads({ onAction }: { onAction?: (action: string) => void }
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-border bg-muted/50 text-xs font-bold uppercase tracking-wider text-muted-foreground">
-              <th className="px-4 py-3 text-left">Company</th>
-              <th className="px-4 py-3 text-left">Category</th>
-              <th className="px-4 py-3 text-left">Source</th>
-              <th className="px-4 py-3 text-left">Stage</th>
-              <th className="px-4 py-3 text-left">Owner</th>
-              <th className="px-4 py-3 text-left">Priority</th>
-              <th className="px-4 py-3 text-right">Budget</th>
-              <th className="px-4 py-3 text-left">Next Follow-up</th>
-              <th className="px-4 py-3 text-center">AI</th>
+              <SortableHeader label="Company" sortKey="company" currentSort={sortConfig} onSort={requestSort} className="px-4 py-3" />
+              <SortableHeader label="Category" sortKey="category" currentSort={sortConfig} onSort={requestSort} className="px-4 py-3" />
+              <SortableHeader label="Source" sortKey="source" currentSort={sortConfig} onSort={requestSort} className="px-4 py-3" />
+              <SortableHeader label="Stage" sortKey="stage" currentSort={sortConfig} onSort={requestSort} className="px-4 py-3" />
+              <SortableHeader label="Owner" sortKey="owner" currentSort={sortConfig} onSort={requestSort} className="px-4 py-3" />
+              <SortableHeader label="Priority" sortKey="priority" currentSort={sortConfig} onSort={requestSort} className="px-4 py-3" />
+              <SortableHeader label="Budget" sortKey="budget" currentSort={sortConfig} onSort={requestSort} className="px-4 py-3 text-right" />
+              <SortableHeader label="Next Follow-up" sortKey="nextFollowUp" currentSort={sortConfig} onSort={requestSort} className="px-4 py-3" />
+              <SortableHeader label="AI" sortKey="aiScore" currentSort={sortConfig} onSort={requestSort} className="px-4 py-3 text-center" />
             </tr>
           </thead>
           <tbody>
-            {filtered.map((lead) => (
+            {sortedLeads.map((lead) => (
               <tr
                 key={lead.id}
                 onClick={() => setSelectedLead(lead)}

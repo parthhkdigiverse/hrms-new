@@ -5,6 +5,8 @@ import {
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { useSortableData } from "@/hooks/useSortableData";
+import { SortableHeader } from "@/components/ui/sortable-header";
 
 const MOCK_CRITERIA = [
   { name: "Punctuality", maxScore: 10, isFixed: true, entryType: "direct", category: "+ve" },
@@ -32,6 +34,8 @@ export function Recognitions() {
   const yearOptions = Array.from({ length: 5 }, (_, i) => currentYear - i);
 
   const totalMaxScore = MOCK_CRITERIA.reduce((sum, item) => sum + item.maxScore, 0);
+
+  const { items: sortedCriteria, requestSort, sortConfig } = useSortableData(MOCK_CRITERIA);
 
   return (
     <div className="w-full space-y-6 animate-in fade-in duration-500">
@@ -154,15 +158,15 @@ export function Recognitions() {
             <table className="w-full text-left text-sm border-collapse">
               <thead>
                 <tr className="border-b border-border text-muted-foreground font-bold text-xs uppercase tracking-wider">
-                  <th className="py-3 px-4">Criteria Name</th>
-                  <th className="py-3 px-4">Type</th>
-                  <th className="py-3 px-4">Max Score</th>
-                  <th className="py-3 px-4">Category</th>
+                  <SortableHeader label="Criteria Name" sortKey="name" currentSort={sortConfig} onSort={requestSort} className="py-3 px-4" />
+                  <SortableHeader label="Type" sortKey="isFixed" currentSort={sortConfig} onSort={requestSort} className="py-3 px-4" />
+                  <SortableHeader label="Max Score" sortKey="maxScore" currentSort={sortConfig} onSort={requestSort} className="py-3 px-4" />
+                  <SortableHeader label="Category" sortKey="category" currentSort={sortConfig} onSort={requestSort} className="py-3 px-4" />
                   <th className="py-3 px-4 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/40 text-foreground font-medium">
-                {MOCK_CRITERIA.map((item, idx) => (
+                {sortedCriteria.map((item, idx) => (
                   <tr key={idx} className="hover:bg-muted/50 transition-colors">
                     <td className="py-4 px-4 font-bold">{item.name}</td>
                     <td className="py-4 px-4">

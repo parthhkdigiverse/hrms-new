@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { Shield, Search, Filter, History, Download, ArrowUpDown } from "lucide-react";
+import { useSortableData } from "@/hooks/useSortableData";
+import { SortableHeader } from "@/components/ui/sortable-header";
 
 const mockAuditLogs = [
   { id: 'AUD-001', date: 'Oct 24, 2023 10:45 AM', user: 'Admin System', action: 'Approved Payroll Run', ip: '192.168.1.1' },
@@ -12,6 +14,12 @@ const mockAuditLogs = [
 
 export function AuditLogs() {
   const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredLogs = mockAuditLogs.filter(log => 
+    log.user.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    log.action.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+  const { items: sortedLogs, requestSort, sortConfig } = useSortableData(filteredLogs);
 
   return (
     <div className="w-full space-y-8 animate-in fade-in duration-500">
@@ -68,16 +76,14 @@ export function AuditLogs() {
           <table className="w-full text-left">
             <thead className="bg-muted/30 text-muted-foreground text-xs font-bold uppercase tracking-wider">
               <tr>
-                <th className="p-4 pl-6 cursor-pointer hover:text-foreground">
-                  <div className="flex items-center gap-2">Timestamp <ArrowUpDown className="w-3 h-3" /></div>
-                </th>
-                <th className="p-4">User / Actor</th>
-                <th className="p-4">Action Event</th>
-                <th className="p-4 pr-6">IP Address</th>
+                <SortableHeader label="Timestamp" sortKey="date" currentSort={sortConfig} onSort={requestSort} className="p-4 pl-6" />
+                <SortableHeader label="User / Actor" sortKey="user" currentSort={sortConfig} onSort={requestSort} className="p-4" />
+                <SortableHeader label="Action Event" sortKey="action" currentSort={sortConfig} onSort={requestSort} className="p-4" />
+                <SortableHeader label="IP Address" sortKey="ip" currentSort={sortConfig} onSort={requestSort} className="p-4 pr-6" />
               </tr>
             </thead>
             <tbody className="divide-y divide-border/50">
-              {mockAuditLogs.map((log, idx) => (
+              {sortedLogs.map((log, idx) => (
                 <tr key={idx} className="hover:bg-muted/20 transition-colors">
                   <td className="p-4 pl-6">
                     <div className="font-bold text-sm text-foreground">{log.date.split(' ')[0]} {log.date.split(' ')[1]}</div>

@@ -6,6 +6,8 @@ import { cn } from "@/lib/utils";
 import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
 import { toast } from "sonner";
 import { DialogClose,  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter  } from "@/components/ui/dialog";
+import { useSortableData } from "@/hooks/useSortableData";
+import { SortableHeader } from "@/components/ui/sortable-header";
 
 export function FranchiseModule() {
   const [isAddAllocationOpen, setIsAddAllocationOpen] = useState(false);
@@ -48,6 +50,8 @@ export function FranchiseModule() {
     { name: 'Available', value: 45 },
   ];
   const COLORS = ['var(--chart-1)', 'var(--chart-2)', 'var(--chart-3)', 'var(--chart-4)', 'var(--chart-5)'];
+
+  const { items: sortedTerritories, requestSort, sortConfig } = useSortableData(territories);
 
   return (
     <div className="w-full space-y-8 animate-in fade-in duration-500">
@@ -157,15 +161,15 @@ export function FranchiseModule() {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-border/50">
-                <th className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-wider">Territory Name</th>
-                <th className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-wider">Status</th>
-                <th className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-wider">Partner</th>
-                <th className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-wider">Reservation Expires</th>
+                <SortableHeader label="Territory Name" sortKey="name" currentSort={sortConfig} onSort={requestSort} className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-wider" />
+                <SortableHeader label="Status" sortKey="status" currentSort={sortConfig} onSort={requestSort} className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-wider" />
+                <SortableHeader label="Partner" sortKey="partner" currentSort={sortConfig} onSort={requestSort} className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-wider" />
+                <SortableHeader label="Reservation Expires" sortKey="expires" currentSort={sortConfig} onSort={requestSort} className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-wider" />
                 <th className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-wider text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border/50">
-              {territories.map((territory, i) => (
+              {sortedTerritories.map((territory, i) => (
                 <tr key={i} className="hover:bg-muted/30 transition-colors">
                   <td className="p-4 font-bold text-foreground">{territory.name}</td>
                   <td className="p-4">

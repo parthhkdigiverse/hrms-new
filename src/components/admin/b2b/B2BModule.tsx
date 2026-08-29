@@ -9,6 +9,8 @@ import { cn } from "@/lib/utils";
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
 import { toast } from "sonner";
 import { DialogClose,  Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter  } from "@/components/ui/dialog";
+import { useSortableData } from "@/hooks/useSortableData";
+import { SortableHeader } from "@/components/ui/sortable-header";
 
 // --- Sub-components ---
 
@@ -107,6 +109,8 @@ function B2BPartners() {
     { name: "ABC Business Group", type: "Consulting", status: "Active", deals: 8, value: "₹1.2M" },
     { name: "XYZ Packaging", type: "Manufacturing", status: "Inactive", deals: 3, value: "₹850K" },
   ];
+
+  const { items: sortedPartners, requestSort, sortConfig } = useSortableData(partners);
 
   return (
     <div className="bg-card border border-border/50 rounded-3xl p-6 shadow-sm">
@@ -207,16 +211,16 @@ function B2BPartners() {
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="border-b border-border/50">
-              <th className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-wider">Partner Name</th>
-              <th className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-wider">Type</th>
-              <th className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-wider">Status</th>
-              <th className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-wider">Deals Closed</th>
-              <th className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-wider">Total Value</th>
+              <SortableHeader label="Partner Name" sortKey="name" currentSort={sortConfig} onSort={requestSort} className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-wider" />
+              <SortableHeader label="Type" sortKey="type" currentSort={sortConfig} onSort={requestSort} className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-wider" />
+              <SortableHeader label="Status" sortKey="status" currentSort={sortConfig} onSort={requestSort} className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-wider" />
+              <SortableHeader label="Deals Closed" sortKey="deals" currentSort={sortConfig} onSort={requestSort} className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-wider" />
+              <SortableHeader label="Total Value" sortKey="value" currentSort={sortConfig} onSort={requestSort} className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-wider" />
               <th className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-wider text-right">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
-            {partners.map((partner, i) => (
+            {sortedPartners.map((partner, i) => (
               <tr key={i} className="hover:bg-muted/30 transition-colors">
                 <td className="p-4 font-bold text-foreground">{partner.name}</td>
                 <td className="p-4 text-sm font-medium text-muted-foreground">{partner.type}</td>
@@ -240,6 +244,8 @@ function B2BPartners() {
 }
 
 function B2BGenericTable({ title, columns, data }: { title: string, columns: string[], data: any[][] }) {
+  const { items: sortedData, requestSort, sortConfig } = useSortableData(data);
+
   return (
     <div className="bg-card border border-border/50 rounded-3xl p-6 shadow-sm">
       <div className="flex justify-between items-center mb-6">
@@ -250,12 +256,12 @@ function B2BGenericTable({ title, columns, data }: { title: string, columns: str
           <thead>
             <tr className="border-b border-border/50">
               {columns.map((col, i) => (
-                <th key={i} className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-wider">{col}</th>
+                <SortableHeader key={i} label={col} sortKey={i.toString()} currentSort={sortConfig} onSort={requestSort} className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-wider" />
               ))}
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
-            {data.map((row, i) => (
+            {sortedData.map((row, i) => (
               <tr key={i} className="hover:bg-muted/30 transition-colors">
                 {row.map((cell, j) => (
                   <td key={j} className="p-4 text-sm font-medium text-foreground">{cell}</td>

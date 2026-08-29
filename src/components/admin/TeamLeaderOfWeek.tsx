@@ -32,6 +32,16 @@ export function TeamLeaderOfWeek() {
 
   const totalMaxMarks = MOCK_TOPICS.reduce((sum, t) => sum + t.maxMarks, 0);
 
+  const sortedParticipants = [...MOCK_PARTICIPANTS].sort((a, b) => {
+    if (sortBy === "total") {
+      const totalA = Object.values(a.marks).reduce((sum, val) => sum + val, 0);
+      const totalB = Object.values(b.marks).reduce((sum, val) => sum + val, 0);
+      return totalB - totalA; // descending
+    } else {
+      return a.name.localeCompare(b.name);
+    }
+  });
+
   return (
     <div className="w-full space-y-6 animate-in fade-in duration-500 pb-20">
       {/* Header */}
@@ -179,7 +189,7 @@ export function TeamLeaderOfWeek() {
               </tr>
             </thead>
             <tbody className="divide-y divide-border/40 font-medium text-foreground">
-              {MOCK_PARTICIPANTS.map((p, idx) => {
+              {sortedParticipants.map((p, idx) => {
                 const total = Object.values(p.marks).reduce((a, b) => a + b, 0);
                 return (
                   <tr key={p.id} className="hover:bg-muted/30 transition-colors group">

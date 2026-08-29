@@ -4,6 +4,8 @@ import { DialogClose,  Dialog, DialogContent  } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { EMPLOYEES } from "@/components/employees/employee-data";
 import { SearchableSelect } from "@/components/ui/select";
+import { useSortableData } from "@/hooks/useSortableData";
+import { SortableHeader } from "@/components/ui/sortable-header";
 
 type RequestStatus = "Pending" | "Approved" | "Sent" | "Rejected";
 
@@ -38,6 +40,8 @@ export function OfficialLetters({ onNavigate }: { onNavigate?: ((path: string) =
     req.employeeName.toLowerCase().includes(search.toLowerCase()) || 
     req.letterType.toLowerCase().includes(search.toLowerCase())
   );
+
+  const { items: sortedRequests, requestSort, sortConfig } = useSortableData(filteredRequests);
 
   const handleCreateRequest = () => {
     if (!newEmployeeName.trim() || !newReason.trim() || !newNeededBy) return;
@@ -176,23 +180,23 @@ export function OfficialLetters({ onNavigate }: { onNavigate?: ((path: string) =
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-border/50 bg-muted/30">
-                <th className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-widest whitespace-nowrap">Employee</th>
-                <th className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-widest whitespace-nowrap">Letter Type</th>
-                <th className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-widest whitespace-nowrap">Reason</th>
-                <th className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-widest whitespace-nowrap">Timeline</th>
-                <th className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-widest whitespace-nowrap">Status</th>
+                <SortableHeader label="Employee" sortKey="employeeName" currentSort={sortConfig} onSort={requestSort} className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-widest whitespace-nowrap" />
+                <SortableHeader label="Letter Type" sortKey="letterType" currentSort={sortConfig} onSort={requestSort} className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-widest whitespace-nowrap" />
+                <SortableHeader label="Reason" sortKey="reason" currentSort={sortConfig} onSort={requestSort} className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-widest whitespace-nowrap" />
+                <SortableHeader label="Dates" sortKey="requestDate" currentSort={sortConfig} onSort={requestSort} className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-widest whitespace-nowrap" />
+                <SortableHeader label="Status" sortKey="status" currentSort={sortConfig} onSort={requestSort} className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-widest whitespace-nowrap" />
                 <th className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-widest whitespace-nowrap text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border/50">
-              {filteredRequests.length === 0 ? (
+              {sortedRequests.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="p-8 text-center text-muted-foreground">
                     No requests found matching your search.
                   </td>
                 </tr>
               ) : (
-                filteredRequests.map((req) => (
+                sortedRequests.map((req) => (
                   <tr key={req.id} className="hover:bg-muted/30 transition-colors group">
                     <td className="p-4">
                       <div className="font-bold text-foreground">{req.employeeName}</div>

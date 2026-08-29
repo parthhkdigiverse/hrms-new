@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
-import { Download, Plus, Edit3, Trash2, ArrowUpRight, ArrowDownRight, Search, FileText, ChevronRight, Briefcase, Calendar, Info, X, Users, Filter, ChevronDown } from "lucide-react";
+import { Download, Plus, Edit3, Trash2, ArrowUpRight, ArrowDownRight, Search, FileText, ChevronRight, Briefcase, Calendar, Info, X, Users, Filter, ChevronDown, Landmark } from "lucide-react";
 import { DialogClose,  Dialog, DialogContent  } from "@/components/ui/dialog";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { moveToRecycleBin } from "@/lib/recycle-bin";
 import { SearchableSelect } from "@/components/ui/select";
+import { useSortableData } from "@/hooks/useSortableData";
+import { SortableHeader } from "@/components/ui/sortable-header";
 
 const mockClientData = [
   {
@@ -12,8 +14,8 @@ const mockClientData = [
     totalOutflow: 10000,
     netBalance: 140000,
     transactions: [
-      { id: 'TX-001', date: '2023-10-15', type: 'inflow', amount: 150000, desc: 'Project Advance', method: 'Wire Transfer', remarks: 'Q4 Contract' },
-      { id: 'TX-002', date: '2023-10-20', type: 'outflow', amount: 10000, desc: 'Hardware Refund', method: 'Bank Transfer', remarks: 'Defective units' },
+      { id: 'TX-001', date: '2023-10-15', type: 'inflow', amount: 150000, desc: 'Project Advance', method: 'Wire Transfer', remarks: 'Q4 Contract', bankId: 'b1' },
+      { id: 'TX-002', date: '2023-10-20', type: 'outflow', amount: 10000, desc: 'Hardware Refund', method: 'Bank Transfer', remarks: 'Defective units', bankId: 'b1' },
     ]
   },
   {
@@ -22,7 +24,7 @@ const mockClientData = [
     totalOutflow: 45000,
     netBalance: -45000,
     transactions: [
-      { id: 'TX-003', date: '2023-10-22', type: 'outflow', amount: 45000, desc: 'Consulting Fees', method: 'ACH', remarks: 'Sept invoice' },
+      { id: 'TX-003', date: '2023-10-22', type: 'outflow', amount: 45000, desc: 'Consulting Fees', method: 'ACH', remarks: 'Sept invoice', bankId: 'b1' },
     ]
   }
 ];
@@ -39,15 +41,31 @@ export function OtherTransactions() {
   const [searchQuery, setSearchQuery] = useState("");
   const [expandedClients, setExpandedClients] = useState<string[]>(["Acme Corp"]);
 
+  // Sorting for clients
+  const { items: sortedClients, requestSort, sortConfig } = useSortableData(clientData);
+
   // Modal States
   const [isAddTxOpen, setIsAddTxOpen] = useState(false);
   const [isManageClientOpen, setIsManageClientOpen] = useState(false);
+  const [isManageBanksOpen, setIsManageBanksOpen] = useState(false);
+
+  const [banksData, setBanksData] = useState(() => {
+    const saved = localStorage.getItem('hrms_banks');
+    return saved ? JSON.parse(saved) : [{ id: 'b1', name: 'HDFC Bank', openingBalance: 500000 }];
+  });
+  
+  useEffect(() => { localStorage.setItem('hrms_banks', JSON.stringify(banksData)); }, [banksData]);
+
+  const [newBankName, setNewBankName] = useState("");
+  const [newBankBalance, setNewBankBalance] = useState("");
 
   const [addTxType, setAddTxType] = useState("Inflow (Received)");
   const [addTxMethod, setAddTxMethod] = useState("Wire Transfer");
+  const [addTxBank, setAddTxBank] = useState("b1");
   
   const [manageTxType, setManageTxType] = useState("Inflow (Received)");
   const [manageTxMethod, setManageTxMethod] = useState("Wire Transfer");
+  const [manageTxBank, setManageTxBank] = useState("b1");
 
   const toggleExpand = (clientName: string) => {
     setExpandedClients(prev => 
@@ -95,6 +113,12 @@ export function OtherTransactions() {
           </p>
         </div>
         <div className="flex flex-wrap gap-2.5">
+          <button 
+            onClick={() => setIsManageBanksOpen(true)}
+            className="px-4 py-2 bg-background border border-border/50 text-foreground font-bold rounded-lg hover:bg-muted/50 transition-colors shadow-sm flex items-center gap-2 text-sm"
+          >
+            <Landmark className="w-4 h-4 text-emerald-500" /> Manage Banks
+          </button>
           <button className="px-4 py-2 bg-background border border-border/50 text-foreground font-bold rounded-lg hover:bg-muted/50 transition-colors shadow-sm flex items-center gap-2 text-sm">
             <Download className="w-4 h-4 text-indigo-500" /> Export Ledgers
           </button>
@@ -148,15 +172,39 @@ export function OtherTransactions() {
             <thead className="bg-muted/30 text-muted-foreground font-extrabold uppercase tracking-wider text-xs border-b border-border/50">
               <tr>
                 <th className="p-4 w-12 text-center"></th>
-                <th className="p-4">Category</th>
-                <th className="p-4 text-emerald-600 dark:text-emerald-500">Total Inflow</th>
-                <th className="p-4 text-rose-600 dark:text-rose-500">Total Outflow</th>
-                <th className="p-4 text-indigo-600 dark:text-indigo-400">Net Balance</th>
+                <SortableHeader 
+                  label="Category"
+                  sortKey="clientName"
+                  currentSort={sortConfig}
+                  onSort={requestSort}
+                  className="p-4"
+                />
+                <SortableHeader 
+                  label="Total Inflow"
+                  sortKey="totalInflow"
+                  currentSort={sortConfig}
+                  onSort={requestSort}
+                  className="p-4 text-emerald-600 dark:text-emerald-500"
+                />
+                <SortableHeader 
+                  label="Total Outflow"
+                  sortKey="totalOutflow"
+                  currentSort={sortConfig}
+                  onSort={requestSort}
+                  className="p-4 text-rose-600 dark:text-rose-500"
+                />
+                <SortableHeader 
+                  label="Net Balance"
+                  sortKey="netBalance"
+                  currentSort={sortConfig}
+                  onSort={requestSort}
+                  className="p-4 text-indigo-600 dark:text-indigo-400"
+                />
                 <th className="p-4 pr-6 text-center">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border/50">
-              {clientData.filter((c: any) => c.clientName.toLowerCase().includes(searchQuery.toLowerCase())).map((client: any, idx: number) => {
+              {sortedClients.filter((c: any) => c.clientName.toLowerCase().includes(searchQuery.toLowerCase())).map((client: any, idx: number) => {
                 const isExpanded = expandedClients.includes(client.clientName);
                 
                 return (
@@ -210,6 +258,7 @@ export function OtherTransactions() {
                                   <th className="p-3 text-right">Amount</th>
                                   <th className="p-3">Description</th>
                                   <th className="p-3">Method</th>
+                                  <th className="p-3">Bank</th>
                                   <th className="p-3">Remarks</th>
                                   <th className="p-3 pr-4 text-center">Actions</th>
                                 </tr>
@@ -237,6 +286,9 @@ export function OtherTransactions() {
                                     </td>
                                     <td className="p-3 font-bold text-foreground">{tx.desc}</td>
                                     <td className="p-3 font-medium text-muted-foreground">{tx.method}</td>
+                                    <td className="p-3 font-medium text-muted-foreground">
+                                      {banksData.find((b: any) => b.id === tx.bankId)?.name || 'N/A'}
+                                    </td>
                                     <td className="p-3 font-medium text-muted-foreground">{tx.remarks}</td>
                                     <td className="p-3 pr-4 text-center">
                                       <div className="flex items-center justify-center gap-2">
@@ -244,6 +296,7 @@ export function OtherTransactions() {
                                           onClick={() => {
                                             setAddTxType(tx.type === "inflow" ? "Inflow (Received)" : "Outflow (Paid)");
                                             setAddTxMethod(tx.method);
+                                            setAddTxBank(tx.bankId || banksData[0]?.id || "");
                                             setIsAddTxOpen(true);
                                             // Pre-fill inputs after modal dialog updates
                                             setTimeout(() => {
@@ -339,9 +392,20 @@ export function OtherTransactions() {
                   />
                 </div>
               </div>
-              <div className="space-y-1.5">
-                <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wide">Description</label>
-                <input type="text" placeholder="Short description" className="w-full px-3 py-2 bg-background border border-border/50 rounded-lg text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-primary/20" />
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wide">Bank Account *</label>
+                  <SearchableSelect
+                    value={addTxBank}
+                    onChange={setAddTxBank}
+                    options={banksData.map((b: any) => ({ label: b.name, value: b.id }))}
+                    className="w-full h-[40px] px-3 bg-background border border-border/50 rounded-lg text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-primary/20"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wide">Description</label>
+                  <input type="text" placeholder="Short description" className="w-full px-3 py-2 bg-background border border-border/50 rounded-lg text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-primary/20" />
+                </div>
               </div>
               <div className="space-y-1.5">
                 <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wide">Remarks / Notes</label>
@@ -428,9 +492,20 @@ export function OtherTransactions() {
                     />
                   </div>
                 </div>
-                <div className="space-y-1.5">
-                  <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wide">Description & Remarks</label>
-                  <input type="text" placeholder="Short description or narrative" className="w-full px-3 py-2 bg-background border border-border/50 rounded-lg text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500/20" />
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wide">Bank Account *</label>
+                    <SearchableSelect
+                      value={manageTxBank}
+                      onChange={setManageTxBank}
+                      options={banksData.map((b: any) => ({ label: b.name, value: b.id }))}
+                      className="w-full h-[40px] px-3 bg-background border border-border/50 rounded-lg text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wide">Description & Remarks</label>
+                    <input type="text" placeholder="Short description or narrative" className="w-full px-3 py-2 bg-background border border-border/50 rounded-lg text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500/20" />
+                  </div>
                 </div>
               </div>
             </div>
@@ -439,6 +514,128 @@ export function OtherTransactions() {
               <button onClick={() => setIsManageClientOpen(false)} className="px-4 py-2 font-bold text-sm bg-background border border-border/50 rounded-lg hover:bg-muted transition-colors text-muted-foreground">Close</button>
               <button onClick={() => setIsManageClientOpen(false)} className="px-4 py-2 font-bold text-sm bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors shadow-sm">Save Transaction</button>
             </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* --- MANAGE BANKS MODAL --- */}
+      <Dialog open={isManageBanksOpen} onOpenChange={setIsManageBanksOpen}>
+        <DialogContent className="max-w-2xl p-0 overflow-hidden rounded-[2rem] gap-0 border-border/60 shadow-2xl [&>button]:hidden bg-card">
+          <div className="p-4 border-b border-border/50 flex justify-between items-center bg-emerald-500/5 shrink-0">
+            <div>
+              <h3 className="font-black text-lg text-foreground">Manage Bank Accounts</h3>
+              <p className="text-xs font-medium text-muted-foreground">Add new banks and view current balances.</p>
+            </div>
+            <button onClick={() => setIsManageBanksOpen(false)} className="p-2 hover:bg-muted rounded-full transition-colors">
+              <X className="w-4 h-4 text-muted-foreground" />
+            </button>
+          </div>
+          
+          <div className="p-6 md:p-8 space-y-6 overflow-y-auto max-h-[70vh]">
+            {/* Add Bank Form */}
+            <div className="bg-muted/30 border border-border/50 rounded-xl p-4 space-y-4">
+              <h4 className="text-sm font-bold text-foreground">Add New Bank</h4>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+                <div className="space-y-1.5 md:col-span-2">
+                  <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wide">Bank Name *</label>
+                  <input 
+                    type="text" 
+                    value={newBankName}
+                    onChange={(e) => setNewBankName(e.target.value)}
+                    placeholder="e.g. HDFC Current Account" 
+                    className="w-full px-3 py-2 bg-background border border-border/50 rounded-lg text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500/20" 
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wide">Opening Balance (₹) *</label>
+                  <input 
+                    type="number" 
+                    value={newBankBalance}
+                    onChange={(e) => setNewBankBalance(e.target.value)}
+                    placeholder="0.00" 
+                    className="w-full px-3 py-2 bg-background border border-border/50 rounded-lg text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500/20" 
+                  />
+                </div>
+              </div>
+              <button 
+                onClick={() => {
+                  if (newBankName && newBankBalance) {
+                    const newBank = {
+                      id: `b${Date.now()}`,
+                      name: newBankName,
+                      openingBalance: parseFloat(newBankBalance)
+                    };
+                    setBanksData([...banksData, newBank]);
+                    setNewBankName("");
+                    setNewBankBalance("");
+                  }
+                }}
+                className="w-full md:w-auto px-4 py-2 bg-emerald-600 text-white font-bold text-sm rounded-lg hover:bg-emerald-700 transition-colors shadow-sm"
+              >
+                Add Bank Account
+              </button>
+            </div>
+
+            {/* Banks List */}
+            <div className="space-y-3">
+              <h4 className="text-sm font-bold text-foreground">Current Accounts</h4>
+              <div className="border border-border/50 rounded-xl overflow-hidden shadow-inner bg-card">
+                <table className="w-full text-left">
+                  <thead className="bg-muted/30 border-b border-border/50 text-muted-foreground text-[10px] font-black uppercase tracking-widest">
+                    <tr>
+                      <th className="p-3 pl-4">Bank Name</th>
+                      <th className="p-3 text-right">Opening Balance</th>
+                      <th className="p-3 text-right">Current Balance</th>
+                      <th className="p-3 pr-4 text-center">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border/50 text-sm">
+                    {banksData.map((bank: any) => {
+                      let currentBalance = bank.openingBalance;
+                      let hasTransactions = false;
+                      clientData.forEach((client: any) => {
+                        client.transactions.forEach((tx: any) => {
+                          if (tx.bankId === bank.id) {
+                            hasTransactions = true;
+                            if (tx.type === 'inflow') currentBalance += tx.amount;
+                            else if (tx.type === 'outflow') currentBalance -= tx.amount;
+                          }
+                        });
+                      });
+
+                      return (
+                        <tr key={bank.id} className="hover:bg-muted/30 transition-colors">
+                          <td className="p-3 pl-4 font-bold text-foreground flex items-center gap-2">
+                            <Landmark className="w-4 h-4 text-emerald-500" />
+                            {bank.name}
+                          </td>
+                          <td className="p-3 text-right font-medium text-muted-foreground">
+                            ₹{bank.openingBalance.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                          </td>
+                          <td className="p-3 text-right font-black text-emerald-600 dark:text-emerald-500">
+                            ₹{currentBalance.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                          </td>
+                          <td className="p-3 pr-4 text-center">
+                            <button 
+                              disabled={hasTransactions}
+                              onClick={() => {
+                                if (!hasTransactions) {
+                                  setBanksData(banksData.filter((b: any) => b.id !== bank.id));
+                                }
+                              }}
+                              className={`text-rose-500 transition-colors ${hasTransactions ? 'opacity-30 cursor-not-allowed' : 'hover:text-rose-600'}`}
+                              title={hasTransactions ? "Cannot delete bank with associated transactions" : "Delete Bank"}
+                            >
+                              <Trash2 className="w-4 h-4 mx-auto" />
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
 

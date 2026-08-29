@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { Search, Filter, Plus, FileText, Download, MoreVertical, Trash2, Edit2, ReceiptText, ArrowUpRight } from "lucide-react";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
+import { moveToRecycleBin } from "@/lib/recycle-bin";
+import { useSortableData } from "@/hooks/useSortableData";
+import { SortableHeader } from "@/components/ui/sortable-header";
 import { cn } from "@/lib/utils";
 import { SearchableSelect } from "@/components/ui/select";
 
@@ -30,10 +33,13 @@ export function AllInvoices() {
   const [deleteConfirm, setDeleteConfirm] = useState<{isOpen: boolean, id: string | null, name: string}>({isOpen: false, id: null, name: ""});
 
   const filteredInvoices = invoices.filter(inv => {
-    const matchesSearch = inv.clientName.toLowerCase().includes(search.toLowerCase()) || inv.invoiceNumber.toLowerCase().includes(search.toLowerCase());
+    const matchesSearch = inv.invoiceNumber.toLowerCase().includes(search.toLowerCase()) || 
+                          inv.clientName.toLowerCase().includes(search.toLowerCase());
     const matchesStatus = statusFilter === "All" || inv.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
+
+  const { items: sortedInvoices, requestSort, sortConfig } = useSortableData(filteredInvoices);
 
   const getStatusColor = (status: InvoiceStatus) => {
     switch (status) {
@@ -135,16 +141,16 @@ export function AllInvoices() {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-border/50 bg-muted/30">
-                <th className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-wider">Invoice Info</th>
-                <th className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-wider">Client</th>
-                <th className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-wider">Amount</th>
-                <th className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-wider">Dates</th>
-                <th className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-wider">Status</th>
+                <SortableHeader label="Invoice Info" sortKey="invoiceNumber" currentSort={sortConfig} onSort={requestSort} className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-wider" />
+                <SortableHeader label="Client" sortKey="clientName" currentSort={sortConfig} onSort={requestSort} className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-wider" />
+                <SortableHeader label="Amount" sortKey="amount" currentSort={sortConfig} onSort={requestSort} className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-wider" />
+                <SortableHeader label="Dates" sortKey="date" currentSort={sortConfig} onSort={requestSort} className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-wider" />
+                <SortableHeader label="Status" sortKey="status" currentSort={sortConfig} onSort={requestSort} className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-wider" />
                 <th className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-wider text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border/50">
-              {filteredInvoices.map((inv) => (
+              {sortedInvoices.map((inv) => (
                 <tr key={inv.id} className="hover:bg-muted/20 transition-colors group">
                   <td className="p-4">
                     <div className="flex items-center gap-3">

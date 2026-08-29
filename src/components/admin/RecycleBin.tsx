@@ -5,6 +5,8 @@ import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { formatDistanceToNow, format } from "date-fns";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { useSortableData } from "@/hooks/useSortableData";
+import { SortableHeader } from "@/components/ui/sortable-header";
 
 export function RecycleBin() {
   const [items, setItems] = useState<RecycleBinItem[]>([]);
@@ -40,6 +42,8 @@ export function RecycleBin() {
     i.itemName.toLowerCase().includes(searchQuery.toLowerCase()) || 
     i.module.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const { items: sortedItems, requestSort, sortConfig } = useSortableData(filteredItems);
 
   return (
     <div className="w-full space-y-6 animate-in fade-in duration-500 pb-12 relative">
@@ -88,15 +92,15 @@ export function RecycleBin() {
             <table className="w-full text-left border-collapse whitespace-nowrap min-w-[800px]">
               <thead className="bg-muted/30 text-[10px] font-black uppercase tracking-widest text-muted-foreground border-b border-border/50">
                 <tr>
-                  <th className="p-4 w-[20%]">Module</th>
-                  <th className="p-4 w-[35%]">Item Name</th>
-                  <th className="p-4 w-[20%]">Deleted On</th>
+                  <SortableHeader label="Module" sortKey="module" currentSort={sortConfig} onSort={requestSort} className="p-4 w-[20%]" />
+                  <SortableHeader label="Item Name" sortKey="itemName" currentSort={sortConfig} onSort={requestSort} className="p-4 w-[35%]" />
+                  <SortableHeader label="Deleted On" sortKey="deletedAt" currentSort={sortConfig} onSort={requestSort} className="p-4 w-[20%]" />
                   <th className="p-4 w-[15%]">Days Left</th>
                   <th className="p-4 w-[10%] text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/30">
-                {filteredItems.map(item => {
+                {sortedItems.map(item => {
                   const deletedDate = new Date(item.deletedAt);
                   const expiryDate = new Date(item.deletedAt + (RECYCLE_BIN_DAYS_LIMIT * 24 * 60 * 60 * 1000));
                   const daysLeft = Math.ceil((expiryDate.getTime() - Date.now()) / (24 * 60 * 60 * 1000));

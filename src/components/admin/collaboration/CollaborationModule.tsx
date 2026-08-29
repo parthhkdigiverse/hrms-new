@@ -8,6 +8,8 @@ import { cn } from "@/lib/utils";
 import { AreaChart, Area, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
 import { toast } from "sonner";
 import { DialogClose,  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter  } from "@/components/ui/dialog";
+import { useSortableData } from "@/hooks/useSortableData";
+import { SortableHeader } from "@/components/ui/sortable-header";
 
 export function CollaborationModule() {
   const [isAddPartnerOpen, setIsAddPartnerOpen] = useState(false);
@@ -39,6 +41,8 @@ export function CollaborationModule() {
     { name: 'Outgoing (Outsourced)', value: 9 },
   ];
   const COLORS = ['var(--chart-1)', 'var(--chart-2)', 'var(--chart-3)', 'var(--chart-4)', 'var(--chart-5)'];
+
+  const { items: sortedPartners, requestSort, sortConfig } = useSortableData(partners);
 
   return (
     <div className="w-full space-y-8 animate-in fade-in duration-500">
@@ -134,16 +138,16 @@ export function CollaborationModule() {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-border/50">
-                <th className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-wider">Partner Name</th>
-                <th className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-wider">Capability</th>
-                <th className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-wider">Type</th>
-                <th className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-wider">Active Projects</th>
-                <th className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-wider">Rating</th>
+                <SortableHeader label="Partner Name" sortKey="name" currentSort={sortConfig} onSort={requestSort} className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-wider" />
+                <SortableHeader label="Capability" sortKey="capability" currentSort={sortConfig} onSort={requestSort} className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-wider" />
+                <SortableHeader label="Type" sortKey="type" currentSort={sortConfig} onSort={requestSort} className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-wider" />
+                <SortableHeader label="Active Projects" sortKey="activeProjects" currentSort={sortConfig} onSort={requestSort} className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-wider" />
+                <SortableHeader label="Rating" sortKey="rating" currentSort={sortConfig} onSort={requestSort} className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-wider" />
                 <th className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-wider text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border/50">
-              {partners.map((partner, i) => (
+              {sortedPartners.map((partner, i) => (
                 <tr key={i} className="hover:bg-muted/30 transition-colors">
                   <td className="p-4 font-bold text-foreground">{partner.name}</td>
                   <td className="p-4 text-sm font-medium text-muted-foreground">{partner.capability}</td>

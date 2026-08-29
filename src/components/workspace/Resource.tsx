@@ -44,6 +44,8 @@ import { useUser } from "@/hooks/useUser";
 import { API_URL } from "@/lib/config";
 import { toast } from "sonner";
 import { PrintLabelsModal } from "./PrintLabelsModal";
+import { useSortableData } from "@/hooks/useSortableData";
+import { SortableHeader } from "@/components/ui/sortable-header";
 
 const getStatusBadge = (status: string) => {
   switch (status) {
@@ -678,7 +680,9 @@ export default function ResourceManagementPage() {
     return matchStatus && matchType && matchEmployee && matchSearch;
   });
   
-  const paginatedResources = filteredResources.slice(
+  const { items: sortedResources, requestSort: requestSortResources, sortConfig: sortConfigResources } = useSortableData(filteredResources);
+
+  const paginatedResources = sortedResources.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
@@ -713,6 +717,8 @@ export default function ResourceManagementPage() {
       allocationRate
     };
   });
+
+  const { items: sortedCategoryStats, requestSort: requestSortCategories, sortConfig: sortConfigCategories } = useSortableData(categoryStats);
 
   if (isAddingMode) {
     return (
@@ -956,16 +962,16 @@ export default function ResourceManagementPage() {
                 <table className="w-full text-sm text-left whitespace-nowrap">
                   <thead className="text-xs text-muted-foreground font-semibold border-b border-border bg-gray-50/50 uppercase tracking-wider">
                     <tr>
-                      <th className="px-6 py-4 font-bold text-foreground">Category Name</th>
-                      <th className="px-6 py-4 font-bold text-foreground text-center">Total Items</th>
-                      <th className="px-6 py-4 font-bold text-foreground text-center">Available Stock</th>
-                      <th className="px-6 py-4 font-bold text-foreground text-center">Allocated (Assigned)</th>
-                      <th className="px-6 py-4 font-bold text-foreground text-center">In Maintenance</th>
-                      <th className="px-6 py-4 font-bold text-foreground">Allocation Ratio</th>
+                      <SortableHeader label="Category Name" sortKey="name" currentSort={sortConfigCategories} onSort={requestSortCategories} className="px-6 py-4" />
+                      <SortableHeader label="Total Items" sortKey="total" currentSort={sortConfigCategories} onSort={requestSortCategories} className="px-6 py-4 text-center" />
+                      <SortableHeader label="Available Stock" sortKey="available" currentSort={sortConfigCategories} onSort={requestSortCategories} className="px-6 py-4 text-center" />
+                      <SortableHeader label="Allocated (Assigned)" sortKey="allocated" currentSort={sortConfigCategories} onSort={requestSortCategories} className="px-6 py-4 text-center" />
+                      <SortableHeader label="In Maintenance" sortKey="maintenance" currentSort={sortConfigCategories} onSort={requestSortCategories} className="px-6 py-4 text-center" />
+                      <SortableHeader label="Allocation Ratio" sortKey="allocationRate" currentSort={sortConfigCategories} onSort={requestSortCategories} className="px-6 py-4" />
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border">
-                    {categoryStats.map(cat => (
+                    {sortedCategoryStats.map(cat => (
                       <tr key={cat.name} className="hover:bg-gray-50/30 transition-colors">
                         <td className="px-6 py-4 font-medium text-foreground">
                           <span className="font-semibold text-sm">{cat.name}</span>
@@ -1080,11 +1086,11 @@ export default function ResourceManagementPage() {
             <table className="w-full text-sm text-left whitespace-nowrap">
               <thead className="text-xs text-muted-foreground font-semibold border-b border-border bg-gray-50/50 uppercase tracking-wider">
                 <tr>
-                  <th className="px-6 py-4 font-bold text-foreground">Resource ID</th>
-                  <th className="px-6 py-4 font-bold text-foreground">Category</th>
-                  <th className="px-6 py-4 font-bold text-foreground text-center">Condition</th>
-                  <th className="px-6 py-4 font-bold text-foreground">Status</th>
-                  <th className="px-6 py-4 font-bold text-foreground">Assigned To</th>
+                  <SortableHeader label="Resource ID" sortKey="assetId" currentSort={sortConfigResources} onSort={requestSortResources} className="px-6 py-4" />
+                  <SortableHeader label="Category" sortKey="category" currentSort={sortConfigResources} onSort={requestSortResources} className="px-6 py-4" />
+                  <SortableHeader label="Condition" sortKey="condition" currentSort={sortConfigResources} onSort={requestSortResources} className="px-6 py-4 text-center" />
+                  <SortableHeader label="Status" sortKey="status" currentSort={sortConfigResources} onSort={requestSortResources} className="px-6 py-4" />
+                  <SortableHeader label="Assigned To" sortKey="assignedTo" currentSort={sortConfigResources} onSort={requestSortResources} className="px-6 py-4" />
                   {!isEmployeeOnly && <th className="px-6 py-4 font-bold text-foreground text-right sticky right-0 z-20 bg-[#f9fafb] shadow-[-1px_0_0_0_#e2e8f0]">Actions</th>}
                 </tr>
               </thead>
@@ -1358,20 +1364,20 @@ export default function ResourceManagementPage() {
                 <table className="w-full text-sm text-left whitespace-nowrap">
                   <thead className="text-xs text-muted-foreground font-semibold border-b border-border bg-gray-50/50 uppercase tracking-wider">
                     <tr>
-                      <th className="px-6 py-4 font-bold text-foreground">Category</th>
-                      <th className="px-6 py-4 font-bold text-foreground">Description</th>
-                      <th className="px-6 py-4 font-bold text-foreground">Total Resources</th>
+                      <SortableHeader label="Category" sortKey="name" currentSort={sortConfigCategories} onSort={requestSortCategories} className="px-6 py-4" />
+                      <SortableHeader label="Description" sortKey="description" currentSort={sortConfigCategories} onSort={requestSortCategories} className="px-6 py-4" />
+                      <SortableHeader label="Total Resources" sortKey="total" currentSort={sortConfigCategories} onSort={requestSortCategories} className="px-6 py-4" />
                       <th className="px-6 py-4 font-bold text-foreground text-right sticky right-0 z-20 bg-[#f9fafb] shadow-[-1px_0_0_0_#e2e8f0]">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border">
-                    {categoryStats.length === 0 ? (
+                    {sortedCategoryStats.length === 0 ? (
                       <tr>
                         <td colSpan={4} className="px-6 py-10 text-center text-muted-foreground">
                           {categoriesLoading ? "Syncing categories..." : "No categories found. Click 'Add Category' to create one."}
                         </td>
                       </tr>
-                    ) : categoryStats.map((cat: any) => (
+                    ) : sortedCategoryStats.map((cat: any) => (
                       <tr key={cat.id} className="hover:bg-gray-50/30 transition-colors">
                         <td className="px-6 py-4 font-medium text-foreground">
                           <span className="font-semibold text-sm">{cat.name}</span>

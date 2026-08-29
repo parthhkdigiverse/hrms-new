@@ -7,6 +7,8 @@ import { SearchableSelect } from "@/components/ui/select";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { toast } from "sonner";
 import { format } from "date-fns";
+import { useSortableData } from "@/hooks/useSortableData";
+import { SortableHeader } from "@/components/ui/sortable-header";
 
 type TaskStatus = "Todo" | "In Progress" | "In Review" | "Done";
 type Priority = "High" | "Medium" | "Low";
@@ -313,6 +315,8 @@ export function Tasks({ setActive }: { setActive?: (route: string) => void }) {
     }
     return result;
   }, [allTasks, searchQuery, statusFilter]);
+
+  const { items: sortedTasks, requestSort, sortConfig } = useSortableData(filteredTasks);
 
   const updateTaskStatus = (taskId: string, nextStatus: TaskStatus) => {
     const task = allTasks.find(t => t.id === taskId);
@@ -935,16 +939,16 @@ export function Tasks({ setActive }: { setActive?: (route: string) => void }) {
             <table className="w-full text-left border-collapse">
               <thead className="bg-muted/30 border-b border-border sticky top-0">
                 <tr>
-                  <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase tracking-wider">Task Details</th>
-                  <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase tracking-wider">Status</th>
-                  <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase tracking-wider">Priority</th>
-                  <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase tracking-wider">Due Date</th>
+                  <SortableHeader label="Task Details" sortKey="title" currentSort={sortConfig} onSort={requestSort} className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase tracking-wider" />
+                  <SortableHeader label="Status" sortKey="status" currentSort={sortConfig} onSort={requestSort} className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase tracking-wider" />
+                  <SortableHeader label="Priority" sortKey="priority" currentSort={sortConfig} onSort={requestSort} className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase tracking-wider" />
+                  <SortableHeader label="Due Date" sortKey="dueDate" currentSort={sortConfig} onSort={requestSort} className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase tracking-wider" />
                   <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase tracking-wider">Assignee</th>
                   <th className="px-6 py-4"></th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {filteredTasks.map(task => (
+                {sortedTasks.map(task => (
                   <tr key={task.id} className="hover:bg-muted/20 transition-colors group cursor-pointer" onClick={() => !inlineEditingTaskId && startInlineEdit(task)}>
                     {inlineEditingTaskId === task.id ? (
                       <>

@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Activity, MousePointerClick, Keyboard, TrendingUp, Monitor, Globe, Search, Download, ArrowUpDown, Filter } from "lucide-react";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { SearchableSelect } from "@/components/ui/select";
+import { useSortableData } from "@/hooks/useSortableData";
+import { SortableHeader } from "@/components/ui/sortable-header";
 
 const trendData = [
   { date: 'Mon', clicks: 12500, keystrokes: 45000 },
@@ -45,6 +47,13 @@ export function ActivityTracker() {
     if (secs < 3600) return `${Math.round(secs / 60)}m`;
     return `${(secs / 3600).toFixed(1)}h`;
   };
+
+  const filteredLogs = mockLogs.filter(log => 
+    log.employee.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    log.empId.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const { items: sortedLogs, requestSort, sortConfig } = useSortableData(filteredLogs);
 
   return (
     <div className="w-full space-y-8 animate-in fade-in duration-500">
@@ -248,22 +257,14 @@ export function ActivityTracker() {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-muted/30 border-b border-border/50 text-muted-foreground font-bold text-xs uppercase tracking-wider">
-                <th className="p-4 pl-6 cursor-pointer hover:text-foreground transition-colors">
-                  <div className="flex items-center gap-2">Date <ArrowUpDown className="w-3 h-3" /></div>
-                </th>
-                <th className="p-4 cursor-pointer hover:text-foreground transition-colors">
-                  <div className="flex items-center gap-2">Employee <ArrowUpDown className="w-3 h-3" /></div>
-                </th>
-                <th className="p-4 text-right cursor-pointer hover:text-foreground transition-colors">
-                  <div className="flex items-center justify-end gap-2">Clicks <ArrowUpDown className="w-3 h-3" /></div>
-                </th>
-                <th className="p-4 pr-6 text-right cursor-pointer hover:text-foreground transition-colors">
-                  <div className="flex items-center justify-end gap-2">Keystrokes <ArrowUpDown className="w-3 h-3" /></div>
-                </th>
+                <SortableHeader label="Date" sortKey="date" currentSort={sortConfig} onSort={requestSort} className="p-4 pl-6" />
+                <SortableHeader label="Employee" sortKey="employee" currentSort={sortConfig} onSort={requestSort} className="p-4" />
+                <SortableHeader label="Clicks" sortKey="clicks" currentSort={sortConfig} onSort={requestSort} className="p-4 text-right" />
+                <SortableHeader label="Keystrokes" sortKey="keystrokes" currentSort={sortConfig} onSort={requestSort} className="p-4 pr-6 text-right" />
               </tr>
             </thead>
             <tbody className="divide-y divide-border/50">
-              {mockLogs.map((log) => (
+              {sortedLogs.map((log) => (
                 <tr key={log.id} className="hover:bg-muted/20 transition-colors">
                   <td className="p-4 pl-6 font-medium text-foreground text-sm">{log.date}</td>
                   <td className="p-4">

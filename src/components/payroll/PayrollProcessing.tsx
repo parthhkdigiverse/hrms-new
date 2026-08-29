@@ -1,5 +1,7 @@
 import { useState } from "react";
-import { formatCurrency, MOCK_PAYROLL_RUNS } from "./payroll-data";
+import { formatCurrency, MOCK_PAYROLL_RUNS, type PayrollRun } from "./payroll-data";
+import { useSortableData } from "@/hooks/useSortableData";
+import { SortableHeader } from "@/components/ui/sortable-header";
 import { Users, Gift, MinusCircle, PlayCircle, CheckCircle2, Lock, FileSpreadsheet, FileText, Send, Search, Filter } from "lucide-react";
 import { SearchableSelect } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
@@ -17,6 +19,8 @@ export function PayrollProcessing() {
     r.employee.toLowerCase().includes(searchTerm.toLowerCase()) || 
     r.empId.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const { items: sortedRuns, requestSort, sortConfig } = useSortableData(filteredRuns);
 
   const handleGenerate = () => {
     setStage("generated");
@@ -243,20 +247,20 @@ export function PayrollProcessing() {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-border/60 bg-muted/50/50">
-                <th className="py-4 px-5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Employee</th>
-                <th className="py-4 px-5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest text-center">Working</th>
-                <th className="py-4 px-5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest text-center">Present</th>
-                <th className="py-4 px-5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest text-center">Absent</th>
-                <th className="py-4 px-5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest text-center">Leave</th>
-                <th className="py-4 px-5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest text-center">OT Hrs</th>
-                <th className="py-4 px-5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest text-right">Gross</th>
-                <th className="py-4 px-5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest text-right">Deduction</th>
-                <th className="py-4 px-5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest text-right">Net Salary</th>
-                <th className="py-4 px-5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest text-center">Status</th>
+                <SortableHeader label="Employee" sortKey="employee" currentSort={sortConfig} onSort={requestSort} className="py-4 px-5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest" />
+                <SortableHeader label="Working" sortKey="working" currentSort={sortConfig} onSort={requestSort} className="py-4 px-5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest text-center" />
+                <SortableHeader label="Present" sortKey="present" currentSort={sortConfig} onSort={requestSort} className="py-4 px-5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest text-center" />
+                <SortableHeader label="Absent" sortKey="absent" currentSort={sortConfig} onSort={requestSort} className="py-4 px-5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest text-center" />
+                <SortableHeader label="Leave" sortKey="leave" currentSort={sortConfig} onSort={requestSort} className="py-4 px-5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest text-center" />
+                <SortableHeader label="OT Hrs" sortKey="otHrs" currentSort={sortConfig} onSort={requestSort} className="py-4 px-5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest text-center" />
+                <SortableHeader label="Gross" sortKey="gross" currentSort={sortConfig} onSort={requestSort} className="py-4 px-5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest text-right" />
+                <SortableHeader label="Deduction" sortKey="deduction" currentSort={sortConfig} onSort={requestSort} className="py-4 px-5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest text-right" />
+                <SortableHeader label="Net Salary" sortKey="netSalary" currentSort={sortConfig} onSort={requestSort} className="py-4 px-5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest text-right" />
+                <SortableHeader label="Status" sortKey="status" currentSort={sortConfig} onSort={requestSort} className="py-4 px-5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest text-center" />
               </tr>
             </thead>
             <tbody className="divide-y divide-border/40">
-              {filteredRuns.map((run) => (
+              {sortedRuns.map((run) => (
                 <tr key={run.id} className="hover:bg-muted/50/50 transition-colors">
                   <td className="py-4 px-5">
                     <div className="flex items-center gap-3">

@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Search, Filter, Landmark, Download, FileText, IndianRupee, Activity } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SearchableSelect } from "@/components/ui/select";
+import { useSortableData } from "@/hooks/useSortableData";
+import { SortableHeader } from "@/components/ui/sortable-header";
 
 interface LedgerEntry {
   id: string;
@@ -31,6 +33,8 @@ export function InvoiceLedger() {
     const matchesClient = clientFilter === "All" || entry.clientName === clientFilter;
     return matchesSearch && matchesClient;
   }).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()); // sort newest first
+
+  const { items: sortedLedger, requestSort, sortConfig } = useSortableData(filteredLedger, { key: "date", direction: "descending" });
 
   const totalInvoiced = filteredLedger.filter(e => e.type === "Invoice").reduce((acc, curr) => acc + curr.amount, 0);
   const totalReceived = filteredLedger.filter(e => e.type === "Payment").reduce((acc, curr) => acc + Math.abs(curr.amount), 0);
@@ -114,16 +118,16 @@ export function InvoiceLedger() {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-border/50 bg-muted/30">
-                <th className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-wider">Date</th>
-                <th className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-wider">Client</th>
-                <th className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-wider">Reference</th>
-                <th className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-wider">Type</th>
-                <th className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-wider text-right">Debit (Invoice)</th>
-                <th className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-wider text-right">Credit (Payment)</th>
+                <SortableHeader label="Date" sortKey="date" currentSort={sortConfig} onSort={requestSort} className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-wider" />
+                <SortableHeader label="Client" sortKey="clientName" currentSort={sortConfig} onSort={requestSort} className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-wider" />
+                <SortableHeader label="Reference" sortKey="reference" currentSort={sortConfig} onSort={requestSort} className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-wider" />
+                <SortableHeader label="Type" sortKey="type" currentSort={sortConfig} onSort={requestSort} className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-wider" />
+                <SortableHeader align="right" label="Debit (Invoice)" sortKey="amount" currentSort={sortConfig} onSort={requestSort} className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-wider text-right" />
+                <SortableHeader align="right" label="Credit (Payment)" sortKey="amount" currentSort={sortConfig} onSort={requestSort} className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-wider text-right" />
               </tr>
             </thead>
             <tbody className="divide-y divide-border/50">
-              {filteredLedger.map((entry) => (
+              {sortedLedger.map((entry) => (
                 <tr key={entry.id} className="hover:bg-muted/20 transition-colors">
                   <td className="p-4 font-bold text-sm text-foreground">{entry.date}</td>
                   <td className="p-4 font-bold text-sm text-foreground">{entry.clientName}</td>

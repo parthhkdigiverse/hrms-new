@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Search, PenTool, CheckCircle2, Clock, Send, Eye } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useSortableData } from "@/hooks/useSortableData";
+import { SortableHeader } from "@/components/ui/sortable-header";
 
 type SignatureStatus = "Pending" | "Signed" | "Expired";
 
@@ -27,6 +29,8 @@ export function EmployeeSignatures() {
     sig.employeeName.toLowerCase().includes(search.toLowerCase()) || 
     sig.documentName.toLowerCase().includes(search.toLowerCase())
   );
+
+  const { items: sortedSignatures, requestSort, sortConfig } = useSortableData(filteredSignatures);
 
   const getStatusIcon = (status: SignatureStatus) => {
     switch (status) {
@@ -83,22 +87,22 @@ export function EmployeeSignatures() {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-border/50 bg-muted/30">
-                <th className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-widest whitespace-nowrap">Employee</th>
-                <th className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-widest whitespace-nowrap">Document Name</th>
-                <th className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-widest whitespace-nowrap">Status</th>
-                <th className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-widest whitespace-nowrap">Timeline</th>
+                <SortableHeader label="Employee" sortKey="employeeName" currentSort={sortConfig} onSort={requestSort} className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-widest whitespace-nowrap" />
+                <SortableHeader label="Document Name" sortKey="documentName" currentSort={sortConfig} onSort={requestSort} className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-widest whitespace-nowrap" />
+                <SortableHeader label="Status" sortKey="status" currentSort={sortConfig} onSort={requestSort} className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-widest whitespace-nowrap" />
+                <SortableHeader label="Timeline" sortKey="sentDate" currentSort={sortConfig} onSort={requestSort} className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-widest whitespace-nowrap" />
                 <th className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-widest whitespace-nowrap text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border/50">
-              {filteredSignatures.length === 0 ? (
+              {sortedSignatures.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="p-8 text-center text-muted-foreground">
                     No signature requests found.
                   </td>
                 </tr>
               ) : (
-                filteredSignatures.map((sig) => (
+                sortedSignatures.map((sig) => (
                   <tr key={sig.id} className="hover:bg-muted/30 transition-colors group">
                     <td className="p-4">
                       <div className="font-bold text-foreground">{sig.employeeName}</div>

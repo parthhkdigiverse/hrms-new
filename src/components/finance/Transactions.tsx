@@ -4,6 +4,8 @@ import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { DialogClose,  Dialog, DialogContent  } from "@/components/ui/dialog";
 import { moveToRecycleBin } from "@/lib/recycle-bin";
 import { SearchableSelect } from "@/components/ui/select";
+import { useSortableData } from "@/hooks/useSortableData";
+import { SortableHeader } from "@/components/ui/sortable-header";
 
 const MOCK_CREDIT_TRANSACTIONS = [
   { id: 'INV-001', date: '15/6/2026', amount: 1234.00, category: 'Sales', description: 'test', service: 'fgh', remarks: '1. Payment is due w...' },
@@ -57,6 +59,9 @@ export function Transactions() {
   const [filterSyncStatus, setFilterSyncStatus] = useState("All Entries");
   const [addCreditCategory, setAddCreditCategory] = useState("Sales");
   const [addDebtCategory, setAddDebtCategory] = useState("General");
+
+  const { items: sortedCredit, requestSort: requestCreditSort, sortConfig: creditSortConfig } = useSortableData(creditTransactions);
+  const { items: sortedDebt, requestSort: requestDebtSort, sortConfig: debtSortConfig } = useSortableData(debitTransactions);
 
   const confirmDelete = () => {
     if (deleteConfirm.id) {
@@ -284,17 +289,17 @@ export function Transactions() {
             <table className="w-full text-left whitespace-nowrap">
               <thead className="bg-background text-muted-foreground text-[10px] font-black uppercase tracking-widest border-b border-border/50">
                 <tr>
-                  <th className="p-3 pl-4">Date ↕</th>
-                  <th className="p-3">Amount ↕</th>
-                  <th className="p-3">Category ↕</th>
-                  <th className="p-3">Descriptions</th>
-                  <th className="p-3">Services</th>
-                  <th className="p-3">Remarks</th>
+                  <SortableHeader label="Date" sortKey="date" currentSort={creditSortConfig} onSort={requestCreditSort} className="p-3 pl-4" />
+                  <SortableHeader label="Amount" sortKey="amount" currentSort={creditSortConfig} onSort={requestCreditSort} className="p-3" />
+                  <SortableHeader label="Category" sortKey="category" currentSort={creditSortConfig} onSort={requestCreditSort} className="p-3" />
+                  <SortableHeader label="Descriptions" sortKey="desc" currentSort={creditSortConfig} onSort={requestCreditSort} className="p-3" />
+                  <SortableHeader label="Services" sortKey="services" currentSort={creditSortConfig} onSort={requestCreditSort} className="p-3" />
+                  <SortableHeader label="Remarks" sortKey="remarks" currentSort={creditSortConfig} onSort={requestCreditSort} className="p-3" />
                   <th className="p-3 pr-4 text-center">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/50">
-                {creditTransactions.map((trx: any, idx: number) => (
+                {sortedCredit.map((trx: any, idx: number) => (
                   <tr key={idx} className="hover:bg-muted/30 transition-colors">
                     <td className="p-3 pl-4 text-xs font-bold text-muted-foreground">{trx.date}</td>
                     <td className="p-3 text-sm font-black text-emerald-600">
@@ -346,17 +351,17 @@ export function Transactions() {
             <table className="w-full text-left whitespace-nowrap">
               <thead className="bg-background text-muted-foreground text-[10px] font-black uppercase tracking-widest border-b border-border/50">
                 <tr>
-                  <th className="p-3 pl-4">Expense No. ↕</th>
-                  <th className="p-3">Date ↕</th>
-                  <th className="p-3">Amount ↕</th>
-                  <th className="p-3">Category ↕</th>
-                  <th className="p-3">Things</th>
-                  <th className="p-3">Narrative</th>
+                  <SortableHeader label="Expense No." sortKey="id" currentSort={debtSortConfig} onSort={requestDebtSort} className="p-3 pl-4" />
+                  <SortableHeader label="Date" sortKey="date" currentSort={debtSortConfig} onSort={requestDebtSort} className="p-3" />
+                  <SortableHeader label="Amount" sortKey="amount" currentSort={debtSortConfig} onSort={requestDebtSort} className="p-3" />
+                  <SortableHeader label="Category" sortKey="category" currentSort={debtSortConfig} onSort={requestDebtSort} className="p-3" />
+                  <SortableHeader label="Things" sortKey="things" currentSort={debtSortConfig} onSort={requestDebtSort} className="p-3" />
+                  <SortableHeader label="Narrative" sortKey="narrative" currentSort={debtSortConfig} onSort={requestDebtSort} className="p-3" />
                   <th className="p-3 pr-4 text-center">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/50">
-                {debitTransactions.map((trx: any, idx: number) => (
+                {sortedDebt.map((trx: any, idx: number) => (
                   <tr key={idx} className="hover:bg-muted/30 transition-colors">
                     <td className="p-3 pl-4">
                       <span className="text-xs font-black text-foreground bg-muted/50 px-2 py-0.5 rounded-md border border-border/50">{trx.id}</span>

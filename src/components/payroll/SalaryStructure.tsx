@@ -19,6 +19,8 @@ import {
   RefreshCcw
 } from "lucide-react";
 import { cn, formatDate } from "@/lib/utils";
+import { useSortableData } from "@/hooks/useSortableData";
+import { SortableHeader } from "@/components/ui/sortable-header";
 import { SearchableSelect } from "@/components/ui/select";
 import { MOCK_EMPLOYEES, formatCurrency } from "./payroll-data";
 
@@ -36,6 +38,8 @@ export function SalaryStructure() {
     e.empId.toLowerCase().includes(searchTerm.toLowerCase()) ||
     e.department.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const { items: sortedEmployees, requestSort, sortConfig } = useSortableData(filteredEmployees);
 
   const selectedEmp = useMemo(() => {
     return selectedEmpId ? employees.find(e => e.id === selectedEmpId) : null;
@@ -176,15 +180,15 @@ export function SalaryStructure() {
             <table className="w-full text-sm">
               <thead className="bg-white text-muted-foreground/70 border-b border-border">
                 <tr>
-                  <th className="px-6 py-4 text-left text-[11px] font-bold uppercase tracking-wider">Employee</th>
-                  <th className="px-6 py-4 text-left text-[11px] font-bold uppercase tracking-wider">Department</th>
-                  <th className="px-6 py-4 text-left text-[11px] font-bold uppercase tracking-wider">Joining</th>
-                  <th className="px-6 py-4 text-left text-[11px] font-bold uppercase tracking-wider">Type</th>
-                  <th className="px-6 py-4 text-left text-[11px] font-bold uppercase tracking-wider">Effective From</th>
+                  <SortableHeader label="Employee" sortKey="name" currentSort={sortConfig} onSort={requestSort} className="px-6 py-4 text-left text-[11px] font-bold uppercase tracking-wider" />
+                  <SortableHeader label="Department" sortKey="department" currentSort={sortConfig} onSort={requestSort} className="px-6 py-4 text-left text-[11px] font-bold uppercase tracking-wider" />
+                  <SortableHeader label="Joining" sortKey="joiningDate" currentSort={sortConfig} onSort={requestSort} className="px-6 py-4 text-left text-[11px] font-bold uppercase tracking-wider" />
+                  <SortableHeader label="Type" sortKey="type" currentSort={sortConfig} onSort={requestSort} className="px-6 py-4 text-left text-[11px] font-bold uppercase tracking-wider" />
+                  <SortableHeader label="Effective From" sortKey="effectiveDate" currentSort={sortConfig} onSort={requestSort} className="px-6 py-4 text-left text-[11px] font-bold uppercase tracking-wider" />
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/50">
-                {filteredEmployees.map(emp => {
+                {sortedEmployees.map(emp => {
                   const isSelected = selectedEmpId === emp.id;
                   return (
                     <tr 

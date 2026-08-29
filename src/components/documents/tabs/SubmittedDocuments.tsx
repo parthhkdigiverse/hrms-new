@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Search, Filter, FileText, CheckCircle2, Clock, AlertCircle, Eye, Download } from "lucide-react";
 import { cn, formatDate } from "@/lib/utils";
 import { SearchableSelect } from "@/components/ui/select";
+import { useSortableData } from "@/hooks/useSortableData";
+import { SortableHeader } from "@/components/ui/sortable-header";
 
 type DocStatus = "Accepted" | "Pending Review" | "Pending Submission" | "Rejected";
 
@@ -31,6 +33,8 @@ export function SubmittedDocuments() {
     const matchesStatus = statusFilter === "All" || doc.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
+
+  const { items: sortedDocs, requestSort, sortConfig } = useSortableData(filteredDocs);
 
   const getStatusIcon = (status: DocStatus) => {
     switch (status) {
@@ -87,22 +91,22 @@ export function SubmittedDocuments() {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-border/50 bg-muted/30">
-                <th className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-widest whitespace-nowrap">Employee</th>
-                <th className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-widest whitespace-nowrap">Document</th>
-                <th className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-widest whitespace-nowrap">Status</th>
-                <th className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-widest whitespace-nowrap">Submitted On</th>
+                <SortableHeader label="Employee" sortKey="employeeName" currentSort={sortConfig} onSort={requestSort} className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-widest whitespace-nowrap" />
+                <SortableHeader label="Document" sortKey="documentName" currentSort={sortConfig} onSort={requestSort} className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-widest whitespace-nowrap" />
+                <SortableHeader label="Status" sortKey="status" currentSort={sortConfig} onSort={requestSort} className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-widest whitespace-nowrap" />
+                <SortableHeader label="Submitted On" sortKey="submittedAt" currentSort={sortConfig} onSort={requestSort} className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-widest whitespace-nowrap" />
                 <th className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-widest whitespace-nowrap text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border/50">
-              {filteredDocs.length === 0 ? (
+              {sortedDocs.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="p-8 text-center text-muted-foreground">
                     No documents found matching your filters.
                   </td>
                 </tr>
               ) : (
-                filteredDocs.map((doc) => (
+                sortedDocs.map((doc) => (
                   <tr key={doc.id} className="hover:bg-muted/30 transition-colors group">
                     <td className="p-4">
                       <div className="font-bold text-foreground">{doc.employeeName}</div>

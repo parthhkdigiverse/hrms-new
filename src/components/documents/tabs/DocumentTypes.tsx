@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { Plus, Trash2, Settings2 } from "lucide-react";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { moveToRecycleBin } from "@/lib/recycle-bin";
+import { useSortableData } from "@/hooks/useSortableData";
+import { SortableHeader } from "@/components/ui/sortable-header";
 
 interface DocType {
   id: string;
@@ -70,6 +72,8 @@ export function DocumentTypes() {
     }
     setConfirmModal({ isOpen: false });
   };
+
+  const { items: sortedTypes, requestSort, sortConfig } = useSortableData(types);
 
   return (
     <div className="space-y-6">
@@ -150,21 +154,21 @@ export function DocumentTypes() {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-border/50 bg-muted/30">
-                <th className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-widest whitespace-nowrap">Document Type</th>
-                <th className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-widest whitespace-nowrap">Description</th>
-                <th className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-widest whitespace-nowrap">Requirement</th>
+                <SortableHeader label="Document Type" sortKey="name" currentSort={sortConfig} onSort={requestSort} className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-widest whitespace-nowrap" />
+                <SortableHeader label="Description" sortKey="description" currentSort={sortConfig} onSort={requestSort} className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-widest whitespace-nowrap" />
+                <SortableHeader label="Requirement" sortKey="isRequired" currentSort={sortConfig} onSort={requestSort} className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-widest whitespace-nowrap" />
                 <th className="p-4 text-xs font-bold text-muted-foreground uppercase tracking-widest whitespace-nowrap text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border/50">
-              {types.length === 0 ? (
+              {sortedTypes.length === 0 ? (
                 <tr>
                   <td colSpan={4} className="p-8 text-center text-muted-foreground">
                     No document types configured.
                   </td>
                 </tr>
               ) : (
-                types.map((type) => (
+                sortedTypes.map((type) => (
                   <tr key={type.id} className="hover:bg-muted/30 transition-colors group">
                     <td className="p-4">
                       <div className="font-bold text-foreground">{type.name}</div>
