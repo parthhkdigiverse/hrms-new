@@ -3,20 +3,11 @@ import { X,  Clock, Coffee, LogIn, LogOut, CheckCircle2, Pencil  } from "lucide-
 import { DialogClose,  Dialog, DialogContent, DialogHeader, DialogTitle  } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 
-const CATEGORIES = ["Today's Work", "Upcoming Work", "Research", "Activity", "Meeting"];
+const CATEGORIES = ["Tasks", "Research", "Activity", "Meeting"];
 
 type Task = { id: string, title: string, date?: string, isCustom?: boolean };
 const MOCK_TASKS_DATA: Record<string, Task[]> = {
-  "Today's Work": [
-    { id: "1", title: "make feedback forms" },
-    { id: "2", title: "HRMS UI", date: "2026-08-08", isCustom: true },
-    { id: "3", title: "create super admin panel and discuss about it", date: "2026-08-08" },
-    { id: "4", title: "Wifi ip block issue solved", date: "2026-08-10" },
-  ],
-  "Upcoming Work": [
-    { id: "5", title: "Prepare Q4 Marketing Strategy" },
-    { id: "6", title: "Team Performance Reviews", date: "2026-08-15" }
-  ],
+  "Tasks": [],
   "Research": [
     { id: "7", title: "Competitor Analysis: Acme Corp" }
   ],
@@ -38,12 +29,64 @@ export function TimeTrackerWidget() {
   const [punchInTime, setPunchInTime] = useState<string | null>(null);
   const [punchOutTime, setPunchOutTime] = useState<string | null>(null);
   const [isPunchInModalOpen, setIsPunchInModalOpen] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState<string>(CATEGORIES[0] || "Today's Work");
+  const [selectedCategory, setSelectedCategory] = useState<string>(CATEGORIES[0] || "Tasks");
   const [selectedTasks, setSelectedTasks] = useState<string[]>([]);
   const [isAddingCustom, setIsAddingCustom] = useState(false);
   const [customTask, setCustomTask] = useState("");
   const [activeTasks, setActiveTasks] = useState<string[]>([]);
   const [activeTaskSeconds, setActiveTaskSeconds] = useState(0);
+
+  const [taskData, setTaskData] = useState<Record<string, Task[]>>(MOCK_TASKS_DATA);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const fetchTasks = () => {
+        const newData = { ...MOCK_TASKS_DATA };
+        newData["Tasks"] = []; // Reset dynamic tasks
+
+        try {
+          const localProjects = localStorage.getItem("hrms_projects");
+          if (localProjects) {
+            const parsed = JSON.parse(localProjects);
+            parsed.forEach((proj: any) => {
+              if (proj.modules) {
+                proj.modules.forEach((mod: any) => {
+                  if (mod.tasks && mod.tasks.length > 0) {
+                    mod.tasks.forEach((t: any) => {
+                      if (newData["Tasks"]) {
+                        newData["Tasks"].push({ id: t.id, title: t.title });
+                      }
+                    });
+                  }
+                });
+              }
+            });
+          }
+        } catch (e) {}
+
+        try {
+          const localTasks = localStorage.getItem("hrms_tasks");
+          if (localTasks) {
+            const parsed = JSON.parse(localTasks);
+            if (parsed && parsed.length > 0) {
+              parsed.forEach((t: any) => {
+                if (newData["Tasks"]) {
+                  newData["Tasks"].push({ id: t.id, title: t.title });
+                }
+              });
+            }
+          }
+        } catch (e) {}
+
+        setTaskData(newData);
+      };
+      
+      fetchTasks();
+      window.addEventListener("storage", fetchTasks);
+      return () => window.removeEventListener("storage", fetchTasks);
+    }
+    return undefined;
+  }, []);
 
   // Simulated timer
   useEffect(() => {
@@ -75,9 +118,41 @@ export function TimeTrackerWidget() {
     if (status === "Punched Out") {
       setIsPunchInModalOpen(true);
     } else {
+      // Create work log entry on punch out
+      if (activeTasks.length > 0 && workSeconds > 0) {
+         try {
+           const saved = localStorage.getItem("hrms_work_logs");
+           let existingLogs: any[] = [];
+           if (saved) { existingLogs = JSON.parse(saved); }
+           
+           const hoursVal = Math.round((workSeconds / 3600) * 100) / 100;
+           const hoursPerTask = hoursVal / activeTasks.length;
+           
+           const newLogs = activeTasks.map((taskName, idx) => ({
+             id: `log-${Date.now()}-${idx}`,
+             employee: "Current User",
+             avatar: `https://api.dicebear.com/7.x/adventurer/svg?seed=CurrentUser`,
+             date: new Date().toISOString().split("T")[0],
+             project: "Tracked Work",
+             task: taskName,
+             startTime: punchInTime || "09:00",
+             endTime: timeString,
+             hours: hoursPerTask,
+             status: "Pending",
+             description: "Automatically logged via Time Tracker."
+           }));
+           
+           localStorage.setItem("hrms_work_logs", JSON.stringify([...newLogs, ...existingLogs]));
+           window.dispatchEvent(new Event("storage"));
+         } catch(e) {}
+      }
+
       setStatus("Punched Out");
       setPunchOutTime(timeString);
       setActiveTasks([]);
+      setWorkSeconds(0);
+      setActiveTaskSeconds(0);
+      setBreakSeconds(0);
     }
   };
 
@@ -287,7 +362,7 @@ export function TimeTrackerWidget() {
           <div className="p-6 bg-muted/30">
             <h3 className="text-sm font-bold text-foreground mb-4">Select Task</h3>
             <div className="flex flex-col gap-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
-              {MOCK_TASKS_DATA[selectedCategory]?.map((task: Task) => {
+              {taskData[selectedCategory]?.map((task: Task) => {
                 const isSelected = selectedTasks.includes(task.title);
                 return (
                   <button

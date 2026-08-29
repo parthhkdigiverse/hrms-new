@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Search, Plus, Filter, Clock, CheckCircle2, XCircle, MoreHorizontal, FileText, ScrollText, User, ChevronDown, ChevronUp, Calendar } from "lucide-react";
 import { format } from "date-fns";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -30,7 +30,67 @@ const MOCK_LOGS: WorkLog[] = [
 ];
 
 export function WorkLogs() {
-  const [logs, setLogs] = useState<WorkLog[]>(MOCK_LOGS);
+  const [logs, setLogs] = useState<WorkLog[]>(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("hrms_work_logs");
+      if (saved) {
+        try { return JSON.parse(saved); } catch (e) {}
+      }
+    }
+    return MOCK_LOGS;
+  });
+  
+  useEffect(() => {
+    localStorage.setItem("hrms_work_logs", JSON.stringify(logs));
+  }, [logs]);
+
+  const [availableTasks, setAvailableTasks] = useState<{ id: string; title: string; project: string }[]>([]);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const fetchTasks = () => {
+        let tasksList: { id: string; title: string; project: string }[] = [];
+        
+        // 1. Projects tasks
+        try {
+          const localProjects = localStorage.getItem("hrms_projects");
+          if (localProjects) {
+            const parsed = JSON.parse(localProjects);
+            parsed.forEach((proj: any) => {
+              if (proj.modules) {
+                proj.modules.forEach((mod: any) => {
+                  if (mod.tasks) {
+                    mod.tasks.forEach((t: any) => {
+                      tasksList.push({ id: t.id, title: t.title, project: proj.name });
+                    });
+                  }
+                });
+              }
+            });
+          }
+        } catch (e) {}
+
+        // 2. Independent tasks
+        try {
+          const localTasks = localStorage.getItem("hrms_tasks");
+          if (localTasks) {
+            const parsed = JSON.parse(localTasks);
+            parsed.forEach((t: any) => {
+              tasksList.push({ id: t.id, title: t.title, project: "Independent Tasks" });
+            });
+          }
+        } catch (e) {}
+
+        setAvailableTasks(tasksList);
+      };
+      
+      fetchTasks();
+      window.addEventListener("storage", fetchTasks);
+      return () => window.removeEventListener("storage", fetchTasks);
+    }
+    return undefined;
+  }, []);
+
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState<"all" | "employee">("all");
   const [expandedEmployee, setExpandedEmployee] = useState<string | null>(null);
@@ -434,15 +494,67 @@ export function WorkLogs() {
                 </div>
               </div>
 
-              <div>
-                <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">Task performed</label>
-                <input 
-                  type="text" 
-                  placeholder="e.g. Setup AWS authentication keys"
-                  value={newLog.task} 
-                  onChange={(e) => setNewLog({ ...newLog, task: e.target.value })} 
-                  className="w-full px-3 py-2 bg-muted/50 border border-border/50 rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-primary font-semibold" 
-                />
+              <div className="col-span-2">
+                <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block mb-2">Select Tasks</label>
+                <div className="flex flex-col gap-2 max-h-[150px] overflow-y-auto pr-2 custom-scrollbar border border-border/50 rounded-xl p-2 bg-muted/20">
+                  {availableTasks.map((t) => {
+                    const currentTasks = newLog.task ? newLog.task.split(",").map(x => x.trim()).filter(Boolean) : [];
+                    const isSelected = currentTasks.includes(t.title);
+                    return (
+                      <button
+                        key={t.id}
+                        type="button"
+                        onClick={() => {
+                          let nextTasks = [...currentTasks];
+                          if (isSelected) {
+                            nextTasks = nextTasks.filter(x => x !== t.title);
+                          } else {
+                            nextTasks.push(t.title);
+                          }
+                          setNewLog({ ...newLog, task: nextTasks.join(", ") });
+                        }}
+                        className={cn(
+                          "w-full flex items-center gap-3 text-left px-3 py-2 rounded-lg border transition-all duration-200",
+                          isSelected
+                            ? "border-primary bg-primary/10" 
+                            : "border-transparent hover:bg-muted"
+                        )}
+                      >
+                        <div className={cn(
+                          "w-4 h-4 rounded flex items-center justify-center shrink-0 border transition-colors",
+                          isSelected ? "bg-primary border-primary text-white" : "border-border/80 bg-white"
+                        )}>
+                          {isSelected && <CheckCircle2 className="w-3 h-3" />}
+                        </div>
+                        <div className="flex flex-col">
+                          <span className={cn(
+                            "font-bold text-xs truncate",
+                            isSelected ? "text-primary" : "text-foreground"
+                          )}>
+                            {t.title}
+                          </span>
+                          <span className="text-[9px] text-muted-foreground uppercase tracking-wider">{t.project}</span>
+                        </div>
+                      </button>
+                    );
+                  })}
+                  {availableTasks.length === 0 && (
+                    <div className="text-center py-4 text-xs font-semibold text-muted-foreground">
+                      No active tasks found in projects.
+                    </div>
+                  )}
+                </div>
+                
+                {/* Custom Task Input */}
+                <div className="mt-2">
+                   <input 
+                    type="text" 
+                    placeholder="Or type a custom task (comma-separated)..."
+                    value={newLog.task} 
+                    onChange={(e) => setNewLog({ ...newLog, task: e.target.value })} 
+                    className="w-full px-3 py-2 bg-muted/50 border border-border/50 rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-primary font-semibold" 
+                  />
+                </div>
               </div>
 
               <div>
