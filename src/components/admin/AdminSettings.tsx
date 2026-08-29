@@ -151,6 +151,17 @@ export function AdminSettings() {
     // Force a tiny delay so state sets, then reload to apply date format globally instantly
     setTimeout(() => window.location.reload(), 100);
   };
+
+  const [nameFormat, setNameFormat] = useState(() => {
+    if (typeof window === "undefined") return "First Last";
+    return localStorage.getItem('hrms_name_format') || 'First Last';
+  });
+
+  const handleNameFormatChange = (newFormat: string) => {
+    setNameFormat(newFormat);
+    localStorage.setItem('hrms_name_format', newFormat);
+    setTimeout(() => window.location.reload(), 100);
+  };
   const [newTemplateLabel, setNewTemplateLabel] = useState("");
   const [newTemplateDesc, setNewTemplateDesc] = useState("");
   const [newTemplateType, setNewTemplateType] = useState<"Penalty" | "Warning">("Penalty");
@@ -418,6 +429,22 @@ export function AdminSettings() {
                 className="w-full h-11 px-4 rounded-xl border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm font-medium"
               />
               <p className="text-[10px] text-muted-foreground mt-2">Changing this will reload the application to apply the format globally.</p>
+            </div>
+            
+            <div>
+              <label className="block text-xs font-bold text-muted-foreground mb-1.5 uppercase tracking-wide">Name Format</label>
+              <SearchableSelect 
+                value={nameFormat}
+                onChange={(val) => handleNameFormatChange(val as string)}
+                options={[
+                  { label: "First Last (John Doe)", value: "First Last" },
+                  { label: "Last, First (Doe, John)", value: "Last, First" },
+                  { label: "First M. Last (John M. Doe)", value: "First M. Last" },
+                  { label: "Last, First M. (Doe, John M.)", value: "Last, First M." },
+                ]}
+                className="w-full h-11 px-4 rounded-xl border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm font-medium"
+              />
+              <p className="text-[10px] text-muted-foreground mt-2">Preferred way to display employee names.</p>
             </div>
           </div>
         </div>
