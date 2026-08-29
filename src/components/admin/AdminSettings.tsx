@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { cn } from "@/lib/utils";
-import { Settings, Settings2, Save, Palette, Paintbrush, Type, Square, Image as ImageIcon, Briefcase, X, ShieldAlert, Plus, Trash2, MessageSquare } from "lucide-react";
+import { Settings, Image as ImageIcon, Layout, Type, Palette, Shield, CreditCard, ChevronDown, CheckCircle2, Search, X, Plus, GripVertical, Settings2, Save, Paintbrush, Square, Briefcase, Trash2, MessageSquare, ShieldAlert } from "lucide-react";
 import { toast } from "sonner";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { useTheme } from "../ThemeProvider";
@@ -108,13 +108,14 @@ export function AdminSettings() {
     isGradient, setIsGradient,
     gradientType, setGradientType,
     gradientDirection, setGradientDirection,
-    gradientColor2, setGradientColor2,
+    gradientColors, setGradientColors,
     radius, setRadius, 
     fontFamily, setFontFamily, 
     logoUrl, setLogoUrl, 
     companyName, setCompanyName 
   } = useTheme();
 
+  const [draggedColorIndex, setDraggedColorIndex] = useState<number | null>(null);
   const { penaltyTemplates, addPenaltyTemplate, removePenaltyTemplate } = useSettingsContext();
   const [canCreateChannels, setCanCreateChannels] = useState(() => {
     if (typeof window === "undefined") return true;
@@ -235,40 +236,110 @@ export function AdminSettings() {
             </div>
 
             <div className="flex flex-col gap-4 p-4 border border-border rounded-2xl bg-muted/30">
-              {/* Primary Color */}
-              <div className="flex items-center gap-4">
-                <div className="relative w-12 h-12 rounded-xl overflow-hidden border-2 border-background shadow-sm shrink-0">
-                  <input
-                    type="color"
-                    value={color}
-                    onChange={(e) => setColor(e.target.value)}
-                    className="absolute inset-[-10px] w-20 h-20 cursor-pointer"
-                  />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="text-sm font-bold">{isGradient ? "Start Color" : "Brand Color"}</div>
-                  <div className="text-xs text-muted-foreground uppercase">{color}</div>
-                </div>
-              </div>
-
-              {/* Gradient Settings */}
-              {isGradient && (
-                <>
-                  <div className="flex items-center gap-4">
-                    <div className="relative w-12 h-12 rounded-xl overflow-hidden border-2 border-background shadow-sm shrink-0">
-                      <input
-                        type="color"
-                        value={gradientColor2}
-                        onChange={(e) => setGradientColor2(e.target.value)}
-                        className="absolute inset-[-10px] w-20 h-20 cursor-pointer"
-                      />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="text-sm font-bold">End Color</div>
-                      <div className="text-xs text-muted-foreground uppercase">{gradientColor2}</div>
-                    </div>
+              {!isGradient ? (
+                /* Primary Color (No Gradient) */
+                <div className="flex items-center gap-4">
+                  <div className="relative w-12 h-12 rounded-xl overflow-hidden border-2 border-background shadow-sm shrink-0">
+                    <input
+                      type="color"
+                      value={color}
+                      onChange={(e) => setColor(e.target.value)}
+                      className="absolute inset-[-10px] w-20 h-20 cursor-pointer"
+                    />
                   </div>
-                  
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm font-bold">Brand Color</div>
+                    <div className="text-xs text-muted-foreground uppercase">{color}</div>
+                  </div>
+                </div>
+              ) : (
+                /* Gradient Settings */
+                <>
+                  <div className="space-y-3">
+                    {[color, ...gradientColors].map((colorItem, idx) => {
+                      const allColors = [color, ...gradientColors];
+                      return (
+                        <div 
+                          key={idx} 
+                          className={cn(
+                            "flex items-center gap-4 p-2 rounded-xl border border-transparent transition-colors",
+                            draggedColorIndex === idx ? "opacity-50 border-dashed border-primary" : "hover:border-border"
+                          )}
+                          draggable
+                          onDragStart={(e) => {
+                            setDraggedColorIndex(idx);
+                            e.dataTransfer.effectAllowed = "move";
+                          }}
+                          onDragOver={(e) => {
+                            e.preventDefault();
+                            e.dataTransfer.dropEffect = "move";
+                          }}
+                          onDrop={(e) => {
+                            e.preventDefault();
+                            if (draggedColorIndex === null || draggedColorIndex === idx) {
+                              setDraggedColorIndex(null);
+                              return;
+                            }
+                            const newColors = [...allColors];
+                            const draggedColor = newColors[draggedColorIndex];
+                            if (!draggedColor) return;
+                            newColors.splice(draggedColorIndex, 1);
+                            newColors.splice(idx, 0, draggedColor);
+                            setColor(newColors[0] || color);
+                            setGradientColors(newColors.slice(1));
+                            setDraggedColorIndex(null);
+                          }}
+                          onDragEnd={() => setDraggedColorIndex(null)}
+                        >
+                          <div className="cursor-grab active:cursor-grabbing text-muted-foreground/50 hover:text-muted-foreground transition-colors p-1">
+                            <GripVertical className="w-4 h-4" />
+                          </div>
+                          <div className="relative w-12 h-12 rounded-xl overflow-hidden border-2 border-background shadow-sm shrink-0">
+                            <input
+                              type="color"
+                              value={colorItem}
+                              onChange={(e) => {
+                                const newColors = [...allColors];
+                                newColors[idx] = e.target.value;
+                                setColor(newColors[0] || color);
+                                setGradientColors(newColors.slice(1));
+                              }}
+                              className="absolute inset-[-10px] w-20 h-20 cursor-pointer"
+                            />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="text-sm font-bold">{idx === 0 ? "Start Color" : `Color ${idx + 1}`}</div>
+                            <div className="text-xs text-muted-foreground uppercase">{colorItem}</div>
+                          </div>
+                          {allColors.length > 2 && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const newColors = allColors.filter((_, i) => i !== idx);
+                                setColor(newColors[0] || color);
+                                setGradientColors(newColors.slice(1));
+                              }}
+                              className="p-2 text-muted-foreground hover:text-red-500 rounded-lg transition-colors"
+                            >
+                              <X className="w-4 h-4" />
+                            </button>
+                          )}
+                        </div>
+                      );
+                    })}
+                    {gradientColors.length < 5 && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setGradientColors([...gradientColors, "#0284c7"]);
+                        }}
+                        className="w-full py-2 flex items-center justify-center gap-2 text-xs font-bold text-muted-foreground hover:text-foreground border border-dashed border-border rounded-xl hover:bg-muted/50 transition-colors"
+                      >
+                        <Plus className="w-4 h-4" />
+                        Add Gradient Color
+                      </button>
+                    )}
+                  </div>
                   <div className="grid grid-cols-2 gap-2 mt-2">
                     <div>
                       <label className="block text-[10px] font-bold text-muted-foreground uppercase mb-1">Type</label>

@@ -9,8 +9,8 @@ interface ThemeContextType {
   setGradientType: (type: "linear" | "radial") => void;
   gradientDirection: string;
   setGradientDirection: (direction: string) => void;
-  gradientColor2: string;
-  setGradientColor2: (color: string) => void;
+  gradientColors: string[];
+  setGradientColors: (colors: string[]) => void;
   radius: number;
   setRadius: (radius: number) => void;
   fontFamily: string;
@@ -67,7 +67,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [isGradient, setIsGradient] = useState<boolean>(false);
   const [gradientType, setGradientType] = useState<"linear" | "radial">("linear");
   const [gradientDirection, setGradientDirection] = useState<string>("to right");
-  const [gradientColor2, setGradientColor2] = useState<string>("#0284c7");
+  const [gradientColors, setGradientColors] = useState<string[]>(["#0284c7"]);
 
   const [radius, setRadius] = useState<number>(0.75);
   const [fontFamily, setFontFamily] = useState<string>("Inter");
@@ -79,7 +79,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     const savedIsGradient = localStorage.getItem("app-theme-is-gradient");
     const savedGradientType = localStorage.getItem("app-theme-gradient-type");
     const savedGradientDirection = localStorage.getItem("app-theme-gradient-direction");
-    const savedGradientColor2 = localStorage.getItem("app-theme-gradient-color2");
+    const savedGradientColors = localStorage.getItem("app-theme-gradient-colors");
 
     const savedRadius = localStorage.getItem("app-theme-radius");
     const savedFont = localStorage.getItem("app-theme-font");
@@ -90,9 +90,14 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     if (savedIsGradient) setIsGradient(savedIsGradient === "true");
     if (savedGradientType) setGradientType(savedGradientType as "linear" | "radial");
     if (savedGradientDirection) setGradientDirection(savedGradientDirection);
-    if (savedGradientColor2) setGradientColor2(savedGradientColor2);
-
-    if (savedRadius) setRadius(parseFloat(savedRadius));
+    if (savedGradientColors) {
+      try {
+        const parsed = JSON.parse(savedGradientColors);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setGradientColors(parsed);
+        }
+      } catch (e) {}
+    } if (savedRadius) setRadius(parseFloat(savedRadius));
     if (savedFont) setFontFamily(savedFont);
     if (savedLogo) setLogoUrl(savedLogo);
     if (savedName) setCompanyName(savedName);
@@ -135,7 +140,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem("app-theme-is-gradient", isGradient.toString());
     localStorage.setItem("app-theme-gradient-type", gradientType);
     localStorage.setItem("app-theme-gradient-direction", gradientDirection);
-    localStorage.setItem("app-theme-gradient-color2", gradientColor2);
+    localStorage.setItem("app-theme-gradient-colors", JSON.stringify(gradientColors));
 
     localStorage.setItem("app-theme-radius", radius.toString());
     localStorage.setItem("app-theme-font", fontFamily);
@@ -151,11 +156,13 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     }
 
     if (isGradient) {
-      const hsl2 = hexToHSL(gradientColor2);
-      const color2 = `hsl(${hsl2.h}, ${hsl2.s}%, ${hsl2.l}%)`;
+      const parsedColors = gradientColors.map(c => {
+        const hsl = hexToHSL(c);
+        return `hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)`;
+      });
       const bgImage = gradientType === "linear" 
-        ? `linear-gradient(${gradientDirection}, var(--primary), ${color2})`
-        : `radial-gradient(circle, var(--primary), ${color2})`;
+        ? `linear-gradient(${gradientDirection}, var(--primary), ${parsedColors.join(", ")})`
+        : `radial-gradient(circle, var(--primary), ${parsedColors.join(", ")})`;
       
       styleEl.innerHTML = `
         .bg-primary, .bg-sidebar-primary {
@@ -165,7 +172,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     } else {
       styleEl.innerHTML = "";
     }
-  }, [color, isGradient, gradientType, gradientDirection, gradientColor2, radius, fontFamily, logoUrl, companyName]);
+  }, [color, isGradient, gradientType, gradientDirection, gradientColors, radius, fontFamily, logoUrl, companyName]);
 
   return (
     <ThemeContext.Provider value={{ 
@@ -173,7 +180,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       isGradient, setIsGradient,
       gradientType, setGradientType,
       gradientDirection, setGradientDirection,
-      gradientColor2, setGradientColor2,
+      gradientColors, setGradientColors,
       radius, setRadius, 
       fontFamily, setFontFamily, 
       logoUrl, setLogoUrl, 

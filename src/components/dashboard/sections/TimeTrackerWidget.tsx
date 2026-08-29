@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { X,  Clock, Coffee, LogIn, LogOut, CheckCircle2, Pencil  } from "lucide-react";
+import { X,  Clock, Coffee, LogIn, LogOut, CheckCircle2, Pencil, Search } from "lucide-react";
 import { DialogClose,  Dialog, DialogContent, DialogHeader, DialogTitle  } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 
@@ -35,6 +35,7 @@ export function TimeTrackerWidget() {
   const [customTask, setCustomTask] = useState("");
   const [activeTasks, setActiveTasks] = useState<string[]>([]);
   const [activeTaskSeconds, setActiveTaskSeconds] = useState(0);
+  const [taskSearchQuery, setTaskSearchQuery] = useState("");
 
   const [taskData, setTaskData] = useState<Record<string, Task[]>>(MOCK_TASKS_DATA);
 
@@ -360,9 +361,23 @@ export function TimeTrackerWidget() {
 
           {/* Tasks */}
           <div className="p-6 bg-muted/30">
-            <h3 className="text-sm font-bold text-foreground mb-4">Select Task</h3>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-sm font-bold text-foreground">Select Task</h3>
+              <div className="relative w-48">
+                <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                <input
+                  type="text"
+                  placeholder="Search tasks..."
+                  value={taskSearchQuery}
+                  onChange={(e) => setTaskSearchQuery(e.target.value)}
+                  className="w-full pl-8 pr-3 py-1.5 text-xs bg-card border border-border rounded-lg focus:outline-none focus:border-primary transition-colors"
+                />
+              </div>
+            </div>
             <div className="flex flex-col gap-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
-              {taskData[selectedCategory]?.map((task: Task) => {
+              {taskData[selectedCategory]
+                ?.filter(task => task.title.toLowerCase().includes(taskSearchQuery.toLowerCase()))
+                .map((task: Task) => {
                 const isSelected = selectedTasks.includes(task.title);
                 return (
                   <button

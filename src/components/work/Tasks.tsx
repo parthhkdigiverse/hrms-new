@@ -21,6 +21,7 @@ interface Task {
   priority: Priority;
   dueDate: string;
   assignees: { name: string; avatar: string }[];
+  assignedBy?: { name: string; avatar: string };
   commentsCount: number;
   attachmentsCount: number;
   isProjectTask?: boolean;
@@ -52,6 +53,8 @@ export function Tasks({ setActive }: { setActive?: (route: string) => void }) {
   const [view, setView] = useState<"board" | "list">("list");
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<"All" | TaskStatus>("All");
+  const [priorityFilter, setPriorityFilter] = useState<"All" | Priority>("All");
+  const [projectFilter, setProjectFilter] = useState<"All" | string>("All");
 
   const [isNewTaskOpen, setIsNewTaskOpen] = useState(false);
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
@@ -313,8 +316,18 @@ export function Tasks({ setActive }: { setActive?: (route: string) => void }) {
     if (statusFilter !== "All") {
       result = result.filter(t => t.status === statusFilter);
     }
+    if (priorityFilter !== "All") {
+      result = result.filter(t => t.priority === priorityFilter);
+    }
+    if (projectFilter !== "All") {
+      if (projectFilter === "Independent") {
+        result = result.filter(t => !t.isProjectTask);
+      } else {
+        result = result.filter(t => t.projectId === projectFilter);
+      }
+    }
     return result;
-  }, [allTasks, searchQuery, statusFilter]);
+  }, [allTasks, searchQuery, statusFilter, priorityFilter, projectFilter]);
 
   const { items: sortedTasks, requestSort, sortConfig } = useSortableData(filteredTasks);
 
@@ -542,6 +555,62 @@ export function Tasks({ setActive }: { setActive?: (route: string) => void }) {
               className="w-full pl-9 pr-4 py-2 bg-muted/40 border border-border/60 rounded-xl text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-primary"
             />
           </div>
+
+          <Popover>
+            <PopoverTrigger asChild>
+              <button className="flex items-center gap-2 px-3 py-2 bg-muted/40 border border-border/60 rounded-xl text-xs font-semibold hover:bg-muted transition-colors text-foreground">
+                <Filter className="w-4 h-4" />
+                Filter
+                {(priorityFilter !== "All" || projectFilter !== "All") && (
+                  <span className="w-2 h-2 rounded-full bg-primary ml-1" />
+                )}
+              </button>
+            </PopoverTrigger>
+            <PopoverContent className="w-64 p-4" align="end">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h4 className="font-bold text-sm">Filters</h4>
+                  {(priorityFilter !== "All" || projectFilter !== "All") && (
+                    <button 
+                      onClick={() => { setPriorityFilter("All"); setProjectFilter("All"); }}
+                      className="text-[10px] font-semibold text-muted-foreground hover:text-foreground"
+                    >
+                      Reset
+                    </button>
+                  )}
+                </div>
+                
+                <div className="space-y-2">
+                  <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Priority</label>
+                  <select 
+                    value={priorityFilter}
+                    onChange={(e) => setPriorityFilter(e.target.value as any)}
+                    className="w-full p-2 bg-muted/50 border border-border rounded-lg text-xs focus:outline-none"
+                  >
+                    <option value="All">All Priorities</option>
+                    <option value="High">High</option>
+                    <option value="Medium">Medium</option>
+                    <option value="Low">Low</option>
+                  </select>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Project</label>
+                  <select 
+                    value={projectFilter}
+                    onChange={(e) => setProjectFilter(e.target.value)}
+                    className="w-full p-2 bg-muted/50 border border-border rounded-lg text-xs focus:outline-none"
+                  >
+                    <option value="All">All Projects</option>
+                    <option value="Independent">Independent Tasks</option>
+                    {projects.map(p => (
+                      <option key={p.id} value={p.id}>{p.name}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </PopoverContent>
+          </Popover>
 
           <div className="flex items-center bg-muted/40 border border-border/50 rounded-xl p-1 shrink-0">
             <button 
@@ -943,8 +1012,9 @@ export function Tasks({ setActive }: { setActive?: (route: string) => void }) {
                   <SortableHeader label="Status" sortKey="status" currentSort={sortConfig} onSort={requestSort} className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase tracking-wider" />
                   <SortableHeader label="Priority" sortKey="priority" currentSort={sortConfig} onSort={requestSort} className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase tracking-wider" />
                   <SortableHeader label="Due Date" sortKey="dueDate" currentSort={sortConfig} onSort={requestSort} className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase tracking-wider" />
-                  <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase tracking-wider">Assignee</th>
-                  <th className="px-6 py-4"></th>
+                  <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase tracking-wider">Assigned To</th>
+                  <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase tracking-wider">Assigned By</th>
+                  <th className="px-6 py-4 text-right"></th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
@@ -997,55 +1067,98 @@ export function Tasks({ setActive }: { setActive?: (route: string) => void }) {
                             className="px-2 py-1 text-xs text-foreground/80 border border-border rounded-xl bg-card focus:outline-none font-bold" 
                           />
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
-                          <Popover>
-                            <PopoverTrigger asChild>
-                              <button
-                                type="button"
-                                className="flex h-[30px] w-[140px] items-center justify-between whitespace-nowrap rounded-xl border border-border bg-card px-2 py-1 text-xs font-bold focus:outline-none"
-                              >
-                                <span className="truncate">
-                                  {inlineTaskAssignees.length > 0 ? inlineTaskAssignees.join(", ") : "Unassigned"}
-                                </span>
-                                <ChevronDown className="ml-1 h-3.5 w-3.5 shrink-0 opacity-50" />
-                              </button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-[200px] p-2 bg-card border border-border rounded-xl shadow-xl z-50" align="start">
-                              <div className="px-1 py-1 border-b border-border/40 mb-1">
-                                <input
-                                  type="text"
-                                  placeholder="Search employee..."
-                                  value={inlineAssigneeSearchQuery}
-                                  onChange={(e) => setInlineAssigneeSearchQuery(e.target.value)}
-                                  className="w-full px-2 py-1 text-xs border border-border rounded-lg bg-muted/30 focus:outline-none"
-                                />
-                              </div>
-                              <div className="space-y-1 max-h-[200px] overflow-y-auto">
-                                {employees.filter(emp => emp.name.toLowerCase().includes(inlineAssigneeSearchQuery.toLowerCase())).map((emp) => {
-                                  const isChecked = inlineTaskAssignees.includes(emp.name);
-                                  return (
-                                    <label key={emp.id} className="flex items-center gap-2 px-2 py-1.5 hover:bg-muted rounded-lg cursor-pointer text-xs font-bold select-none text-foreground">
-                                      <input
-                                        type="checkbox"
-                                        checked={isChecked}
-                                        onChange={() => {
-                                          if (isChecked) {
-                                            setInlineTaskAssignees(inlineTaskAssignees.filter(n => n !== emp.name));
-                                          } else {
-                                            setInlineTaskAssignees([...inlineTaskAssignees, emp.name]);
-                                          }
-                                        }}
-                                        className="rounded border-border text-primary focus:ring-primary/20 w-3.5 h-3.5"
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          {inlineEditingTaskId === task.id ? (
+                            <div className="relative">
+                              <Popover>
+                                <PopoverTrigger asChild>
+                                  <button className="flex items-center gap-2 px-3 py-2 bg-muted/40 border border-border/60 rounded-xl text-xs font-semibold w-full">
+                                    {inlineTaskAssignees.length > 0 ? inlineTaskAssignees.join(", ") : "Unassigned"}
+                                    <ChevronDown className="w-3 h-3 ml-auto opacity-50" />
+                                  </button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-64 p-3" align="start">
+                                  <div className="space-y-3">
+                                    <div className="relative">
+                                      <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                                      <input 
+                                        type="text" 
+                                        placeholder="Search employees..." 
+                                        value={inlineAssigneeSearchQuery}
+                                        onChange={(e) => setInlineAssigneeSearchQuery(e.target.value)}
+                                        className="w-full pl-8 pr-3 py-2 bg-muted/50 border border-border rounded-lg text-xs focus:outline-none focus:border-primary"
                                       />
-                                      {emp.name}
-                                    </label>
-                                  );
-                                })}
-                              </div>
-                            </PopoverContent>
-                          </Popover>
+                                    </div>
+                                    <div className="space-y-1 max-h-[150px] overflow-y-auto custom-scrollbar pr-1">
+                                      {employees.filter(emp => emp.name.toLowerCase().includes(inlineAssigneeSearchQuery.toLowerCase())).map((emp) => {
+                                        const isChecked = inlineTaskAssignees.includes(emp.name);
+                                        return (
+                                          <label key={emp.id} className="flex items-center gap-3 p-2 rounded hover:bg-muted cursor-pointer transition-colors">
+                                            <input 
+                                              type="checkbox" 
+                                              checked={isChecked}
+                                              onChange={() => {
+                                                if (isChecked) {
+                                                  setInlineTaskAssignees(inlineTaskAssignees.filter(n => n !== emp.name));
+                                                } else {
+                                                  setInlineTaskAssignees([...inlineTaskAssignees, emp.name]);
+                                                }
+                                              }}
+                                              className="rounded border-border text-primary focus:ring-primary"
+                                            />
+                                            <div className="flex items-center gap-2">
+                                              <img src={emp.avatar} alt={emp.name} className="w-5 h-5 rounded-full" />
+                                              <span className="text-xs font-semibold">{emp.name}</span>
+                                            </div>
+                                          </label>
+                                        );
+                                      })}
+                                    </div>
+                                  </div>
+                                </PopoverContent>
+                              </Popover>
+                            </div>
+                          ) : (
+                            <div className="flex items-center gap-2">
+                              {task.assignees.length > 0 ? (
+                                <div className="flex -space-x-2">
+                                  {task.assignees.slice(0, 3).map((a, i) => (
+                                    <TooltipProvider key={i}>
+                                      <Tooltip>
+                                        <TooltipTrigger asChild>
+                                          <img src={a.avatar} alt={a.name} className="w-7 h-7 rounded-full border-2 border-card relative hover:z-10 hover:scale-110 transition-transform cursor-pointer" />
+                                        </TooltipTrigger>
+                                        <TooltipContent side="top">
+                                          <p className="text-xs font-semibold">{a.name}</p>
+                                        </TooltipContent>
+                                      </Tooltip>
+                                    </TooltipProvider>
+                                  ))}
+                                  {task.assignees.length > 3 && (
+                                    <div className="w-7 h-7 rounded-full border-2 border-card bg-muted flex items-center justify-center text-[10px] font-bold relative z-0">
+                                      +{task.assignees.length - 3}
+                                    </div>
+                                  )}
+                                </div>
+                              ) : (
+                                <span className="text-xs text-muted-foreground font-medium italic">Unassigned</span>
+                              )}
+                            </div>
+                          )}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-right" onClick={(e) => e.stopPropagation()}>
+                        
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          {task.assignedBy ? (
+                             <div className="flex items-center gap-2">
+                               <img src={task.assignedBy.avatar} alt={task.assignedBy.name} className="w-6 h-6 rounded-full border border-border" />
+                               <span className="text-xs font-medium text-foreground">{task.assignedBy.name}</span>
+                             </div>
+                          ) : (
+                             <span className="text-xs text-muted-foreground">Self</span>
+                          )}
+                        </td>
+
+                        <td className="px-6 py-4 whitespace-nowrap text-right">
                           <div className="flex items-center justify-end gap-2">
                             <button onClick={() => setInlineEditingTaskId(null)} className="px-2.5 py-1.5 text-xs font-bold text-muted-foreground hover:bg-muted rounded-xl transition-colors">Cancel</button>
                             <button onClick={saveInlineEdit} className="px-3 py-1.5 text-xs font-bold bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl transition-all">Save</button>
