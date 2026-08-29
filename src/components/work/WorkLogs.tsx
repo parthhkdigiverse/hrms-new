@@ -68,21 +68,27 @@ export function WorkLogs() {
       return;
     }
 
-    const created: WorkLog = {
-      id: `log-${Date.now()}`,
+    const tasks = newLog.task
+      ? newLog.task.split(",").map(t => t.trim()).filter(Boolean)
+      : ["Development"];
+      
+    const hoursPerTask = hoursVal / Math.max(tasks.length, 1);
+
+    const createdLogs: WorkLog[] = tasks.map((taskName, index) => ({
+      id: `log-${Date.now()}-${index}`,
       employee: newLog.employee || "",
       avatar: `https://api.dicebear.com/7.x/adventurer/svg?seed=${newLog.employee || "Sarah"}`,
       date: newLog.date || "",
       project: newLog.project || "General",
-      task: newLog.task || "Development",
+      task: taskName,
       startTime: newLog.startTime || "09:00",
       endTime: newLog.endTime || "17:00",
-      hours: hoursVal,
+      hours: hoursPerTask,
       status: "Pending",
       description: newLog.description || ""
-    };
+    }));
 
-    setLogs([created, ...logs]);
+    setLogs([...createdLogs, ...logs]);
     setIsAddOpen(false);
     setNewLog({
       employee: "Sarah Connor",
