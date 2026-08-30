@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { format } from "date-fns";
 import { useSortableData } from "@/hooks/useSortableData";
 import { SortableHeader } from "@/components/ui/sortable-header";
+import { useSales } from "@/components/sales/SalesContext";
 
 type TaskStatus = "Todo" | "In Progress" | "In Review" | "Done";
 type Priority = "High" | "Medium" | "Low";
@@ -29,11 +30,13 @@ interface Task {
   moduleId?: string;
   clientId?: string;
   originalStatus?: string;
+  isSalesTask?: boolean;
 }
 
 export function Tasks({ setActive }: { setActive?: (route: string) => void }) {
   const [projects, setProjects] = useState<any[]>([]);
   const [independentTasks, setIndependentTasks] = useState<Task[]>([]);
+  const { tasks: salesTasks, setTasks: setSalesTasks } = useSales();
 
   const handleRedirectToProject = (e: React.MouseEvent, projectId: string, clientId?: string, moduleId?: string) => {
     e.stopPropagation();
@@ -299,8 +302,28 @@ export function Tasks({ setActive }: { setActive?: (route: string) => void }) {
       });
     });
 
-    return [...independentTasks, ...projectTasksList];
-  }, [projects, independentTasks]);
+    const mappedSalesTasks: Task[] = salesTasks.map(t => {
+      let mappedStatus: TaskStatus = "Todo";
+      if (t.status === "completed") mappedStatus = "Done";
+      else if (t.status === "today" || t.status === "overdue") mappedStatus = "In Progress";
+      
+      return {
+        id: t.id,
+        title: `${t.type} — ${t.company}`,
+        description: "Sales Task",
+        status: mappedStatus,
+        priority: t.priority,
+        dueDate: t.dueDate,
+        assignees: t.assignee ? [{ name: t.assignee, avatar: `https://api.dicebear.com/7.x/adventurer/svg?seed=${t.assignee}` }] : [],
+        commentsCount: 0,
+        attachmentsCount: 0,
+        isSalesTask: true,
+        originalStatus: t.status
+      };
+    });
+
+    return [...independentTasks, ...projectTasksList, ...mappedSalesTasks];
+  }, [projects, independentTasks, salesTasks]);
 
   const stats = useMemo(() => {
     const total = allTasks.length;
@@ -363,6 +386,14 @@ export function Tasks({ setActive }: { setActive?: (route: string) => void }) {
       });
       saveProjects(newProjects);
       toast.success("Project task status synced!");
+    } else if (task.isSalesTask) {
+      let originalStatus = "upcoming";
+      if (nextStatus === "Done") originalStatus = "completed";
+      else if (nextStatus === "In Progress") originalStatus = "today";
+      
+      const updated = salesTasks.map(st => st.id === taskId ? { ...st, status: originalStatus as any } : st);
+      setSalesTasks(updated);
+      toast.success("Sales task status synced!");
     } else {
       const updated = independentTasks.map(t => t.id === taskId ? { ...t, status: nextStatus } : t);
       saveIndependentTasks(updated);
@@ -405,6 +436,9 @@ export function Tasks({ setActive }: { setActive?: (route: string) => void }) {
           return p;
         });
         saveProjects(newProjects);
+      } else if (task?.isSalesTask) {
+        const updated = salesTasks.map(st => st.id === editingTaskId ? { ...st, type: newTaskTitle, company: newTaskDesc, dueDate: newTaskDueDate || st.dueDate, assignee: newTaskAssignees[0] || st.assignee } : st);
+        setSalesTasks(updated);
       } else {
         const updated = independentTasks.map(t => t.id === editingTaskId ? {
           ...t,
@@ -504,6 +538,13 @@ export function Tasks({ setActive }: { setActive?: (route: string) => void }) {
         return p;
       });
       saveProjects(newProjects);
+    } else if (task?.isSalesTask) {
+      let originalStatus = "upcoming";
+      if (inlineTaskStatus === "Done") originalStatus = "completed";
+      else if (inlineTaskStatus === "In Progress") originalStatus = "today";
+
+      const updated = salesTasks.map(st => st.id === inlineEditingTaskId ? { ...st, type: inlineTaskTitle, status: originalStatus as any, assignee: inlineTaskAssignees[0] || st.assignee } : st);
+      setSalesTasks(updated);
     } else {
       const updated = independentTasks.map(t => t.id === inlineEditingTaskId ? {
         ...t,
@@ -967,7 +1008,21 @@ export function Tasks({ setActive }: { setActive?: (route: string) => void }) {
                                 className="text-[9px] font-bold bg-muted hover:bg-muted/80 text-muted-foreground border border-border/50 px-2 py-0.5 rounded-md flex items-center gap-0.5 transition-colors"
                                 title="View project workspace"
                               >
-                                🔗 Go
+                                🔗 Go to Project
+                              </button>
+                            </div>
+                          )}
+                          {task.isSalesTask && (
+                            <div className="flex items-center gap-1">
+                              <span className="text-[9px] font-black bg-amber-500/10 text-amber-600 border border-amber-500/25 px-2 py-0.5 rounded-md uppercase tracking-wider">
+                                Sales Task
+                              </span>
+                              <button
+                                onClick={(e) => { e.stopPropagation(); if(setActive) setActive("/work/sales/tasks"); }}
+                                className="text-[9px] font-bold bg-muted hover:bg-muted/80 text-muted-foreground border border-border/50 px-2 py-0.5 rounded-md flex items-center gap-0.5 transition-colors"
+                                title="View sales tasks"
+                              >
+                                🔗 Go to Sales
                               </button>
                             </div>
                           )}
@@ -1181,6 +1236,20 @@ export function Tasks({ setActive }: { setActive?: (route: string) => void }) {
                                   title="View project workspace"
                                 >
                                   🔗 Go to Project
+                                </button>
+                              </div>
+                            )}
+                            {task.isSalesTask && (
+                              <div className="flex items-center gap-1 inline-flex">
+                                <span className="text-[9px] font-black bg-amber-500/10 text-amber-600 border border-amber-500/25 px-2 py-0.5 rounded-lg uppercase tracking-wider">
+                                  Sales Task
+                                </span>
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); if(setActive) setActive("/work/sales/tasks"); }}
+                                  className="text-[9px] font-bold bg-muted hover:bg-muted/80 text-muted-foreground border border-border/50 px-2 py-0.5 rounded-lg flex items-center gap-0.5 transition-colors"
+                                  title="View sales tasks"
+                                >
+                                  🔗 Go to Sales
                                 </button>
                               </div>
                             )}
