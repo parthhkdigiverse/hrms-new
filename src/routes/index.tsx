@@ -74,8 +74,6 @@ import { FinancialPlan } from "@/components/finance/FinancialPlan";
 import { FinancialSummary } from "@/components/finance/FinancialSummary";
 import { OtherTransactions } from "@/components/finance/OtherTransactions";
 import { AuditLogs } from "@/components/finance/AuditLogs";
-import { TrainingDashboard } from "@/components/training/TrainingDashboard";
-import { CoursePlayer } from "@/components/training/CoursePlayer";
 import { UserProfile } from "@/components/profile/UserProfile";
 
 export const Route = createFileRoute("/")({
@@ -240,9 +238,6 @@ function Index() {
         {basePath === "/workspace/resource" && <ResourceManagementPage />}
         {basePath === "/workspace/gallery" && <Gallery />}
 
-        {/* Training & Learning */}
-        {basePath.startsWith("/learn/") && !basePath.startsWith("/learn/course/") && <TrainingDashboard active={active} setActive={setActive} />}
-        {basePath.startsWith("/learn/course/") && <CoursePlayer active={active} setActive={setActive} />}
 
         {/* Admin & Command Center */}
         {basePath === "/ceo-dashboard" && <CEODashboard active={active} />}
@@ -264,7 +259,7 @@ function Index() {
         {basePath === "/profile" && <UserProfile />}
 
         {/* Fallback original content for all other items */}
-        {basePath !== "/dashboard" && basePath !== "/profile" && basePath !== "/schedule" && basePath !== "/work/logs" && basePath !== "/work/projects" && basePath !== "/tasks" && basePath !== "/chat" && basePath !== "/work/research" && basePath !== "/penalty" && basePath !== "/approvals/penalties" && basePath !== "/remarks" && basePath !== "/activity-logs" && basePath !== "/activity-tracker" && basePath !== "/restrictions" && basePath !== "/settings" && basePath !== "/recycle-bin" && basePath !== "/elections" && basePath !== "/recognitions" && basePath !== "/team-leader-of-the-week" && !basePath.startsWith("/ceo-dashboard") && !basePath.startsWith("/work/sales") && !basePath.startsWith("/payroll") && !basePath.startsWith("/employees") && !basePath.startsWith("/recruitment") && !basePath.startsWith("/workspace") && !basePath.startsWith("/approvals") && !basePath.startsWith("/invoice") && !basePath.startsWith("/reports") && !basePath.startsWith("/finance") && !basePath.startsWith("/learn") && (
+        {basePath !== "/dashboard" && basePath !== "/profile" && basePath !== "/schedule" && basePath !== "/work/logs" && basePath !== "/work/projects" && basePath !== "/tasks" && basePath !== "/chat" && basePath !== "/work/research" && basePath !== "/penalty" && basePath !== "/approvals/penalties" && basePath !== "/remarks" && basePath !== "/activity-logs" && basePath !== "/activity-tracker" && basePath !== "/restrictions" && basePath !== "/settings" && basePath !== "/recycle-bin" && basePath !== "/elections" && basePath !== "/recognitions" && basePath !== "/team-leader-of-the-week" && !basePath.startsWith("/ceo-dashboard") && !basePath.startsWith("/work/sales") && !basePath.startsWith("/payroll") && !basePath.startsWith("/employees") && !basePath.startsWith("/recruitment") && !basePath.startsWith("/workspace") && !basePath.startsWith("/approvals") && !basePath.startsWith("/invoice") && !basePath.startsWith("/reports") && !basePath.startsWith("/finance") && (
           <>
             <header className="mb-8 max-w-3xl">
               <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">

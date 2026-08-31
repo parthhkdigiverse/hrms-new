@@ -106,18 +106,7 @@ export const navItems: NavItem[] = [
       { title: "Hirings", url: "/recruitment/hirings" },
     ],
   },
-  {
-    title: "Learn with me",
-    icon: BookOpen,
-    section: "People",
-    children: [
-      { title: "Dashboard", url: "/learn/dashboard" },
-      { title: "Courses", url: "/learn/courses" },
-      { title: "My Learning", url: "/learn/my-learning" },
-      { title: "Certificates", url: "/learn/certificates" },
-      { title: "Leaderboard", url: "/learn/leaderboard" },
-    ],
-  },
+
   { title: "Schedule", url: "/schedule", icon: CalendarRange, section: "Work" },
   {
     title: "Payroll",
@@ -217,17 +206,7 @@ export const navItems: NavItem[] = [
   { title: "Reports", url: "/ceo-dashboard/reports", icon: BarChart2, section: "Command Center" },
   { title: "Settings", url: "/ceo-dashboard/settings", icon: Settings, section: "Command Center" },
   { title: "Activity Tracker", url: "/activity-tracker", icon: Activity, section: "Admin" },
-  {
-    title: "Manage Learning",
-    icon: BookOpen,
-    section: "Admin",
-    children: [
-      { title: "Analytics", url: "/learn/analytics" },
-      { title: "CEO Dashboard", url: "/learn/ceo-dashboard" },
-      { title: "Course Assignment", url: "/learn/assignment" },
-      { title: "Roles & Audit", url: "/learn/audit" },
-    ],
-  },
+
   {
     title: "Elections & Recognition",
     icon: Vote,
