@@ -1,1 +1,0 @@
-import{t as e}from"./RecycleBin-CYr0AmLn.js";var t=e;export{t as component};

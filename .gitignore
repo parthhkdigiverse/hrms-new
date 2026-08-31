@@ -40,3 +40,4 @@ build/
 
 # Lovable config
 .lovable/
+.vercel
