@@ -1,10 +1,12 @@
 import { useState } from "react";
-import { UserPlus, CheckSquare, Briefcase, Receipt, Clock, Settings, X, Plus } from "lucide-react";
+import { UserPlus, CheckSquare, Briefcase, Receipt, Clock, Settings, X, Plus, Search } from "lucide-react";
 import { formatDate, cn } from "@/lib/utils";
-import { triggerGlobalModal } from "@/components/GlobalModalContext";
 import { Dialog, DialogContent, DialogClose } from "@/components/ui/dialog";
 
-const DASHBOARD_QUICK_ACTIONS = [
+import { navItems } from "@/components/nav-data";
+import { Link2 } from "lucide-react";
+
+const DEFAULT_QUICK_ACTIONS = [
   { id: "employees", title: "Employees", icon: UserPlus, url: "/employees/list", hint: "People" },
   { id: "tasks", title: "Tasks", icon: CheckSquare, url: "/tasks", hint: "Work" },
   { id: "clients", title: "Clients", icon: Briefcase, url: "/work/sales/leads", hint: "Sales" },
@@ -15,8 +17,39 @@ const DASHBOARD_QUICK_ACTIONS = [
   { id: "attendance", title: "Attendance", icon: Clock, url: "/employees/attendance", hint: "People" },
 ];
 
+const DASHBOARD_QUICK_ACTIONS = [...DEFAULT_QUICK_ACTIONS];
+const existingUrls = new Set(DASHBOARD_QUICK_ACTIONS.map(a => a.url));
+
+navItems.forEach(item => {
+  if (item.url && !existingUrls.has(item.url)) {
+    DASHBOARD_QUICK_ACTIONS.push({
+      id: item.url,
+      title: item.title,
+      icon: item.icon || Link2,
+      url: item.url,
+      hint: item.section || "Page"
+    });
+    existingUrls.add(item.url);
+  }
+  if (item.children) {
+    item.children.forEach(child => {
+      if (child.url && !existingUrls.has(child.url)) {
+        DASHBOARD_QUICK_ACTIONS.push({
+          id: child.url,
+          title: child.title,
+          icon: item.icon || Link2,
+          url: child.url,
+          hint: item.title
+        });
+        existingUrls.add(child.url);
+      }
+    });
+  }
+});
+
 export function DashboardHeader({ setActive }: { setActive?: (url: string) => void }) {
   const [isCustomizeOpen, setIsCustomizeOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const [selectedActionIds, setSelectedActionIds] = useState<string[]>(() => {
     if (typeof window !== "undefined") {
       const stored = localStorage.getItem("hrms_dashboard_actions");
@@ -98,8 +131,23 @@ export function DashboardHeader({ setActive }: { setActive?: (url: string) => vo
               </button>
             </DialogClose>
           </div>
+          <div className="p-4 border-b border-border/50 bg-white">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <input
+                type="text"
+                placeholder="Search pages..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-9 pr-4 py-2 bg-muted/30 border border-border/60 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all shadow-sm"
+              />
+            </div>
+          </div>
           <div className="p-4 max-h-[60vh] overflow-y-auto space-y-1 bg-white">
-            {DASHBOARD_QUICK_ACTIONS.map((a) => {
+            {DASHBOARD_QUICK_ACTIONS.filter(a => 
+              a.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+              a.hint.toLowerCase().includes(searchQuery.toLowerCase())
+            ).map((a) => {
               const isSelected = selectedActionIds.includes(a.id);
               return (
                 <label key={a.id} className="flex items-center gap-3 p-3 rounded-xl hover:bg-muted/50 cursor-pointer transition-colors border border-transparent hover:border-border/50">
