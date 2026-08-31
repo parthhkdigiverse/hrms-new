@@ -15,7 +15,7 @@ export function ProjectDelivery() {
           </div>
           <div className="bg-white border border-border/60 rounded-3xl p-5 shadow-sm flex flex-col justify-between">
             <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Active</p>
-            <p className="text-3xl font-black text-[#00A56C]">24</p>
+            <p className="text-3xl font-black text-primary">24</p>
           </div>
           <div className="bg-white border border-border/60 rounded-3xl p-5 shadow-sm flex flex-col justify-between">
             <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Completed</p>
@@ -42,7 +42,7 @@ export function ProjectDelivery() {
               <h3 className="font-bold text-foreground">Gantt preview of live delivery</h3>
               <p className="text-[11px] text-muted-foreground">Top active and at-risk projects</p>
             </div>
-            <button className="text-[11px] font-bold text-[#00A56C] bg-[#00A56C]/10 px-3 py-1.5 rounded-lg">View All</button>
+            <button className="text-[11px] font-bold text-primary bg-primary/10 px-3 py-1.5 rounded-lg">View All</button>
           </div>
           
           <div className="space-y-5">
@@ -56,7 +56,7 @@ export function ProjectDelivery() {
                   <span className={cn("text-[10px] font-bold px-2 py-0.5 rounded-md border", 
                     proj.status === 'Delayed' ? 'text-rose-600 bg-rose-50 border-rose-100' :
                     proj.status === 'Over Budget' ? 'text-amber-600 bg-amber-50 border-amber-100' : 
-                    'text-[#00A56C] bg-emerald-50 border-emerald-100'
+                    'text-primary bg-emerald-50 border-emerald-100'
                   )}>
                     {proj.status}
                   </span>
@@ -64,7 +64,7 @@ export function ProjectDelivery() {
                 <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
                   <div 
                     className={cn("h-full rounded-full transition-all duration-1000", 
-                      proj.color === 'emerald' ? 'bg-[#00A56C]' : 
+                      proj.color === 'emerald' ? 'bg-primary' : 
                       proj.color === 'rose' ? 'bg-rose-500' : 'bg-amber-500'
                     )} 
                     style={{ width: `${proj.progress}%` }}

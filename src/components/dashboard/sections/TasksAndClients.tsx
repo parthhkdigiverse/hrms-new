@@ -20,7 +20,7 @@ export function TasksAndClients() {
               <div key={i} className="flex items-start gap-3 p-3 rounded-2xl bg-muted/50 border border-border/50 hover:bg-muted transition-colors cursor-pointer">
                 <div className="mt-0.5">
                   {task.status === "completed" ? (
-                    <CheckCircle2 className="h-5 w-5 text-[#00A56C]" />
+                    <CheckCircle2 className="h-5 w-5 text-primary" />
                   ) : (
                     <Circle className="h-5 w-5 text-border" />
                   )}
@@ -60,7 +60,7 @@ export function TasksAndClients() {
           </div>
           <div className="bg-white border border-border/60 rounded-3xl p-5 shadow-sm">
             <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider mb-1">Active Clients</p>
-            <p className="text-[26px] font-black text-[#00A56C] leading-none">64</p>
+            <p className="text-[26px] font-black text-primary leading-none">64</p>
           </div>
           <div className="bg-white border border-border/60 rounded-3xl p-5 shadow-sm">
             <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider mb-1">New This Month</p>
@@ -81,7 +81,7 @@ export function TasksAndClients() {
             {KEY_ACCOUNTS.map((account, i) => (
               <div key={i} className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-xl bg-[#00A56C]/10 border border-indigo-100 flex items-center justify-center text-[14px] font-bold text-[#00A56C]">
+                  <div className="w-8 h-8 rounded-xl bg-primary/10 border border-indigo-100 flex items-center justify-center text-[14px] font-bold text-primary">
                     {account.name.charAt(0)}
                   </div>
                   <div>

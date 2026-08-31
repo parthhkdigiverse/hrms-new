@@ -75,6 +75,8 @@ import { FinancialSummary } from "@/components/finance/FinancialSummary";
 import { OtherTransactions } from "@/components/finance/OtherTransactions";
 import { AuditLogs } from "@/components/finance/AuditLogs";
 import { UserProfile } from "@/components/profile/UserProfile";
+import { GlobalModalProvider } from "@/components/GlobalModalContext";
+import { GlobalModalManager } from "@/components/GlobalModalManager";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -160,12 +162,14 @@ function Index() {
   const isNew = active.includes('?new=1');
 
   return (
+    <GlobalModalProvider>
     <SettingsProvider>
       <DepartmentProvider>
         <EmployeeProvider>
           <SalesProvider>
             <div className="flex h-screen overflow-hidden bg-gradient-to-br from-background via-background to-primary/5">
           <AppSidebar active={active} setActive={setActive} />
+          <GlobalModalManager />
         <main className="min-w-0 flex-1 overflow-x-hidden px-6 pb-24 pt-20 sm:px-10 md:pb-8 md:pt-8">
           {/* Main Dashboard */}
           {basePath === "/dashboard" && <Dashboard setActive={setActive} onAction={handleQuickAction} />}
@@ -306,5 +310,6 @@ function Index() {
         </EmployeeProvider>
       </DepartmentProvider>
     </SettingsProvider>
+    </GlobalModalProvider>
   );
 }

@@ -18,17 +18,17 @@ export function DepartmentStatus() {
               <div className="flex justify-between items-end">
                 <div>
                   <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider mb-1">Present Today</p>
-                  <p className="text-xl font-black text-[#00A56C] leading-none">{dept.present}<span className="text-sm text-muted-foreground font-medium">/{dept.total}</span></p>
+                  <p className="text-xl font-black text-primary leading-none">{dept.present}<span className="text-sm text-muted-foreground font-medium">/{dept.total}</span></p>
                 </div>
                 <div className="text-right">
                   <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider mb-1">Tasks</p>
-                  <p className="text-xl font-black text-[#00A56C] leading-none">{dept.completed}<span className="text-sm text-muted-foreground font-medium">/{dept.completed + dept.tasks}</span></p>
+                  <p className="text-xl font-black text-primary leading-none">{dept.completed}<span className="text-sm text-muted-foreground font-medium">/{dept.completed + dept.tasks}</span></p>
                 </div>
               </div>
               
               <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden">
                 <div 
-                  className="h-full bg-[#00A56C] rounded-full" 
+                  className="h-full bg-primary rounded-full" 
                   style={{ width: `${(dept.completed / (dept.completed + dept.tasks)) * 100}%` }}
                 ></div>
               </div>

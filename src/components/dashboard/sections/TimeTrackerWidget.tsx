@@ -201,7 +201,7 @@ export function TimeTrackerWidget() {
         <div className="flex items-center gap-5 w-full md:w-auto">
           <div className="w-16 h-16 rounded-2xl flex items-center justify-center shrink-0 shadow-sm border border-border">
             {status === "Punched Out" && <LogOut className="w-8 h-8 text-muted-foreground" />}
-            {status === "Punched In" && <Clock className="w-8 h-8 text-[#00A56C]" />}
+            {status === "Punched In" && <Clock className="w-8 h-8 text-primary" />}
             {status === "On Break" && <Coffee className="w-8 h-8 text-amber-500" />}
           </div>
           <div>
@@ -210,8 +210,8 @@ export function TimeTrackerWidget() {
               <span className="relative flex h-3 w-3">
                 {status === "Punched In" && (
                   <>
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00A56C] opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-3 w-3 bg-[#00A56C]"></span>
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-3 w-3 bg-primary"></span>
                   </>
                 )}
                 {status === "On Break" && (
@@ -225,7 +225,7 @@ export function TimeTrackerWidget() {
                 )}
               </span>
               <h2 className={cn("text-2xl font-black tracking-tight", 
-                status === "Punched In" ? "text-[#00A56C]" : 
+                status === "Punched In" ? "text-primary" : 
                 status === "On Break" ? "text-amber-500" : "text-muted-foreground"
               )}>
                 {status}
@@ -240,7 +240,7 @@ export function TimeTrackerWidget() {
             {activeTasks.length > 0 ? (
               <div className="space-y-1">
                 <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest mb-1 flex items-center gap-2">
-                  Active Tasks <span className="w-1.5 h-1.5 rounded-full bg-[#00A56C]/50 animate-pulse" />
+                  Active Tasks <span className="w-1.5 h-1.5 rounded-full bg-primary/50 animate-pulse" />
                 </p>
                 <div className="flex flex-wrap gap-1.5">
                   {activeTasks.map((t, idx) => (
@@ -253,7 +253,7 @@ export function TimeTrackerWidget() {
             ) : (
               <div>
                 <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest mb-1 flex items-center gap-2">
-                  Active Task <span className="w-1.5 h-1.5 rounded-full bg-[#00A56C]/50 animate-pulse" />
+                  Active Task <span className="w-1.5 h-1.5 rounded-full bg-primary/50 animate-pulse" />
                 </p>
                 <h3 className="text-sm font-black text-foreground">No active task</h3>
               </div>
@@ -263,11 +263,11 @@ export function TimeTrackerWidget() {
                 onClick={() => setIsPunchInModalOpen(true)}
                 className="flex items-center gap-2 mt-3 pt-2 border-t border-border/40 hover:opacity-80 transition-opacity group text-left"
               >
-                <div className="w-1.5 h-1.5 rounded-full bg-[#00A56C] animate-pulse"></div>
+                <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></div>
                 <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Task:</span>
-                <span className="text-xs font-bold text-foreground truncate max-w-[150px] group-hover:text-[#00A56C] transition-colors">{activeTasks.join(", ")}</span>
-                <Pencil className="w-3 h-3 text-muted-foreground group-hover:text-[#00A56C] transition-colors ml-1" />
-                <span className="text-xs font-mono font-bold text-[#00A56C] ml-auto">{formatTime(activeTaskSeconds)}</span>
+                <span className="text-xs font-bold text-foreground truncate max-w-[150px] group-hover:text-primary transition-colors">{activeTasks.join(", ")}</span>
+                <Pencil className="w-3 h-3 text-muted-foreground group-hover:text-primary transition-colors ml-1" />
+                <span className="text-xs font-mono font-bold text-primary ml-auto">{formatTime(activeTaskSeconds)}</span>
               </button>
             )}
           </div>
@@ -290,7 +290,7 @@ export function TimeTrackerWidget() {
               onClick={handleBreak}
               className={cn("flex-1 md:flex-none px-6 py-3 rounded-2xl font-bold text-sm transition-colors flex items-center justify-center gap-2",
                 status === "On Break" 
-                  ? "bg-[#00A56C] text-white hover:bg-[#00A56C]/90" 
+                  ? "bg-primary text-primary-foreground hover:bg-primary/90" 
                   : "bg-amber-100 text-amber-700 hover:bg-amber-200"
               )}
             >
@@ -306,7 +306,7 @@ export function TimeTrackerWidget() {
             onClick={handlePunch}
             className={cn("flex-1 md:flex-none px-6 py-3 rounded-2xl font-bold text-sm transition-colors flex items-center justify-center gap-2",
               status === "Punched Out" 
-                ? "bg-[#00A56C] text-white hover:bg-[#00A56C]/90 shadow-md shadow-primary/20" 
+                ? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-md shadow-primary/20" 
                 : "bg-destructive text-destructive-foreground hover:bg-destructive/90"
             )}
           >
@@ -349,7 +349,7 @@ export function TimeTrackerWidget() {
                   className={cn(
                     "px-4 py-2 rounded-full text-sm font-bold whitespace-nowrap transition-all duration-300",
                     selectedCategory === cat 
-                      ? "bg-[#00A56C] text-white shadow-md shadow-primary/20" 
+                      ? "bg-primary text-primary-foreground shadow-md shadow-primary/20" 
                       : "bg-transparent text-foreground/80 hover:bg-muted/60"
                   )}
                 >
@@ -394,20 +394,20 @@ export function TimeTrackerWidget() {
                   className={cn(
                     "w-full flex items-center justify-between text-left px-5 py-4 rounded-2xl border transition-all duration-300 group relative overflow-hidden",
                     isSelected && !isAddingCustom
-                      ? "border-primary bg-[#00A56C]/5 shadow-[0_4px_20px_rgba(0,165,108,0.08)] ring-1 ring-primary/20" 
+                      ? "border-primary bg-primary/5 shadow-[0_4px_20px_rgba(0,165,108,0.08)] ring-1 ring-primary/20" 
                       : "border-border/60 bg-card hover:border-primary/40 hover:shadow-sm"
                   )}
                 >
                   <div className="flex items-center gap-3">
                     <div className={cn(
                       "w-5 h-5 rounded flex items-center justify-center shrink-0 border transition-colors",
-                      isSelected && !isAddingCustom ? "bg-[#00A56C] border-primary text-white" : "border-border/80 bg-white group-hover:border-primary/50"
+                      isSelected && !isAddingCustom ? "bg-primary border-primary text-white" : "border-border/80 bg-white group-hover:border-primary/50"
                     )}>
                       {isSelected && !isAddingCustom && <CheckCircle2 className="w-3.5 h-3.5" />}
                     </div>
                     <span className={cn(
                       "font-bold text-sm",
-                      isSelected && !isAddingCustom ? "text-[#00A56C]" : "text-foreground"
+                      isSelected && !isAddingCustom ? "text-primary" : "text-foreground"
                     )}>
                       {task.title}
                     </span>
@@ -431,13 +431,13 @@ export function TimeTrackerWidget() {
                   onClick={() => {
                     setIsAddingCustom(true);
                   }}
-                  className="w-full text-left px-5 py-4 rounded-2xl border border-dashed border-primary/50 text-[#00A56C] bg-[#00A56C]/5 hover:bg-[#00A56C]/10 transition-colors font-bold text-sm"
+                  className="w-full text-left px-5 py-4 rounded-2xl border border-dashed border-primary/50 text-primary bg-primary/5 hover:bg-primary/10 transition-colors font-bold text-sm"
                 >
                   + Add Custom Work (Not Listed)
                 </button>
               ) : (
                 <div className="w-full px-5 py-4 rounded-2xl border border-primary ring-1 ring-primary/20 bg-card shadow-sm animate-in fade-in slide-in-from-top-2 duration-300">
-                  <p className="text-[11px] font-bold text-[#00A56C] uppercase tracking-widest mb-2">New Custom Task</p>
+                  <p className="text-[11px] font-bold text-primary uppercase tracking-widest mb-2">New Custom Task</p>
                   <input
                     type="text"
                     autoFocus
@@ -462,7 +462,7 @@ export function TimeTrackerWidget() {
             <button
               onClick={confirmPunchIn}
               disabled={(selectedTasks.length === 0 && !customTask.trim())}
-              className="px-6 py-2.5 bg-[#00A56C] text-white font-bold text-sm rounded-xl shadow-md hover:bg-[#00A56C]/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-6 py-2.5 bg-primary text-primary-foreground font-bold text-sm rounded-xl shadow-md hover:bg-primary/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {status === "Punched Out" ? "Save & Punch In" : "Update Task"}
             </button>

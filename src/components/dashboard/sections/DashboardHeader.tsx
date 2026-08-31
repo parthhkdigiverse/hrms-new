@@ -1,32 +1,32 @@
 import { UserPlus, CheckSquare, Briefcase, Receipt, Clock } from "lucide-react";
 import { formatDate } from "@/lib/utils";
+import { triggerGlobalModal } from "@/components/GlobalModalContext";
 
 export function DashboardHeader({ setActive }: { setActive?: (url: string) => void }) {
   return (
     <div className="bg-white rounded-[32px] p-8 border border-border/60 shadow-sm relative overflow-hidden mb-12">
       <div className="flex justify-between items-start">
         <div>
-          <p className="text-[10px] font-bold text-[#00A56C] uppercase tracking-widest mb-2">CEO Command Center</p>
+          <p className="text-[10px] font-bold text-primary uppercase tracking-widest mb-2">CEO Command Center</p>
           <h1 className="text-[34px] font-black text-foreground tracking-tight flex items-center gap-2 mb-2 leading-none">
             Good Evening, Het <span className="text-3xl">👋</span>
           </h1>
           <p className="text-[14px] text-muted-foreground">Today's overview for HK DigiVerse — everything moving across the company, in one screen.</p>
         </div>
         <div className="flex flex-wrap gap-3 justify-end max-w-md">
-          <button onClick={() => setActive?.("/employees/list?new=1")} className="flex items-center gap-1.5 px-4 py-2 bg-white border border-border/80 rounded-full text-[12px] font-bold text-foreground/80 shadow-[0_2px_10px_rgba(0,0,0,0.02)] hover:bg-muted/50 transition-colors cursor-pointer">
+          <button onClick={() => triggerGlobalModal("addEmployee")} className="flex items-center gap-1.5 px-4 py-2 bg-white border border-border/80 rounded-full text-[12px] font-bold text-foreground/80 shadow-[0_2px_10px_rgba(0,0,0,0.02)] hover:bg-muted/50 transition-colors cursor-pointer">
             <UserPlus className="h-3.5 w-3.5 text-muted-foreground" /> Employees
           </button>
-          <button onClick={() => setActive?.("/tasks?new=1")} className="flex items-center gap-1.5 px-4 py-2 bg-white border border-border/80 rounded-full text-[12px] font-bold text-foreground/80 shadow-[0_2px_10px_rgba(0,0,0,0.02)] hover:bg-muted/50 transition-colors cursor-pointer">
+          <button onClick={() => triggerGlobalModal("newTask")} className="flex items-center gap-1.5 px-4 py-2 bg-white border border-border/80 rounded-full text-[12px] font-bold text-foreground/80 shadow-[0_2px_10px_rgba(0,0,0,0.02)] hover:bg-muted/50 transition-colors cursor-pointer">
             <CheckSquare className="h-3.5 w-3.5 text-muted-foreground" /> Tasks
           </button>
-          <button onClick={() => setActive?.("/work/sales/leads?new=1")} className="flex items-center gap-1.5 px-4 py-2 bg-white border border-border/80 rounded-full text-[12px] font-bold text-foreground/80 shadow-[0_2px_10px_rgba(0,0,0,0.02)] hover:bg-muted/50 transition-colors cursor-pointer">
+          <button onClick={() => triggerGlobalModal("newLead")} className="flex items-center gap-1.5 px-4 py-2 bg-white border border-border/80 rounded-full text-[12px] font-bold text-foreground/80 shadow-[0_2px_10px_rgba(0,0,0,0.02)] hover:bg-muted/50 transition-colors cursor-pointer">
             <Briefcase className="h-3.5 w-3.5 text-muted-foreground" /> Clients
           </button>
-          {/* Create Invoice doesn't have a direct modal equivalent, navigating to the dedicated page */}
           <button onClick={() => setActive?.("/invoice/create")} className="flex items-center gap-1.5 px-4 py-2 bg-white border border-border/80 rounded-full text-[12px] font-bold text-foreground/80 shadow-[0_2px_10px_rgba(0,0,0,0.02)] hover:bg-muted/50 transition-colors cursor-pointer">
             <Receipt className="h-3.5 w-3.5 text-muted-foreground" /> Invoices
           </button>
-          <button onClick={() => setActive?.("/schedule?new=1")} className="flex items-center gap-1.5 px-4 py-2 bg-white border border-border/80 rounded-full text-[12px] font-bold text-foreground/80 shadow-[0_2px_10px_rgba(0,0,0,0.02)] hover:bg-muted/50 transition-colors cursor-pointer">
+          <button onClick={() => triggerGlobalModal("newMeeting")} className="flex items-center gap-1.5 px-4 py-2 bg-white border border-border/80 rounded-full text-[12px] font-bold text-foreground/80 shadow-[0_2px_10px_rgba(0,0,0,0.02)] hover:bg-muted/50 transition-colors cursor-pointer">
             <Clock className="h-3.5 w-3.5 text-muted-foreground" /> Meetings
           </button>
         </div>
@@ -35,7 +35,7 @@ export function DashboardHeader({ setActive }: { setActive?: (url: string) => vo
       <div className="grid grid-cols-4 gap-4 mt-8">
         <div className="bg-muted/50/40 rounded-2xl p-5 border border-border/40">
           <p className="text-[10px] font-bold text-muted-foreground mb-1">Current Time</p>
-          <p className="text-[22px] font-black text-[#00A56C]">05:28:41 PM</p>
+          <p className="text-[22px] font-black text-primary">05:28:41 PM</p>
         </div>
         <div className="bg-muted/50/40 rounded-2xl p-5 border border-border/40">
           <p className="text-[10px] font-bold text-muted-foreground mb-1">Today's Date</p>
@@ -47,7 +47,7 @@ export function DashboardHeader({ setActive }: { setActive?: (url: string) => vo
         </div>
         <div className="bg-muted/50/40 rounded-2xl p-5 border border-border/40">
           <p className="text-[10px] font-bold text-muted-foreground mb-1">Financial Month</p>
-          <p className="text-[22px] font-black text-[#00A56C]">August</p>
+          <p className="text-[22px] font-black text-primary">August</p>
         </div>
       </div>
     </div>

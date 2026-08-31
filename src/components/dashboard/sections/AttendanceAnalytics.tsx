@@ -73,10 +73,10 @@ export function AttendanceAnalytics() {
                   wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} 
                   formatter={(value) => <span className="text-muted-foreground font-medium capitalize">{value}</span>}
                 />
-                <Bar dataKey="present" fill="var(--chart-1)" radius={[4, 4, 0, 0]} barSize={16} />
-                <Bar dataKey="late" fill="var(--chart-2)" radius={[4, 4, 0, 0]} barSize={16} />
-                <Bar dataKey="wfh" fill="var(--chart-3)" radius={[4, 4, 0, 0]} barSize={16} />
-                <Bar dataKey="absent" fill="var(--destructive)" radius={[4, 4, 0, 0]} barSize={16} />
+                <Bar dataKey="present" fill="#00A56C" radius={[4, 4, 0, 0]} barSize={16} />
+                <Bar dataKey="late" fill="#F59E0B" radius={[4, 4, 0, 0]} barSize={16} />
+                <Bar dataKey="wfh" fill="#3B82F6" radius={[4, 4, 0, 0]} barSize={16} />
+                <Bar dataKey="absent" fill="#EF4444" radius={[4, 4, 0, 0]} barSize={16} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -118,13 +118,13 @@ export function AttendanceAnalytics() {
             <div className="flex items-center gap-2">
               <button 
                 onClick={() => setCurrentMonthDate(new Date(currentMonthDate.getFullYear(), currentMonthDate.getMonth() - 1, 1))}
-                className="w-8 h-8 flex items-center justify-center rounded-lg bg-muted/50 text-muted-foreground hover:bg-[#00A56C]/10 hover:text-[#00A56C] transition-colors"
+                className="w-8 h-8 flex items-center justify-center rounded-lg bg-muted/50 text-muted-foreground hover:bg-primary/10 hover:text-primary transition-colors"
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
               <button 
                 onClick={() => setCurrentMonthDate(new Date(currentMonthDate.getFullYear(), currentMonthDate.getMonth() + 1, 1))}
-                className="w-8 h-8 flex items-center justify-center rounded-lg bg-muted/50 text-muted-foreground hover:bg-[#00A56C]/10 hover:text-[#00A56C] transition-colors"
+                className="w-8 h-8 flex items-center justify-center rounded-lg bg-muted/50 text-muted-foreground hover:bg-primary/10 hover:text-primary transition-colors"
               >
                 <ChevronRight className="w-4 h-4" />
               </button>

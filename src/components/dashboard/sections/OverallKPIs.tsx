@@ -18,7 +18,7 @@ export function OverallKPIs() {
               {kpi.value.includes('%') && (
                 <div className="h-1 w-full bg-muted rounded-full mt-3 overflow-hidden">
                   <div 
-                    className="h-full bg-[#00A56C] rounded-full" 
+                    className="h-full bg-primary rounded-full" 
                     style={{ width: kpi.value }}
                   ></div>
                 </div>

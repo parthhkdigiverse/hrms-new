@@ -32,6 +32,17 @@ import {
   type QuickAction
 } from "./nav-data";
 import { useTheme } from "./ThemeProvider";
+import { triggerGlobalModal, type GlobalModalType } from "./GlobalModalContext";
+
+// Mapping from Create-menu URL to a GlobalModalType (undefined = navigate as before)
+const MODAL_TRIGGER_MAP: Record<string, GlobalModalType> = {
+  "/tasks?new=1": "newTask",
+  "/employees/list?new=1": "addEmployee",
+  "/employees/leave-requests?new=1": "applyLeave",
+  "/work/projects?new=1": "newProject",
+  "/work/sales/leads?new=1": "newLead",
+  "/meetings?new=1": "newMeeting",
+};
 
 function Badge({ count }: { count: number }) {
   if (count <= 0) return null;
@@ -120,8 +131,13 @@ function CreateMenu({ collapsed, onNavigate }: { collapsed: boolean; onNavigate:
               <button
                 key={a.url}
                 onClick={() => {
-                  onNavigate(a.url);
                   setOpen(false);
+                  const modalType = MODAL_TRIGGER_MAP[a.url];
+                  if (modalType) {
+                    triggerGlobalModal(modalType);
+                  } else {
+                    onNavigate(a.url);
+                  }
                 }}
                 className="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-sm hover:bg-sidebar-accent"
               >

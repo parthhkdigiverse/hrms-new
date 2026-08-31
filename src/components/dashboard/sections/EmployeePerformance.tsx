@@ -67,7 +67,7 @@ export function EmployeePerformance() {
         <div 
           className={cn(
             "rounded-3xl p-6 shadow-sm relative overflow-hidden flex flex-col justify-between transition-all duration-500 group", 
-            !(spotlight && 'image' in spotlight && spotlight.image) && "bg-[#00A56C]"
+            !(spotlight && 'image' in spotlight && spotlight.image) && "bg-primary"
           )}
           style={(spotlight && 'image' in spotlight && spotlight.image) ? {
             backgroundImage: `url(${spotlight.image})`,
@@ -90,8 +90,8 @@ export function EmployeePerformance() {
                 {spotlights.map((_, i) => (
                   <div key={i} className={cn("h-1 rounded-full transition-all duration-300", 
                     i === currentSpotlight 
-                      ? ((spotlight && 'image' in spotlight && spotlight.image) ? "w-3 bg-white" : "w-3 bg-[#00A56C]-foreground") 
-                      : ((spotlight && 'image' in spotlight && spotlight.image) ? "w-1 bg-white/30" : "w-1 bg-[#00A56C]-foreground/30")
+                      ? ((spotlight && 'image' in spotlight && spotlight.image) ? "w-3 bg-white" : "w-3 bg-primary-foreground") 
+                      : ((spotlight && 'image' in spotlight && spotlight.image) ? "w-1 bg-white/30" : "w-1 bg-primary-foreground/30")
                   )} />
                 ))}
               </div>
@@ -110,7 +110,7 @@ export function EmployeePerformance() {
                   {spotlight.ringStyle && spotlight.ringStyle !== "none" && (
                     <div className={cn("absolute -inset-[5px] rounded-full shadow-sm -z-10", BADGE_PRESETS[spotlight.ringStyle]?.class)}></div>
                   )}
-                  <div className="w-full h-full rounded-full bg-[#00A56C] flex items-center justify-center relative z-10 overflow-hidden border-2 border-white/20">
+                  <div className="w-full h-full rounded-full bg-primary flex items-center justify-center relative z-10 overflow-hidden border-2 border-white/20">
                     <img src={spotlight.image} alt={spotlight.name} className="w-full h-full object-cover" />
                   </div>
                 </div>

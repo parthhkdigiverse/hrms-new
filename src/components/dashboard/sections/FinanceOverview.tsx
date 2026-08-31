@@ -57,8 +57,8 @@ export function FinanceOverview() {
                   contentStyle={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', borderRadius: '12px', color: 'var(--foreground)', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                   itemStyle={{ fontWeight: 'bold' }}
                 />
-                <Area type="monotone" dataKey="revenue" stroke="var(--chart-1)" strokeWidth={2} fillOpacity={1} fill="url(#colorRev)" />
-                <Area type="monotone" dataKey="expense" stroke="var(--destructive)" strokeWidth={2} fillOpacity={1} fill="url(#colorExp)" />
+                <Area type="monotone" dataKey="revenue" stroke="#00A56C" strokeWidth={2} fillOpacity={1} fill="url(#colorRev)" />
+                <Area type="monotone" dataKey="expense" stroke="#EF4444" strokeWidth={2} fillOpacity={1} fill="url(#colorExp)" />
               </AreaChart>
             </ResponsiveContainer>
           </div>
@@ -86,7 +86,7 @@ export function FinanceOverview() {
                   contentStyle={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', borderRadius: '12px', color: 'var(--foreground)', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                   itemStyle={{ fontWeight: 'bold' }}
                 />
-                <Area type="monotone" dataKey="profit" stroke="var(--chart-1)" strokeWidth={2} fillOpacity={1} fill="url(#colorProfit)" />
+                <Area type="monotone" dataKey="profit" stroke="#00A56C" strokeWidth={2} fillOpacity={1} fill="url(#colorProfit)" />
               </AreaChart>
             </ResponsiveContainer>
           </div>

@@ -23,7 +23,7 @@ export function SalesOverview() {
             <div className="grid grid-cols-2 gap-4 mb-6">
               <div>
                 <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1">Monthly Sales</p>
-                <p className="text-xl font-black text-[#00A56C]">{SALES_METRICS.monthly}</p>
+                <p className="text-xl font-black text-primary">{SALES_METRICS.monthly}</p>
               </div>
               <div>
                 <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1">Sales Target</p>
@@ -43,7 +43,7 @@ export function SalesOverview() {
               <p className="text-[11px] font-bold text-muted-foreground">6 working days remaining</p>
             </div>
             <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
-              <div className="h-full bg-[#00A56C] rounded-full" style={{ width: `${SALES_METRICS.achievement}%` }}></div>
+              <div className="h-full bg-primary rounded-full" style={{ width: `${SALES_METRICS.achievement}%` }}></div>
             </div>
           </div>
         </div>
