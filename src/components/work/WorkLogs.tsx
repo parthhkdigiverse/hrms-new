@@ -522,7 +522,7 @@ export function WorkLogs() {
                       >
                         <div className={cn(
                           "w-4 h-4 rounded flex items-center justify-center shrink-0 border transition-colors",
-                          isSelected ? "bg-primary border-primary text-white" : "border-border/80 bg-white"
+                          isSelected ? "bg-primary border-primary text-primary-foreground" : "border-border/80 bg-white"
                         )}>
                           {isSelected && <CheckCircle2 className="w-3 h-3" />}
                         </div>

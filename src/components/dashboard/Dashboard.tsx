@@ -12,11 +12,11 @@ import { HRAndNews } from "./sections/HRAndNews";
 import { ActivityAndAI } from "./sections/ActivityAndAI";
 import { OverallKPIs } from "./sections/OverallKPIs";
 
-export function Dashboard() {
+export function Dashboard({ setActive, onAction }: { setActive?: (url: string) => void, onAction?: (action: string) => void }) {
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 pb-24">
       {/* SECTION 01: Header */}
-      <DashboardHeader />
+      <DashboardHeader setActive={setActive} onAction={onAction} />
 
       {/* SECTION 01b: Time Tracker Widget */}
       <TimeTrackerWidget />

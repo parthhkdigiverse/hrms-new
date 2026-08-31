@@ -139,12 +139,12 @@ const getLeaveTypeIcon = (type: string) => {
   }
 };
 
-export function LeaveRequests() {
+export function LeaveRequests({ isNew }: { isNew?: boolean }) {
   const { leaveTypes } = useSettingsContext();
   const [requests, setRequests] = useState<LeaveRequest[]>(MOCK_REQUESTS);
   const [activeTab, setActiveTab] = useState<LeaveStatus>("Pending");
   const [searchQuery, setSearchQuery] = useState("");
-  const [isAddOpen, setIsAddOpen] = useState(false);
+  const [isAddOpen, setIsAddOpen] = useState(isNew || false);
   
   // New leave form state
   const [newLeaveType, setNewLeaveType] = useState<string>(leaveTypes[0] || "Sick Leave");

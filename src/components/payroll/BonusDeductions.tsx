@@ -158,7 +158,7 @@ export function BonusDeductions() {
                     <span className={cn(
                       "inline-flex items-center justify-center px-3 py-1 rounded-full text-[11px] font-bold",
                       entry.state === "Approved" 
-                        ? "bg-[#00a56c] text-white" 
+                        ? "bg-primary text-primary-foreground" 
                         : "bg-white text-foreground/80 border border-border/80"
                     )}>
                       {entry.state}

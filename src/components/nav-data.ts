@@ -260,7 +260,7 @@ export const quickCreateActions: QuickAction[] = [
   { title: "New Invoice", url: "/invoice/create", icon: ReceiptText, hint: "Billing" },
   { title: "New Task", url: "/tasks?new=1", icon: ListPlus, hint: "Work" },
   { title: "Add Employee", url: "/employees/list?new=1", icon: UserPlus, hint: "People" },
-  { title: "Apply Leave", url: "/leave?new=1", icon: CalendarPlus, hint: "Work" },
+  { title: "Apply Leave", url: "/employees/leave-requests?new=1", icon: CalendarPlus, hint: "Work" },
 ];
 
 export const mobileBarItems: QuickAction[] = [

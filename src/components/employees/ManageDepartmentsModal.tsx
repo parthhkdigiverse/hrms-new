@@ -60,12 +60,12 @@ export function ManageDepartmentsModal({ isOpen, onClose }: ManageDepartmentsMod
                 value={newDept}
                 onChange={(e) => setNewDept(e.target.value)}
                 placeholder="New department name..."
-                className="flex-1 px-4 py-2 bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#00A56C]/20 focus:border-[#00A56C]/50 transition-all"
+                className="flex-1 px-4 py-2 bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all"
               />
               <button 
                 type="submit"
                 disabled={!newDept.trim()}
-                className="px-4 py-2 bg-[#00A56C] hover:bg-[#00A56C]/90 text-white rounded-xl font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                className="px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
               >
                 <Plus className="w-4 h-4" />
                 Add

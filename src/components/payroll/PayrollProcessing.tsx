@@ -165,7 +165,7 @@ export function PayrollProcessing() {
             "flex items-center gap-2 px-4 py-2 rounded-lg text-[13px] font-bold shadow-sm transition-colors whitespace-nowrap",
             stage === "locked"
               ? "bg-muted text-muted-foreground opacity-50 cursor-not-allowed"
-              : "bg-[#00a56c] hover:bg-[#00925e] text-white"
+              : "bg-primary hover:bg-[#00925e] text-primary-foreground"
           )}
         >
           <PlayCircle className="h-4 w-4" /> {stage === "generated" || stage === "approved" ? "Re-Generate" : "Generate Payroll"}

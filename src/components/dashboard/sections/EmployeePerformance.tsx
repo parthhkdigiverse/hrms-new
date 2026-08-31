@@ -67,7 +67,7 @@ export function EmployeePerformance() {
         <div 
           className={cn(
             "rounded-3xl p-6 shadow-sm relative overflow-hidden flex flex-col justify-between transition-all duration-500 group", 
-            !(spotlight && 'image' in spotlight && spotlight.image) && "bg-primary"
+            !(spotlight && 'image' in spotlight && spotlight.image) && "bg-[#00A56C]"
           )}
           style={(spotlight && 'image' in spotlight && spotlight.image) ? {
             backgroundImage: `url(${spotlight.image})`,
@@ -84,14 +84,14 @@ export function EmployeePerformance() {
             <Sparkles className={cn("h-32 w-32", (spotlight && 'image' in spotlight && spotlight.image) ? "text-white" : "")} />
           </div>
           <div className="relative z-10 h-full flex flex-col justify-between">
-            <h3 className={cn("text-xs font-bold uppercase tracking-wider mb-6 flex items-center justify-between", (spotlight && 'image' in spotlight && spotlight.image) ? "text-white/80" : "text-primary-foreground/70")}>
+            <h3 className={cn("text-xs font-bold uppercase tracking-wider mb-6 flex items-center justify-between", (spotlight && 'image' in spotlight && spotlight.image) ? "text-white/80" : "text-white/70")}>
               Spotlight
               <div className="flex gap-1">
                 {spotlights.map((_, i) => (
                   <div key={i} className={cn("h-1 rounded-full transition-all duration-300", 
                     i === currentSpotlight 
-                      ? ((spotlight && 'image' in spotlight && spotlight.image) ? "w-3 bg-white" : "w-3 bg-primary-foreground") 
-                      : ((spotlight && 'image' in spotlight && spotlight.image) ? "w-1 bg-white/30" : "w-1 bg-primary-foreground/30")
+                      ? ((spotlight && 'image' in spotlight && spotlight.image) ? "w-3 bg-white" : "w-3 bg-[#00A56C]-foreground") 
+                      : ((spotlight && 'image' in spotlight && spotlight.image) ? "w-1 bg-white/30" : "w-1 bg-[#00A56C]-foreground/30")
                   )} />
                 ))}
               </div>
@@ -110,15 +110,15 @@ export function EmployeePerformance() {
                   {spotlight.ringStyle && spotlight.ringStyle !== "none" && (
                     <div className={cn("absolute -inset-[5px] rounded-full shadow-sm -z-10", BADGE_PRESETS[spotlight.ringStyle]?.class)}></div>
                   )}
-                  <div className="w-full h-full rounded-full bg-primary flex items-center justify-center relative z-10 overflow-hidden border-2 border-white/20">
+                  <div className="w-full h-full rounded-full bg-[#00A56C] flex items-center justify-center relative z-10 overflow-hidden border-2 border-white/20">
                     <img src={spotlight.image} alt={spotlight.name} className="w-full h-full object-cover" />
                   </div>
                 </div>
               )}
-              <p className={cn("text-3xl font-black mb-1 animate-in fade-in slide-in-from-right-4 duration-500", (spotlight && 'image' in spotlight && spotlight.image) ? "text-white" : "text-primary-foreground")} key={`name-${spotlight?.name}`}>
+              <p className={cn("text-3xl font-black mb-1 animate-in fade-in slide-in-from-right-4 duration-500", (spotlight && 'image' in spotlight && spotlight.image) ? "text-white" : "text-white")} key={`name-${spotlight?.name}`}>
                 {spotlight?.name}
               </p>
-              <p className={cn("text-sm animate-in fade-in slide-in-from-right-4 duration-500 delay-75", (spotlight && 'image' in spotlight && spotlight.image) ? "text-white/80" : "text-primary-foreground/80")} key={`role-${spotlight?.role}`}>
+              <p className={cn("text-sm animate-in fade-in slide-in-from-right-4 duration-500 delay-75", (spotlight && 'image' in spotlight && spotlight.image) ? "text-white/80" : "text-white/80")} key={`role-${spotlight?.role}`}>
                 {spotlight?.role}
               </p>
             </div>

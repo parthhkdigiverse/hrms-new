@@ -37,7 +37,7 @@ function Badge({ count }: { count: number }) {
   if (count <= 0) return null;
   return (
     <span 
-      className="ml-auto shrink-0 rounded-full bg-[#00A56C] w-2.5 h-2.5 shadow-sm shadow-[#00A56C]/30" 
+      className="ml-auto shrink-0 rounded-full bg-primary w-2.5 h-2.5 shadow-sm shadow-primary/30" 
       aria-label={`${count} notifications`} 
     />
   );
@@ -47,7 +47,7 @@ const ALL_CREATE_ACTIONS: QuickAction[] = [
   { title: "New Invoice", url: "/invoice/create", icon: ReceiptText, hint: "Finance" },
   { title: "New Task", url: "/tasks?new=1", icon: ListPlus, hint: "Work" },
   { title: "Add Employee", url: "/employees/list?new=1", icon: UserPlus, hint: "People" },
-  { title: "Apply Leave", url: "/leave?new=1", icon: CalendarPlus, hint: "Work" },
+  { title: "Apply Leave", url: "/employees/leave-requests?new=1", icon: CalendarPlus, hint: "Work" },
   { title: "New Project", url: "/work/projects?new=1", icon: Briefcase, hint: "Work" },
   { title: "New Lead", url: "/work/sales/leads?new=1", icon: Target, hint: "Sales" },
   { title: "New Meeting", url: "/meetings?new=1", icon: MonitorPlay, hint: "Collaboration" },
@@ -63,7 +63,7 @@ function CreateMenu({ collapsed, onNavigate }: { collapsed: boolean; onNavigate:
       const stored = localStorage.getItem("hrms_custom_create_actions");
       if (stored) return JSON.parse(stored);
     }
-    return ["/invoice/create", "/tasks?new=1", "/employees/list?new=1", "/leave?new=1"];
+    return ["/invoice/create", "/tasks?new=1", "/employees/list?new=1", "/employees/leave-requests?new=1"];
   });
 
   const activeActions = useMemo(() => {

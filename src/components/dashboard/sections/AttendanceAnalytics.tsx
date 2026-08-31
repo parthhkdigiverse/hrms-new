@@ -118,13 +118,13 @@ export function AttendanceAnalytics() {
             <div className="flex items-center gap-2">
               <button 
                 onClick={() => setCurrentMonthDate(new Date(currentMonthDate.getFullYear(), currentMonthDate.getMonth() - 1, 1))}
-                className="w-8 h-8 flex items-center justify-center rounded-lg bg-muted/50 text-muted-foreground hover:bg-primary/10 hover:text-primary transition-colors"
+                className="w-8 h-8 flex items-center justify-center rounded-lg bg-muted/50 text-muted-foreground hover:bg-[#00A56C]/10 hover:text-[#00A56C] transition-colors"
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
               <button 
                 onClick={() => setCurrentMonthDate(new Date(currentMonthDate.getFullYear(), currentMonthDate.getMonth() + 1, 1))}
-                className="w-8 h-8 flex items-center justify-center rounded-lg bg-muted/50 text-muted-foreground hover:bg-primary/10 hover:text-primary transition-colors"
+                className="w-8 h-8 flex items-center justify-center rounded-lg bg-muted/50 text-muted-foreground hover:bg-[#00A56C]/10 hover:text-[#00A56C] transition-colors"
               >
                 <ChevronRight className="w-4 h-4" />
               </button>

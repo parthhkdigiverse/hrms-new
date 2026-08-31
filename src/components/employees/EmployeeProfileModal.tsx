@@ -70,11 +70,11 @@ export function EmployeeProfileModal({ employee, onClose }: EmployeeProfileModal
             
             <div className="flex-1 pt-2 md:pt-0 pb-1">
               <h2 className="text-3xl font-black text-foreground tracking-tight">{employee.name}</h2>
-              <p className="text-[15px] font-medium text-muted-foreground">{employee.role} · <span className="text-[#00A56C]">{employee.department}</span></p>
+              <p className="text-[15px] font-medium text-muted-foreground">{employee.role} · <span className="text-primary">{employee.department}</span></p>
             </div>
             
             <div className="flex gap-2 w-full md:w-auto mt-4 md:mt-0">
-              <button className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-[#00A56C] hover:bg-[#00A56C]/90 text-white px-5 py-2.5 rounded-xl font-bold transition-all shadow-sm shadow-emerald-500/20 active:scale-95 text-[13px]">
+              <button className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground px-5 py-2.5 rounded-xl font-bold transition-all shadow-sm shadow-primary/20 active:scale-95 text-[13px]">
                 <Mail className="w-4 h-4" /> Message
               </button>
             </div>

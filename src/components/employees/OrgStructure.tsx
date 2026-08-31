@@ -54,7 +54,7 @@ const OrgNodeCard = ({
             e.preventDefault();
             onAddClick(node);
           }}
-          className="p-1.5 bg-muted/50 hover:bg-[#00A56C] hover:text-white text-muted-foreground rounded-lg shadow-sm border border-border transition-colors"
+          className="p-1.5 bg-muted/50 hover:bg-primary hover:text-primary-foreground text-muted-foreground rounded-lg shadow-sm border border-border transition-colors"
           title="Add report under this person"
         >
           <Plus className="w-3.5 h-3.5" />

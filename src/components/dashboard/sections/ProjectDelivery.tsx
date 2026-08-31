@@ -42,7 +42,7 @@ export function ProjectDelivery() {
               <h3 className="font-bold text-foreground">Gantt preview of live delivery</h3>
               <p className="text-[11px] text-muted-foreground">Top active and at-risk projects</p>
             </div>
-            <button className="text-[11px] font-bold text-primary bg-primary/10 px-3 py-1.5 rounded-lg">View All</button>
+            <button className="text-[11px] font-bold text-[#00A56C] bg-[#00A56C]/10 px-3 py-1.5 rounded-lg">View All</button>
           </div>
           
           <div className="space-y-5">

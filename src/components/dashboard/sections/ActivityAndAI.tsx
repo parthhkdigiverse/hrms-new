@@ -69,7 +69,7 @@ export function ActivityAndAI() {
                 <div key={i} className="flex gap-3">
                   <div className={cn("mt-0.5 p-1.5 rounded-full shrink-0 text-white", 
                     activity.color === 'emerald' ? 'bg-emerald-500' :
-                    activity.color === 'indigo' ? 'bg-primary' :
+                    activity.color === 'indigo' ? 'bg-[#00A56C]' :
                     activity.color === 'amber' ? 'bg-amber-500' : 'bg-blue-500'
                   )}>
                     {Icon && <Icon className="h-3 w-3" />}
@@ -88,7 +88,7 @@ export function ActivityAndAI() {
 
       {/* SECTION 15: AI Summary */}
       <div>
-        <CollapsibleSection section="Section 15" title="AI Summary" titleIcon={<Sparkles className="h-5 w-5 text-primary" />}>
+        <CollapsibleSection section="Section 15" title="AI Summary" titleIcon={<Sparkles className="h-5 w-5 text-[#00A56C]" />}>
         <div className="bg-indigo-900 rounded-3xl p-6 text-white shadow-sm h-[320px] overflow-y-auto relative">
           <p className="text-[11px] text-indigo-200 mb-6">Generated from attendance, sales, finance and delivery signals</p>
           

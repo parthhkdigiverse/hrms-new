@@ -113,7 +113,7 @@ export function SpotlightEditor({ spotlights, setSpotlights }: SpotlightEditorPr
         <div className="flex items-center justify-between px-6 md:px-8 py-6 border-b border-border/50 bg-muted/30 sticky top-0 z-50">
           <div>
             <h2 className="text-xl md:text-2xl font-black tracking-tight flex items-center gap-2">
-              <Edit2 className="w-5 h-5 text-primary" />
+              <Edit2 className="w-5 h-5 text-[#00A56C]" />
               Manage Spotlight
             </h2>
           </div>
@@ -138,7 +138,7 @@ export function SpotlightEditor({ spotlights, setSpotlights }: SpotlightEditorPr
                       {emp.image ? (
                         <img src={emp.image} alt={emp.name} className="w-10 h-10 rounded-full object-cover shadow-sm" />
                       ) : (
-                        <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-sm">
+                        <div className="w-10 h-10 rounded-full bg-[#00A56C]/10 text-[#00A56C] flex items-center justify-center font-bold text-sm">
                           {emp.name.charAt(0)}
                         </div>
                       )}
@@ -150,7 +150,7 @@ export function SpotlightEditor({ spotlights, setSpotlights }: SpotlightEditorPr
                     <div className="flex items-center gap-1">
                       <button 
                         onClick={() => handleEdit(i)}
-                        className="p-2 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg transition-colors"
+                        className="p-2 text-muted-foreground hover:text-[#00A56C] hover:bg-[#00A56C]/10 rounded-lg transition-colors"
                         title="Edit employee"
                       >
                         <Edit2 className="w-4 h-4" />
@@ -218,7 +218,7 @@ export function SpotlightEditor({ spotlights, setSpotlights }: SpotlightEditorPr
                         reader.readAsDataURL(file);
                       }
                     }}
-                    className="w-full text-sm text-foreground file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 transition-colors border border-border rounded-xl bg-background pr-4 cursor-pointer"
+                    className="w-full text-sm text-foreground file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-[#00A56C]/10 file:text-[#00A56C] hover:file:bg-[#00A56C]/20 transition-colors border border-border rounded-xl bg-background pr-4 cursor-pointer"
                   />
                   {newImage && (
                     <button 
@@ -279,7 +279,7 @@ export function SpotlightEditor({ spotlights, setSpotlights }: SpotlightEditorPr
                         e.preventDefault();
                         setReplayCount(c => c + 1);
                       }}
-                      className="p-1 hover:bg-black/5 dark:hover:bg-white/10 rounded-full transition-colors text-primary"
+                      className="p-1 hover:bg-black/5 dark:hover:bg-white/10 rounded-full transition-colors text-[#00A56C]"
                       title="Replay Animation"
                     >
                       <RefreshCw className="w-3 h-3" />
@@ -321,7 +321,7 @@ export function SpotlightEditor({ spotlights, setSpotlights }: SpotlightEditorPr
                 <button 
                   onClick={handleAdd}
                   disabled={!newName || !newRole}
-                  className="flex-1 py-3 px-4 bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-xl transition-all shadow-[0_0_20px_rgba(var(--primary),0.3)] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  className="flex-1 py-3 px-4 bg-[#00A56C] hover:bg-[#00A56C]/90 text-white font-bold rounded-xl transition-all shadow-[0_0_20px_rgba(var(--primary),0.3)] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                   {editIndex !== null ? (
                     <>

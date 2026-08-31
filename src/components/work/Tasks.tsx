@@ -33,7 +33,7 @@ interface Task {
   isSalesTask?: boolean;
 }
 
-export function Tasks({ setActive }: { setActive?: (route: string) => void }) {
+export function Tasks({ setActive, isNew }: { setActive?: (route: string) => void, isNew?: boolean }) {
   const [projects, setProjects] = useState<any[]>([]);
   const [independentTasks, setIndependentTasks] = useState<Task[]>([]);
   const { tasks: salesTasks, setTasks: setSalesTasks } = useSales();
@@ -59,7 +59,7 @@ export function Tasks({ setActive }: { setActive?: (route: string) => void }) {
   const [priorityFilter, setPriorityFilter] = useState<"All" | Priority>("All");
   const [projectFilter, setProjectFilter] = useState<"All" | string>("All");
 
-  const [isNewTaskOpen, setIsNewTaskOpen] = useState(false);
+  const [isNewTaskOpen, setIsNewTaskOpen] = useState(isNew || false);
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
   const [newTaskTitle, setNewTaskTitle] = useState("");
   const [newTaskDesc, setNewTaskDesc] = useState("");

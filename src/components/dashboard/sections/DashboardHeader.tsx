@@ -1,7 +1,7 @@
 import { UserPlus, CheckSquare, Briefcase, Receipt, Clock } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 
-export function DashboardHeader() {
+export function DashboardHeader({ setActive }: { setActive?: (url: string) => void }) {
   return (
     <div className="bg-white rounded-[32px] p-8 border border-border/60 shadow-sm relative overflow-hidden mb-12">
       <div className="flex justify-between items-start">
@@ -13,20 +13,21 @@ export function DashboardHeader() {
           <p className="text-[14px] text-muted-foreground">Today's overview for HK DigiVerse — everything moving across the company, in one screen.</p>
         </div>
         <div className="flex flex-wrap gap-3 justify-end max-w-md">
-          <button className="flex items-center gap-1.5 px-4 py-2 bg-white border border-border/80 rounded-full text-[12px] font-bold text-foreground/80 shadow-[0_2px_10px_rgba(0,0,0,0.02)] hover:bg-muted/50 transition-colors">
-            <UserPlus className="h-3.5 w-3.5 text-muted-foreground" /> Add Employee
+          <button onClick={() => setActive?.("/employees/list?new=1")} className="flex items-center gap-1.5 px-4 py-2 bg-white border border-border/80 rounded-full text-[12px] font-bold text-foreground/80 shadow-[0_2px_10px_rgba(0,0,0,0.02)] hover:bg-muted/50 transition-colors cursor-pointer">
+            <UserPlus className="h-3.5 w-3.5 text-muted-foreground" /> Employees
           </button>
-          <button className="flex items-center gap-1.5 px-4 py-2 bg-white border border-border/80 rounded-full text-[12px] font-bold text-foreground/80 shadow-[0_2px_10px_rgba(0,0,0,0.02)] hover:bg-muted/50 transition-colors">
-            <CheckSquare className="h-3.5 w-3.5 text-muted-foreground" /> Add Task
+          <button onClick={() => setActive?.("/tasks?new=1")} className="flex items-center gap-1.5 px-4 py-2 bg-white border border-border/80 rounded-full text-[12px] font-bold text-foreground/80 shadow-[0_2px_10px_rgba(0,0,0,0.02)] hover:bg-muted/50 transition-colors cursor-pointer">
+            <CheckSquare className="h-3.5 w-3.5 text-muted-foreground" /> Tasks
           </button>
-          <button className="flex items-center gap-1.5 px-4 py-2 bg-white border border-border/80 rounded-full text-[12px] font-bold text-foreground/80 shadow-[0_2px_10px_rgba(0,0,0,0.02)] hover:bg-muted/50 transition-colors">
-            <Briefcase className="h-3.5 w-3.5 text-muted-foreground" /> Add Client
+          <button onClick={() => setActive?.("/work/sales/leads?new=1")} className="flex items-center gap-1.5 px-4 py-2 bg-white border border-border/80 rounded-full text-[12px] font-bold text-foreground/80 shadow-[0_2px_10px_rgba(0,0,0,0.02)] hover:bg-muted/50 transition-colors cursor-pointer">
+            <Briefcase className="h-3.5 w-3.5 text-muted-foreground" /> Clients
           </button>
-          <button className="flex items-center gap-1.5 px-4 py-2 bg-white border border-border/80 rounded-full text-[12px] font-bold text-foreground/80 shadow-[0_2px_10px_rgba(0,0,0,0.02)] hover:bg-muted/50 transition-colors">
-            <Receipt className="h-3.5 w-3.5 text-muted-foreground" /> Create Invoice
+          {/* Create Invoice doesn't have a direct modal equivalent, navigating to the dedicated page */}
+          <button onClick={() => setActive?.("/invoice/create")} className="flex items-center gap-1.5 px-4 py-2 bg-white border border-border/80 rounded-full text-[12px] font-bold text-foreground/80 shadow-[0_2px_10px_rgba(0,0,0,0.02)] hover:bg-muted/50 transition-colors cursor-pointer">
+            <Receipt className="h-3.5 w-3.5 text-muted-foreground" /> Invoices
           </button>
-          <button className="flex items-center gap-1.5 px-4 py-2 bg-white border border-border/80 rounded-full text-[12px] font-bold text-foreground/80 shadow-[0_2px_10px_rgba(0,0,0,0.02)] hover:bg-muted/50 transition-colors">
-            <Clock className="h-3.5 w-3.5 text-muted-foreground" /> Schedule Meeting
+          <button onClick={() => setActive?.("/schedule?new=1")} className="flex items-center gap-1.5 px-4 py-2 bg-white border border-border/80 rounded-full text-[12px] font-bold text-foreground/80 shadow-[0_2px_10px_rgba(0,0,0,0.02)] hover:bg-muted/50 transition-colors cursor-pointer">
+            <Clock className="h-3.5 w-3.5 text-muted-foreground" /> Meetings
           </button>
         </div>
       </div>

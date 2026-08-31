@@ -158,6 +158,9 @@ function Index() {
     );
   }
 
+  const basePath = active.split('?')[0] || "/";
+  const isNew = active.includes('?new=1');
+
   return (
     <SettingsProvider>
       <DepartmentProvider>
@@ -167,101 +170,101 @@ function Index() {
           <AppSidebar active={active} setActive={setActive} />
         <main className="min-w-0 flex-1 overflow-x-hidden px-6 pb-24 pt-20 sm:px-10 md:pb-8 md:pt-8">
           {/* Main Dashboard */}
-          {active === "/dashboard" && <Dashboard />}
+          {basePath === "/dashboard" && <Dashboard setActive={setActive} onAction={handleQuickAction} />}
 
           {/* Render the appropriate sales page based on state */}
-          {active === "/work/sales/dashboard" && <SalesDashboard setActive={setActive} onAction={handleQuickAction} />}
-          {active === "/work/sales/pipeline" && <SalesPipeline onAction={handleQuickAction} />}
-          {active === "/work/sales/leads" && <SalesLeads onAction={handleQuickAction} />}
-          {active === "/work/sales/tasks" && <SalesTasks onAction={handleQuickAction} />}
-          {active === "/work/sales/analytics" && <SalesAnalytics onAction={handleQuickAction} />}
-          {active === "/work/sales/team" && <SalesTeamPerformance onAction={handleQuickAction} />}
-          {active === "/work/sales/reports" && <SalesReports onAction={handleQuickAction} />}
-          {active === "/work/sales/settings" && <SalesSettings />}
+          {basePath === "/work/sales/dashboard" && <SalesDashboard setActive={setActive} onAction={handleQuickAction} />}
+          {basePath === "/work/sales/pipeline" && <SalesPipeline onAction={handleQuickAction} />}
+          {basePath === "/work/sales/leads" && <SalesLeads onAction={handleQuickAction} isNew={isNew} />}
+          {basePath === "/work/sales/tasks" && <SalesTasks onAction={handleQuickAction} />}
+          {basePath === "/work/sales/analytics" && <SalesAnalytics onAction={handleQuickAction} />}
+          {basePath === "/work/sales/team" && <SalesTeamPerformance onAction={handleQuickAction} />}
+          {basePath === "/work/sales/reports" && <SalesReports onAction={handleQuickAction} />}
+          {basePath === "/work/sales/settings" && <SalesSettings />}
 
         {/* Render Payroll pages */}
-        {active === "/payroll/dashboard" && <PayrollDashboard />}
-        {active === "/payroll/structure" && <SalaryStructure />}
-        {active === "/payroll/settings" && <PayrollSettings />}
-        {active === "/payroll/processing" && <PayrollProcessing />}
-        {active === "/payroll/bonuses" && <BonusDeductions />}
-        {active === "/payroll/payslips" && <Payslips />}
+        {basePath === "/payroll/dashboard" && <PayrollDashboard />}
+        {basePath === "/payroll/structure" && <SalaryStructure />}
+        {basePath === "/payroll/settings" && <PayrollSettings />}
+        {basePath === "/payroll/processing" && <PayrollProcessing />}
+        {basePath === "/payroll/bonuses" && <BonusDeductions />}
+        {basePath === "/payroll/payslips" && <Payslips />}
 
         {/* Render Employee pages */}
-        {active === "/employees/list" && <EmployeeList />}
-        {active === "/employees/org" && <OrgStructure />}
-        {active === "/employees/attendance" && <AttendanceList />}
-        {active === "/employees/leave-requests" && <LeaveRequests />}
-        {active === "/employees/documents" && <Documents setActive={setActive} />}
-        {active === "/employees/documents/generate" && <DocumentGenerator onBack={() => setActive("/employees/documents")} />}
+        {basePath === "/employees/list" && <EmployeeList isNew={isNew} />}
+        {basePath === "/employees/org" && <OrgStructure />}
+        {basePath === "/employees/attendance" && <AttendanceList />}
+        {basePath === "/employees/leave-requests" && <LeaveRequests isNew={isNew} />}
+        {basePath === "/employees/documents" && <Documents setActive={setActive} />}
+        {basePath === "/employees/documents/generate" && <DocumentGenerator onBack={() => setActive("/employees/documents")} />}
         {(active === "/penalty" || active === "/approvals/penalties") && <Penalties />}
-        {active === "/approvals/daily-progress" && <DailyProgress />}
-        {active === "/approvals/history" && <ApprovalHistory />}
-        {active === "/approvals/invoices" && <InvoiceApprovals />}
-        {active === "/remarks" && <Remarks />}
+        {basePath === "/approvals/daily-progress" && <DailyProgress />}
+        {basePath === "/approvals/history" && <ApprovalHistory />}
+        {basePath === "/approvals/invoices" && <InvoiceApprovals />}
+        {basePath === "/remarks" && <Remarks />}
         
         {/* Finance */}
-        {active === "/finance/transactions" && <Transactions />}
-        {active === "/finance/plan" && <FinancialPlan />}
-        {active === "/finance/summary" && <FinancialSummary />}
-        {active === "/finance/clients" && <OtherTransactions />}
-        {active === "/finance/audit" && <AuditLogs />}
-        {active === "/invoice/all" && <AllInvoices />}
-        {active === "/invoice/ledger" && <InvoiceLedger />}
-        {active === "/invoice/create" && <CreateInvoice onBack={() => setActive("/invoice/all")} />}
-        {active === "/invoice/proforma" && <CreateProforma onBack={() => setActive("/invoice/all")} />}
+        {basePath === "/finance/transactions" && <Transactions />}
+        {basePath === "/finance/plan" && <FinancialPlan />}
+        {basePath === "/finance/summary" && <FinancialSummary />}
+        {basePath === "/finance/clients" && <OtherTransactions />}
+        {basePath === "/finance/audit" && <AuditLogs />}
+        {basePath === "/invoice/all" && <AllInvoices />}
+        {basePath === "/invoice/ledger" && <InvoiceLedger />}
+        {basePath === "/invoice/create" && <CreateInvoice onBack={() => setActive("/invoice/all")} />}
+        {basePath === "/invoice/proforma" && <CreateProforma onBack={() => setActive("/invoice/all")} />}
 
         {/* Reports */}
-        {active === "/reports" && <ReportsOverview />}
-        {active === "/reports/attendance" && <AttendanceReport />}
-        {active === "/reports/payroll" && <PayrollReport />}
-        {active === "/reports/hiring" && <HiringFunnel />}
-        {active === "/reports/work" && <WorkReport />}
+        {basePath === "/reports" && <ReportsOverview />}
+        {basePath === "/reports/attendance" && <AttendanceReport />}
+        {basePath === "/reports/payroll" && <PayrollReport />}
+        {basePath === "/reports/hiring" && <HiringFunnel />}
+        {basePath === "/reports/work" && <WorkReport />}
 
         {/* Recruitment */}
-        {active === "/recruitment/interviews" && <Interviews />}
-        {active === "/recruitment/hirings" && <Hirings />}
+        {basePath === "/recruitment/interviews" && <Interviews />}
+        {basePath === "/recruitment/hirings" && <Hirings />}
 
         {/* Schedule */}
-        {active === "/schedule" && <Schedule />}
+        {basePath === "/schedule" && <Schedule isNew={isNew} />}
 
         {/* Work */}
-        {active === "/work/logs" && <WorkLogs />}
-        {active === "/work/projects" && <Projects />}
-        {active === "/tasks" && <Tasks setActive={setActive} />}
-        {active === "/chat" && <Chat />}
-        {active === "/work/research" && <Research />}
+        {basePath === "/work/logs" && <WorkLogs />}
+        {basePath === "/work/projects" && <Projects isNew={isNew} />}
+        {basePath === "/tasks" && <Tasks setActive={setActive} isNew={isNew} />}
+        {basePath === "/chat" && <Chat />}
+        {basePath === "/work/research" && <Research />}
 
         {/* Workspace */}
-        {active === "/workspace/seating" && <SeatingArrangementPage />}
-        {active === "/workspace/resource" && <ResourceManagementPage />}
-        {active === "/workspace/gallery" && <Gallery />}
+        {basePath === "/workspace/seating" && <SeatingArrangementPage />}
+        {basePath === "/workspace/resource" && <ResourceManagementPage />}
+        {basePath === "/workspace/gallery" && <Gallery />}
 
         {/* Training & Learning */}
-        {active.startsWith("/learn/") && !active.startsWith("/learn/course/") && <TrainingDashboard active={active} setActive={setActive} />}
-        {active.startsWith("/learn/course/") && <CoursePlayer active={active} setActive={setActive} />}
+        {basePath.startsWith("/learn/") && !basePath.startsWith("/learn/course/") && <TrainingDashboard active={active} setActive={setActive} />}
+        {basePath.startsWith("/learn/course/") && <CoursePlayer active={active} setActive={setActive} />}
 
         {/* Admin & Command Center */}
-        {active === "/ceo-dashboard" && <CEODashboard active={active} />}
-        {active.startsWith("/ceo-dashboard/b2b") && <B2BModule active={active} />}
-        {active === "/ceo-dashboard/collaboration" && <CollaborationModule />}
-        {active === "/ceo-dashboard/franchise" && <FranchiseModule />}
-        {active === "/ceo-dashboard/reports" && <ReportsModule />}
-        {active === "/ceo-dashboard/settings" && <SettingsModule />}
-        {active === "/activity-logs" && <ActivityLogs />}
-        {active === "/activity-tracker" && <ActivityTracker />}
-        {active === "/restrictions" && <Restrictions />}
-        {active === "/settings" && <AdminSettings />}
-        {active === "/recycle-bin" && <RecycleBin />}
-        {active === "/elections" && <Elections />}
-        {active === "/recognitions" && <Recognitions />}
-        {active === "/team-leader-of-the-week" && <TeamLeaderOfWeek />}
+        {basePath === "/ceo-dashboard" && <CEODashboard active={active} />}
+        {basePath.startsWith("/ceo-dashboard/b2b") && <B2BModule active={active} />}
+        {basePath === "/ceo-dashboard/collaboration" && <CollaborationModule />}
+        {basePath === "/ceo-dashboard/franchise" && <FranchiseModule />}
+        {basePath === "/ceo-dashboard/reports" && <ReportsModule />}
+        {basePath === "/ceo-dashboard/settings" && <SettingsModule />}
+        {basePath === "/activity-logs" && <ActivityLogs />}
+        {basePath === "/activity-tracker" && <ActivityTracker />}
+        {basePath === "/restrictions" && <Restrictions />}
+        {basePath === "/settings" && <AdminSettings />}
+        {basePath === "/recycle-bin" && <RecycleBin />}
+        {basePath === "/elections" && <Elections />}
+        {basePath === "/recognitions" && <Recognitions />}
+        {basePath === "/team-leader-of-the-week" && <TeamLeaderOfWeek />}
 
         {/* User Profile */}
-        {active === "/profile" && <UserProfile />}
+        {basePath === "/profile" && <UserProfile />}
 
         {/* Fallback original content for all other items */}
-        {active !== "/dashboard" && active !== "/profile" && active !== "/schedule" && active !== "/work/logs" && active !== "/work/projects" && active !== "/tasks" && active !== "/chat" && active !== "/work/research" && active !== "/penalty" && active !== "/approvals/penalties" && active !== "/remarks" && active !== "/activity-logs" && active !== "/activity-tracker" && active !== "/restrictions" && active !== "/settings" && active !== "/recycle-bin" && active !== "/elections" && active !== "/recognitions" && active !== "/team-leader-of-the-week" && !active.startsWith("/ceo-dashboard") && !active.startsWith("/work/sales") && !active.startsWith("/payroll") && !active.startsWith("/employees") && !active.startsWith("/recruitment") && !active.startsWith("/workspace") && !active.startsWith("/approvals") && !active.startsWith("/invoice") && !active.startsWith("/reports") && !active.startsWith("/finance") && !active.startsWith("/learn") && (
+        {basePath !== "/dashboard" && basePath !== "/profile" && basePath !== "/schedule" && basePath !== "/work/logs" && basePath !== "/work/projects" && basePath !== "/tasks" && basePath !== "/chat" && basePath !== "/work/research" && basePath !== "/penalty" && basePath !== "/approvals/penalties" && basePath !== "/remarks" && basePath !== "/activity-logs" && basePath !== "/activity-tracker" && basePath !== "/restrictions" && basePath !== "/settings" && basePath !== "/recycle-bin" && basePath !== "/elections" && basePath !== "/recognitions" && basePath !== "/team-leader-of-the-week" && !basePath.startsWith("/ceo-dashboard") && !basePath.startsWith("/work/sales") && !basePath.startsWith("/payroll") && !basePath.startsWith("/employees") && !basePath.startsWith("/recruitment") && !basePath.startsWith("/workspace") && !basePath.startsWith("/approvals") && !basePath.startsWith("/invoice") && !basePath.startsWith("/reports") && !basePath.startsWith("/finance") && !basePath.startsWith("/learn") && (
           <>
             <header className="mb-8 max-w-3xl">
               <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">

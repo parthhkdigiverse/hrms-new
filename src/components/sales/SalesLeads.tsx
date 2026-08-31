@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { Search, Plus, Filter, Download, MoreVertical, X, Calendar, Phone, Mail, MessageSquare } from "lucide-react";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { toast } from "sonner";
@@ -26,12 +26,18 @@ const priorityColors: Record<string, string> = {
   Low: "bg-blue-100 text-blue-700",
 };
 
-export function SalesLeads({ onAction }: { onAction?: (action: string) => void }) {
+export function SalesLeads({ onAction, isNew }: { onAction?: (action: string) => void, isNew?: boolean }) {
   const { leads, setLeads, stages } = useSales();
   const [tab, setTab] = useState<"all" | "my">("all");
   const [stageFilter, setStageFilter] = useState<LeadStage | "All">("All");
   const [search, setSearch] = useState("");
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
+
+  useEffect(() => {
+    if (isNew) {
+      onAction?.("Add Lead");
+    }
+  }, [isNew, onAction]);
 
   const handleStageChange = (id: string, newStage: string) => {
     setLeads(leads.map(l => l.id === id ? { ...l, stage: newStage } : l));

@@ -57,10 +57,11 @@ const COLUMN_OPTIONS = [
   { key: "actions", label: "Actions", default: true }
 ];
 
-export function EmployeeList() {
+export function EmployeeList({ isNew }: { isNew?: boolean }) {
   const { employees, addEmployee, updateEmployee, deleteEmployee } = useEmployeesContext();
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [searchQuery, setSearchQuery] = useState("");
+  const [isFormOpen, setIsFormOpen] = useState(isNew || false);
   const [selectedDept, setSelectedDept] = useState<string | null>(null);
   const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
   const [visibleColumns, setVisibleColumns] = useState<Record<string, boolean>>(() => {
@@ -115,7 +116,7 @@ export function EmployeeList() {
             <div className="flex gap-1 opacity-0 translate-x-4 group-hover:translate-x-0 group-hover:opacity-100 transition-all duration-300 bg-white shadow-sm border border-border/50 rounded-lg p-1 relative z-10">
               <button 
                 onClick={() => setSelectedEmployee(emp)}
-                className="p-1.5 text-muted-foreground hover:bg-[#00A56C]/10 hover:text-[#00A56C] rounded-md transition-all active:scale-95"
+                className="p-1.5 text-muted-foreground hover:bg-primary/10 hover:text-primary rounded-md transition-all active:scale-95"
                 title="View Profile"
               >
                 <Eye className="w-3.5 h-3.5" />
@@ -163,7 +164,7 @@ export function EmployeeList() {
 
   
   // Form modal state
-  const [isFormOpen, setIsFormOpen] = useState(false);
+  // The form state is now declared at the top as isFormOpen
   const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<{isOpen: boolean, id: string | null, name: string}>({isOpen: false, id: null, name: ""});
 
@@ -237,7 +238,7 @@ export function EmployeeList() {
         </div>
         <button 
           onClick={openAddForm}
-          className="flex items-center gap-2 bg-[#00A56C] hover:bg-[#00A56C]/90 text-white px-5 py-2.5 rounded-xl font-bold transition-all shadow-sm shadow-emerald-500/20 active:scale-95"
+          className="flex items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground px-5 py-2.5 rounded-xl font-bold transition-all shadow-sm shadow-primary/20 active:scale-95"
         >
           <Plus className="w-4 h-4" />
           Add Employee
@@ -254,7 +255,7 @@ export function EmployeeList() {
               placeholder="Search by name or role..." 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 bg-muted/50 border-none rounded-xl text-[13px] focus:outline-none focus:ring-2 focus:ring-[#00A56C]/20 transition-all font-medium"
+              className="w-full pl-10 pr-4 py-2 bg-muted/50 border-none rounded-xl text-[13px] focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium"
             />
           </div>
           
@@ -266,7 +267,7 @@ export function EmployeeList() {
                 className={cn(
                   "px-4 py-2 rounded-xl text-[12px] font-bold transition-all border",
                   selectedDept === dept 
-                    ? "bg-[#00A56C] text-white border-[#00A56C]" 
+                    ? "bg-primary text-primary-foreground border-primary" 
                     : "bg-white text-foreground/80 border-border hover:bg-muted/50"
                 )}
               >
@@ -424,7 +425,7 @@ export function EmployeeList() {
 
                 <button 
                   onClick={() => setSelectedEmployee(emp)}
-                  className="w-full bg-[#00A56C]/10 text-[#00A56C] hover:bg-[#00A56C]/20 py-2.5 rounded-xl text-[12px] font-bold transition-colors"
+                  className="w-full bg-primary/10 text-primary hover:bg-primary/20 py-2.5 rounded-xl text-[12px] font-bold transition-colors"
                 >
                   View Profile
                 </button>

@@ -624,7 +624,7 @@ const getPresetDates = (postingDateStr: string) => {
   };
 };
 
-export function Projects() {
+export function Projects({ isNew }: { isNew?: boolean }) {
   const [projectSubTab, setProjectSubTab] = useState<"workspace" | "logs">("workspace");
   const [isBulkAdd, setIsBulkAdd] = useState(false);
   const [bulkStatsEntries, setBulkStatsEntries] = useState<{ [campaignName: string]: { reach: string, leads: string, spend: string } }>({});
@@ -1171,7 +1171,7 @@ export function Projects() {
     { id: 'service', label: 'Service Details', icon: CreditCard },
     { id: 'remarks', label: 'Remarks', icon: FileText }
   ];
-  const [isNewProjectModalOpen, setIsNewProjectModalOpen] = useState(false);
+  const [isNewProjectModalOpen, setIsNewProjectModalOpen] = useState(isNew || false);
   const [isEditClientModalOpen, setIsEditClientModalOpen] = useState(false);
   const [editingClient, setEditingClient] = useState<Client | null>(null);
   const [showEditClientErrors, setShowEditClientErrors] = useState(false);

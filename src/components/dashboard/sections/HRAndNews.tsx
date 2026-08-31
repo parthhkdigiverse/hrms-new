@@ -97,7 +97,7 @@ export function HRAndNews() {
             
             <div>
               <div className="flex items-center gap-2 mb-3">
-                <CheckCircle2 className="h-4 w-4 text-primary" />
+                <CheckCircle2 className="h-4 w-4 text-[#00A56C]" />
                 <h3 className="text-[13px] font-bold text-foreground">Probation Ending</h3>
               </div>
               <ul className="space-y-2">

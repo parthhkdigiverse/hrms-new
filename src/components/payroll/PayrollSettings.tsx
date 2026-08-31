@@ -18,7 +18,7 @@ function Switch({ checked, onChange }: { checked?: boolean; onChange?: () => voi
     <div 
       className={cn(
         "w-11 h-6 rounded-full relative cursor-pointer transition-colors duration-200 ease-in-out",
-        checked ? "bg-[#00A56C]" : "bg-slate-200"
+        checked ? "bg-primary" : "bg-slate-200"
       )}
       onClick={onChange}
     >
@@ -174,7 +174,7 @@ export function PayrollSettings() {
                       className={cn(
                         "px-4 py-1.5 rounded-full text-[13px] font-semibold transition-colors",
                         isSelected 
-                          ? "bg-[#00A56C] text-white border border-[#00A56C]" 
+                          ? "bg-primary text-primary-foreground border border-primary" 
                           : "bg-white border border-border/80 text-foreground/80 hover:bg-muted/50"
                       )}
                     >
@@ -213,19 +213,19 @@ export function PayrollSettings() {
               <div className="space-y-4">
                 <div className="flex items-center justify-between p-3.5 border border-border/80 rounded-xl">
                   <span className="text-[14px] font-semibold text-foreground">Company Holidays</span>
-                  <span className="px-3 py-1 bg-[#E8F5F1] text-[#00A56C] text-[12px] font-bold rounded-full">4 days</span>
+                  <span className="px-3 py-1 bg-[#E8F5F1] text-primary text-[12px] font-bold rounded-full">4 days</span>
                 </div>
                 <div className="flex items-center justify-between p-3.5 border border-border/80 rounded-xl">
                   <span className="text-[14px] font-semibold text-foreground">National Holidays</span>
-                  <span className="px-3 py-1 bg-[#E8F5F1] text-[#00A56C] text-[12px] font-bold rounded-full">3 days</span>
+                  <span className="px-3 py-1 bg-[#E8F5F1] text-primary text-[12px] font-bold rounded-full">3 days</span>
                 </div>
                 <div className="flex items-center justify-between p-3.5 border border-border/80 rounded-xl">
                   <span className="text-[14px] font-semibold text-foreground">Festival Holidays</span>
-                  <span className="px-3 py-1 bg-[#E8F5F1] text-[#00A56C] text-[12px] font-bold rounded-full">8 days</span>
+                  <span className="px-3 py-1 bg-[#E8F5F1] text-primary text-[12px] font-bold rounded-full">8 days</span>
                 </div>
                 <div className="flex items-center justify-between p-3.5 border border-border/80 rounded-xl">
                   <span className="text-[14px] font-semibold text-foreground">Optional Holidays</span>
-                  <span className="px-3 py-1 bg-[#E8F5F1] text-[#00A56C] text-[12px] font-bold rounded-full">2 of 5 selectable</span>
+                  <span className="px-3 py-1 bg-[#E8F5F1] text-primary text-[12px] font-bold rounded-full">2 of 5 selectable</span>
                 </div>
               </div>
             </div>
@@ -553,7 +553,7 @@ export function PayrollSettings() {
 
               <div className="space-y-4 relative before:absolute before:inset-y-0 before:left-[19px] before:w-px before:bg-border/60">
                 <div className="flex items-center gap-4 p-4 border border-border/80 rounded-xl bg-white relative z-10">
-                  <div className="w-8 h-8 rounded-full bg-[#00A56C] text-white flex items-center justify-center text-[14px] font-bold shrink-0">1</div>
+                  <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-[14px] font-bold shrink-0">1</div>
                   <div>
                     <p className="text-[14px] font-bold text-foreground">HR</p>
                     <p className="text-[12px] text-muted-foreground mt-0.5">Verifies attendance, leave and salary revisions</p>
@@ -561,7 +561,7 @@ export function PayrollSettings() {
                 </div>
 
                 <div className="flex items-center gap-4 p-4 border border-border/80 rounded-xl bg-white relative z-10">
-                  <div className="w-8 h-8 rounded-full bg-[#00A56C] text-white flex items-center justify-center text-[14px] font-bold shrink-0">2</div>
+                  <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-[14px] font-bold shrink-0">2</div>
                   <div>
                     <p className="text-[14px] font-bold text-foreground">Accounts</p>
                     <p className="text-[12px] text-muted-foreground mt-0.5">Validates deductions, recoveries and tax</p>
@@ -569,7 +569,7 @@ export function PayrollSettings() {
                 </div>
 
                 <div className="flex items-center gap-4 p-4 border border-border/80 rounded-xl bg-white relative z-10">
-                  <div className="w-8 h-8 rounded-full bg-[#00A56C] text-white flex items-center justify-center text-[14px] font-bold shrink-0">3</div>
+                  <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-[14px] font-bold shrink-0">3</div>
                   <div>
                     <p className="text-[14px] font-bold text-foreground">CEO</p>
                     <p className="text-[12px] text-muted-foreground mt-0.5">Final approval — locks payroll</p>

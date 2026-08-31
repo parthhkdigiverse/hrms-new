@@ -81,7 +81,7 @@ export function TasksAndClients() {
             {KEY_ACCOUNTS.map((account, i) => (
               <div key={i} className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-xl bg-primary/10 border border-indigo-100 flex items-center justify-center text-[14px] font-bold text-primary">
+                  <div className="w-8 h-8 rounded-xl bg-[#00A56C]/10 border border-indigo-100 flex items-center justify-center text-[14px] font-bold text-[#00A56C]">
                     {account.name.charAt(0)}
                   </div>
                   <div>

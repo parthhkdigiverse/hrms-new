@@ -28,11 +28,11 @@ const MOCK_EVENTS: ScheduleEvent[] = [
   { id: "3", title: "Client Call", date: format(new Date(), "yyyy-MM-dd"), startTime: "15:30", endTime: "16:30", color: "bg-purple-500" },
 ];
 
-export function Schedule() {
+export function Schedule({ isNew }: { isNew?: boolean }) {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [view, setView] = useState<ViewType>("Month");
   const [events, setEvents] = useState<ScheduleEvent[]>(MOCK_EVENTS);
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(isNew || false);
   const [selectedDateForCreate, setSelectedDateForCreate] = useState<Date>(new Date());
   
   // Date calculations
@@ -74,7 +74,7 @@ export function Schedule() {
       <header className="flex items-center justify-between px-6 py-4 border-b border-border">
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
-            <div className="p-2 bg-primary rounded-lg text-white">
+            <div className="p-2 bg-primary rounded-lg text-primary-foreground">
               <CalendarIcon className="w-5 h-5" />
             </div>
             <h1 className="text-xl font-bold text-foreground tracking-tight">Calendar</h1>

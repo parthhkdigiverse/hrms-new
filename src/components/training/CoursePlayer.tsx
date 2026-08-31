@@ -103,7 +103,7 @@ export function CoursePlayer({ active, setActive }: { active: string, setActive:
           <div className="w-full aspect-video bg-black rounded-2xl border border-border/50 overflow-hidden relative shadow-lg group">
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-6">
               <div className="absolute inset-0 flex items-center justify-center">
-                <button className="w-20 h-20 bg-primary/90 text-white rounded-full flex items-center justify-center hover:scale-110 transition-transform shadow-2xl backdrop-blur-sm border-4 border-white/20">
+                <button className="w-20 h-20 bg-primary/90 text-primary-foreground rounded-full flex items-center justify-center hover:scale-110 transition-transform shadow-2xl backdrop-blur-sm border-4 border-white/20">
                   <PlayCircle className="w-10 h-10 ml-1" />
                 </button>
               </div>
