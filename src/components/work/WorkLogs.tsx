@@ -32,7 +32,7 @@ const MOCK_LOGS: WorkLog[] = [
 export function WorkLogs() {
   const [logs, setLogs] = useState<WorkLog[]>(() => {
     if (typeof window !== "undefined") {
-      const saved = localStorage.getItem("hrms_work_logs");
+      const saved = (typeof window !== 'undefined' ? localStorage.getItem("hrms_work_logs") : null);
       if (saved) {
         try { return JSON.parse(saved); } catch (e) {}
       }
@@ -53,7 +53,7 @@ export function WorkLogs() {
         
         // 1. Projects tasks
         try {
-          const localProjects = localStorage.getItem("hrms_projects");
+          const localProjects = (typeof window !== 'undefined' ? localStorage.getItem("hrms_projects") : null);
           if (localProjects) {
             const parsed = JSON.parse(localProjects);
             parsed.forEach((proj: any) => {
@@ -72,7 +72,7 @@ export function WorkLogs() {
 
         // 2. Independent tasks
         try {
-          const localTasks = localStorage.getItem("hrms_tasks");
+          const localTasks = (typeof window !== 'undefined' ? localStorage.getItem("hrms_tasks") : null);
           if (localTasks) {
             const parsed = JSON.parse(localTasks);
             parsed.forEach((t: any) => {

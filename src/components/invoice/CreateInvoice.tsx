@@ -32,7 +32,7 @@ export function CreateInvoice({ onBack, isProforma = false }: { onBack?: (() => 
   
   const [clients, setClients] = useState<any[]>(() => {
     if (typeof window !== "undefined") {
-      const saved = localStorage.getItem('hrms_clients');
+      const saved = (typeof window !== 'undefined' ? localStorage.getItem('hrms_clients') : null);
       return saved ? JSON.parse(saved) : [];
     }
     return [];
@@ -40,7 +40,7 @@ export function CreateInvoice({ onBack, isProforma = false }: { onBack?: (() => 
 
   const [projects, setProjects] = useState<any[]>(() => {
     if (typeof window !== "undefined") {
-      const saved = localStorage.getItem('hrms_projects');
+      const saved = (typeof window !== 'undefined' ? localStorage.getItem('hrms_projects') : null);
       return saved ? JSON.parse(saved) : [];
     }
     return [];

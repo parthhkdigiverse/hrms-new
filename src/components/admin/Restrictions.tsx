@@ -23,12 +23,12 @@ export function Restrictions() {
   const [editingPc, setEditingPc] = useState<any>(null);
   
   const [blockApps, setBlockApps] = useState<string[]>(() => {
-    const saved = localStorage.getItem('hrms_block_apps');
+    const saved = (typeof window !== 'undefined' ? localStorage.getItem('hrms_block_apps') : null);
     return saved ? JSON.parse(saved) : ["spotify.exe"];
   });
   
   const [blockUrls, setBlockUrls] = useState<string[]>(() => {
-    const saved = localStorage.getItem('hrms_block_urls');
+    const saved = (typeof window !== 'undefined' ? localStorage.getItem('hrms_block_urls') : null);
     return saved ? JSON.parse(saved) : ["facebook.com", "instagram.com"];
   });
 

@@ -143,7 +143,7 @@ export function Tasks({ setActive, isNew }: { setActive?: (route: string) => voi
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const saved = localStorage.getItem('hrms_employees');
+      const saved = (typeof window !== 'undefined' ? localStorage.getItem('hrms_employees') : null);
       if (saved) {
         try {
           setEmployees(JSON.parse(saved));
@@ -163,7 +163,7 @@ export function Tasks({ setActive, isNew }: { setActive?: (route: string) => voi
   // Load from local storage
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const localProjects = localStorage.getItem("hrms_projects");
+      const localProjects = (typeof window !== 'undefined' ? localStorage.getItem("hrms_projects") : null);
       let currentProjects = [];
       if (localProjects) {
         try {
@@ -221,7 +221,7 @@ export function Tasks({ setActive, isNew }: { setActive?: (route: string) => voi
         setProjects(currentProjects);
       }
 
-      const localTasks = localStorage.getItem("hrms_tasks");
+      const localTasks = (typeof window !== 'undefined' ? localStorage.getItem("hrms_tasks") : null);
       if (localTasks) {
         setIndependentTasks(JSON.parse(localTasks));
       } else {
@@ -237,7 +237,7 @@ export function Tasks({ setActive, isNew }: { setActive?: (route: string) => voi
   // Listen to external localstorage changes (like Projects.tsx updating tasks)
   useEffect(() => {
     const handleStorageChange = () => {
-      const localProjects = localStorage.getItem("hrms_projects");
+      const localProjects = (typeof window !== 'undefined' ? localStorage.getItem("hrms_projects") : null);
       if (localProjects) {
         setProjects(JSON.parse(localProjects));
       }

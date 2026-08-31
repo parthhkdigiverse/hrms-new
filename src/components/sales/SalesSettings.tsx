@@ -153,17 +153,17 @@ export function SalesSettings() {
   };
   
   const [categories, setCategories] = useState(() => {
-    const saved = localStorage.getItem('hrms_sales_categories');
+    const saved = (typeof window !== 'undefined' ? localStorage.getItem('hrms_sales_categories') : null);
     return saved ? JSON.parse(saved) : INITIAL_LEAD_CATEGORIES;
   });
   
   const [sources, setSources] = useState(() => {
-    const saved = localStorage.getItem('hrms_sales_sources');
+    const saved = (typeof window !== 'undefined' ? localStorage.getItem('hrms_sales_sources') : null);
     return saved ? JSON.parse(saved) : INITIAL_LEAD_SOURCES;
   });
   
   const [permissions, setPermissions] = useState(() => {
-    const saved = localStorage.getItem('hrms_sales_permissions');
+    const saved = (typeof window !== 'undefined' ? localStorage.getItem('hrms_sales_permissions') : null);
     return saved ? JSON.parse(saved) : INITIAL_PERMISSIONS;
   });
 

@@ -34,7 +34,7 @@ const getIconForType = (type: string) => {
 
 export function ResourceManagement() {
   const [resources, setResources] = useState<Resource[]>(() => {
-    const saved = localStorage.getItem('hrms_resources');
+    const saved = (typeof window !== 'undefined' ? localStorage.getItem('hrms_resources') : null);
     if (saved) {
       try { return JSON.parse(saved); } catch (e) {}
     }
@@ -42,7 +42,7 @@ export function ResourceManagement() {
   });
 
   const [resourceTypes, setResourceTypes] = useState<string[]>(() => {
-    const saved = localStorage.getItem('hrms_resource_types');
+    const saved = (typeof window !== 'undefined' ? localStorage.getItem('hrms_resource_types') : null);
     if (saved) {
       try { return JSON.parse(saved); } catch (e) {}
     }

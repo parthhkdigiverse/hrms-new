@@ -39,7 +39,7 @@ const INITIAL_DESKS: Desk[] = Array.from({ length: 48 }, (_, i) => {
 
 export function SeatingArrangement() {
   const [desks, setDesks] = useState<Desk[]>(() => {
-    const saved = localStorage.getItem('hrms_seating');
+    const saved = (typeof window !== 'undefined' ? localStorage.getItem('hrms_seating') : null);
     if (saved) {
       try { return JSON.parse(saved); } catch (e) {}
     }

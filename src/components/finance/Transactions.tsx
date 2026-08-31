@@ -17,12 +17,12 @@ const MOCK_DEBIT_TRANSACTIONS = [
 
 export function Transactions() {
   const [creditTransactions, setCreditTransactions] = useState(() => {
-    const saved = localStorage.getItem('hrms_credit_transactions');
+    const saved = (typeof window !== 'undefined' ? localStorage.getItem('hrms_credit_transactions') : null);
     return saved ? JSON.parse(saved) : MOCK_CREDIT_TRANSACTIONS;
   });
   
   const [debitTransactions, setDebitTransactions] = useState(() => {
-    const saved = localStorage.getItem('hrms_debit_transactions');
+    const saved = (typeof window !== 'undefined' ? localStorage.getItem('hrms_debit_transactions') : null);
     return saved ? JSON.parse(saved) : MOCK_DEBIT_TRANSACTIONS;
   });
 

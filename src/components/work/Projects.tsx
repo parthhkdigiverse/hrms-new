@@ -609,7 +609,7 @@ const getPresetDates = (postingDateStr: string) => {
   let offsets = { script: 14, shoot: 12, editing: 6, approval: 5 };
   if (typeof window !== 'undefined') {
     try {
-      const saved = localStorage.getItem('hrms_calendar_offsets');
+      const saved = (typeof window !== 'undefined' ? localStorage.getItem('hrms_calendar_offsets') : null);
       if (saved) offsets = JSON.parse(saved);
     } catch (e) {}
   }
@@ -656,7 +656,7 @@ export function Projects({ isNew }: { isNew?: boolean }) {
   };
   // One-time migration: clear old localStorage if version mismatch
   const STORAGE_VERSION = 'v3';
-  if (localStorage.getItem('hrms_storage_version') !== STORAGE_VERSION) {
+  if ((typeof window !== 'undefined' ? localStorage.getItem('hrms_storage_version') : null) !== STORAGE_VERSION) {
     localStorage.removeItem('hrms_clients');
     localStorage.removeItem('hrms_projects');
     localStorage.removeItem('hrms_categories');
@@ -664,7 +664,7 @@ export function Projects({ isNew }: { isNew?: boolean }) {
   }
 
   const [clients, setClients] = useState<Client[]>(() => {
-    const saved = localStorage.getItem('hrms_clients');
+    const saved = (typeof window !== 'undefined' ? localStorage.getItem('hrms_clients') : null);
     if (saved) {
       try { 
         const parsed = JSON.parse(saved);
@@ -683,7 +683,7 @@ export function Projects({ isNew }: { isNew?: boolean }) {
   });
 
   const [projects, setProjects] = useState<Project[]>(() => {
-    const saved = localStorage.getItem('hrms_projects');
+    const saved = (typeof window !== 'undefined' ? localStorage.getItem('hrms_projects') : null);
     let loadedProjects: Project[] = INITIAL_PROJECTS;
     if (saved) {
       try { 
@@ -788,7 +788,7 @@ export function Projects({ isNew }: { isNew?: boolean }) {
   });
 
   const [categories, setCategories] = useState<string[]>(() => {
-    const saved = localStorage.getItem('hrms_categories');
+    const saved = (typeof window !== 'undefined' ? localStorage.getItem('hrms_categories') : null);
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
@@ -817,7 +817,7 @@ export function Projects({ isNew }: { isNew?: boolean }) {
   
   const [selectedClientId, setSelectedClientId] = useState<string | null>(() => {
     if (typeof window !== "undefined") {
-      const saved = localStorage.getItem("hrms_selected_client_id");
+      const saved = (typeof window !== 'undefined' ? localStorage.getItem("hrms_selected_client_id") : null);
       if (saved) return saved;
     }
     return null;
@@ -832,7 +832,7 @@ export function Projects({ isNew }: { isNew?: boolean }) {
   }, [selectedClientId]);
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(() => {
     if (typeof window !== "undefined") {
-      const saved = localStorage.getItem("hrms_selected_project_id");
+      const saved = (typeof window !== 'undefined' ? localStorage.getItem("hrms_selected_project_id") : null);
       if (saved) return saved;
     }
     return null;
@@ -1026,7 +1026,7 @@ export function Projects({ isNew }: { isNew?: boolean }) {
   const [isKanbanView, setIsKanbanView] = useState(false);
   const [selectedModuleId, setSelectedModuleId] = useState<string | null>(() => {
     if (typeof window !== "undefined") {
-      const saved = localStorage.getItem("hrms_selected_module_id");
+      const saved = (typeof window !== 'undefined' ? localStorage.getItem("hrms_selected_module_id") : null);
       if (saved) return saved;
     }
     return null;
@@ -1065,7 +1065,7 @@ export function Projects({ isNew }: { isNew?: boolean }) {
   const [isPresetsModalOpen, setIsPresetsModalOpen] = useState(false);
   const [presets, setPresets] = useState<any[]>(() => {
     if (typeof window !== "undefined") {
-      const local = localStorage.getItem("hrms_module_presets");
+      const local = (typeof window !== 'undefined' ? localStorage.getItem("hrms_module_presets") : null);
       if (local) return JSON.parse(local);
     }
     return [
@@ -1265,7 +1265,7 @@ export function Projects({ isNew }: { isNew?: boolean }) {
     let offsets = { script: 14, shoot: 12, editing: 6, approval: 5 };
     if (typeof window !== 'undefined') {
       try {
-        const saved = localStorage.getItem('hrms_calendar_offsets');
+        const saved = (typeof window !== 'undefined' ? localStorage.getItem('hrms_calendar_offsets') : null);
         if (saved) offsets = JSON.parse(saved);
       } catch (e) {}
     }

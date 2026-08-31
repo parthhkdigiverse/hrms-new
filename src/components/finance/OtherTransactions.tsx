@@ -31,7 +31,7 @@ const mockClientData = [
 
 export function OtherTransactions() {
   const [clientData, setClientData] = useState(() => {
-    const saved = localStorage.getItem('hrms_other_transactions');
+    const saved = (typeof window !== 'undefined' ? localStorage.getItem('hrms_other_transactions') : null);
     return saved ? JSON.parse(saved) : mockClientData;
   });
   
@@ -50,7 +50,7 @@ export function OtherTransactions() {
   const [isManageBanksOpen, setIsManageBanksOpen] = useState(false);
 
   const [banksData, setBanksData] = useState(() => {
-    const saved = localStorage.getItem('hrms_banks');
+    const saved = (typeof window !== 'undefined' ? localStorage.getItem('hrms_banks') : null);
     return saved ? JSON.parse(saved) : [{ id: 'b1', name: 'HDFC Bank', openingBalance: 500000 }];
   });
   

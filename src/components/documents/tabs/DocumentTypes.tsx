@@ -22,7 +22,7 @@ const DEFAULT_TYPES: DocType[] = [
 export function DocumentTypes() {
   const [types, setTypes] = useState<DocType[]>(() => {
     if (typeof window !== "undefined") {
-      const stored = localStorage.getItem("documentTypes");
+      const stored = (typeof window !== 'undefined' ? localStorage.getItem("documentTypes") : null);
       return stored ? JSON.parse(stored) : DEFAULT_TYPES;
     }
     return DEFAULT_TYPES;

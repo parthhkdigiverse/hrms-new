@@ -61,17 +61,17 @@ export function Chat() {
   const [newMessage, setNewMessage] = useState("");
   const [canCreateChannels, setCanCreateChannels] = useState(() => {
     if (typeof window === "undefined") return true;
-    return localStorage.getItem("hrms_chat_can_create_channels") !== "false";
+    return (typeof window !== 'undefined' ? localStorage.getItem("hrms_chat_can_create_channels") : null) !== "false";
   });
   const [canDeleteMessages, setCanDeleteMessages] = useState(() => {
     if (typeof window === "undefined") return true;
-    return localStorage.getItem("hrms_chat_can_delete_messages") !== "false";
+    return (typeof window !== 'undefined' ? localStorage.getItem("hrms_chat_can_delete_messages") : null) !== "false";
   });
 
   useEffect(() => {
     const handleStorageChange = () => {
-      setCanCreateChannels(localStorage.getItem("hrms_chat_can_create_channels") !== "false");
-      setCanDeleteMessages(localStorage.getItem("hrms_chat_can_delete_messages") !== "false");
+      setCanCreateChannels((typeof window !== 'undefined' ? localStorage.getItem("hrms_chat_can_create_channels") : null) !== "false");
+      setCanDeleteMessages((typeof window !== 'undefined' ? localStorage.getItem("hrms_chat_can_delete_messages") : null) !== "false");
     };
     window.addEventListener("storage", handleStorageChange);
     return () => window.removeEventListener("storage", handleStorageChange);

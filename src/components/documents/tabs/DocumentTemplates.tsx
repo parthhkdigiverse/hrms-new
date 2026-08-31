@@ -22,7 +22,7 @@ const DEFAULT_TEMPLATES: DocTemplate[] = [
 export function DocumentTemplates() {
   const [templates, setTemplates] = useState<DocTemplate[]>(() => {
     if (typeof window !== "undefined") {
-      const stored = localStorage.getItem("documentTemplates");
+      const stored = (typeof window !== 'undefined' ? localStorage.getItem("documentTemplates") : null);
       return stored ? JSON.parse(stored) : DEFAULT_TEMPLATES;
     }
     return DEFAULT_TEMPLATES;

@@ -31,7 +31,7 @@ const mockPlanData = {
 
 export function FinancialPlan() {
   const [planData, setPlanData] = useState<Record<string, any[]>>(() => {
-    const saved = localStorage.getItem('hrms_financial_plan');
+    const saved = (typeof window !== 'undefined' ? localStorage.getItem('hrms_financial_plan') : null);
     return saved ? JSON.parse(saved) : mockPlanData;
   });
   

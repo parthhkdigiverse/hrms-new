@@ -97,7 +97,7 @@ export function Research() {
   // Dynamic categories synced with project categories
   const [projectCategories, setProjectCategories] = useState<string[]>(() => {
     if (typeof window !== "undefined") {
-      const saved = localStorage.getItem("hrms_categories");
+      const saved = (typeof window !== 'undefined' ? localStorage.getItem("hrms_categories") : null);
       if (saved) {
         try {
           return JSON.parse(saved);
