@@ -63,6 +63,13 @@ interface Project {
   cpl?: string;
   campaigns?: any[];
   contentCalendar?: CalendarItem[];
+  revenueRecords?: {
+    id: string;
+    startDate: string;
+    endDate: string;
+    revenue: string;
+    feedback: string;
+  }[];
   team: { name: string; avatar: string }[];
   dailyStats?: {
     id: string;
@@ -1253,6 +1260,15 @@ export function Projects({ isNew }: { isNew?: boolean }) {
   
   // Bulk Add States
   const [isBulkAddModalOpen, setIsBulkAddModalOpen] = useState(false);
+
+  const [isAddRevenueModalOpen, setIsAddRevenueModalOpen] = useState(false);
+  const [revenueProject, setRevenueProject] = useState<Project | null>(null);
+  const [revenueForm, setRevenueForm] = useState({
+    startDate: "",
+    endDate: "",
+    revenue: "",
+    feedback: ""
+  });
   const [bulkAddTab, setBulkAddTab] = useState<'range' | 'visual'>('range');
   const [bulkStartDate, setBulkStartDate] = useState("");
   const [bulkEndDate, setBulkEndDate] = useState("");
@@ -1448,6 +1464,29 @@ export function Projects({ isNew }: { isNew?: boolean }) {
     setCategories(prev => prev.filter(c => c !== categoryToDelete));
     setNewProjectCategory(prev => prev === categoryToDelete ? "" : prev);
     toast.success(`Category "${categoryToDelete}" deleted.`);
+  };
+
+  const handleAddRevenue = () => {
+    if (!revenueProject || !revenueForm.startDate || !revenueForm.endDate || !revenueForm.revenue) {
+      toast.error("Please fill all required fields.");
+      return;
+    }
+    setProjects(prev => prev.map(p => {
+      if (p.id === revenueProject.id) {
+        return {
+          ...p,
+          revenueRecords: [...(p.revenueRecords || []), {
+            id: crypto.randomUUID(),
+            ...revenueForm
+          }]
+        };
+      }
+      return p;
+    }));
+    toast.success("Revenue added successfully!");
+    setIsAddRevenueModalOpen(false);
+    setRevenueProject(null);
+    setRevenueForm({ startDate: "", endDate: "", revenue: "", feedback: "" });
   };
 
   const confirmDeleteProject = (project: Project) => {
@@ -3284,6 +3323,8 @@ export function Projects({ isNew }: { isNew?: boolean }) {
             </div>
           );
         })()}
+
+
 
         {/* Bulk Add Calendar Slots Modal */}
         {isBulkAddModalOpen && (() => {
@@ -5382,6 +5423,19 @@ export function Projects({ isNew }: { isNew?: boolean }) {
                       >
                         <Edit2 className="w-4 h-4 mr-2" /> Edit Project
                       </DropdownMenuItem>
+                      {project.category === "Digital Marketing" && (
+                        <DropdownMenuItem 
+                          onSelect={() => {
+                            setTimeout(() => {
+                              setRevenueProject(project);
+                              setIsAddRevenueModalOpen(true);
+                            }, 100);
+                          }}
+                          className="rounded-xl cursor-pointer py-2.5 focus:bg-emerald-500/10 focus:text-emerald-600 font-medium text-emerald-600 transition-colors"
+                        >
+                          <IndianRupee className="w-4 h-4 mr-2" /> Add Revenue
+                        </DropdownMenuItem>
+                      )}
                       <DropdownMenuSeparator className="bg-border/50" />
                       <DropdownMenuItem 
                         onSelect={() => {
@@ -6789,6 +6843,84 @@ export function Projects({ isNew }: { isNew?: boolean }) {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Add Revenue Modal */}
+      {isAddRevenueModalOpen && revenueProject && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-card w-full max-w-md rounded-[24px] border border-border/60 shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            <div className="px-6 py-4 border-b border-border/40 flex justify-between items-center bg-muted/20">
+              <div>
+                <h2 className="text-lg font-black text-foreground">Add Revenue</h2>
+                <p className="text-xs text-muted-foreground">{revenueProject.name}</p>
+              </div>
+              <button 
+                onClick={() => { setIsAddRevenueModalOpen(false); setRevenueProject(null); }}
+                className="p-2 text-muted-foreground hover:bg-muted hover:text-foreground rounded-full transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="p-6 overflow-y-auto custom-scrollbar space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Start Date</label>
+                  <input 
+                    type="date" 
+                    value={revenueForm.startDate}
+                    onChange={(e) => setRevenueForm({...revenueForm, startDate: e.target.value})}
+                    className="w-full px-4 h-[42px] bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">End Date</label>
+                  <input 
+                    type="date" 
+                    value={revenueForm.endDate}
+                    onChange={(e) => setRevenueForm({...revenueForm, endDate: e.target.value})}
+                    className="w-full px-4 h-[42px] bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium"
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Revenue Amount</label>
+                <div className="relative">
+                  <IndianRupee className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <input 
+                    type="number" 
+                    value={revenueForm.revenue}
+                    onChange={(e) => setRevenueForm({...revenueForm, revenue: e.target.value})}
+                    className="w-full pl-10 pr-4 h-[42px] bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium"
+                    placeholder="Enter amount"
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Feedback / Notes</label>
+                <textarea 
+                  value={revenueForm.feedback}
+                  onChange={(e) => setRevenueForm({...revenueForm, feedback: e.target.value})}
+                  className="w-full px-4 py-3 bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium min-h-[100px] resize-none"
+                  placeholder="Enter any feedback or notes..."
+                />
+              </div>
+            </div>
+            <div className="p-4 border-t border-border/40 bg-muted/10 flex justify-end gap-3">
+              <button 
+                onClick={() => { setIsAddRevenueModalOpen(false); setRevenueProject(null); }}
+                className="px-6 py-2.5 rounded-xl font-bold text-sm text-muted-foreground hover:bg-muted transition-colors"
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={handleAddRevenue}
+                className="px-6 py-2.5 rounded-xl font-bold text-sm bg-primary text-primary-foreground hover:bg-primary/90 transition-all shadow-sm flex items-center gap-2"
+              >
+                <CheckCircle2 className="w-4 h-4" /> Save Revenue
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <ConfirmModal 
         isOpen={confirmModalState.isOpen}
