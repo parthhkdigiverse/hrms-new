@@ -20,177 +20,18 @@ import {
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 
-// --- Mock Data ---
-interface Curriculum {
-  id: string;
-  title: string;
-  type: "video" | "document" | "quiz";
-  duration: string;
-  completed: boolean;
-  contentUrl?: string;
-  viewCount?: number;
-  progress?: number;
-  midVideoQuiz?: {
-    timeSeconds: number;
-    passingThreshold: number;
-    questions: {
-      question: string;
-      options: string[];
-      correctAnswerIndex: number;
-    }[];
-  } | undefined;
-}
-
-interface Module {
-  id: string;
-  title: string;
-  description: string;
-  curriculums: Curriculum[];
-  progress?: number;
-}
-
-const calculateCourseProgress = (course: Course): Course => {
-  const updatedModules = course.modules.map(mod => {
-    const totalCurriculums = mod.curriculums.length;
-    if (totalCurriculums === 0) return { ...mod, progress: 0 };
-    
-    const curProgress = mod.curriculums.reduce((acc, cur) => acc + (cur.progress || (cur.completed ? 100 : 0)), 0);
-    return { ...mod, progress: Math.round(curProgress / totalCurriculums) };
-  });
-
-  const totalModules = updatedModules.length;
-  const courseProgress = totalModules === 0 
-    ? 0 
-    : Math.round(updatedModules.reduce((acc, mod) => acc + (mod.progress || 0), 0) / totalModules);
-
-  return { ...course, modules: updatedModules, progress: courseProgress };
-};
-
-interface Course {
-  id: string;
-  title: string;
-  description: string;
-  thumbnail: string;
-  category: string;
-  instructor: string;
-  totalModules: number;
-  totalDuration: string;
-  progress: number; // 0-100
-  modules: Module[];
-}
-
-const MOCK_COURSES: Course[] = [
-  {
-    id: "c1",
-    title: "Advanced React & Next.js Masterclass",
-    description: "Deep dive into React 19, Server Components, and advanced Next.js patterns for building scalable B2B applications.",
-    thumbnail: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?q=80&w=300&h=200&auto=format&fit=crop",
-    category: "Engineering",
-    instructor: "Alex Johnson",
-    totalModules: 4,
-    totalDuration: "6h 30m",
-    progress: 45,
-    modules: [
-      {
-        id: "m1",
-        title: "Introduction to React 19",
-        description: "Understanding the new features and compiler.",
-        curriculums: [
-          { id: "cur1", title: "What's new in React 19?", type: "video", duration: "15m", completed: true, viewCount: 2, progress: 100 },
-          { id: "cur2", title: "Setting up the compiler", type: "document", duration: "10m", completed: true, viewCount: 1, progress: 100 },
-          { id: "cur3", title: "Knowledge Check", type: "quiz", duration: "5m", completed: true, viewCount: 1, progress: 100 },
-        ],
-        progress: 100
-      },
-      {
-        id: "m2",
-        title: "Server Components",
-        description: "Mastering RSC for optimal performance.",
-        curriculums: [
-          { 
-            id: "cur4", 
-            title: "RSC Fundamentals", 
-            type: "video", 
-            duration: "25m", 
-            completed: true, 
-            viewCount: 3, 
-            progress: 100,
-            midVideoQuiz: {
-              timeSeconds: 15,
-              passingThreshold: 100,
-              questions: [
-                {
-                  question: "Which of the following components render on the server by default in App Router?",
-                  options: ["Client Components", "Server Components", "Both", "None"],
-                  correctAnswerIndex: 1
-                }
-              ]
-            }
-          },
-          { id: "cur5", title: "Data Fetching Strategies", type: "video", duration: "35m", completed: false, viewCount: 1, progress: 0 },
-          { id: "cur6", title: "Suspense Boundaries", type: "document", duration: "15m", completed: false, viewCount: 0, progress: 0 },
-        ],
-        progress: 33
-      }
-    ]
-  },
-  {
-    id: "c2",
-    title: "B2B Sales Strategies for 2027",
-    description: "Learn how to close enterprise deals using modern CRM tools, effective follow-ups, and negotiation tactics.",
-    thumbnail: "https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=300&h=200&auto=format&fit=crop",
-    category: "Sales",
-    instructor: "Sarah Chen",
-    totalModules: 3,
-    totalDuration: "4h 15m",
-    progress: 0,
-    modules: [
-      {
-        id: "m1",
-        title: "Prospecting in the Modern Era",
-        description: "Identifying high-value targets.",
-        curriculums: [
-          { id: "cur1", title: "Using LinkedIn Sales Navigator", type: "video", duration: "20m", completed: false, viewCount: 0, progress: 0 },
-        ],
-        progress: 0
-      }
-    ]
-  },
-  {
-    id: "c3",
-    title: "HR Policies & Compliance",
-    description: "Mandatory training on workplace policies, remote work guidelines, and internal compliance.",
-    thumbnail: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?q=80&w=300&h=200&auto=format&fit=crop",
-    category: "HR & Onboarding",
-    instructor: "HR Department",
-    totalModules: 2,
-    totalDuration: "1h 45m",
-    progress: 100,
-    modules: [
-      {
-        id: "m1",
-        title: "Remote Work Guidelines",
-        description: "Policies for hybrid and remote work.",
-        curriculums: [
-          { id: "cur1", title: "Core Hours & Communication", type: "video", duration: "15m", completed: true, viewCount: 1, progress: 100 },
-          { id: "cur2", title: "Home Office Setup", type: "document", duration: "10m", completed: true, viewCount: 1, progress: 100 },
-        ],
-        progress: 100
-      }
-    ]
-  }
-];
+import { useSharedCourses, Course, Module, Curriculum, calculateCourseProgress } from "@/hooks/useSharedCourses";
 
 export function LearningModule({ basePath, setActive }: { basePath?: string, setActive?: (val: string) => void }) {
   const activeTab = basePath === "/learning/my-courses" ? "my-courses" : "catalog";
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
   const [activeModuleId, setActiveModuleId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCurriculum, setSelectedCurriculum] = useState<Curriculum | null>(null);
+
   const [activeCategory, setActiveCategory] = useState<string>("All");
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
-  const [courses, setCourses] = useState<Course[]>(MOCK_COURSES);
+  const { courses, setCourses } = useSharedCourses();
   
   // Modals state
   const [isAddCourseOpen, setIsAddCourseOpen] = useState(false);
@@ -222,13 +63,7 @@ export function LearningModule({ basePath, setActive }: { basePath?: string, set
   const [editingCurriculumId, setEditingCurriculumId] = useState<string | null>(null);
 
   // Video Player States
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [showQuizOverlay, setShowQuizOverlay] = useState(false);
-  const [quizPassed, setQuizPassed] = useState(false);
-  const [quizError, setQuizError] = useState(false);
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [quizScore, setQuizScore] = useState(0);
-  const [quizFinished, setQuizFinished] = useState(false);
+
 
   const categories = ["All", ...Array.from(new Set(courses.map(c => c.category)))];
 
@@ -396,9 +231,8 @@ export function LearningModule({ basePath, setActive }: { basePath?: string, set
 
   const handleCurriculumClick = (moduleId: string, curriculum: Curriculum) => {
     if (!selectedCourse) return;
-    setShowQuizOverlay(false);
-    setQuizPassed(false);
-    setQuizError(false);
+    
+    // Update view count locally
     const updatedModules = selectedCourse.modules.map(m => {
       if (m.id === moduleId) {
         return {
@@ -412,31 +246,10 @@ export function LearningModule({ basePath, setActive }: { basePath?: string, set
     setCourses(courses.map(c => c.id === updatedCourse.id ? updatedCourse : c));
     setSelectedCourse(updatedCourse);
     
-    const updatedCurriculum = updatedCourse.modules.find(m => m.id === moduleId)?.curriculums.find(c => c.id === curriculum.id);
-    setSelectedCurriculum(updatedCurriculum || curriculum);
+    window.open(`/learning/viewer/${selectedCourse.id}/${moduleId}/${curriculum.id}`, '_blank');
   };
 
-  const handleMarkAsComplete = () => {
-    if (!selectedCourse || !selectedCurriculum) return;
-    
-    const moduleId = selectedCourse.modules.find(m => m.curriculums.some(c => c.id === selectedCurriculum.id))?.id;
-    if (!moduleId) return;
 
-    const updatedModules = selectedCourse.modules.map(m => {
-      if (m.id === moduleId) {
-        return {
-          ...m,
-          curriculums: m.curriculums.map(c => c.id === selectedCurriculum.id ? { ...c, completed: true, progress: 100 } : c)
-        };
-      }
-      return m;
-    });
-    
-    const updatedCourse = calculateCourseProgress({ ...selectedCourse, modules: updatedModules });
-    setCourses(courses.map(c => c.id === updatedCourse.id ? updatedCourse : c));
-    setSelectedCourse(updatedCourse);
-    setSelectedCurriculum(null);
-  };
 
   // --- Course Detail View ---
   if (selectedCourse) {
@@ -678,145 +491,7 @@ export function LearningModule({ basePath, setActive }: { basePath?: string, set
           </div>
         </div>
 
-        {/* Curriculum Viewer Modal */}
-        <Dialog open={!!selectedCurriculum} onOpenChange={(open) => !open && setSelectedCurriculum(null)}>
-          <DialogContent className="sm:max-w-[800px] p-0 overflow-hidden rounded-[2rem] gap-0 border-border/60 shadow-2xl bg-card">
-            {selectedCurriculum && (
-              <div className="flex flex-col h-[600px]">
-                <div className="px-6 py-4 border-b border-border/50 bg-muted/30 flex items-center justify-between shrink-0">
-                  <DialogTitle className="text-lg font-black tracking-tight flex items-center gap-2">
-                    {selectedCurriculum.type === "video" && <PlayCircle className="w-5 h-5 text-primary" />}
-                    {selectedCurriculum.type === "document" && <FileText className="w-5 h-5 text-primary" />}
-                    {selectedCurriculum.title}
-                  </DialogTitle>
-                </div>
-                
-                {/* Content Area */}
-                <div className="flex-1 bg-black/5 flex items-center justify-center p-8">
-                  {selectedCurriculum.type === "video" ? (
-                    <div className="w-full h-full bg-black rounded-xl flex items-center justify-center shadow-inner relative overflow-hidden group">
-                      <video
-                        ref={videoRef}
-                        src={selectedCurriculum.contentUrl || "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"}
-                        className="w-full h-full object-contain"
-                        controls={!showQuizOverlay}
-                        onTimeUpdate={() => {
-                          if (!selectedCurriculum.midVideoQuiz || quizPassed) return;
-                          if (videoRef.current && videoRef.current.currentTime >= selectedCurriculum.midVideoQuiz.timeSeconds) {
-                            videoRef.current.pause();
-                            setShowQuizOverlay(true);
-                          }
-                        }}
-                      />
-                      {showQuizOverlay && selectedCurriculum.midVideoQuiz && (
-                        <div className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center p-8 z-10 backdrop-blur-sm">
-                          <div className="bg-card p-6 rounded-2xl max-w-md w-full shadow-2xl border border-border">
-                            {!quizFinished ? (
-                              <>
-                                <div className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">Question {currentQuestionIndex + 1} of {selectedCurriculum.midVideoQuiz!.questions.length}</div>
-                                <h3 className="text-xl font-bold mb-4">{selectedCurriculum.midVideoQuiz!.questions[currentQuestionIndex]!.question}</h3>
-                                <div className="space-y-2">
-                                  {selectedCurriculum.midVideoQuiz!.questions[currentQuestionIndex]!.options.map((opt, idx) => (
-                                    <button
-                                      key={idx}
-                                      onClick={() => {
-                                        const isCorrect = idx === selectedCurriculum.midVideoQuiz!.questions[currentQuestionIndex]!.correctAnswerIndex;
-                                        const newScore = isCorrect ? quizScore + 1 : quizScore;
-                                        setQuizScore(newScore);
-                                        
-                                        if (currentQuestionIndex + 1 < selectedCurriculum.midVideoQuiz!.questions.length) {
-                                          setCurrentQuestionIndex(currentQuestionIndex + 1);
-                                        } else {
-                                          setQuizFinished(true);
-                                          const finalScorePercent = Math.round((newScore / selectedCurriculum.midVideoQuiz!.questions.length) * 100);
-                                          const passed = finalScorePercent >= selectedCurriculum.midVideoQuiz!.passingThreshold;
-                                          if (passed) {
-                                            setQuizPassed(true);
-                                            setTimeout(() => {
-                                              setShowQuizOverlay(false);
-                                              if (videoRef.current) videoRef.current.play();
-                                            }, 2000);
-                                          } else {
-                                            setQuizError(true);
-                                            setTimeout(() => {
-                                              setQuizError(false);
-                                              setShowQuizOverlay(false);
-                                              setCurrentQuestionIndex(0);
-                                              setQuizScore(0);
-                                              setQuizFinished(false);
-                                              if (videoRef.current) {
-                                                videoRef.current.currentTime = Math.max(0, selectedCurriculum.midVideoQuiz!.timeSeconds - 15);
-                                                videoRef.current.play();
-                                              }
-                                            }, 3500);
-                                          }
-                                        }
-                                      }}
-                                      className="w-full text-left p-3 rounded-xl border border-border hover:bg-primary/10 hover:border-primary transition-all font-semibold"
-                                    >
-                                      {opt}
-                                    </button>
-                                  ))}
-                                </div>
-                              </>
-                            ) : (
-                              <div className="text-center py-6">
-                                <div className="text-4xl font-black mb-2">{Math.round((quizScore / selectedCurriculum.midVideoQuiz.questions.length) * 100)}%</div>
-                                <p className="text-muted-foreground font-semibold mb-6">Passing threshold: {selectedCurriculum.midVideoQuiz.passingThreshold}%</p>
-                                {quizPassed ? (
-                                  <div className="flex flex-col items-center text-green-500">
-                                    <CheckCircle2 className="w-16 h-16 mb-2" />
-                                    <p className="font-bold text-lg">Great job! Resuming video...</p>
-                                  </div>
-                                ) : (
-                                  <div className="flex flex-col items-center text-red-500">
-                                    <div className="w-16 h-16 mb-2 bg-red-100 rounded-full flex items-center justify-center">
-                                      <Trash2 className="w-8 h-8 text-red-500" />
-                                    </div>
-                                    <p className="font-bold text-lg mb-2">Almost there!</p>
-                                    <p className="text-sm font-semibold text-foreground/80">Rewinding video by 15s to help you review before trying again.</p>
-                                  </div>
-                                )}
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  ) : (
-                    <div className="w-full h-full bg-white rounded-xl p-8 border border-border shadow-sm overflow-y-auto">
-                      <h3 className="text-xl font-bold mb-4">{selectedCurriculum.title}</h3>
-                      {selectedCurriculum.contentUrl ? (
-                        <div className="w-full h-full min-h-[400px]">
-                          <iframe src={selectedCurriculum.contentUrl} className="w-full h-full min-h-[400px] border-0" />
-                        </div>
-                      ) : (
-                        <div className="space-y-4 text-sm text-foreground/80 leading-relaxed">
-                          <p>This is placeholder content for the document viewer. In a real application, this would render markdown, PDF, or HTML content related to the lesson.</p>
-                          <p>It's important to provide a seamless reading experience without distracting the user from the core material.</p>
-                          <div className="p-4 bg-muted/50 rounded-lg border border-border mt-6">
-                            <p className="font-bold text-foreground">Key Takeaway:</p>
-                            <p>Always structure your curriculums clearly to improve learner retention.</p>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
 
-                <div className="px-6 py-4 bg-muted/30 border-t border-border/50 flex justify-between items-center shrink-0">
-                  <button className="text-sm font-bold text-muted-foreground hover:text-foreground transition-colors">Previous</button>
-                  <button 
-                    onClick={handleMarkAsComplete}
-                    className="px-6 py-2.5 bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-sm rounded-xl transition-all shadow-sm flex items-center gap-2"
-                  >
-                    Mark as Complete <CheckCircle2 className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-            )}
-          </DialogContent>
-        </Dialog>
 
         {/* Add Module Modal */}
         <Dialog open={isAddModuleOpen} onOpenChange={setIsAddModuleOpen}>
@@ -960,6 +635,49 @@ export function LearningModule({ basePath, setActive }: { basePath?: string, set
             </form>
           </DialogContent>
         </Dialog>
+
+        {/* Add Course Modal */}
+        <Dialog open={isAddCourseOpen} onOpenChange={(open) => {
+          setIsAddCourseOpen(open);
+          if (!open) {
+            setEditingCourseId(null);
+            setNewCourse({ title: "", description: "", category: "", instructor: "" });
+          }
+        }}>
+          <DialogContent className="sm:max-w-[500px] p-6 rounded-[2rem] bg-card border-border shadow-2xl">
+            <DialogHeader>
+              <DialogTitle className="text-xl font-black">{editingCourseId ? "Edit Course" : "Create New Course"}</DialogTitle>
+            </DialogHeader>
+            <form onSubmit={handleAddCourse} className="space-y-4 mt-4">
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Course Title</label>
+                <input required type="text" value={newCourse.title} onChange={e => setNewCourse({...newCourse, title: e.target.value})} className="w-full px-3 py-2 bg-white border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" placeholder="e.g. Sales Onboarding" />
+              </div>
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Description</label>
+                <textarea required value={newCourse.description} onChange={e => setNewCourse({...newCourse, description: e.target.value})} className="w-full px-3 py-2 bg-white border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 resize-none" placeholder="Brief summary of the course..." rows={3} />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Category</label>
+                  <input required type="text" value={newCourse.category} onChange={e => setNewCourse({...newCourse, category: e.target.value})} className="w-full px-3 py-2 bg-white border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" placeholder="e.g. Engineering" />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Instructor</label>
+                  <input required type="text" value={newCourse.instructor} onChange={e => setNewCourse({...newCourse, instructor: e.target.value})} className="w-full px-3 py-2 bg-white border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" placeholder="e.g. John Doe" />
+                </div>
+              </div>
+              <div className="pt-4 flex justify-end gap-3 border-t border-border/50">
+                <button type="button" onClick={() => {
+                  setIsAddCourseOpen(false);
+                  setEditingCourseId(null);
+                  setNewCourse({ title: "", description: "", category: "", instructor: "" });
+                }} className="px-4 py-2 bg-white border border-border text-foreground hover:bg-muted/50 font-bold text-sm rounded-xl">Cancel</button>
+                <button type="submit" className="px-4 py-2 bg-primary text-primary-foreground font-bold text-sm rounded-xl hover:bg-primary/90">{editingCourseId ? "Save Changes" : "Create Course"}</button>
+              </div>
+            </form>
+          </DialogContent>
+        </Dialog>
       </div>
     );
   }
@@ -1022,7 +740,11 @@ export function LearningModule({ basePath, setActive }: { basePath?: string, set
             )}
           </div>
           <button 
-            onClick={() => setIsAddCourseOpen(true)}
+            onClick={() => {
+              setEditingCourseId(null);
+              setNewCourse({ title: "", description: "", category: "", instructor: "" });
+              setIsAddCourseOpen(true);
+            }}
             className="px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-xs rounded-xl transition-all shadow-sm flex items-center gap-1.5 shrink-0"
           >
             + Add Course
@@ -1106,10 +828,16 @@ export function LearningModule({ basePath, setActive }: { basePath?: string, set
       </div>
 
       {/* Add Course Modal */}
-      <Dialog open={isAddCourseOpen} onOpenChange={setIsAddCourseOpen}>
+      <Dialog open={isAddCourseOpen} onOpenChange={(open) => {
+        setIsAddCourseOpen(open);
+        if (!open) {
+          setEditingCourseId(null);
+          setNewCourse({ title: "", description: "", category: "", instructor: "" });
+        }
+      }}>
         <DialogContent className="sm:max-w-[500px] p-6 rounded-[2rem] bg-card border-border shadow-2xl">
           <DialogHeader>
-            <DialogTitle className="text-xl font-black">Create New Course</DialogTitle>
+            <DialogTitle className="text-xl font-black">{editingCourseId ? "Edit Course" : "Create New Course"}</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleAddCourse} className="space-y-4 mt-4">
             <div className="space-y-2">
@@ -1131,8 +859,12 @@ export function LearningModule({ basePath, setActive }: { basePath?: string, set
               </div>
             </div>
             <div className="pt-4 flex justify-end gap-3 border-t border-border/50">
-              <button type="button" onClick={() => setIsAddCourseOpen(false)} className="px-4 py-2 bg-white border border-border text-foreground hover:bg-muted/50 font-bold text-sm rounded-xl">Cancel</button>
-              <button type="submit" className="px-4 py-2 bg-primary text-primary-foreground font-bold text-sm rounded-xl hover:bg-primary/90">Create Course</button>
+              <button type="button" onClick={() => {
+                setIsAddCourseOpen(false);
+                setEditingCourseId(null);
+                setNewCourse({ title: "", description: "", category: "", instructor: "" });
+              }} className="px-4 py-2 bg-white border border-border text-foreground hover:bg-muted/50 font-bold text-sm rounded-xl">Cancel</button>
+              <button type="submit" className="px-4 py-2 bg-primary text-primary-foreground font-bold text-sm rounded-xl hover:bg-primary/90">{editingCourseId ? "Save Changes" : "Create Course"}</button>
             </div>
           </form>
         </DialogContent>

@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as RecycleBinRouteImport } from './routes/recycle-bin'
+import { Route as LearningViewerCourseIdModuleIdCurriculumIdRouteImport } from './routes/learning.viewer.$courseId.$moduleId.$curriculumId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -22,31 +23,47 @@ const RecycleBinRoute = RecycleBinRouteImport.update({
   path: '/recycle-bin',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LearningViewerCourseIdModuleIdCurriculumIdRoute =
+  LearningViewerCourseIdModuleIdCurriculumIdRouteImport.update({
+    id: '/learning/viewer/$courseId/$moduleId/$curriculumId',
+    path: '/learning/viewer/$courseId/$moduleId/$curriculumId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/recycle-bin': typeof RecycleBinRoute
+  '/learning/viewer/$courseId/$moduleId/$curriculumId': typeof LearningViewerCourseIdModuleIdCurriculumIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/recycle-bin': typeof RecycleBinRoute
+  '/learning/viewer/$courseId/$moduleId/$curriculumId': typeof LearningViewerCourseIdModuleIdCurriculumIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/recycle-bin': typeof RecycleBinRoute
+  '/learning/viewer/$courseId/$moduleId/$curriculumId': typeof LearningViewerCourseIdModuleIdCurriculumIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/recycle-bin'
+  fullPaths:
+    '/' | '/recycle-bin' | '/learning/viewer/$courseId/$moduleId/$curriculumId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/recycle-bin'
-  id: '__root__' | '/' | '/recycle-bin'
+  to:
+    '/' | '/recycle-bin' | '/learning/viewer/$courseId/$moduleId/$curriculumId'
+  id:
+    | '__root__'
+    | '/'
+    | '/recycle-bin'
+    | '/learning/viewer/$courseId/$moduleId/$curriculumId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   RecycleBinRoute: typeof RecycleBinRoute
+  LearningViewerCourseIdModuleIdCurriculumIdRoute: typeof LearningViewerCourseIdModuleIdCurriculumIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -65,12 +82,21 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RecycleBinRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/learning/viewer/$courseId/$moduleId/$curriculumId': {
+      id: '/learning/viewer/$courseId/$moduleId/$curriculumId'
+      path: '/learning/viewer/$courseId/$moduleId/$curriculumId'
+      fullPath: '/learning/viewer/$courseId/$moduleId/$curriculumId'
+      preLoaderRoute: typeof LearningViewerCourseIdModuleIdCurriculumIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   RecycleBinRoute: RecycleBinRoute,
+  LearningViewerCourseIdModuleIdCurriculumIdRoute:
+    LearningViewerCourseIdModuleIdCurriculumIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
