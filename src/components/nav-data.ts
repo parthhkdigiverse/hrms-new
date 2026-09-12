@@ -45,6 +45,7 @@ import {
   Trash2,
   Package,
   Map,
+  GraduationCap,
   type LucideIcon,
 } from "lucide-react";
 
@@ -221,6 +222,15 @@ export const navItems: NavItem[] = [
   { title: "Restrictions", url: "/restrictions", icon: Shield, section: "Admin" },
   { title: "Activity Logs", url: "/activity-logs", icon: ScrollText, section: "Admin" },
   { title: "Recycle Bin", url: "/recycle-bin", icon: Trash2, section: "Admin" },
+  {
+    title: "Learning Hub",
+    icon: GraduationCap,
+    section: "Learning",
+    children: [
+      { title: "Courses Catalog", url: "/learning/courses" },
+      { title: "My Learning", url: "/learning/my-courses" },
+    ],
+  },
 ];
 
 export const sectionOrder = [
@@ -230,6 +240,7 @@ export const sectionOrder = [
   "Finance",
   "Work",
   "Workplace",
+  "Learning",
   "Admin",
 ];
 

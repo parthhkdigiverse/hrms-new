@@ -57,6 +57,7 @@ import ResourceManagementPage from "@/components/workspace/Resource";
 import { Gallery } from "@/components/workspace/Gallery";
 import { Documents } from "@/components/documents/Documents";
 import { DocumentGenerator } from "@/components/documents/DocumentGenerator";
+import { LearningModule } from "@/components/learning/LearningModule";
 import { DailyProgress } from "@/components/approvals/DailyProgress";
 import { ApprovalHistory } from "@/components/approvals/ApprovalHistory";
 import { AllInvoices } from "@/components/invoice/AllInvoices";
@@ -198,6 +199,9 @@ function Index() {
         {basePath === "/employees/attendance" && <AttendanceList />}
         {basePath === "/employees/leave-requests" && <LeaveRequests isNew={isNew} />}
         {basePath === "/employees/documents" && <Documents setActive={setActive} />}
+
+        {/* Learning Module */}
+        {basePath.startsWith("/learning") && <LearningModule basePath={basePath} setActive={setActive} />}
         {basePath === "/employees/documents/generate" && <DocumentGenerator onBack={() => setActive("/employees/documents")} />}
         {(active === "/penalty" || active === "/approvals/penalties") && <Penalties />}
         {basePath === "/approvals/daily-progress" && <DailyProgress />}
@@ -263,7 +267,7 @@ function Index() {
         {basePath === "/profile" && <UserProfile />}
 
         {/* Fallback original content for all other items */}
-        {basePath !== "/dashboard" && basePath !== "/profile" && basePath !== "/schedule" && basePath !== "/work/logs" && basePath !== "/work/projects" && basePath !== "/tasks" && basePath !== "/chat" && basePath !== "/work/research" && basePath !== "/penalty" && basePath !== "/approvals/penalties" && basePath !== "/remarks" && basePath !== "/activity-logs" && basePath !== "/activity-tracker" && basePath !== "/restrictions" && basePath !== "/settings" && basePath !== "/recycle-bin" && basePath !== "/elections" && basePath !== "/recognitions" && basePath !== "/team-leader-of-the-week" && !basePath.startsWith("/ceo-dashboard") && !basePath.startsWith("/work/sales") && !basePath.startsWith("/payroll") && !basePath.startsWith("/employees") && !basePath.startsWith("/recruitment") && !basePath.startsWith("/workspace") && !basePath.startsWith("/approvals") && !basePath.startsWith("/invoice") && !basePath.startsWith("/reports") && !basePath.startsWith("/finance") && (
+        {basePath !== "/dashboard" && basePath !== "/profile" && basePath !== "/schedule" && basePath !== "/work/logs" && basePath !== "/work/projects" && basePath !== "/tasks" && basePath !== "/chat" && basePath !== "/work/research" && basePath !== "/penalty" && basePath !== "/approvals/penalties" && basePath !== "/remarks" && basePath !== "/activity-logs" && basePath !== "/activity-tracker" && basePath !== "/restrictions" && basePath !== "/settings" && basePath !== "/recycle-bin" && basePath !== "/elections" && basePath !== "/recognitions" && basePath !== "/team-leader-of-the-week" && !basePath.startsWith("/ceo-dashboard") && !basePath.startsWith("/work/sales") && !basePath.startsWith("/payroll") && !basePath.startsWith("/employees") && !basePath.startsWith("/recruitment") && !basePath.startsWith("/workspace") && !basePath.startsWith("/approvals") && !basePath.startsWith("/invoice") && !basePath.startsWith("/reports") && !basePath.startsWith("/finance") && !basePath.startsWith("/learning") && (
           <>
             <header className="mb-8 max-w-3xl">
               <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
