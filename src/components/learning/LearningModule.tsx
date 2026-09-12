@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import {
   GraduationCap,
   BookOpen,
@@ -27,6 +27,17 @@ export function LearningModule({ basePath, setActive }: { basePath?: string, set
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
   const [activeModuleId, setActiveModuleId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+
+  useEffect(() => {
+    const handleNav = (e: Event) => {
+      const url = (e as CustomEvent).detail;
+      if (url === "/learning/courses" || url === "/learning/my-courses") {
+        setSelectedCourse(null);
+      }
+    };
+    window.addEventListener("appNavigate", handleNav);
+    return () => window.removeEventListener("appNavigate", handleNav);
+  }, []);
 
   const [activeCategory, setActiveCategory] = useState<string>("All");
   const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -754,7 +765,7 @@ export function LearningModule({ basePath, setActive }: { basePath?: string, set
 
       <div className="flex items-center gap-2 border-b border-border/50 pb-px shrink-0">
         <button
-          onClick={() => setActive && setActive("/learning/courses")}
+          onClick={() => { setActive && setActive("/learning/courses"); setSelectedCourse(null); }}
           className={cn(
             "px-4 py-2 text-sm font-bold border-b-2 transition-colors",
             activeTab === "catalog" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
@@ -763,7 +774,7 @@ export function LearningModule({ basePath, setActive }: { basePath?: string, set
           Course Catalog
         </button>
         <button
-          onClick={() => setActive && setActive("/learning/my-courses")}
+          onClick={() => { setActive && setActive("/learning/my-courses"); setSelectedCourse(null); }}
           className={cn(
             "px-4 py-2 text-sm font-bold border-b-2 transition-colors",
             activeTab === "my-courses" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"

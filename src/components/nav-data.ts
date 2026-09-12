@@ -227,6 +227,7 @@ export const navItems: NavItem[] = [
     icon: GraduationCap,
     section: "Learning",
     children: [
+      { title: "Dashboard", url: "/learning/dashboard" },
       { title: "Courses Catalog", url: "/learning/courses" },
       { title: "My Learning", url: "/learning/my-courses" },
     ],

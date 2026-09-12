@@ -58,6 +58,7 @@ import { Gallery } from "@/components/workspace/Gallery";
 import { Documents } from "@/components/documents/Documents";
 import { DocumentGenerator } from "@/components/documents/DocumentGenerator";
 import { LearningModule } from "@/components/learning/LearningModule";
+import { LearningDashboard } from "@/components/learning/LearningDashboard";
 import { DailyProgress } from "@/components/approvals/DailyProgress";
 import { ApprovalHistory } from "@/components/approvals/ApprovalHistory";
 import { AllInvoices } from "@/components/invoice/AllInvoices";
@@ -201,7 +202,8 @@ function Index() {
         {basePath === "/employees/documents" && <Documents setActive={setActive} />}
 
         {/* Learning Module */}
-        {basePath.startsWith("/learning") && <LearningModule basePath={basePath} setActive={setActive} />}
+        {basePath === "/learning/dashboard" && <LearningDashboard setActive={setActive} />}
+        {(basePath.startsWith("/learning") && basePath !== "/learning/dashboard") && <LearningModule basePath={basePath} setActive={setActive} />}
         {basePath === "/employees/documents/generate" && <DocumentGenerator onBack={() => setActive("/employees/documents")} />}
         {(active === "/penalty" || active === "/approvals/penalties") && <Penalties />}
         {basePath === "/approvals/daily-progress" && <DailyProgress />}

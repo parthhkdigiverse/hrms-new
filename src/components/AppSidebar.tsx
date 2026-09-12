@@ -240,6 +240,7 @@ function SidebarBody({
 
   const go = (url: string) => {
     setActive(url);
+    window.dispatchEvent(new CustomEvent('appNavigate', { detail: url }));
     onClose?.();
 
     // Find title of item being navigated to
