@@ -46,7 +46,7 @@ export function LearningModule({ basePath, setActive }: { basePath?: string, set
   
   // Modals state
   const [isAddCourseOpen, setIsAddCourseOpen] = useState(false);
-  const [newCourse, setNewCourse] = useState({ title: "", description: "", category: "", instructor: "" });
+  const [newCourse, setNewCourse] = useState({ title: "", description: "", category: "", instructor: "", thumbnail: "" });
   
   const [isAddModuleOpen, setIsAddModuleOpen] = useState(false);
   const [newModule, setNewModule] = useState({ title: "", description: "" });
@@ -89,7 +89,7 @@ export function LearningModule({ basePath, setActive }: { basePath?: string, set
   const handleAddCourse = (e: React.FormEvent) => {
     e.preventDefault();
     if (editingCourseId) {
-      const updated = courses.map(c => c.id === editingCourseId ? { ...c, title: newCourse.title, description: newCourse.description, category: newCourse.category, instructor: newCourse.instructor } : c);
+      const updated = courses.map(c => c.id === editingCourseId ? { ...c, title: newCourse.title, description: newCourse.description, category: newCourse.category, instructor: newCourse.instructor, thumbnail: newCourse.thumbnail || c.thumbnail } : c);
       setCourses(updated);
       if (selectedCourse && selectedCourse.id === editingCourseId) {
         setSelectedCourse(updated.find(c => c.id === editingCourseId) || null);
@@ -101,7 +101,7 @@ export function LearningModule({ basePath, setActive }: { basePath?: string, set
         description: newCourse.description,
         category: newCourse.category || "General",
         instructor: newCourse.instructor,
-        thumbnail: "https://images.unsplash.com/photo-1516321497487-e288fb19713f?q=80&w=300&h=200&auto=format&fit=crop",
+        thumbnail: newCourse.thumbnail || "https://images.unsplash.com/photo-1516321497487-e288fb19713f?q=80&w=300&h=200&auto=format&fit=crop",
         totalModules: 0,
         totalDuration: "0h 0m",
         progress: 0,
@@ -111,7 +111,7 @@ export function LearningModule({ basePath, setActive }: { basePath?: string, set
     }
     setIsAddCourseOpen(false);
     setEditingCourseId(null);
-    setNewCourse({ title: "", description: "", category: "", instructor: "" });
+    setNewCourse({ title: "", description: "", category: "", instructor: "", thumbnail: "" });
   };
 
   const handleDeleteCourse = (id: string, e?: React.MouseEvent) => {
@@ -306,7 +306,8 @@ export function LearningModule({ basePath, setActive }: { basePath?: string, set
                         title: selectedCourse.title,
                         description: selectedCourse.description,
                         category: selectedCourse.category,
-                        instructor: selectedCourse.instructor
+                        instructor: selectedCourse.instructor,
+                        thumbnail: selectedCourse.thumbnail
                       });
                       setIsAddCourseOpen(true);
                     }}
@@ -658,7 +659,7 @@ export function LearningModule({ basePath, setActive }: { basePath?: string, set
           setIsAddCourseOpen(open);
           if (!open) {
             setEditingCourseId(null);
-            setNewCourse({ title: "", description: "", category: "", instructor: "" });
+            setNewCourse({ title: "", description: "", category: "", instructor: "", thumbnail: "" });
           }
         }}>
           <DialogContent className="sm:max-w-[500px] p-6 rounded-[2rem] bg-card border-border shadow-2xl">
@@ -684,11 +685,29 @@ export function LearningModule({ basePath, setActive }: { basePath?: string, set
                   <input required type="text" value={newCourse.instructor} onChange={e => setNewCourse({...newCourse, instructor: e.target.value})} className="w-full px-3 py-2 bg-white border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" placeholder="e.g. John Doe" />
                 </div>
               </div>
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Thumbnail Image (Optional)</label>
+                <div className="flex items-center gap-4">
+                  {newCourse.thumbnail && (
+                    <img src={newCourse.thumbnail} alt="Thumbnail preview" className="w-16 h-16 object-cover rounded-xl border border-border shadow-sm" />
+                  )}
+                  <input type="file" accept="image/*" onChange={e => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      const reader = new FileReader();
+                      reader.onloadend = () => {
+                        setNewCourse({...newCourse, thumbnail: reader.result as string});
+                      };
+                      reader.readAsDataURL(file);
+                    }
+                  }} className="flex-1 px-3 py-2 bg-white border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer text-muted-foreground" />
+                </div>
+              </div>
               <div className="pt-4 flex justify-end gap-3 border-t border-border/50">
                 <button type="button" onClick={() => {
                   setIsAddCourseOpen(false);
                   setEditingCourseId(null);
-                  setNewCourse({ title: "", description: "", category: "", instructor: "" });
+                  setNewCourse({ title: "", description: "", category: "", instructor: "", thumbnail: "" });
                 }} className="px-4 py-2 bg-white border border-border text-foreground hover:bg-muted/50 font-bold text-sm rounded-xl">Cancel</button>
                 <button type="submit" className="px-4 py-2 bg-primary text-primary-foreground font-bold text-sm rounded-xl hover:bg-primary/90">{editingCourseId ? "Save Changes" : "Create Course"}</button>
               </div>
@@ -759,7 +778,7 @@ export function LearningModule({ basePath, setActive }: { basePath?: string, set
           <button 
             onClick={() => {
               setEditingCourseId(null);
-              setNewCourse({ title: "", description: "", category: "", instructor: "" });
+              setNewCourse({ title: "", description: "", category: "", instructor: "", thumbnail: "" });
               setIsAddCourseOpen(true);
             }}
             className="px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-xs rounded-xl transition-all shadow-sm flex items-center gap-1.5 shrink-0"
@@ -849,7 +868,7 @@ export function LearningModule({ basePath, setActive }: { basePath?: string, set
         setIsAddCourseOpen(open);
         if (!open) {
           setEditingCourseId(null);
-          setNewCourse({ title: "", description: "", category: "", instructor: "" });
+          setNewCourse({ title: "", description: "", category: "", instructor: "", thumbnail: "" });
         }
       }}>
         <DialogContent className="sm:max-w-[500px] p-6 rounded-[2rem] bg-card border-border shadow-2xl">
@@ -879,7 +898,7 @@ export function LearningModule({ basePath, setActive }: { basePath?: string, set
               <button type="button" onClick={() => {
                 setIsAddCourseOpen(false);
                 setEditingCourseId(null);
-                setNewCourse({ title: "", description: "", category: "", instructor: "" });
+                setNewCourse({ title: "", description: "", category: "", instructor: "", thumbnail: "" });
               }} className="px-4 py-2 bg-white border border-border text-foreground hover:bg-muted/50 font-bold text-sm rounded-xl">Cancel</button>
               <button type="submit" className="px-4 py-2 bg-primary text-primary-foreground font-bold text-sm rounded-xl hover:bg-primary/90">{editingCourseId ? "Save Changes" : "Create Course"}</button>
             </div>
