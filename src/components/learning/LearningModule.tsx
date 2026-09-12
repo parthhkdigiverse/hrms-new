@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import {
   GraduationCap,
   BookOpen,
@@ -30,6 +30,15 @@ interface Curriculum {
   contentUrl?: string;
   viewCount?: number;
   progress?: number;
+  midVideoQuiz?: {
+    timeSeconds: number;
+    passingThreshold: number;
+    questions: {
+      question: string;
+      options: string[];
+      correctAnswerIndex: number;
+    }[];
+  } | undefined;
 }
 
 interface Module {
@@ -98,7 +107,26 @@ const MOCK_COURSES: Course[] = [
         title: "Server Components",
         description: "Mastering RSC for optimal performance.",
         curriculums: [
-          { id: "cur4", title: "RSC Fundamentals", type: "video", duration: "25m", completed: true, viewCount: 3, progress: 100 },
+          { 
+            id: "cur4", 
+            title: "RSC Fundamentals", 
+            type: "video", 
+            duration: "25m", 
+            completed: true, 
+            viewCount: 3, 
+            progress: 100,
+            midVideoQuiz: {
+              timeSeconds: 15,
+              passingThreshold: 100,
+              questions: [
+                {
+                  question: "Which of the following components render on the server by default in App Router?",
+                  options: ["Client Components", "Server Components", "Both", "None"],
+                  correctAnswerIndex: 1
+                }
+              ]
+            }
+          },
           { id: "cur5", title: "Data Fetching Strategies", type: "video", duration: "35m", completed: false, viewCount: 1, progress: 0 },
           { id: "cur6", title: "Suspense Boundaries", type: "document", duration: "15m", completed: false, viewCount: 0, progress: 0 },
         ],
@@ -172,13 +200,35 @@ export function LearningModule({ basePath, setActive }: { basePath?: string, set
   const [newModule, setNewModule] = useState({ title: "", description: "" });
   
   const [isAddCurriculumOpen, setIsAddCurriculumOpen] = useState(false);
-  const [newCurriculum, setNewCurriculum] = useState({ title: "", type: "video" as Curriculum["type"], duration: "", contentUrl: "" });
+  const [newCurriculum, setNewCurriculum] = useState({ 
+    title: "", 
+    type: "video" as Curriculum["type"], 
+    duration: "", 
+    contentUrl: "",
+    enableMidVideoQuiz: false,
+    quizTimeSeconds: 15,
+    quizPassingThreshold: 100,
+    quizQuestions: [{
+      question: "",
+      options: ["", "", "", ""],
+      correctAnswerIndex: 0
+    }]
+  });
   const [targetModuleId, setTargetModuleId] = useState<string | null>(null);
 
   // Edit States
   const [editingCourseId, setEditingCourseId] = useState<string | null>(null);
   const [editingModuleId, setEditingModuleId] = useState<string | null>(null);
   const [editingCurriculumId, setEditingCurriculumId] = useState<string | null>(null);
+
+  // Video Player States
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [showQuizOverlay, setShowQuizOverlay] = useState(false);
+  const [quizPassed, setQuizPassed] = useState(false);
+  const [quizError, setQuizError] = useState(false);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [quizScore, setQuizScore] = useState(0);
+  const [quizFinished, setQuizFinished] = useState(false);
 
   const categories = ["All", ...Array.from(new Set(courses.map(c => c.category)))];
 
@@ -267,7 +317,18 @@ export function LearningModule({ basePath, setActive }: { basePath?: string, set
         if (m.id === targetModuleId) {
           return {
             ...m,
-            curriculums: m.curriculums.map(cur => cur.id === editingCurriculumId ? { ...cur, title: newCurriculum.title, type: newCurriculum.type, duration: newCurriculum.duration, contentUrl: newCurriculum.contentUrl } : cur)
+            curriculums: m.curriculums.map(cur => cur.id === editingCurriculumId ? { 
+              ...cur, 
+              title: newCurriculum.title, 
+              type: newCurriculum.type, 
+              duration: newCurriculum.duration, 
+              contentUrl: newCurriculum.contentUrl,
+              midVideoQuiz: newCurriculum.type === 'video' && newCurriculum.enableMidVideoQuiz ? {
+                timeSeconds: newCurriculum.quizTimeSeconds,
+                passingThreshold: newCurriculum.quizPassingThreshold,
+                questions: newCurriculum.quizQuestions
+              } : undefined
+            } : cur)
           };
         }
         return m;
@@ -284,7 +345,12 @@ export function LearningModule({ basePath, setActive }: { basePath?: string, set
         completed: false,
         contentUrl: newCurriculum.contentUrl,
         viewCount: 0,
-        progress: 0
+        progress: 0,
+        midVideoQuiz: newCurriculum.type === 'video' && newCurriculum.enableMidVideoQuiz ? {
+          timeSeconds: newCurriculum.quizTimeSeconds,
+          passingThreshold: newCurriculum.quizPassingThreshold,
+          questions: newCurriculum.quizQuestions
+        } : undefined
       };
       const updatedModules = selectedCourse.modules.map(m => {
         if (m.id === targetModuleId) {
@@ -298,7 +364,20 @@ export function LearningModule({ basePath, setActive }: { basePath?: string, set
     }
     setIsAddCurriculumOpen(false);
     setEditingCurriculumId(null);
-    setNewCurriculum({ title: "", type: "video", duration: "", contentUrl: "" });
+    setNewCurriculum({ 
+      title: "", 
+      type: "video", 
+      duration: "", 
+      contentUrl: "",
+      enableMidVideoQuiz: false,
+      quizTimeSeconds: 15,
+      quizPassingThreshold: 100,
+      quizQuestions: [{
+        question: "",
+        options: ["", "", "", ""],
+        correctAnswerIndex: 0
+      }]
+    });
   };
 
   const handleDeleteCurriculum = (moduleId: string, curriculumId: string, e: React.MouseEvent) => {
@@ -317,6 +396,9 @@ export function LearningModule({ basePath, setActive }: { basePath?: string, set
 
   const handleCurriculumClick = (moduleId: string, curriculum: Curriculum) => {
     if (!selectedCourse) return;
+    setShowQuizOverlay(false);
+    setQuizPassed(false);
+    setQuizError(false);
     const updatedModules = selectedCourse.modules.map(m => {
       if (m.id === moduleId) {
         return {
@@ -552,7 +634,15 @@ export function LearningModule({ basePath, setActive }: { basePath?: string, set
                                 title: curriculum.title,
                                 type: curriculum.type,
                                 duration: curriculum.duration,
-                                contentUrl: curriculum.contentUrl || ""
+                                contentUrl: curriculum.contentUrl || "",
+                                enableMidVideoQuiz: !!curriculum.midVideoQuiz,
+                                quizTimeSeconds: curriculum.midVideoQuiz?.timeSeconds || 15,
+                                quizPassingThreshold: curriculum.midVideoQuiz?.passingThreshold || 100,
+                                quizQuestions: curriculum.midVideoQuiz?.questions || [{
+                                  question: "",
+                                  options: ["", "", "", ""],
+                                  correctAnswerIndex: 0
+                                }]
                               });
                               setIsAddCurriculumOpen(true);
                             }}
@@ -605,16 +695,92 @@ export function LearningModule({ basePath, setActive }: { basePath?: string, set
                 <div className="flex-1 bg-black/5 flex items-center justify-center p-8">
                   {selectedCurriculum.type === "video" ? (
                     <div className="w-full h-full bg-black rounded-xl flex items-center justify-center shadow-inner relative overflow-hidden group">
-                      {selectedCurriculum.contentUrl ? (
-                        <iframe src={selectedCurriculum.contentUrl} className="w-full h-full border-0" allowFullScreen />
-                      ) : (
-                        <>
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent pointer-events-none" />
-                          <PlayCircle className="w-16 h-16 text-white/80 group-hover:text-white group-hover:scale-110 transition-all cursor-pointer shadow-2xl" />
-                          <div className="absolute bottom-4 left-4 right-4 h-1 bg-white/20 rounded-full overflow-hidden">
-                            <div className="h-full bg-primary w-1/3" />
+                      <video
+                        ref={videoRef}
+                        src={selectedCurriculum.contentUrl || "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"}
+                        className="w-full h-full object-contain"
+                        controls={!showQuizOverlay}
+                        onTimeUpdate={() => {
+                          if (!selectedCurriculum.midVideoQuiz || quizPassed) return;
+                          if (videoRef.current && videoRef.current.currentTime >= selectedCurriculum.midVideoQuiz.timeSeconds) {
+                            videoRef.current.pause();
+                            setShowQuizOverlay(true);
+                          }
+                        }}
+                      />
+                      {showQuizOverlay && selectedCurriculum.midVideoQuiz && (
+                        <div className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center p-8 z-10 backdrop-blur-sm">
+                          <div className="bg-card p-6 rounded-2xl max-w-md w-full shadow-2xl border border-border">
+                            {!quizFinished ? (
+                              <>
+                                <div className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">Question {currentQuestionIndex + 1} of {selectedCurriculum.midVideoQuiz!.questions.length}</div>
+                                <h3 className="text-xl font-bold mb-4">{selectedCurriculum.midVideoQuiz!.questions[currentQuestionIndex]!.question}</h3>
+                                <div className="space-y-2">
+                                  {selectedCurriculum.midVideoQuiz!.questions[currentQuestionIndex]!.options.map((opt, idx) => (
+                                    <button
+                                      key={idx}
+                                      onClick={() => {
+                                        const isCorrect = idx === selectedCurriculum.midVideoQuiz!.questions[currentQuestionIndex]!.correctAnswerIndex;
+                                        const newScore = isCorrect ? quizScore + 1 : quizScore;
+                                        setQuizScore(newScore);
+                                        
+                                        if (currentQuestionIndex + 1 < selectedCurriculum.midVideoQuiz!.questions.length) {
+                                          setCurrentQuestionIndex(currentQuestionIndex + 1);
+                                        } else {
+                                          setQuizFinished(true);
+                                          const finalScorePercent = Math.round((newScore / selectedCurriculum.midVideoQuiz!.questions.length) * 100);
+                                          const passed = finalScorePercent >= selectedCurriculum.midVideoQuiz!.passingThreshold;
+                                          if (passed) {
+                                            setQuizPassed(true);
+                                            setTimeout(() => {
+                                              setShowQuizOverlay(false);
+                                              if (videoRef.current) videoRef.current.play();
+                                            }, 2000);
+                                          } else {
+                                            setQuizError(true);
+                                            setTimeout(() => {
+                                              setQuizError(false);
+                                              setShowQuizOverlay(false);
+                                              setCurrentQuestionIndex(0);
+                                              setQuizScore(0);
+                                              setQuizFinished(false);
+                                              if (videoRef.current) {
+                                                videoRef.current.currentTime = Math.max(0, selectedCurriculum.midVideoQuiz!.timeSeconds - 15);
+                                                videoRef.current.play();
+                                              }
+                                            }, 3500);
+                                          }
+                                        }
+                                      }}
+                                      className="w-full text-left p-3 rounded-xl border border-border hover:bg-primary/10 hover:border-primary transition-all font-semibold"
+                                    >
+                                      {opt}
+                                    </button>
+                                  ))}
+                                </div>
+                              </>
+                            ) : (
+                              <div className="text-center py-6">
+                                <div className="text-4xl font-black mb-2">{Math.round((quizScore / selectedCurriculum.midVideoQuiz.questions.length) * 100)}%</div>
+                                <p className="text-muted-foreground font-semibold mb-6">Passing threshold: {selectedCurriculum.midVideoQuiz.passingThreshold}%</p>
+                                {quizPassed ? (
+                                  <div className="flex flex-col items-center text-green-500">
+                                    <CheckCircle2 className="w-16 h-16 mb-2" />
+                                    <p className="font-bold text-lg">Great job! Resuming video...</p>
+                                  </div>
+                                ) : (
+                                  <div className="flex flex-col items-center text-red-500">
+                                    <div className="w-16 h-16 mb-2 bg-red-100 rounded-full flex items-center justify-center">
+                                      <Trash2 className="w-8 h-8 text-red-500" />
+                                    </div>
+                                    <p className="font-bold text-lg mb-2">Almost there!</p>
+                                    <p className="text-sm font-semibold text-foreground/80">Rewinding video by 15s to help you review before trying again.</p>
+                                  </div>
+                                )}
+                              </div>
+                            )}
                           </div>
-                        </>
+                        </div>
                       )}
                     </div>
                   ) : (
@@ -677,7 +843,7 @@ export function LearningModule({ basePath, setActive }: { basePath?: string, set
 
         {/* Add Curriculum Modal */}
         <Dialog open={isAddCurriculumOpen} onOpenChange={setIsAddCurriculumOpen}>
-          <DialogContent className="sm:max-w-[400px] p-6 rounded-[2rem] bg-card border-border shadow-2xl">
+          <DialogContent className="sm:max-w-[400px] max-h-[90vh] overflow-y-auto p-6 rounded-[2rem] bg-card border-border shadow-2xl">
             <DialogHeader>
               <DialogTitle className="text-xl font-black">Add Curriculum Lesson</DialogTitle>
             </DialogHeader>
@@ -704,6 +870,89 @@ export function LearningModule({ basePath, setActive }: { basePath?: string, set
                 <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Content URL (Optional)</label>
                 <input type="text" value={newCurriculum.contentUrl} onChange={e => setNewCurriculum({...newCurriculum, contentUrl: e.target.value})} className="w-full px-3 py-2 bg-white border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" placeholder="e.g. https://www.youtube.com/embed/..." />
               </div>
+
+              {newCurriculum.type === "video" && (
+                <div className="space-y-3 p-4 bg-muted/30 border border-border rounded-xl">
+                  <div className="flex items-center justify-between">
+                    <label className="text-sm font-bold text-foreground flex items-center gap-2">
+                      <input type="checkbox" checked={newCurriculum.enableMidVideoQuiz} onChange={e => setNewCurriculum({...newCurriculum, enableMidVideoQuiz: e.target.checked})} className="rounded border-border text-primary focus:ring-primary" />
+                      Enable Mid-Video Quiz
+                    </label>
+                  </div>
+                  
+                  {newCurriculum.enableMidVideoQuiz && (
+                    <div className="space-y-4 pt-2">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Show at Time (s)</label>
+                          <input type="number" value={newCurriculum.quizTimeSeconds} onChange={e => setNewCurriculum({...newCurriculum, quizTimeSeconds: parseInt(e.target.value) || 0})} className="w-full px-3 py-2 bg-white border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Threshold (%)</label>
+                          <input type="number" min="0" max="100" value={newCurriculum.quizPassingThreshold} onChange={e => setNewCurriculum({...newCurriculum, quizPassingThreshold: parseInt(e.target.value) || 0})} className="w-full px-3 py-2 bg-white border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
+                        </div>
+                      </div>
+
+                      <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2">
+                        {newCurriculum.quizQuestions.map((q, qIdx) => (
+                          <div key={qIdx} className="space-y-3 p-3 border border-border rounded-lg bg-background relative">
+                            {newCurriculum.quizQuestions.length > 1 && (
+                              <button type="button" onClick={() => {
+                                const newQs = newCurriculum.quizQuestions.filter((_, i) => i !== qIdx);
+                                setNewCurriculum({...newCurriculum, quizQuestions: newQs});
+                              }} className="absolute top-2 right-2 text-muted-foreground hover:text-red-500">
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            )}
+                            <div className="space-y-1">
+                              <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Question {qIdx + 1}</label>
+                              <input required type="text" value={q.question} onChange={e => {
+                                setNewCurriculum({
+                                  ...newCurriculum, 
+                                  quizQuestions: newCurriculum.quizQuestions.map((item, i) => i === qIdx ? { ...item, question: e.target.value } : item)
+                                });
+                              }} className="w-full px-3 py-2 bg-white border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" placeholder="What is..." />
+                            </div>
+                            <div className="space-y-1">
+                              <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Options & Correct Answer</label>
+                              {q.options.map((opt, optIdx) => (
+                                <div key={optIdx} className="flex items-center gap-2 mt-1">
+                                  <input type="radio" name={`correctAnswer-${qIdx}`} checked={q.correctAnswerIndex === optIdx} onChange={() => {
+                                    setNewCurriculum({
+                                      ...newCurriculum, 
+                                      quizQuestions: newCurriculum.quizQuestions.map((item, i) => i === qIdx ? { ...item, correctAnswerIndex: optIdx } : item)
+                                    });
+                                  }} className="text-primary focus:ring-primary" />
+                                  <input required type="text" value={opt} onChange={e => {
+                                    setNewCurriculum({
+                                      ...newCurriculum, 
+                                      quizQuestions: newCurriculum.quizQuestions.map((item, i) => {
+                                        if (i === qIdx) {
+                                          const newOpts = [...item.options];
+                                          newOpts[optIdx] = e.target.value;
+                                          return { ...item, options: newOpts };
+                                        }
+                                        return item;
+                                      })
+                                    });
+                                  }} className="flex-1 px-3 py-1 bg-white border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" placeholder={`Option ${optIdx + 1}`} />
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                      
+                      <button type="button" onClick={() => {
+                        setNewCurriculum({...newCurriculum, quizQuestions: [...newCurriculum.quizQuestions, { question: "", options: ["", "", "", ""], correctAnswerIndex: 0 }]});
+                      }} className="w-full py-2 bg-primary/10 text-primary hover:bg-primary/20 font-bold text-sm rounded-xl transition-colors">
+                        + Add Question
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+
               <div className="pt-4 flex justify-end gap-3 border-t border-border/50">
                 <button type="button" onClick={() => setIsAddCurriculumOpen(false)} className="px-4 py-2 bg-white border border-border text-foreground hover:bg-muted/50 font-bold text-sm rounded-xl">Cancel</button>
                 <button type="submit" className="px-4 py-2 bg-primary text-primary-foreground font-bold text-sm rounded-xl hover:bg-primary/90">Add Lesson</button>
