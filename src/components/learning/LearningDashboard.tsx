@@ -28,8 +28,8 @@ const parseDurationStr = (str: string): number => {
   let mins = 0;
   const hMatch = str.match(/(\d+)h/);
   const mMatch = str.match(/(\d+)m/);
-  if (hMatch) mins += parseInt(hMatch[1]) * 60;
-  if (mMatch) mins += parseInt(mMatch[1]);
+  if (hMatch) mins += parseInt(hMatch[1]!) * 60;
+  if (mMatch) mins += parseInt(mMatch[1]!);
   return mins;
 };
 
@@ -44,7 +44,7 @@ export function LearningDashboard({ setActive }: { setActive?: (val: string) => 
     .flatMap(c => c.modules)
     .flatMap(m => m.curriculums)
     .filter(c => c.completed)
-    .reduce((acc, c) => acc + parseDurationStr(c.duration), 0);
+    .reduce((acc, c) => acc + parseDurationStr(c.duration || ""), 0);
     
   const totalLearningHours = (completedMins / 60).toFixed(1);
 

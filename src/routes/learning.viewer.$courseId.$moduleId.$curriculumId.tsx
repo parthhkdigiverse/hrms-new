@@ -161,6 +161,78 @@ function CurriculumViewer() {
               </div>
             )}
           </div>
+        ) : curriculum.type === "quiz" ? (
+          <div className="w-full max-w-4xl h-full flex items-center justify-center">
+            {curriculum.midVideoQuiz ? (
+              <div className="bg-card p-6 sm:p-12 rounded-3xl max-w-2xl w-full shadow-xl border border-border relative">
+                  {!quizFinished ? (
+                    <>
+                      <div className="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-4">Question {currentQuestionIndex + 1} of {curriculum.midVideoQuiz.questions.length}</div>
+                      <h3 className="text-3xl font-bold mb-8">{curriculum.midVideoQuiz.questions[currentQuestionIndex]!.question}</h3>
+                      <div className="space-y-4">
+                        {curriculum.midVideoQuiz.questions[currentQuestionIndex]!.options.map((opt, idx) => (
+                          <button
+                            key={idx}
+                            onClick={() => {
+                              const isCorrect = idx === curriculum.midVideoQuiz!.questions[currentQuestionIndex]!.correctAnswerIndex;
+                              const newScore = isCorrect ? quizScore + 1 : quizScore;
+                              setQuizScore(newScore);
+                              
+                              if (currentQuestionIndex + 1 < curriculum.midVideoQuiz!.questions.length) {
+                                setCurrentQuestionIndex(currentQuestionIndex + 1);
+                              } else {
+                                setQuizFinished(true);
+                                const finalScorePercent = Math.round((newScore / curriculum.midVideoQuiz!.questions.length) * 100);
+                                const passed = finalScorePercent >= curriculum.midVideoQuiz!.passingThreshold;
+                                if (passed) {
+                                  setQuizPassed(true);
+                                } else {
+                                  setQuizError(true);
+                                  setTimeout(() => {
+                                    setQuizError(false);
+                                    setCurrentQuestionIndex(0);
+                                    setQuizScore(0);
+                                    setQuizFinished(false);
+                                  }, 3000);
+                                }
+                              }
+                            }}
+                            className="w-full text-left p-5 rounded-xl border-2 border-border hover:bg-primary/5 hover:border-primary transition-all font-bold text-lg"
+                          >
+                            {opt}
+                          </button>
+                        ))}
+                      </div>
+                    </>
+                  ) : (
+                    <div className="text-center py-12">
+                      <div className="text-6xl font-black mb-4 text-primary">{Math.round((quizScore / curriculum.midVideoQuiz.questions.length) * 100)}%</div>
+                      <p className="text-muted-foreground font-semibold mb-8 text-lg">Passing threshold: {curriculum.midVideoQuiz.passingThreshold}%</p>
+                      {quizPassed ? (
+                        <div className="flex flex-col items-center text-green-500 animate-in zoom-in duration-300">
+                          <CheckCircle2 className="w-24 h-24 mb-6" />
+                          <p className="font-bold text-2xl">Quiz Passed!</p>
+                          <p className="text-foreground/80 mt-2 font-medium">You can now mark this lesson as complete.</p>
+                        </div>
+                      ) : (
+                        <div className="flex flex-col items-center text-red-500 animate-in zoom-in duration-300">
+                          <div className="w-24 h-24 mb-6 bg-red-100 rounded-full flex items-center justify-center">
+                            <Trash2 className="w-12 h-12 text-red-500" />
+                          </div>
+                          <p className="font-bold text-2xl mb-2">Not quite there.</p>
+                          <p className="text-base font-semibold text-foreground/80">Let's try again in a moment...</p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+              </div>
+            ) : (
+              <div className="text-center">
+                <h2 className="text-2xl font-bold mb-2">No Questions Found</h2>
+                <p className="text-muted-foreground">This quiz doesn't have any questions configured.</p>
+              </div>
+            )}
+          </div>
         ) : (
           <div className="w-full max-w-4xl h-full bg-white rounded-2xl p-8 border border-border shadow-xl overflow-y-auto">
             {curriculum.contentUrl ? (

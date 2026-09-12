@@ -169,7 +169,7 @@ export function LearningModule({ basePath, setActive }: { basePath?: string, set
               type: newCurriculum.type, 
               duration: newCurriculum.duration, 
               contentUrl: newCurriculum.contentUrl,
-              midVideoQuiz: newCurriculum.type === 'video' && newCurriculum.enableMidVideoQuiz ? {
+              midVideoQuiz: (newCurriculum.type === 'video' && newCurriculum.enableMidVideoQuiz) || newCurriculum.type === 'quiz' ? {
                 timeSeconds: newCurriculum.quizTimeSeconds,
                 passingThreshold: newCurriculum.quizPassingThreshold,
                 questions: newCurriculum.quizQuestions
@@ -192,7 +192,7 @@ export function LearningModule({ basePath, setActive }: { basePath?: string, set
         contentUrl: newCurriculum.contentUrl,
         viewCount: 0,
         progress: 0,
-        midVideoQuiz: newCurriculum.type === 'video' && newCurriculum.enableMidVideoQuiz ? {
+        midVideoQuiz: (newCurriculum.type === 'video' && newCurriculum.enableMidVideoQuiz) || newCurriculum.type === 'quiz' ? {
           timeSeconds: newCurriculum.quizTimeSeconds,
           passingThreshold: newCurriculum.quizPassingThreshold,
           questions: newCurriculum.quizQuestions
@@ -552,28 +552,34 @@ export function LearningModule({ basePath, setActive }: { basePath?: string, set
                   <input required type="text" value={newCurriculum.duration} onChange={e => setNewCurriculum({...newCurriculum, duration: e.target.value})} className="w-full px-3 py-2 bg-white border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" placeholder="e.g. 15m" />
                 </div>
               </div>
-              <div className="space-y-2">
-                <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Content URL (Optional)</label>
-                <input type="text" value={newCurriculum.contentUrl} onChange={e => setNewCurriculum({...newCurriculum, contentUrl: e.target.value})} className="w-full px-3 py-2 bg-white border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" placeholder="e.g. https://www.youtube.com/embed/..." />
-              </div>
+              {newCurriculum.type !== "quiz" && (
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Content URL (Optional)</label>
+                  <input type="text" value={newCurriculum.contentUrl} onChange={e => setNewCurriculum({...newCurriculum, contentUrl: e.target.value})} className="w-full px-3 py-2 bg-white border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" placeholder="e.g. https://www.youtube.com/embed/..." />
+                </div>
+              )}
 
-              {newCurriculum.type === "video" && (
+              {(newCurriculum.type === "video" || newCurriculum.type === "quiz") && (
                 <div className="space-y-3 p-4 bg-muted/30 border border-border rounded-xl">
-                  <div className="flex items-center justify-between">
-                    <label className="text-sm font-bold text-foreground flex items-center gap-2">
-                      <input type="checkbox" checked={newCurriculum.enableMidVideoQuiz} onChange={e => setNewCurriculum({...newCurriculum, enableMidVideoQuiz: e.target.checked})} className="rounded border-border text-primary focus:ring-primary" />
-                      Enable Mid-Video Quiz
-                    </label>
-                  </div>
+                  {newCurriculum.type === "video" && (
+                    <div className="flex items-center justify-between">
+                      <label className="text-sm font-bold text-foreground flex items-center gap-2">
+                        <input type="checkbox" checked={newCurriculum.enableMidVideoQuiz} onChange={e => setNewCurriculum({...newCurriculum, enableMidVideoQuiz: e.target.checked})} className="rounded border-border text-primary focus:ring-primary" />
+                        Enable Mid-Video Quiz
+                      </label>
+                    </div>
+                  )}
                   
-                  {newCurriculum.enableMidVideoQuiz && (
+                  {(newCurriculum.type === "quiz" || newCurriculum.enableMidVideoQuiz) && (
                     <div className="space-y-4 pt-2">
                       <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Show at Time (s)</label>
-                          <input type="number" value={newCurriculum.quizTimeSeconds} onChange={e => setNewCurriculum({...newCurriculum, quizTimeSeconds: parseInt(e.target.value) || 0})} className="w-full px-3 py-2 bg-white border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
-                        </div>
-                        <div className="space-y-2">
+                        {newCurriculum.type === "video" && (
+                          <div className="space-y-2">
+                            <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Show at Time (s)</label>
+                            <input type="number" value={newCurriculum.quizTimeSeconds} onChange={e => setNewCurriculum({...newCurriculum, quizTimeSeconds: parseInt(e.target.value) || 0})} className="w-full px-3 py-2 bg-white border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
+                          </div>
+                        )}
+                        <div className={`space-y-2 ${newCurriculum.type === "quiz" ? "col-span-2" : ""}`}>
                           <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Threshold (%)</label>
                           <input type="number" min="0" max="100" value={newCurriculum.quizPassingThreshold} onChange={e => setNewCurriculum({...newCurriculum, quizPassingThreshold: parseInt(e.target.value) || 0})} className="w-full px-3 py-2 bg-white border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
                         </div>
