@@ -15,18 +15,29 @@ import {
   Award,
   Edit2,
   Trash2,
-  MoreVertical
+  MoreVertical,
+  Users
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 
 import { useSharedCourses, Course, Module, Curriculum, calculateCourseProgress } from "@/hooks/useSharedCourses";
 
+const MOCK_USERS = [
+  { id: "u1", name: "Alice Smith", department: "Engineering" },
+  { id: "u2", name: "Bob Jones", department: "Sales" },
+  { id: "u3", name: "Charlie Brown", department: "Marketing" },
+  { id: "u4", name: "Diana Prince", department: "HR" },
+  { id: "u5", name: "Evan Wright", department: "Engineering" },
+];
+
 export function LearningModule({ basePath, setActive }: { basePath?: string, setActive?: (val: string) => void }) {
   const activeTab = basePath === "/learning/my-courses" ? "my-courses" : "catalog";
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
   const [activeModuleId, setActiveModuleId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [showApprovals, setShowApprovals] = useState(false);
+  const [showCertificate, setShowCertificate] = useState(false);
 
   useEffect(() => {
     const handleNav = (e: Event) => {
@@ -47,6 +58,9 @@ export function LearningModule({ basePath, setActive }: { basePath?: string, set
   // Modals state
   const [isAddCourseOpen, setIsAddCourseOpen] = useState(false);
   const [newCourse, setNewCourse] = useState({ title: "", description: "", category: "", instructor: "", thumbnail: "" });
+  
+  const [isAssignCourseOpen, setIsAssignCourseOpen] = useState(false);
+  const [assignedUsersForm, setAssignedUsersForm] = useState<string[]>([]);
   
   const [isAddModuleOpen, setIsAddModuleOpen] = useState(false);
   const [newModule, setNewModule] = useState({ title: "", description: "" });
@@ -260,6 +274,15 @@ export function LearningModule({ basePath, setActive }: { basePath?: string, set
     window.open(`/learning/viewer/${selectedCourse.id}/${moduleId}/${curriculum.id}`, '_blank');
   };
 
+  const handleAssignCourse = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedCourse) return;
+    const updatedCourse = { ...selectedCourse, assignedUsers: assignedUsersForm };
+    setCourses(courses.map(c => c.id === updatedCourse.id ? updatedCourse : c));
+    setSelectedCourse(updatedCourse);
+    setIsAssignCourseOpen(false);
+  };
+
 
 
   // --- Course Detail View ---
@@ -299,6 +322,16 @@ export function LearningModule({ basePath, setActive }: { basePath?: string, set
                   <p className="text-sm text-muted-foreground mt-2 max-w-2xl">{selectedCourse.description}</p>
                 </div>
                 <div className="flex items-center gap-2 self-start">
+                  <button 
+                    onClick={() => {
+                      setAssignedUsersForm(selectedCourse.assignedUsers || []);
+                      setIsAssignCourseOpen(true);
+                    }}
+                    className="p-2 hover:bg-primary/10 text-muted-foreground hover:text-primary rounded-lg transition-colors"
+                    title="Assign Course"
+                  >
+                    <Users className="w-4 h-4" />
+                  </button>
                   <button 
                     onClick={() => {
                       setEditingCourseId(selectedCourse.id);
@@ -345,6 +378,39 @@ export function LearningModule({ basePath, setActive }: { basePath?: string, set
                     />
                   </div>
                 </div>
+                
+                {selectedCourse.progress === 100 && (
+                  <div className="flex items-center ml-2 border-l border-border/50 pl-6">
+                    {(!selectedCourse.certificateStatus || selectedCourse.certificateStatus === "none") && (
+                      <button 
+                        onClick={() => {
+                           const updatedCourse = { ...selectedCourse, certificateStatus: "pending" as const };
+                           setCourses(courses.map(c => c.id === updatedCourse.id ? updatedCourse : c));
+                           setSelectedCourse(updatedCourse);
+                        }}
+                        className="text-xs font-bold bg-primary text-primary-foreground px-4 py-2 rounded-xl hover:bg-primary/90 transition-colors shadow-sm flex items-center gap-1.5"
+                      >
+                        <Award className="w-4 h-4" />
+                        Request Certificate
+                      </button>
+                    )}
+                    {selectedCourse.certificateStatus === "pending" && (
+                      <div className="text-[10px] font-bold bg-amber-500/10 text-amber-600 px-3 py-2 rounded-xl border border-amber-500/20 flex items-center gap-1.5 uppercase tracking-wider">
+                        <Clock className="w-3.5 h-3.5" />
+                        Pending Approval
+                      </div>
+                    )}
+                    {selectedCourse.certificateStatus === "approved" && (
+                      <button 
+                        onClick={() => setShowCertificate(true)}
+                        className="text-xs font-bold bg-green-500/10 text-green-600 hover:bg-green-500/20 px-4 py-2 rounded-xl border border-green-500/20 transition-colors flex items-center gap-1.5"
+                      >
+                        <Award className="w-4 h-4" />
+                        View Certificate
+                      </button>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -714,14 +780,82 @@ export function LearningModule({ basePath, setActive }: { basePath?: string, set
             </form>
           </DialogContent>
         </Dialog>
+
+        {/* Assign Course Modal */}
+        <Dialog open={isAssignCourseOpen} onOpenChange={setIsAssignCourseOpen}>
+          <DialogContent className="sm:max-w-[400px] p-6 rounded-[2rem] bg-card border-border shadow-2xl">
+            <DialogHeader>
+              <DialogTitle className="text-xl font-black">Assign Course</DialogTitle>
+            </DialogHeader>
+            <form onSubmit={handleAssignCourse} className="space-y-4 mt-2">
+              <p className="text-sm text-muted-foreground mb-4">Select the employees who should be required to take this course.</p>
+              <div className="space-y-3 max-h-[300px] overflow-y-auto pr-2">
+                {MOCK_USERS.map(user => (
+                  <label key={user.id} className="flex items-center gap-3 p-3 border border-border rounded-xl cursor-pointer hover:bg-muted/50 transition-colors">
+                    <input 
+                      type="checkbox" 
+                      checked={assignedUsersForm.includes(user.id)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setAssignedUsersForm([...assignedUsersForm, user.id]);
+                        } else {
+                          setAssignedUsersForm(assignedUsersForm.filter(id => id !== user.id));
+                        }
+                      }}
+                      className="w-4 h-4 rounded border-border text-primary focus:ring-primary"
+                    />
+                    <div className="flex-1">
+                      <p className="font-bold text-sm">{user.name}</p>
+                      <p className="text-xs text-muted-foreground font-semibold">{user.department}</p>
+                    </div>
+                  </label>
+                ))}
+              </div>
+              <div className="pt-4 flex justify-end gap-3 border-t border-border/50">
+                <button type="button" onClick={() => setIsAssignCourseOpen(false)} className="px-4 py-2 bg-white border border-border text-foreground hover:bg-muted/50 font-bold text-sm rounded-xl">Cancel</button>
+                <button type="submit" className="px-4 py-2 bg-primary text-primary-foreground font-bold text-sm rounded-xl hover:bg-primary/90">Save Assignments</button>
+              </div>
+            </form>
+          </DialogContent>
+        </Dialog>
+        {/* Certificate Modal */}
+        <Dialog open={showCertificate} onOpenChange={setShowCertificate}>
+          <DialogContent className="sm:max-w-[800px] p-0 rounded-[2rem] bg-transparent border-none shadow-none overflow-hidden">
+            <div className="relative w-full aspect-[1.414/1] bg-white text-slate-800 p-12 flex flex-col items-center justify-center text-center shadow-2xl rounded-[2rem] border-[12px] border-double border-primary/20 bg-[url('https://www.transparenttextures.com/patterns/cream-paper.png')]">
+              <div className="absolute inset-0 m-6 border border-primary/10" />
+              <Award className="w-24 h-24 text-primary/80 mb-6" />
+              <h2 className="text-4xl font-serif font-black tracking-widest text-primary uppercase mb-2">Certificate of Completion</h2>
+              <p className="text-sm font-semibold tracking-widest uppercase text-slate-500 mb-10">This certifies that</p>
+              <p className="text-5xl font-black font-serif text-slate-800 mb-8 border-b-2 border-slate-200 pb-4 px-12">Current User</p>
+              <p className="text-sm font-semibold tracking-widest uppercase text-slate-500 mb-4">has successfully completed the course</p>
+              <p className="text-2xl font-bold text-primary mb-16">{selectedCourse.title}</p>
+              
+              <div className="flex justify-between w-full max-w-lg px-8 absolute bottom-12">
+                <div className="text-center">
+                  <div className="border-b border-slate-300 w-40 pb-2 mb-2">
+                    <span className="font-signature text-2xl text-slate-700">{selectedCourse.instructor}</span>
+                  </div>
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Course Instructor</p>
+                </div>
+                <div className="text-center">
+                  <div className="border-b border-slate-300 w-40 pb-2 mb-2">
+                    <span className="font-serif text-lg text-slate-700">{new Date().toLocaleDateString()}</span>
+                  </div>
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Date Completed</p>
+                </div>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     );
   }
 
   // --- Catalog / Main View ---
   return (
-    <div className="space-y-6 h-full flex flex-col pb-10">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shrink-0">
+    <>
+      <div className="space-y-6 h-full flex flex-col pb-10">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shrink-0">
         <div>
           <h1 className="text-2xl font-black text-foreground tracking-tight flex items-center gap-2">
             <GraduationCap className="w-7 h-7 text-primary" />
@@ -790,28 +924,74 @@ export function LearningModule({ basePath, setActive }: { basePath?: string, set
 
       <div className="flex items-center gap-2 border-b border-border/50 pb-px shrink-0">
         <button
-          onClick={() => { setActive && setActive("/learning/courses"); setSelectedCourse(null); }}
+          onClick={() => { setActive && setActive("/learning/courses"); setSelectedCourse(null); setShowApprovals(false); }}
           className={cn(
             "px-4 py-2 text-sm font-bold border-b-2 transition-colors",
-            activeTab === "catalog" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
+            activeTab === "catalog" && !showApprovals ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
           )}
         >
           Course Catalog
         </button>
         <button
-          onClick={() => { setActive && setActive("/learning/my-courses"); setSelectedCourse(null); }}
+          onClick={() => { setActive && setActive("/learning/my-courses"); setSelectedCourse(null); setShowApprovals(false); }}
           className={cn(
             "px-4 py-2 text-sm font-bold border-b-2 transition-colors",
-            activeTab === "my-courses" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
+            activeTab === "my-courses" && !showApprovals ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
           )}
         >
           My Learning
         </button>
+        <button
+          onClick={() => { setShowApprovals(true); setSelectedCourse(null); }}
+          className={cn(
+            "px-4 py-2 text-sm font-bold border-b-2 transition-colors",
+            showApprovals ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
+          )}
+        >
+          Approvals
+        </button>
       </div>
 
-      {/* Courses Grid */}
+      {/* Courses Grid or Approvals */}
       <div className="flex-1 overflow-y-auto pr-2">
-        {displayedCourses.length > 0 ? (
+        {showApprovals ? (
+          <div className="space-y-4">
+            <h2 className="text-xl font-black mb-6 flex items-center gap-2">
+              <Award className="w-5 h-5 text-primary" />
+              Pending Certificate Approvals
+            </h2>
+            {courses.filter(c => c.certificateStatus === "pending").length === 0 ? (
+              <div className="text-center py-20 bg-muted/20 border border-border rounded-3xl">
+                <CheckCircle2 className="w-12 h-12 text-muted-foreground mx-auto mb-4 opacity-50" />
+                <h3 className="text-lg font-bold text-foreground">All caught up!</h3>
+                <p className="text-muted-foreground text-sm mt-2">There are no pending certificate requests to approve.</p>
+              </div>
+            ) : (
+              <div className="grid gap-4">
+                {courses.filter(c => c.certificateStatus === "pending").map(course => (
+                  <div key={course.id} className="flex items-center justify-between p-4 bg-card border border-border rounded-2xl">
+                    <div className="flex items-center gap-4">
+                      <img src={course.thumbnail} alt={course.title} className="w-16 h-16 rounded-xl object-cover" />
+                      <div>
+                        <h4 className="font-bold text-foreground">{course.title}</h4>
+                        <p className="text-xs text-muted-foreground mt-1">Requested by: <span className="font-semibold text-foreground">Current User</span></p>
+                      </div>
+                    </div>
+                    <button 
+                      onClick={() => {
+                        const updatedCourse = { ...course, certificateStatus: "approved" as const };
+                        setCourses(courses.map(c => c.id === updatedCourse.id ? updatedCourse : c));
+                      }}
+                      className="px-4 py-2 bg-primary text-primary-foreground font-bold text-sm rounded-xl hover:bg-primary/90 transition-colors"
+                    >
+                      Approve Certificate
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        ) : displayedCourses.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {displayedCourses.map(course => (
               <div 
@@ -906,6 +1086,45 @@ export function LearningModule({ basePath, setActive }: { basePath?: string, set
         </DialogContent>
       </Dialog>
 
+      {/* Assign Course Modal */}
+      <Dialog open={isAssignCourseOpen} onOpenChange={setIsAssignCourseOpen}>
+        <DialogContent className="sm:max-w-[400px] p-6 rounded-[2rem] bg-card border-border shadow-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-black">Assign Course</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleAssignCourse} className="space-y-4 mt-2">
+            <p className="text-sm text-muted-foreground mb-4">Select the employees who should be required to take this course.</p>
+            <div className="space-y-3 max-h-[300px] overflow-y-auto pr-2">
+              {MOCK_USERS.map(user => (
+                <label key={user.id} className="flex items-center gap-3 p-3 border border-border rounded-xl cursor-pointer hover:bg-muted/50 transition-colors">
+                  <input 
+                    type="checkbox" 
+                    checked={assignedUsersForm.includes(user.id)}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setAssignedUsersForm([...assignedUsersForm, user.id]);
+                      } else {
+                        setAssignedUsersForm(assignedUsersForm.filter(id => id !== user.id));
+                      }
+                    }}
+                    className="w-4 h-4 rounded border-border text-primary focus:ring-primary"
+                  />
+                  <div className="flex-1">
+                    <p className="font-bold text-sm">{user.name}</p>
+                    <p className="text-xs text-muted-foreground font-semibold">{user.department}</p>
+                  </div>
+                </label>
+              ))}
+            </div>
+            <div className="pt-4 flex justify-end gap-3 border-t border-border/50">
+              <button type="button" onClick={() => setIsAssignCourseOpen(false)} className="px-4 py-2 bg-white border border-border text-foreground hover:bg-muted/50 font-bold text-sm rounded-xl">Cancel</button>
+              <button type="submit" className="px-4 py-2 bg-primary text-primary-foreground font-bold text-sm rounded-xl hover:bg-primary/90">Save Assignments</button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
+
     </div>
+    </>
   );
 }

@@ -39,6 +39,8 @@ export interface Course {
   totalDuration: string;
   progress: number; // 0-100
   modules: Module[];
+  assignedUsers?: string[];
+  certificateStatus?: "none" | "pending" | "approved";
 }
 
 export const calculateCourseProgress = (course: Course): Course => {
