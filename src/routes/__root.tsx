@@ -117,16 +117,21 @@ function RootShell({ children }: { children: ReactNode }) {
 }
 
 import { ThemeProvider } from "../components/ThemeProvider";
+import { RoleProvider } from "../hooks/useRole";
+import { RoleSwitcher } from "../components/RoleSwitcher";
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
-        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-        <Outlet />
-      </ThemeProvider>
+      <RoleProvider>
+        <ThemeProvider>
+          {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+          <Outlet />
+          <RoleSwitcher />
+        </ThemeProvider>
+      </RoleProvider>
     </QueryClientProvider>
   );
 }

@@ -11,6 +11,7 @@ import { useEmployeesContext } from "./EmployeeContext";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuCheckboxItem, DropdownMenuLabel, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { useSortableData } from "@/hooks/useSortableData";
 import { SortableHeader } from "@/components/ui/sortable-header";
+import { useRole } from "@/hooks/useRole";
 
 const COLUMN_OPTIONS = [
   { key: "employee", label: "Employee", default: true },
@@ -58,6 +59,7 @@ const COLUMN_OPTIONS = [
 ];
 
 export function EmployeeList({ isNew }: { isNew?: boolean }) {
+  const { hasPermission } = useRole();
   const { employees, addEmployee, updateEmployee, deleteEmployee } = useEmployeesContext();
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [searchQuery, setSearchQuery] = useState("");
@@ -121,34 +123,38 @@ export function EmployeeList({ isNew }: { isNew?: boolean }) {
               >
                 <Eye className="w-3.5 h-3.5" />
               </button>
-              <button 
-                onClick={() => openEditForm(emp)}
-                className="p-1.5 text-muted-foreground hover:bg-blue-50 hover:text-blue-600 rounded-md transition-all active:scale-95"
-                title="Edit Employee"
-              >
-                <Edit2 className="w-3.5 h-3.5" />
-              </button>
-              <button
-                onClick={() => toast.success("Permissions management coming soon!")}
-                className="p-1.5 text-muted-foreground hover:bg-indigo-50 hover:text-indigo-600 rounded-md transition-all active:scale-95"
-                title="Manage Permissions"
-              >
-                <Shield className="w-3.5 h-3.5" />
-              </button>
-              <button
-                onClick={() => {
-                  const newStatus = emp.status === 'Inactive' ? 'Active' : 'Inactive';
-                  updateEmployee(emp.id, { status: newStatus as any });
-                  toast.success(`${emp.name} is now ${newStatus}`);
-                }}
-                className={cn(
-                  "p-1.5 rounded-md transition-all active:scale-95",
-                  emp.status === 'Inactive' ? "text-amber-500 hover:bg-amber-50" : "text-muted-foreground hover:text-amber-600 hover:bg-amber-50"
-                )}
-                title={emp.status === 'Inactive' ? "Reactivate Employee" : "Deactivate Employee"}
-              >
-                {emp.status === 'Inactive' ? <UserCheck className="w-3.5 h-3.5" /> : <UserMinus className="w-3.5 h-3.5" />}
-              </button>
+              {hasPermission("edit_employees") && (
+                <>
+                  <button 
+                    onClick={() => openEditForm(emp)}
+                    className="p-1.5 text-muted-foreground hover:bg-blue-50 hover:text-blue-600 rounded-md transition-all active:scale-95"
+                    title="Edit Employee"
+                  >
+                    <Edit2 className="w-3.5 h-3.5" />
+                  </button>
+                  <button
+                    onClick={() => toast.success("Permissions management coming soon!")}
+                    className="p-1.5 text-muted-foreground hover:bg-indigo-50 hover:text-indigo-600 rounded-md transition-all active:scale-95"
+                    title="Manage Permissions"
+                  >
+                    <Shield className="w-3.5 h-3.5" />
+                  </button>
+                  <button
+                    onClick={() => {
+                      const newStatus = emp.status === 'Inactive' ? 'Active' : 'Inactive';
+                      updateEmployee(emp.id, { status: newStatus as any });
+                      toast.success(`${emp.name} is now ${newStatus}`);
+                    }}
+                    className={cn(
+                      "p-1.5 rounded-md transition-all active:scale-95",
+                      emp.status === 'Inactive' ? "text-amber-500 hover:bg-amber-50" : "text-muted-foreground hover:text-amber-600 hover:bg-amber-50"
+                    )}
+                    title={emp.status === 'Inactive' ? "Reactivate Employee" : "Deactivate Employee"}
+                  >
+                    {emp.status === 'Inactive' ? <UserCheck className="w-3.5 h-3.5" /> : <UserMinus className="w-3.5 h-3.5" />}
+                  </button>
+                </>
+              )}
             </div>
           </div>
         );
@@ -236,13 +242,15 @@ export function EmployeeList({ isNew }: { isNew?: boolean }) {
           <h1 className="text-[28px] font-black text-foreground tracking-tight mb-2">Employee Directory</h1>
           <p className="text-[14px] text-muted-foreground">Manage your team members and their account permissions here.</p>
         </div>
-        <button 
-          onClick={openAddForm}
-          className="flex items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground px-5 py-2.5 rounded-xl font-bold transition-all shadow-sm shadow-primary/20 active:scale-95"
-        >
-          <Plus className="w-4 h-4" />
-          Add Employee
-        </button>
+        {hasPermission("edit_employees") && (
+          <button 
+            onClick={openAddForm}
+            className="flex items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground px-5 py-2.5 rounded-xl font-bold transition-all shadow-sm shadow-primary/20 active:scale-95"
+          >
+            <Plus className="w-4 h-4" />
+            Add Employee
+          </button>
+        )}
       </div>
 
       {/* Filters Bar */}
@@ -330,42 +338,44 @@ export function EmployeeList({ isNew }: { isNew?: boolean }) {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {sortedEmployees.map((emp) => (
             <div key={emp.id} className="group bg-white border border-border/50 rounded-3xl p-6 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 relative">
-              <div className="absolute top-4 right-4 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                <button 
-                  onClick={() => openEditForm(emp)}
-                  className="p-2 text-muted-foreground hover:bg-muted hover:text-foreground/80 rounded-full transition-colors"
-                  title="Edit"
-                >
-                  <Edit2 className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => {
-                    const newStatus = emp.status === 'Inactive' ? 'Active' : 'Inactive';
-                    updateEmployee(emp.id, { status: newStatus });
-                    toast.success(`${emp.name} is now ${newStatus}`);
-                  }}
-                  className={cn(
-                    "p-2 rounded-full transition-colors",
-                    emp.status === 'Inactive' ? "text-amber-500 hover:bg-amber-50" : "text-muted-foreground hover:bg-amber-50 hover:text-amber-600"
-                  )}
-                  title={emp.status === 'Inactive' ? "Mark as Active" : "Mark as Inactive"}
-                >
-                  {emp.status === 'Inactive' ? <UserCheck className="w-4 h-4" /> : <UserMinus className="w-4 h-4" />}
-                </button>
-                <button
-                  onClick={() => toast.success("Permissions management coming soon!")}
-                  className="p-2 text-muted-foreground hover:bg-blue-50 hover:text-blue-600 rounded-full transition-colors"
-                  title="Permissions"
-                >
-                  <Shield className="w-4 h-4" />
-                </button>
-                <button 
-                  onClick={() => handleDeleteEmployee(emp.id, emp.name)}
-                  className="p-2 text-muted-foreground hover:bg-red-50 hover:text-red-600 rounded-full transition-colors"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
-              </div>
+              {hasPermission("edit_employees") && (
+                <div className="absolute top-4 right-4 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <button 
+                    onClick={() => openEditForm(emp)}
+                    className="p-2 text-muted-foreground hover:bg-muted hover:text-foreground/80 rounded-full transition-colors"
+                    title="Edit"
+                  >
+                    <Edit2 className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => {
+                      const newStatus = emp.status === 'Inactive' ? 'Active' : 'Inactive';
+                      updateEmployee(emp.id, { status: newStatus });
+                      toast.success(`${emp.name} is now ${newStatus}`);
+                    }}
+                    className={cn(
+                      "p-2 rounded-full transition-colors",
+                      emp.status === 'Inactive' ? "text-amber-500 hover:bg-amber-50" : "text-muted-foreground hover:bg-amber-50 hover:text-amber-600"
+                    )}
+                    title={emp.status === 'Inactive' ? "Mark as Active" : "Mark as Inactive"}
+                  >
+                    {emp.status === 'Inactive' ? <UserCheck className="w-4 h-4" /> : <UserMinus className="w-4 h-4" />}
+                  </button>
+                  <button
+                    onClick={() => toast.success("Permissions management coming soon!")}
+                    className="p-2 text-muted-foreground hover:bg-blue-50 hover:text-blue-600 rounded-full transition-colors"
+                    title="Permissions"
+                  >
+                    <Shield className="w-4 h-4" />
+                  </button>
+                  <button 
+                    onClick={() => handleDeleteEmployee(emp.id, emp.name)}
+                    className="p-2 text-muted-foreground hover:bg-red-50 hover:text-red-600 rounded-full transition-colors"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              )}
               
               <div className="flex flex-col items-center text-center">
                 <div className="relative mb-4">

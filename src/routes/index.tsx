@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { AppSidebar } from "@/components/AppSidebar";
+import { PermissionGate } from "@/components/common/PermissionGate";
 
 // Sales Components
 import { SalesDashboard } from "@/components/sales/SalesDashboard";
@@ -137,6 +138,7 @@ function Index() {
     setActiveState(val);
     if (typeof window !== 'undefined') {
       localStorage.setItem("activeSidebarTab", val);
+      window.dispatchEvent(new Event("sidebarTabChanged"));
     }
   };
 
@@ -174,96 +176,99 @@ function Index() {
           <GlobalModalManager />
         <main className="min-w-0 flex-1 overflow-x-hidden px-6 pb-24 pt-20 sm:px-10 md:pb-8 md:pt-8">
           {/* Main Dashboard */}
-          {basePath === "/dashboard" && <Dashboard setActive={setActive} onAction={handleQuickAction} />}
+          {basePath === "/dashboard" && (
+            <PermissionGate permission="view_dashboard" pageName="Dashboard" onGoHome={() => setActive("/dashboard")}>
+              <Dashboard setActive={setActive} onAction={handleQuickAction} />
+            </PermissionGate>
+          )}
 
-          {/* Render the appropriate sales page based on state */}
-          {basePath === "/work/sales/dashboard" && <SalesDashboard setActive={setActive} onAction={handleQuickAction} />}
-          {basePath === "/work/sales/pipeline" && <SalesPipeline onAction={handleQuickAction} />}
-          {basePath === "/work/sales/leads" && <SalesLeads onAction={handleQuickAction} isNew={isNew} />}
-          {basePath === "/work/sales/tasks" && <SalesTasks onAction={handleQuickAction} />}
-          {basePath === "/work/sales/analytics" && <SalesAnalytics onAction={handleQuickAction} />}
-          {basePath === "/work/sales/team" && <SalesTeamPerformance onAction={handleQuickAction} />}
-          {basePath === "/work/sales/reports" && <SalesReports onAction={handleQuickAction} />}
-          {basePath === "/work/sales/settings" && <SalesSettings />}
+          {/* Sales */}
+          {basePath === "/work/sales/dashboard" && <PermissionGate permission="view_sales" pageName="Sales Dashboard" onGoHome={() => setActive("/dashboard")}><SalesDashboard setActive={setActive} onAction={handleQuickAction} /></PermissionGate>}
+          {basePath === "/work/sales/pipeline" && <PermissionGate permission="view_sales" pageName="Sales Pipeline" onGoHome={() => setActive("/dashboard")}><SalesPipeline onAction={handleQuickAction} /></PermissionGate>}
+          {basePath === "/work/sales/leads" && <PermissionGate permission="view_sales" pageName="Sales Leads" onGoHome={() => setActive("/dashboard")}><SalesLeads onAction={handleQuickAction} isNew={isNew} /></PermissionGate>}
+          {basePath === "/work/sales/tasks" && <PermissionGate permission="view_sales" pageName="Sales Tasks" onGoHome={() => setActive("/dashboard")}><SalesTasks onAction={handleQuickAction} /></PermissionGate>}
+          {basePath === "/work/sales/analytics" && <PermissionGate permission="view_sales" pageName="Sales Analytics" onGoHome={() => setActive("/dashboard")}><SalesAnalytics onAction={handleQuickAction} /></PermissionGate>}
+          {basePath === "/work/sales/team" && <PermissionGate permission="manage_sales" pageName="Sales Team Performance" onGoHome={() => setActive("/dashboard")}><SalesTeamPerformance onAction={handleQuickAction} /></PermissionGate>}
+          {basePath === "/work/sales/reports" && <PermissionGate permission="view_sales" pageName="Sales Reports" onGoHome={() => setActive("/dashboard")}><SalesReports onAction={handleQuickAction} /></PermissionGate>}
+          {basePath === "/work/sales/settings" && <PermissionGate permission="manage_sales" pageName="Sales Settings" onGoHome={() => setActive("/dashboard")}><SalesSettings /></PermissionGate>}
 
-        {/* Render Payroll pages */}
-        {basePath === "/payroll/dashboard" && <PayrollDashboard />}
-        {basePath === "/payroll/structure" && <SalaryStructure />}
-        {basePath === "/payroll/settings" && <PayrollSettings />}
-        {basePath === "/payroll/processing" && <PayrollProcessing />}
-        {basePath === "/payroll/bonuses" && <BonusDeductions />}
-        {basePath === "/payroll/payslips" && <Payslips />}
+        {/* Payroll */}
+        {basePath === "/payroll/dashboard" && <PermissionGate permission="view_payroll" pageName="Payroll Dashboard" onGoHome={() => setActive("/dashboard")}><PayrollDashboard /></PermissionGate>}
+        {basePath === "/payroll/structure" && <PermissionGate permission="view_payroll" pageName="Salary Structure" onGoHome={() => setActive("/dashboard")}><SalaryStructure /></PermissionGate>}
+        {basePath === "/payroll/settings" && <PermissionGate permission="manage_payroll" pageName="Payroll Settings" onGoHome={() => setActive("/dashboard")}><PayrollSettings /></PermissionGate>}
+        {basePath === "/payroll/processing" && <PermissionGate permission="manage_payroll" pageName="Payroll Processing" onGoHome={() => setActive("/dashboard")}><PayrollProcessing /></PermissionGate>}
+        {basePath === "/payroll/bonuses" && <PermissionGate permission="manage_payroll" pageName="Bonus & Deductions" onGoHome={() => setActive("/dashboard")}><BonusDeductions /></PermissionGate>}
+        {basePath === "/payroll/payslips" && <PermissionGate permission="view_own_payslip" pageName="Payslips" onGoHome={() => setActive("/dashboard")}><Payslips /></PermissionGate>}
 
-        {/* Render Employee pages */}
-        {basePath === "/employees/list" && <EmployeeList isNew={isNew} />}
-        {basePath === "/employees/org" && <OrgStructure />}
-        {basePath === "/employees/attendance" && <AttendanceList />}
-        {basePath === "/employees/leave-requests" && <LeaveRequests isNew={isNew} />}
-        {basePath === "/employees/documents" && <Documents setActive={setActive} />}
+        {/* Employees */}
+        {basePath === "/employees/list" && <PermissionGate permission="view_employees" pageName="Employee List" onGoHome={() => setActive("/dashboard")}><EmployeeList isNew={isNew} /></PermissionGate>}
+        {basePath === "/employees/org" && <PermissionGate permission="view_org" pageName="Org Structure" onGoHome={() => setActive("/dashboard")}><OrgStructure /></PermissionGate>}
+        {basePath === "/employees/attendance" && <PermissionGate permission="view_attendance" pageName="Attendance List" onGoHome={() => setActive("/dashboard")}><AttendanceList /></PermissionGate>}
+        {basePath === "/employees/leave-requests" && <PermissionGate permission="manage_leaves" pageName="Leave Requests" onGoHome={() => setActive("/dashboard")}><LeaveRequests isNew={isNew} /></PermissionGate>}
+        {basePath === "/employees/documents" && <PermissionGate permission="manage_documents" pageName="Employee Documents" onGoHome={() => setActive("/dashboard")}><Documents setActive={setActive} /></PermissionGate>}
 
         {/* Learning Module */}
-        {basePath === "/learning/dashboard" && <LearningDashboard setActive={setActive} />}
-        {(basePath.startsWith("/learning") && basePath !== "/learning/dashboard") && <LearningModule basePath={basePath} setActive={setActive} />}
-        {basePath === "/employees/documents/generate" && <DocumentGenerator onBack={() => setActive("/employees/documents")} />}
-        {(active === "/penalty" || active === "/approvals/penalties") && <Penalties />}
-        {basePath === "/approvals/daily-progress" && <DailyProgress />}
-        {basePath === "/approvals/history" && <ApprovalHistory />}
-        {basePath === "/approvals/invoices" && <InvoiceApprovals />}
-        {basePath === "/remarks" && <Remarks />}
+        {basePath === "/learning/dashboard" && <PermissionGate permission="view_learning" pageName="Learning Hub" onGoHome={() => setActive("/dashboard")}><LearningDashboard setActive={setActive} /></PermissionGate>}
+        {(basePath.startsWith("/learning") && basePath !== "/learning/dashboard") && <PermissionGate permission="view_learning" pageName="Learning Hub" onGoHome={() => setActive("/dashboard")}><LearningModule basePath={basePath} setActive={setActive} /></PermissionGate>}
+        {basePath === "/employees/documents/generate" && <PermissionGate permission="manage_documents" pageName="Document Generator" onGoHome={() => setActive("/employees/documents")}><DocumentGenerator onBack={() => setActive("/employees/documents")} /></PermissionGate>}
+        {(active === "/penalty" || active === "/approvals/penalties") && <PermissionGate permission="view_penalties" pageName="Penalties" onGoHome={() => setActive("/dashboard")}><Penalties /></PermissionGate>}
+        {basePath === "/approvals/daily-progress" && <PermissionGate permission="view_daily_progress" pageName="Daily Progress" onGoHome={() => setActive("/dashboard")}><DailyProgress /></PermissionGate>}
+        {basePath === "/approvals/history" && <PermissionGate permission="view_approval_history" pageName="Approval History" onGoHome={() => setActive("/dashboard")}><ApprovalHistory /></PermissionGate>}
+        {basePath === "/approvals/invoices" && <PermissionGate permission="view_invoices" pageName="Invoice Approvals" onGoHome={() => setActive("/dashboard")}><InvoiceApprovals /></PermissionGate>}
+        {basePath === "/remarks" && <PermissionGate permission="view_remarks" pageName="Remarks" onGoHome={() => setActive("/dashboard")}><Remarks /></PermissionGate>}
         
         {/* Finance */}
-        {basePath === "/finance/transactions" && <Transactions />}
-        {basePath === "/finance/plan" && <FinancialPlan />}
-        {basePath === "/finance/summary" && <FinancialSummary />}
-        {basePath === "/finance/clients" && <OtherTransactions />}
-        {basePath === "/finance/audit" && <AuditLogs />}
-        {basePath === "/invoice/all" && <AllInvoices />}
-        {basePath === "/invoice/ledger" && <InvoiceLedger />}
-        {basePath === "/invoice/create" && <CreateInvoice onBack={() => setActive("/invoice/all")} />}
-        {basePath === "/invoice/proforma" && <CreateProforma onBack={() => setActive("/invoice/all")} />}
+        {basePath === "/finance/transactions" && <PermissionGate permission="view_finance" pageName="Transactions" onGoHome={() => setActive("/dashboard")}><Transactions /></PermissionGate>}
+        {basePath === "/finance/plan" && <PermissionGate permission="view_finance" pageName="Financial Plan" onGoHome={() => setActive("/dashboard")}><FinancialPlan /></PermissionGate>}
+        {basePath === "/finance/summary" && <PermissionGate permission="view_finance" pageName="Financial Summary" onGoHome={() => setActive("/dashboard")}><FinancialSummary /></PermissionGate>}
+        {basePath === "/finance/clients" && <PermissionGate permission="view_finance" pageName="Other Transactions" onGoHome={() => setActive("/dashboard")}><OtherTransactions /></PermissionGate>}
+        {basePath === "/finance/audit" && <PermissionGate permission="manage_finance" pageName="Audit Logs" onGoHome={() => setActive("/dashboard")}><AuditLogs /></PermissionGate>}
+        {basePath === "/invoice/all" && <PermissionGate permission="view_invoices" pageName="All Invoices" onGoHome={() => setActive("/dashboard")}><AllInvoices /></PermissionGate>}
+        {basePath === "/invoice/ledger" && <PermissionGate permission="view_invoices" pageName="Invoice Ledger" onGoHome={() => setActive("/dashboard")}><InvoiceLedger /></PermissionGate>}
+        {basePath === "/invoice/create" && <PermissionGate permission="create_invoices" pageName="Create Invoice" onGoHome={() => setActive("/invoice/all")}><CreateInvoice onBack={() => setActive("/invoice/all")} /></PermissionGate>}
+        {basePath === "/invoice/proforma" && <PermissionGate permission="create_invoices" pageName="Create Proforma Invoice" onGoHome={() => setActive("/invoice/all")}><CreateProforma onBack={() => setActive("/invoice/all")} /></PermissionGate>}
 
         {/* Reports */}
-        {basePath === "/reports" && <ReportsOverview />}
-        {basePath === "/reports/attendance" && <AttendanceReport />}
-        {basePath === "/reports/payroll" && <PayrollReport />}
-        {basePath === "/reports/hiring" && <HiringFunnel />}
-        {basePath === "/reports/work" && <WorkReport />}
+        {basePath === "/reports" && <PermissionGate permission="view_reports" pageName="Reports Overview" onGoHome={() => setActive("/dashboard")}><ReportsOverview /></PermissionGate>}
+        {basePath === "/reports/attendance" && <PermissionGate permission="view_reports" pageName="Attendance Report" onGoHome={() => setActive("/dashboard")}><AttendanceReport /></PermissionGate>}
+        {basePath === "/reports/payroll" && <PermissionGate permission="view_reports" pageName="Payroll Report" onGoHome={() => setActive("/dashboard")}><PayrollReport /></PermissionGate>}
+        {basePath === "/reports/hiring" && <PermissionGate permission="view_reports" pageName="Hiring Funnel" onGoHome={() => setActive("/dashboard")}><HiringFunnel /></PermissionGate>}
+        {basePath === "/reports/work" && <PermissionGate permission="view_reports" pageName="Work Report" onGoHome={() => setActive("/dashboard")}><WorkReport /></PermissionGate>}
 
         {/* Recruitment */}
-        {basePath === "/recruitment/interviews" && <Interviews />}
-        {basePath === "/recruitment/hirings" && <Hirings />}
+        {basePath === "/recruitment/interviews" && <PermissionGate permission="view_recruitment" pageName="Interviews" onGoHome={() => setActive("/dashboard")}><Interviews /></PermissionGate>}
+        {basePath === "/recruitment/hirings" && <PermissionGate permission="view_recruitment" pageName="Hirings" onGoHome={() => setActive("/dashboard")}><Hirings /></PermissionGate>}
 
         {/* Schedule */}
-        {basePath === "/schedule" && <Schedule isNew={isNew} />}
+        {basePath === "/schedule" && <PermissionGate permission="view_schedule" pageName="Schedule" onGoHome={() => setActive("/dashboard")}><Schedule isNew={isNew} /></PermissionGate>}
 
         {/* Work */}
-        {basePath === "/work/logs" && <WorkLogs />}
-        {basePath === "/work/projects" && <Projects isNew={isNew} />}
-        {basePath === "/tasks" && <Tasks setActive={setActive} isNew={isNew} />}
-        {basePath === "/chat" && <Chat />}
-        {basePath === "/work/research" && <Research />}
+        {basePath === "/work/logs" && <PermissionGate permission="view_work_logs" pageName="Work Logs" onGoHome={() => setActive("/dashboard")}><WorkLogs /></PermissionGate>}
+        {basePath === "/work/projects" && <PermissionGate permission="view_projects" pageName="Clients & Projects" onGoHome={() => setActive("/dashboard")}><Projects isNew={isNew} /></PermissionGate>}
+        {basePath === "/tasks" && <PermissionGate permission="view_tasks" pageName="Tasks" onGoHome={() => setActive("/dashboard")}><Tasks setActive={setActive} isNew={isNew} /></PermissionGate>}
+        {basePath === "/chat" && <PermissionGate permission="view_chat" pageName="Chat" onGoHome={() => setActive("/dashboard")}><Chat /></PermissionGate>}
+        {basePath === "/work/research" && <PermissionGate permission="view_research" pageName="Research" onGoHome={() => setActive("/dashboard")}><Research /></PermissionGate>}
 
         {/* Workspace */}
-        {basePath === "/workspace/seating" && <SeatingArrangementPage />}
-        {basePath === "/workspace/resource" && <ResourceManagementPage />}
-        {basePath === "/workspace/gallery" && <Gallery />}
-
+        {basePath === "/workspace/seating" && <PermissionGate permission="view_workspace" pageName="Seating Arrangement" onGoHome={() => setActive("/dashboard")}><SeatingArrangementPage /></PermissionGate>}
+        {basePath === "/workspace/resource" && <PermissionGate permission="view_workspace" pageName="Resource Management" onGoHome={() => setActive("/dashboard")}><ResourceManagementPage /></PermissionGate>}
+        {basePath === "/workspace/gallery" && <PermissionGate permission="view_workspace" pageName="Gallery" onGoHome={() => setActive("/dashboard")}><Gallery /></PermissionGate>}
 
         {/* Admin & Command Center */}
-        {basePath === "/ceo-dashboard" && <CEODashboard active={active} />}
-        {basePath.startsWith("/ceo-dashboard/b2b") && <B2BModule active={active} />}
-        {basePath === "/ceo-dashboard/collaboration" && <CollaborationModule />}
-        {basePath === "/ceo-dashboard/franchise" && <FranchiseModule />}
-        {basePath === "/ceo-dashboard/reports" && <ReportsModule />}
-        {basePath === "/ceo-dashboard/settings" && <SettingsModule />}
-        {basePath === "/activity-logs" && <ActivityLogs />}
-        {basePath === "/activity-tracker" && <ActivityTracker />}
-        {basePath === "/restrictions" && <Restrictions />}
-        {basePath === "/settings" && <AdminSettings />}
-        {basePath === "/recycle-bin" && <RecycleBin />}
-        {basePath === "/elections" && <Elections />}
-        {basePath === "/recognitions" && <Recognitions />}
-        {basePath === "/team-leader-of-the-week" && <TeamLeaderOfWeek />}
+        {basePath === "/ceo-dashboard" && <PermissionGate permission="view_command_center" pageName="CEO Overview" onGoHome={() => setActive("/dashboard")}><CEODashboard active={active} /></PermissionGate>}
+        {basePath.startsWith("/ceo-dashboard/b2b") && <PermissionGate permission="view_command_center" pageName="B2B Partnership" onGoHome={() => setActive("/dashboard")}><B2BModule active={active} /></PermissionGate>}
+        {basePath === "/ceo-dashboard/collaboration" && <PermissionGate permission="view_command_center" pageName="Tech Collaboration" onGoHome={() => setActive("/dashboard")}><CollaborationModule /></PermissionGate>}
+        {basePath === "/ceo-dashboard/franchise" && <PermissionGate permission="view_command_center" pageName="Franchise" onGoHome={() => setActive("/dashboard")}><FranchiseModule /></PermissionGate>}
+        {basePath === "/ceo-dashboard/reports" && <PermissionGate permission="view_command_center" pageName="Command Center Reports" onGoHome={() => setActive("/dashboard")}><ReportsModule /></PermissionGate>}
+        {basePath === "/ceo-dashboard/settings" && <PermissionGate permission="manage_settings" pageName="Command Center Settings" onGoHome={() => setActive("/dashboard")}><SettingsModule /></PermissionGate>}
+        {basePath === "/activity-logs" && <PermissionGate permission="view_activity_logs" pageName="Activity Logs" onGoHome={() => setActive("/dashboard")}><ActivityLogs /></PermissionGate>}
+        {basePath === "/activity-tracker" && <PermissionGate permission="view_activity_tracker" pageName="Activity Tracker" onGoHome={() => setActive("/dashboard")}><ActivityTracker /></PermissionGate>}
+        {basePath === "/restrictions" && <PermissionGate permission="manage_restrictions" pageName="Restrictions" onGoHome={() => setActive("/dashboard")}><Restrictions /></PermissionGate>}
+        {basePath === "/settings" && <PermissionGate permission="manage_settings" pageName="Admin Settings" onGoHome={() => setActive("/dashboard")}><AdminSettings /></PermissionGate>}
+        {basePath === "/recycle-bin" && <PermissionGate permission="manage_recycle_bin" pageName="Recycle Bin" onGoHome={() => setActive("/dashboard")}><RecycleBin /></PermissionGate>}
+        {basePath === "/elections" && <PermissionGate permission="view_elections" pageName="Elections" onGoHome={() => setActive("/dashboard")}><Elections /></PermissionGate>}
+        {basePath === "/recognitions" && <PermissionGate permission="view_elections" pageName="Employee Recognition" onGoHome={() => setActive("/dashboard")}><Recognitions /></PermissionGate>}
+        {basePath === "/team-leader-of-the-week" && <PermissionGate permission="view_elections" pageName="Team Leader of the Week" onGoHome={() => setActive("/dashboard")}><TeamLeaderOfWeek /></PermissionGate>}
 
         {/* User Profile */}
         {basePath === "/profile" && <UserProfile />}

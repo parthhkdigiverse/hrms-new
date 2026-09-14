@@ -33,6 +33,8 @@ import {
 } from "./nav-data";
 import { useTheme } from "./ThemeProvider";
 import { triggerGlobalModal, type GlobalModalType } from "./GlobalModalContext";
+import { useRole } from "@/hooks/useRole";
+import { getPageConfig } from "@/lib/permissions";
 
 
 function Badge({ count }: { count: number }) {
@@ -222,6 +224,7 @@ function SidebarBody({
   isLocked?: boolean;
 }) {
   const { logoUrl, companyName } = useTheme();
+  const { effectivePermissions } = useRole();
   const [query, setQuery] = useState("");
   const [openGroups, setOpenGroups] = useState<string[]>(
     navItems.filter((i) => i.children?.length).map((i) => i.title),
@@ -238,6 +241,37 @@ function SidebarBody({
 
   const q = query.trim().toLowerCase();
 
+  /**
+   * Returns true if the given URL path is accessible with current permissions.
+   * Uses getPageConfig to find the required permission, then checks effectivePermissions.
+   */
+  const isPathAccessible = (url: string): boolean => {
+    const config = getPageConfig(url);
+    if (!config) return true; // No config = no restriction
+    return effectivePermissions.has(config.view);
+  };
+
+  /**
+   * Filter navItems by RBAC: remove items (and children) the user can't access.
+   * A parent with children is shown only if at least one child is accessible.
+   */
+  const accessibleNavItems = useMemo<NavItem[]>(() => {
+    return navItems.reduce<NavItem[]>((acc, item) => {
+      if (item.children?.length) {
+        // Filter children
+        const accessibleChildren = item.children.filter(c => isPathAccessible(c.url));
+        if (accessibleChildren.length === 0) return acc; // Hide entire group
+        acc.push({ ...item, children: accessibleChildren });
+      } else if (item.url) {
+        if (isPathAccessible(item.url)) acc.push(item);
+      } else {
+        acc.push(item); // Items with no URL pass through
+      }
+      return acc;
+    }, []);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [effectivePermissions]);
+
   const go = (url: string) => {
     setActive(url);
     window.dispatchEvent(new CustomEvent('appNavigate', { detail: url }));
@@ -245,7 +279,7 @@ function SidebarBody({
 
     // Find title of item being navigated to
     let title = "";
-    for (const item of navItems) {
+    for (const item of accessibleNavItems) {
       if (item.url === url) {
         title = item.title;
         break;
@@ -274,8 +308,8 @@ function SidebarBody({
   };
 
   const filtered = useMemo(() => {
-    if (!q) return navItems;
-    return navItems
+    if (!q) return accessibleNavItems;
+    return accessibleNavItems
       .map((item) => {
         const selfMatch = item.title.toLowerCase().includes(q);
         const children = item.children?.filter((c) => c.title.toLowerCase().includes(q));
@@ -284,7 +318,7 @@ function SidebarBody({
         return null;
       })
       .filter(Boolean) as NavItem[];
-  }, [q]);
+  }, [q, accessibleNavItems]);
 
   const grouped = useMemo(
     () =>
@@ -299,7 +333,7 @@ function SidebarBody({
 
   const pinnedLinks = useMemo(() => {
     const out: { title: string; url: string }[] = [];
-    for (const item of navItems) {
+    for (const item of accessibleNavItems) {
       if (item.url && pinned.includes(item.title)) out.push({ title: item.title, url: item.url });
       for (const c of item.children ?? []) {
         const compoundTitle = `${item.title} — ${c.title}`;
@@ -307,10 +341,10 @@ function SidebarBody({
       }
     }
     return out;
-  }, [pinned]);
+  }, [pinned, accessibleNavItems]);
 
   const toggleGroup = (title: string) => {
-    const item = navItems.find((i) => i.title === title);
+    const item = accessibleNavItems.find((i) => i.title === title);
     if (!item) return;
 
     setOpenGroups((prev) => {
@@ -318,7 +352,7 @@ function SidebarBody({
       if (isAlreadyOpen) {
         return prev.filter((t) => t !== title);
       } else {
-        const siblingGroupTitles = navItems
+        const siblingGroupTitles = accessibleNavItems
           .filter((i) => i.section === item.section && i.title !== title && i.children?.length)
           .map((i) => i.title);
         return [...prev.filter((t) => !siblingGroupTitles.includes(t)), title];

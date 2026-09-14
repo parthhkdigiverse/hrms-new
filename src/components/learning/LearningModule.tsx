@@ -22,6 +22,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { cn } from "@/lib/utils";
 
 import { useSharedCourses, Course, Module, Curriculum, calculateCourseProgress } from "@/hooks/useSharedCourses";
+import { useRole } from "@/hooks/useRole";
 
 const MOCK_USERS = [
   { id: "u1", name: "Alice Smith", department: "Engineering" },
@@ -32,6 +33,7 @@ const MOCK_USERS = [
 ];
 
 export function LearningModule({ basePath, setActive }: { basePath?: string, setActive?: (val: string) => void }) {
+  const { hasPermission } = useRole();
   const activeTab = basePath === "/learning/my-courses" ? "my-courses" : "catalog";
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
   const [activeModuleId, setActiveModuleId] = useState<string | null>(null);
@@ -322,38 +324,44 @@ export function LearningModule({ basePath, setActive }: { basePath?: string, set
                   <p className="text-sm text-muted-foreground mt-2 max-w-2xl">{selectedCourse.description}</p>
                 </div>
                 <div className="flex items-center gap-2 self-start">
-                  <button 
-                    onClick={() => {
-                      setAssignedUsersForm(selectedCourse.assignedUsers || []);
-                      setIsAssignCourseOpen(true);
-                    }}
-                    className="p-2 hover:bg-primary/10 text-muted-foreground hover:text-primary rounded-lg transition-colors"
-                    title="Assign Course"
-                  >
-                    <Users className="w-4 h-4" />
-                  </button>
-                  <button 
-                    onClick={() => {
-                      setEditingCourseId(selectedCourse.id);
-                      setNewCourse({
-                        title: selectedCourse.title,
-                        description: selectedCourse.description,
-                        category: selectedCourse.category,
-                        instructor: selectedCourse.instructor,
-                        thumbnail: selectedCourse.thumbnail
-                      });
-                      setIsAddCourseOpen(true);
-                    }}
-                    className="p-2 hover:bg-muted text-muted-foreground hover:text-foreground rounded-lg transition-colors"
-                  >
-                    <Edit2 className="w-4 h-4" />
-                  </button>
-                  <button 
-                    onClick={(e) => handleDeleteCourse(selectedCourse.id, e)}
-                    className="p-2 hover:bg-red-500/10 text-muted-foreground hover:text-red-500 rounded-lg transition-colors"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+                  {hasPermission("assign_courses") && (
+                    <button 
+                      onClick={() => {
+                        setAssignedUsersForm(selectedCourse.assignedUsers || []);
+                        setIsAssignCourseOpen(true);
+                      }}
+                      className="p-2 hover:bg-primary/10 text-muted-foreground hover:text-primary rounded-lg transition-colors"
+                      title="Assign Course"
+                    >
+                      <Users className="w-4 h-4" />
+                    </button>
+                  )}
+                  {hasPermission("manage_courses") && (
+                    <>
+                      <button 
+                        onClick={() => {
+                          setEditingCourseId(selectedCourse.id);
+                          setNewCourse({
+                            title: selectedCourse.title,
+                            description: selectedCourse.description,
+                            category: selectedCourse.category,
+                            instructor: selectedCourse.instructor,
+                            thumbnail: selectedCourse.thumbnail
+                          });
+                          setIsAddCourseOpen(true);
+                        }}
+                        className="p-2 hover:bg-muted text-muted-foreground hover:text-foreground rounded-lg transition-colors"
+                      >
+                        <Edit2 className="w-4 h-4" />
+                      </button>
+                      <button 
+                        onClick={(e) => handleDeleteCourse(selectedCourse.id, e)}
+                        className="p-2 hover:bg-red-500/10 text-muted-foreground hover:text-red-500 rounded-lg transition-colors"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </>
+                  )}
                 </div>
               </div>
               <div className="flex items-center gap-6 pt-2">
@@ -423,12 +431,14 @@ export function LearningModule({ basePath, setActive }: { basePath?: string, set
               <BookOpen className="w-5 h-5 text-primary" />
               Course Modules
             </h2>
-            <button 
-              onClick={() => setIsAddModuleOpen(true)}
-              className="text-xs font-bold bg-primary text-primary-foreground px-3 py-1.5 rounded-lg hover:bg-primary/90 transition-colors"
-            >
-              + Add Module
-            </button>
+            {hasPermission("manage_courses") && (
+              <button 
+                onClick={() => setIsAddModuleOpen(true)}
+                className="text-xs font-bold bg-primary text-primary-foreground px-3 py-1.5 rounded-lg hover:bg-primary/90 transition-colors"
+              >
+                + Add Module
+              </button>
+            )}
           </div>
           <div className="space-y-4">
             {selectedCourse.modules.map((module, idx) => (
@@ -462,23 +472,27 @@ export function LearningModule({ basePath, setActive }: { basePath?: string, set
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <button 
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setEditingModuleId(module.id);
-                        setNewModule({ title: module.title, description: module.description });
-                        setIsAddModuleOpen(true);
-                      }}
-                      className="p-1.5 opacity-0 group-hover/module:opacity-100 hover:bg-muted text-muted-foreground hover:text-foreground rounded-md transition-all"
-                    >
-                      <Edit2 className="w-4 h-4" />
-                    </button>
-                    <button 
-                      onClick={(e) => handleDeleteModule(module.id, e)}
-                      className="p-1.5 opacity-0 group-hover/module:opacity-100 hover:bg-red-500/10 text-muted-foreground hover:text-red-500 rounded-md transition-all mr-2"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+                    {hasPermission("manage_courses") && (
+                      <>
+                        <button 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setEditingModuleId(module.id);
+                            setNewModule({ title: module.title, description: module.description });
+                            setIsAddModuleOpen(true);
+                          }}
+                          className="p-1.5 opacity-0 group-hover/module:opacity-100 hover:bg-muted text-muted-foreground hover:text-foreground rounded-md transition-all"
+                        >
+                          <Edit2 className="w-4 h-4" />
+                        </button>
+                        <button 
+                          onClick={(e) => handleDeleteModule(module.id, e)}
+                          className="p-1.5 opacity-0 group-hover/module:opacity-100 hover:bg-red-500/10 text-muted-foreground hover:text-red-500 rounded-md transition-all mr-2"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </>
+                    )}
                     <ChevronRight className={cn("w-5 h-5 text-muted-foreground transition-transform duration-300", activeModuleId === module.id && "rotate-90")} />
                   </div>
                 </div>
@@ -516,52 +530,58 @@ export function LearningModule({ basePath, setActive }: { basePath?: string, set
                               {curriculum.duration}
                             </span>
                           </span>
-                          <button 
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setTargetModuleId(module.id);
-                              setEditingCurriculumId(curriculum.id);
-                              setNewCurriculum({
-                                title: curriculum.title,
-                                type: curriculum.type,
-                                duration: curriculum.duration,
-                                contentUrl: curriculum.contentUrl || "",
-                                enableMidVideoQuiz: !!curriculum.midVideoQuiz,
-                                quizTimeSeconds: curriculum.midVideoQuiz?.timeSeconds || 15,
-                                quizPassingThreshold: curriculum.midVideoQuiz?.passingThreshold || 100,
-                                quizQuestions: curriculum.midVideoQuiz?.questions || [{
-                                  question: "",
-                                  options: ["", "", "", ""],
-                                  correctAnswerIndex: 0
-                                }]
-                              });
-                              setIsAddCurriculumOpen(true);
-                            }}
-                            className="p-1.5 opacity-0 group-hover:opacity-100 hover:bg-muted/60 text-muted-foreground hover:text-foreground rounded-md transition-all"
-                          >
-                            <Edit2 className="w-3.5 h-3.5" />
-                          </button>
-                          <button 
-                            onClick={(e) => handleDeleteCurriculum(module.id, curriculum.id, e)}
-                            className="p-1.5 opacity-0 group-hover:opacity-100 hover:bg-red-500/10 text-muted-foreground hover:text-red-500 rounded-md transition-all"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
+                          {hasPermission("manage_courses") && (
+                            <>
+                              <button 
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setTargetModuleId(module.id);
+                                  setEditingCurriculumId(curriculum.id);
+                                  setNewCurriculum({
+                                    title: curriculum.title,
+                                    type: curriculum.type,
+                                    duration: curriculum.duration,
+                                    contentUrl: curriculum.contentUrl || "",
+                                    enableMidVideoQuiz: !!curriculum.midVideoQuiz,
+                                    quizTimeSeconds: curriculum.midVideoQuiz?.timeSeconds || 15,
+                                    quizPassingThreshold: curriculum.midVideoQuiz?.passingThreshold || 100,
+                                    quizQuestions: curriculum.midVideoQuiz?.questions || [{
+                                      question: "",
+                                      options: ["", "", "", ""],
+                                      correctAnswerIndex: 0
+                                    }]
+                                  });
+                                  setIsAddCurriculumOpen(true);
+                                }}
+                                className="p-1.5 opacity-0 group-hover:opacity-100 hover:bg-muted/60 text-muted-foreground hover:text-foreground rounded-md transition-all"
+                              >
+                                <Edit2 className="w-3.5 h-3.5" />
+                              </button>
+                              <button 
+                                onClick={(e) => handleDeleteCurriculum(module.id, curriculum.id, e)}
+                                className="p-1.5 opacity-0 group-hover:opacity-100 hover:bg-red-500/10 text-muted-foreground hover:text-red-500 rounded-md transition-all"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </>
+                          )}
                         </div>
                       </div>
                     ))}
-                    <div className="p-3 pl-20 bg-background/50 border-t border-border/50">
-                      <button 
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setTargetModuleId(module.id);
-                          setIsAddCurriculumOpen(true);
-                        }}
-                        className="text-xs font-bold text-muted-foreground hover:text-primary transition-colors flex items-center gap-1"
-                      >
-                        + Add Curriculum
-                      </button>
-                    </div>
+                    {hasPermission("manage_courses") && (
+                      <div className="p-3 pl-20 bg-background/50 border-t border-border/50">
+                        <button 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setTargetModuleId(module.id);
+                            setIsAddCurriculumOpen(true);
+                          }}
+                          className="text-xs font-bold text-muted-foreground hover:text-primary transition-colors flex items-center gap-1"
+                        >
+                          + Add Curriculum
+                        </button>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -909,16 +929,18 @@ export function LearningModule({ basePath, setActive }: { basePath?: string, set
               </div>
             )}
           </div>
-          <button 
-            onClick={() => {
-              setEditingCourseId(null);
-              setNewCourse({ title: "", description: "", category: "", instructor: "", thumbnail: "" });
-              setIsAddCourseOpen(true);
-            }}
-            className="px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-xs rounded-xl transition-all shadow-sm flex items-center gap-1.5 shrink-0"
-          >
-            + Add Course
-          </button>
+          {hasPermission("manage_courses") && (
+            <button 
+              onClick={() => {
+                setEditingCourseId(null);
+                setNewCourse({ title: "", description: "", category: "", instructor: "", thumbnail: "" });
+                setIsAddCourseOpen(true);
+              }}
+              className="px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-xs rounded-xl transition-all shadow-sm flex items-center gap-1.5 shrink-0"
+            >
+              + Add Course
+            </button>
+          )}
         </div>
       </div>
 
@@ -941,15 +963,17 @@ export function LearningModule({ basePath, setActive }: { basePath?: string, set
         >
           My Learning
         </button>
-        <button
-          onClick={() => { setShowApprovals(true); setSelectedCourse(null); }}
-          className={cn(
-            "px-4 py-2 text-sm font-bold border-b-2 transition-colors",
-            showApprovals ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
-          )}
-        >
-          Approvals
-        </button>
+        {hasPermission("view_approvals") && (
+          <button
+            onClick={() => { setShowApprovals(true); setSelectedCourse(null); }}
+            className={cn(
+              "px-4 py-2 text-sm font-bold border-b-2 transition-colors",
+              showApprovals ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
+            )}
+          >
+            Approvals
+          </button>
+        )}
       </div>
 
       {/* Courses Grid or Approvals */}
